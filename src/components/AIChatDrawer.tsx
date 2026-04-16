@@ -136,9 +136,12 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
 
         <div className="flex-1 overflow-y-auto py-3 space-y-3 min-h-0">
           {messages.length === 0 && (
-            <p className="text-center text-xs text-muted-foreground py-8">
-              Ask anything about this clinical scenario...
-            </p>
+            <div className="text-center text-xs text-muted-foreground py-8 space-y-2">
+              <p>👋 مرحباً! Welcome!</p>
+              <p>معك الروبوت الطبي الذي أعدته د. سحر الخضيري</p>
+              <p className="text-[10px]">Your medical AI assistant by Dr. Sahar Elkhodiry</p>
+              <p className="mt-3">Ask anything about this clinical scenario...</p>
+            </div>
           )}
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
