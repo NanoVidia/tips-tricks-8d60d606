@@ -299,7 +299,7 @@ export function MgSO4Calculator() {
   const tone: Tone = renal ? "warning" : "info";
 
   return (
-    <CalcShell icon={Droplet} title="MgSO₄ Protocol" subtitle="Eclampsia / severe preeclampsia">
+    <CalcShell id="mgso4" icon={Droplet} title="MgSO₄ Protocol" subtitle="Eclampsia / severe preeclampsia">
       <div>
         <Label htmlFor="mg-w" className="text-xs">Maternal weight (kg)</Label>
         <Input
