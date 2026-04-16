@@ -188,7 +188,7 @@ export function BishopCalculator() {
   ];
 
   return (
-    <CalcShell icon={Activity} title="Bishop Score" subtitle="Cervical favorability for induction">
+    <CalcShell id="bishop" icon={Activity} title="Bishop Score" subtitle="Cervical favorability for induction">
       <div className="space-y-2.5">
         {fields.map((f) => (
           <div key={f.key}>
