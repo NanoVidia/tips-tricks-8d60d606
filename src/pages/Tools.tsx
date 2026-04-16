@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Calculator, Siren, Pill, BookMarked, Brain, GraduationCap, WifiOff,
-  Search, Check, X, ChevronRight, AlertTriangle, Shuffle, RotateCcw,
+  Search, Check, X, ChevronRight, AlertTriangle, Shuffle, RotateCcw, Star, Trash2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,13 @@ import {
   EDDCalculator, BishopCalculator, ApgarCalculator, MgSO4Calculator,
   BMICalculator, OvulationCalculator, GonadotropinCalculator,
 } from "@/components/tools/Calculators";
+import { BookmarkButton } from "@/components/tools/BookmarkButton";
+import { useBookmarks } from "@/hooks/useBookmarks";
 import { emergencyProtocols, pregnancyDrugs, guidelines, ddxLibrary } from "@/data/toolsData";
 import { toast } from "@/hooks/use-toast";
 
 const sections = [
+  { id: "favorites", label: "Favorites", icon: Star, color: "from-amber-400 to-orange-500" },
   { id: "calc", label: "Calculators", icon: Calculator, color: "from-blue-500 to-indigo-600" },
   { id: "emergency", label: "Emergency", icon: Siren, color: "from-red-500 to-rose-600" },
   { id: "drugs", label: "Drugs", icon: Pill, color: "from-emerald-500 to-teal-600" },
@@ -27,6 +30,18 @@ const sections = [
   { id: "mcq", label: "MCQ", icon: GraduationCap, color: "from-cyan-500 to-blue-600" },
   { id: "offline", label: "Offline", icon: WifiOff, color: "from-slate-500 to-slate-700" },
 ] as const;
+
+// Registry of calculator IDs → metadata, for the Favorites view
+const CALC_REGISTRY: Record<string, { title: string; subtitle: string }> = {
+  edd: { title: "EDD & Gestational Age", subtitle: "Naegele's rule" },
+  bishop: { title: "Bishop Score", subtitle: "Cervical favorability" },
+  apgar: { title: "APGAR Score", subtitle: "Newborn 1 & 5 min" },
+  mgso4: { title: "MgSO₄ Protocol", subtitle: "Eclampsia / severe PET" },
+  bmi: { title: "Pre-pregnancy BMI", subtitle: "IOM 2009 targets" },
+  ovulation: { title: "Ovulation & Fertile Window", subtitle: "Calendar method" },
+  gonadotropin: { title: "FSH Starting Dose", subtitle: "IVF stimulation" },
+};
+
 
 const STORAGE_TAB = "tools.activeTab";
 
@@ -244,6 +259,42 @@ export default function Tools() {
   const [offlineReady, setOfflineReady] = useState(false);
   const [mcqOrder, setMcqOrder] = useState<number[]>(() => mcqs.map((_, i) => i));
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
+  const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
+
+  // Group bookmarks by type for the Favorites view
+  const favorites = useMemo(() => {
+    const calc: { id: string; title: string; subtitle: string }[] = [];
+    const protocols: typeof emergencyProtocols = [];
+    const drugs: typeof pregnancyDrugs = [];
+    const ddx: typeof ddxLibrary = [];
+    for (const raw of bookmarkIds) {
+      const [kind, ...rest] = raw.split(":");
+      const key = rest.join(":");
+      if (kind === "calc" && CALC_REGISTRY[key]) {
+        calc.push({ id: key, ...CALC_REGISTRY[key] });
+      } else if (kind === "protocol") {
+        const p = emergencyProtocols.find((x) => x.id === key);
+        if (p) protocols.push(p);
+      } else if (kind === "drug") {
+        const d = pregnancyDrugs.find((x) => x.name === key);
+        if (d) drugs.push(d);
+      } else if (kind === "ddx") {
+        const x = ddxLibrary.find((y) => y.presentation === key);
+        if (x) ddx.push(x);
+      }
+    }
+    return { calc, protocols, drugs, ddx, total: calc.length + protocols.length + drugs.length + ddx.length };
+  }, [bookmarkIds]);
+
+  const jumpToCalc = (id: string) => {
+    setActive("calc");
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        document.getElementById(`tool-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    });
+  };
+
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_TAB, active);
@@ -340,8 +391,13 @@ export default function Tools() {
                     : "bg-card border-border/50 text-muted-foreground hover:bg-muted/50"
                 }`}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className={`w-3 h-3 ${s.id === "favorites" && favorites.total > 0 && !isActive ? "fill-warning text-warning" : ""}`} />
                 {s.label}
+                {s.id === "favorites" && favorites.total > 0 && (
+                  <span className={`text-[9px] tabular-nums px-1.5 rounded-full ${isActive ? "bg-white/25" : "bg-warning/20 text-warning"}`}>
+                    {favorites.total}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -353,6 +409,138 @@ export default function Tools() {
           <TabsList className="hidden">
             {sections.map((s) => <TabsTrigger key={s.id} value={s.id}>{s.label}</TabsTrigger>)}
           </TabsList>
+
+          {/* FAVORITES */}
+          <TabsContent value="favorites" className="space-y-3 mt-0">
+            {favorites.total === 0 ? (
+              <Card className="p-8 border-border/50 text-center">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mb-3">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-base font-bold mb-1">No favorites yet</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed max-w-[260px] mx-auto">
+                  Tap the <Star className="w-3 h-3 inline mx-0.5 text-warning fill-warning" /> on any calculator,
+                  protocol, drug or DDx to pin it here for instant access.
+                </p>
+              </Card>
+            ) : (
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] text-muted-foreground tabular-nums">
+                    <span className="font-bold text-foreground">{favorites.total}</span> saved item{favorites.total === 1 ? "" : "s"}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (window.confirm("Remove all bookmarks?")) {
+                        clearBookmarks();
+                        toast({ title: "Cleared", description: "All favorites removed." });
+                      }
+                    }}
+                    className="h-7 text-[10px] gap-1 text-muted-foreground"
+                  >
+                    <Trash2 className="w-3 h-3" /> Clear all
+                  </Button>
+                </div>
+
+                {favorites.calc.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 px-1">
+                      Calculators
+                    </p>
+                    {favorites.calc.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => jumpToCalc(c.id)}
+                        className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:bg-muted/40 transition text-left"
+                      >
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/70">
+                          <Calculator className="w-3.5 h-3.5 text-primary-foreground" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[12px] font-bold text-foreground leading-tight">{c.title}</p>
+                          <p className="text-[10px] text-muted-foreground leading-tight">{c.subtitle}</p>
+                        </div>
+                        <BookmarkButton id={`calc:${c.id}`} label={c.title} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {favorites.protocols.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 px-1">
+                      Emergency protocols
+                    </p>
+                    {favorites.protocols.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setActive("emergency")}
+                        className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:bg-muted/40 transition text-left"
+                      >
+                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color}`}>
+                          <Siren className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <p className="text-[12px] font-bold text-foreground flex-1 leading-tight">{p.title}</p>
+                        <BookmarkButton id={`protocol:${p.id}`} label={p.title} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {favorites.drugs.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 px-1">
+                      Drugs
+                    </p>
+                    {favorites.drugs.map((d) => (
+                      <button
+                        key={d.name}
+                        type="button"
+                        onClick={() => setActive("drugs")}
+                        className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:bg-muted/40 transition text-left"
+                      >
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+                          <Pill className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[12px] font-bold text-foreground leading-tight">{d.name}</p>
+                          <p className="text-[10px] text-muted-foreground leading-tight truncate">FDA {d.category} • {d.trimester}</p>
+                        </div>
+                        <BookmarkButton id={`drug:${d.name}`} label={d.name} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {favorites.ddx.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 px-1">
+                      Differential diagnoses
+                    </p>
+                    {favorites.ddx.map((x) => (
+                      <button
+                        key={x.presentation}
+                        type="button"
+                        onClick={() => setActive("ddx")}
+                        className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:bg-muted/40 transition text-left"
+                      >
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600">
+                          <Brain className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <p className="text-[12px] font-bold text-foreground flex-1 leading-tight">{x.presentation}</p>
+                        <BookmarkButton id={`ddx:${x.presentation}`} label={x.presentation} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
 
           {/* CALCULATORS */}
           <TabsContent value="calc" className="space-y-3 mt-0">
@@ -374,16 +562,20 @@ export default function Tools() {
                 <AccordionItem
                   key={p.id}
                   value={p.id}
-                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50"
+                  id={`protocol-${p.id}`}
+                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
                 >
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center gap-2.5 text-left">
-                      <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
-                        <Siren className="w-3.5 h-3.5 text-white" />
+                  <div className="flex items-center gap-2 pr-3">
+                    <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
+                      <div className="flex items-center gap-2.5 text-left">
+                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
+                          <Siren className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span className="text-sm font-bold">{p.title}</span>
                       </div>
-                      <span className="text-sm font-bold">{p.title}</span>
-                    </div>
-                  </AccordionTrigger>
+                    </AccordionTrigger>
+                    <BookmarkButton id={`protocol:${p.id}`} label={p.title} />
+                  </div>
                   <AccordionContent className="px-4 pb-4">
                     <ol className="space-y-1.5">
                       {p.steps.map((s, i) => (
@@ -454,12 +646,13 @@ export default function Tools() {
 
             <div className="space-y-1.5">
               {filteredDrugs.map((d) => (
-                <Card key={d.name} className="p-3 border-border/50">
+                <Card key={d.name} id={`drug-${d.name}`} className="p-3 border-border/50 scroll-mt-32">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h4 className="text-sm font-bold">{d.name}</h4>
+                    <h4 className="text-sm font-bold flex-1">{d.name}</h4>
                     <Badge className={`${catColor(d.category)} text-[10px] shrink-0 border`}>
                       FDA {d.category}
                     </Badge>
+                    <BookmarkButton id={`drug:${d.name}`} label={d.name} />
                   </div>
                   <div className="grid grid-cols-2 gap-1 text-[10px] mb-1.5">
                     <div><span className="text-muted-foreground">Trimester:</span> <span className="font-semibold">{d.trimester}</span></div>
@@ -506,16 +699,20 @@ export default function Tools() {
                 <AccordionItem
                   key={d.presentation}
                   value={d.presentation}
-                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50"
+                  id={`ddx-${d.presentation}`}
+                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
                 >
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center gap-2.5 text-left">
-                      <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shrink-0">
-                        <Brain className="w-3.5 h-3.5 text-white" />
+                  <div className="flex items-center gap-2 pr-3">
+                    <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
+                      <div className="flex items-center gap-2.5 text-left">
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shrink-0">
+                          <Brain className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span className="text-sm font-bold">{d.presentation}</span>
                       </div>
-                      <span className="text-sm font-bold">{d.presentation}</span>
-                    </div>
-                  </AccordionTrigger>
+                    </AccordionTrigger>
+                    <BookmarkButton id={`ddx:${d.presentation}`} label={d.presentation} />
+                  </div>
                   <AccordionContent className="px-4 pb-4">
                     <p className="text-[10px] uppercase tracking-wider font-bold text-primary mb-1.5">Differentials</p>
                     <ul className="space-y-1 mb-3">

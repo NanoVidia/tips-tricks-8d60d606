@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calculator, Baby, Heart, Droplet, Activity, Scale, AlertCircle } from "lucide-react";
+import { BookmarkButton } from "@/components/tools/BookmarkButton";
 
 /* ---------- shared UI ---------- */
 
@@ -45,26 +46,29 @@ function ResultBox({
 }
 
 function CalcShell({
+  id,
   icon: Icon,
   title,
   subtitle,
   children,
 }: {
+  id: string;
   icon: any;
   title: string;
   subtitle?: string;
   children: React.ReactNode;
 }) {
   return (
-    <Card className="p-4 space-y-3 border-border/50">
+    <Card id={`tool-${id}`} className="p-4 space-y-3 border-border/50 scroll-mt-32">
       <div className="flex items-center gap-2 pb-2 border-b border-border/40">
         <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/70">
           <Icon className="w-3.5 h-3.5 text-primary-foreground" />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h3 className="text-sm font-bold text-foreground leading-tight">{title}</h3>
           {subtitle && <p className="text-[10px] text-muted-foreground leading-tight">{subtitle}</p>}
         </div>
+        <BookmarkButton id={`calc:${id}`} label={title} stopPropagation={false} />
       </div>
       {children}
     </Card>
@@ -118,7 +122,7 @@ export function EDDCalculator() {
   }, [lmp, cycleNum]);
 
   return (
-    <CalcShell icon={Baby} title="EDD & Gestational Age" subtitle="Naegele's rule (cycle-adjusted)">
+    <CalcShell id="edd" icon={Baby} title="EDD & Gestational Age" subtitle="Naegele's rule (cycle-adjusted)">
       <div className="space-y-2">
         <div>
           <Label htmlFor="edd-lmp" className="text-xs">LMP (first day)</Label>
@@ -184,7 +188,7 @@ export function BishopCalculator() {
   ];
 
   return (
-    <CalcShell icon={Activity} title="Bishop Score" subtitle="Cervical favorability for induction">
+    <CalcShell id="bishop" icon={Activity} title="Bishop Score" subtitle="Cervical favorability for induction">
       <div className="space-y-2.5">
         {fields.map((f) => (
           <div key={f.key}>
@@ -276,7 +280,7 @@ export function ApgarCalculator() {
   const [oneMin, setOneMin] = useState<ApgarSet>(init);
   const [fiveMin, setFiveMin] = useState<ApgarSet>(init);
   return (
-    <CalcShell icon={Heart} title="APGAR Score" subtitle="Score newborn at 1 & 5 minutes">
+    <CalcShell id="apgar" icon={Heart} title="APGAR Score" subtitle="Score newborn at 1 & 5 minutes">
       <ApgarBlock label="1 minute" value={oneMin} onChange={setOneMin} />
       <ApgarBlock label="5 minutes" value={fiveMin} onChange={setFiveMin} />
     </CalcShell>
@@ -295,7 +299,7 @@ export function MgSO4Calculator() {
   const tone: Tone = renal ? "warning" : "info";
 
   return (
-    <CalcShell icon={Droplet} title="MgSO₄ Protocol" subtitle="Eclampsia / severe preeclampsia">
+    <CalcShell id="mgso4" icon={Droplet} title="MgSO₄ Protocol" subtitle="Eclampsia / severe preeclampsia">
       <div>
         <Label htmlFor="mg-w" className="text-xs">Maternal weight (kg)</Label>
         <Input
@@ -376,7 +380,7 @@ export function BMICalculator() {
     : "";
 
   return (
-    <CalcShell icon={Scale} title="Pre-pregnancy BMI" subtitle="IOM 2009 weight-gain targets">
+    <CalcShell id="bmi" icon={Scale} title="Pre-pregnancy BMI" subtitle="IOM 2009 weight-gain targets">
       <div className="grid grid-cols-2 gap-2">
         <div>
           <Label htmlFor="bmi-w" className="text-xs">Weight (kg)</Label>
@@ -423,7 +427,7 @@ export function OvulationCalculator() {
   }, [lmp, c]);
 
   return (
-    <CalcShell icon={Calculator} title="Ovulation & Fertile Window" subtitle="Calendar method (regular cycles)">
+    <CalcShell id="ovulation" icon={Calculator} title="Ovulation & Fertile Window" subtitle="Calendar method (regular cycles)">
       <div className="space-y-2">
         <div>
           <Label htmlFor="ov-lmp" className="text-xs">First day of last period</Label>
@@ -491,7 +495,7 @@ export function GonadotropinCalculator() {
       : { t: "Normal responder", tone: "success" as const };
 
   return (
-    <CalcShell icon={Calculator} title="FSH Starting Dose" subtitle="IVF stimulation — La Marca / Nelson nomogram">
+    <CalcShell id="gonadotropin" icon={Calculator} title="FSH Starting Dose" subtitle="IVF stimulation — La Marca / Nelson nomogram">
       <div className="grid grid-cols-3 gap-2">
         <div>
           <Label htmlFor="g-amh" className="text-xs">AMH</Label>
