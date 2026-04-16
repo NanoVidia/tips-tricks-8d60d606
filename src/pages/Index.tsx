@@ -184,7 +184,7 @@ export default function Index() {
         ) : (
           <Accordion type="single" collapsible className="w-full">
             {scenarios.map((item) => (
-              <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} />
+              <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} lang={lang} />
             ))}
           </Accordion>
         )}
