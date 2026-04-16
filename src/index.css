@@ -98,6 +98,18 @@
   }
 }
 
+  .dark {
+    --success: 152 55% 45%;
+    --success-soft: 152 50% 12%;
+    --warning: 38 92% 55%;
+    --warning-soft: 38 60% 12%;
+    --danger: 0 75% 60%;
+    --danger-soft: 0 60% 14%;
+    --info: 217 91% 60%;
+    --info-soft: 217 60% 14%;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -105,4 +117,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { scrollbar-width: none; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
 }
