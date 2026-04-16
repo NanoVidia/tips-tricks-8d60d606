@@ -333,7 +333,7 @@ export default function Index() {
           </motion.div>
 
           {/* Category Cards */}
-          <div className="grid grid-cols-4 gap-2 mb-3">
+          <div className="grid grid-cols-4 gap-1.5 mb-3">
             {tabIds.map((id, idx) => {
               const config = categoryConfig[id];
               const Icon = config.icon;
@@ -347,23 +347,23 @@ export default function Index() {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.15 + idx * 0.06, type: "spring", stiffness: 150, damping: 14 }}
                   whileTap={{ scale: 0.93 }}
-                  className={`relative overflow-hidden rounded-xl p-2.5 text-center transition-all duration-300 border ${
+                  className={`relative overflow-hidden rounded-xl p-2 text-center transition-all duration-300 border ${
                     active
                       ? `${config.borderColor} ${config.bgLight} shadow-md`
                       : "border-border/40 bg-card hover:shadow-sm"
                   }`}
                 >
                   <motion.div
-                    className={`mx-auto p-2 rounded-lg shadow-sm mb-1.5 w-fit ${active ? config.iconBg : "bg-muted/80"}`}
+                    className={`mx-auto p-1.5 rounded-lg shadow-sm mb-1 w-fit ${active ? config.iconBg : "bg-muted/80"}`}
                     animate={active ? { rotate: [0, -8, 8, -4, 0] } : {}}
                     transition={{ duration: 0.5 }}
                   >
-                    <Icon className={`w-4 h-4 ${active ? "text-white" : "text-muted-foreground"}`} />
+                    <Icon className={`w-3.5 h-3.5 ${active ? "text-white" : "text-muted-foreground"}`} />
                   </motion.div>
-                  <p className={`text-[10px] font-bold leading-tight ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                  <p className={`text-[9px] font-bold leading-tight truncate ${active ? "text-foreground" : "text-muted-foreground"}`}>
                     {i.tabs[id]}
                   </p>
-                  <p className={`text-xs font-black tabular-nums mt-0.5 ${active ? config.iconColor : "text-muted-foreground/40"}`}>
+                  <p className={`text-[11px] font-black tabular-nums mt-0.5 ${active ? config.iconColor : "text-muted-foreground/40"}`}>
                     {count}
                   </p>
                   {active && (
