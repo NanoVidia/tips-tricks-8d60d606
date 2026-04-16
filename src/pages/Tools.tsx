@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Calculator, Siren, Pill, BookMarked, Brain, GraduationCap, WifiOff,
-  Search, Check, X, ChevronRight, AlertTriangle, Shuffle, RotateCcw,
+  Search, Check, X, ChevronRight, AlertTriangle, Shuffle, RotateCcw, Star, Trash2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,13 @@ import {
   EDDCalculator, BishopCalculator, ApgarCalculator, MgSO4Calculator,
   BMICalculator, OvulationCalculator, GonadotropinCalculator,
 } from "@/components/tools/Calculators";
+import { BookmarkButton } from "@/components/tools/BookmarkButton";
+import { useBookmarks } from "@/hooks/useBookmarks";
 import { emergencyProtocols, pregnancyDrugs, guidelines, ddxLibrary } from "@/data/toolsData";
 import { toast } from "@/hooks/use-toast";
 
 const sections = [
+  { id: "favorites", label: "Favorites", icon: Star, color: "from-amber-400 to-orange-500" },
   { id: "calc", label: "Calculators", icon: Calculator, color: "from-blue-500 to-indigo-600" },
   { id: "emergency", label: "Emergency", icon: Siren, color: "from-red-500 to-rose-600" },
   { id: "drugs", label: "Drugs", icon: Pill, color: "from-emerald-500 to-teal-600" },
@@ -27,6 +30,18 @@ const sections = [
   { id: "mcq", label: "MCQ", icon: GraduationCap, color: "from-cyan-500 to-blue-600" },
   { id: "offline", label: "Offline", icon: WifiOff, color: "from-slate-500 to-slate-700" },
 ] as const;
+
+// Registry of calculator IDs → metadata, for the Favorites view
+const CALC_REGISTRY: Record<string, { title: string; subtitle: string }> = {
+  edd: { title: "EDD & Gestational Age", subtitle: "Naegele's rule" },
+  bishop: { title: "Bishop Score", subtitle: "Cervical favorability" },
+  apgar: { title: "APGAR Score", subtitle: "Newborn 1 & 5 min" },
+  mgso4: { title: "MgSO₄ Protocol", subtitle: "Eclampsia / severe PET" },
+  bmi: { title: "Pre-pregnancy BMI", subtitle: "IOM 2009 targets" },
+  ovulation: { title: "Ovulation & Fertile Window", subtitle: "Calendar method" },
+  gonadotropin: { title: "FSH Starting Dose", subtitle: "IVF stimulation" },
+};
+
 
 const STORAGE_TAB = "tools.activeTab";
 
