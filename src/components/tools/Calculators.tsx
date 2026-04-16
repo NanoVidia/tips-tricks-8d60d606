@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calculator, Baby, Heart, Droplet, Activity, Scale, AlertCircle } from "lucide-react";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
+import { consumePrefill } from "@/lib/aiTools";
 
 /* ---------- shared UI ---------- */
 
@@ -101,6 +102,14 @@ export function EDDCalculator() {
   const [lmp, setLmp] = useState("");
   const [cycle, setCycle] = useState("28");
 
+  // Hydrate values pushed by the AI bot ("Save to Tools").
+  useEffect(() => {
+    const p = consumePrefill<{ lmp?: string; cycle?: number }>("edd");
+    if (!p) return;
+    if (p.lmp) setLmp(p.lmp);
+    if (typeof p.cycle === "number") setCycle(String(p.cycle));
+  }, []);
+
   const cycleNum = clampNum(cycle, 21, 45);
   const cycleErr = cycle !== "" && cycleNum === null ? "Enter 21–45 days" : null;
 
@@ -169,6 +178,12 @@ export function EDDCalculator() {
 
 export function BishopCalculator() {
   const [scores, setScores] = useState({ dilation: 0, effacement: 0, station: 0, consistency: 0, position: 0 });
+
+  useEffect(() => {
+    const p = consumePrefill<typeof scores>("bishop");
+    if (p) setScores((s) => ({ ...s, ...p }));
+  }, []);
+
   const total = Object.values(scores).reduce((a, b) => a + b, 0);
   const MAX = 13; // 3+3+3+2+2
 
@@ -292,6 +307,14 @@ export function ApgarCalculator() {
 export function MgSO4Calculator() {
   const [weight, setWeight] = useState("70");
   const [renal, setRenal] = useState(false);
+
+  useEffect(() => {
+    const p = consumePrefill<{ weight?: number; renal?: boolean }>("mgso4");
+    if (!p) return;
+    if (typeof p.weight === "number") setWeight(String(p.weight));
+    if (typeof p.renal === "boolean") setRenal(p.renal);
+  }, []);
+
   const w = clampNum(weight, 30, 200);
   const wErr = weight !== "" && w === null ? "Enter 30–200 kg" : null;
   const recurrent = w !== null && w >= 70 ? 4 : 2;
@@ -340,6 +363,14 @@ export function BMICalculator() {
   const [w, setW] = useState("70");
   const [h, setH] = useState("165");
   const [twin, setTwin] = useState(false);
+
+  useEffect(() => {
+    const p = consumePrefill<{ weight?: number; height?: number; twin?: boolean }>("bmi");
+    if (!p) return;
+    if (typeof p.weight === "number") setW(String(p.weight));
+    if (typeof p.height === "number") setH(String(p.height));
+    if (typeof p.twin === "boolean") setTwin(p.twin);
+  }, []);
 
   const W = clampNum(w, 30, 250);
   const H = clampNum(h, 120, 220);

@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, X, Bot, Wrench, CheckCircle2 } from "lucide-react";
+import { Send, Loader2, X, Bot, Wrench, CheckCircle2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { executeTool, TOOL_LABELS } from "@/lib/aiTools";
+import { executeTool, TOOL_LABELS, getSaveTarget, buildSaveToToolsUrl, stashPrefill } from "@/lib/aiTools";
 
 type ToolCall = { id: string; name: string; args: string };
 type Msg = {
@@ -13,8 +14,8 @@ type Msg = {
   content: string;
   tool_calls?: { id: string; type: "function"; function: { name: string; arguments: string } }[];
   tool_call_id?: string;
-  /** UI-only: tool calls executed by THIS assistant turn, for inline chips */
-  uiTools?: { name: string; ok: boolean }[];
+  /** UI-only: tool calls executed by THIS assistant turn, for inline chips + Save-to-Tools button */
+  uiTools?: { name: string; ok: boolean; args: string }[];
 };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
@@ -143,7 +144,7 @@ export function FloatingAIBot() {
               id: t.id, type: "function" as const,
               function: { name: t.name, arguments: t.args },
             })),
-            uiTools: toolCalls.map((t) => ({ name: t.name, ok: true })),
+            uiTools: toolCalls.map((t) => ({ name: t.name, ok: true, args: t.args })),
           }),
         };
         convo = [...convo, assistantMsg];
@@ -155,14 +156,14 @@ export function FloatingAIBot() {
 
         // Execute tools client-side and append tool messages
         const toolMessages: Msg[] = [];
-        const uiTools: { name: string; ok: boolean }[] = [];
+        const uiTools: { name: string; ok: boolean; args: string }[] = [];
         for (const tc of toolCalls) {
           setRunningTool(tc.name);
           let args: Record<string, unknown> = {};
           try { args = JSON.parse(tc.args || "{}"); } catch { /* leave empty */ }
           const result = executeTool(tc.name, args);
           const ok = !("error" in result);
-          uiTools.push({ name: tc.name, ok });
+          uiTools.push({ name: tc.name, ok, args: tc.args });
           toolMessages.push({
             role: "tool",
             tool_call_id: tc.id,
@@ -274,11 +275,26 @@ export function FloatingAIBot() {
                     <div className={`max-w-[80%] space-y-1.5 ${m.role === "user" ? "items-end" : "items-start"}`}>
                       {m.uiTools?.map((t, ti) => {
                         const meta = TOOL_LABELS[t.name] ?? { label: t.name, icon: "🔧" };
+                        const target = t.ok ? getSaveTarget(t.name, t.args) : null;
                         return (
-                          <div key={ti} className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40 w-fit">
-                            <span>{meta.icon}</span>
-                            <span className="font-semibold">{meta.label}</span>
-                            {t.ok && <CheckCircle2 className="w-2.5 h-2.5" />}
+                          <div key={ti} className="flex items-center gap-1.5 flex-wrap">
+                            <div className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40 w-fit">
+                              <span>{meta.icon}</span>
+                              <span className="font-semibold">{meta.label}</span>
+                              {t.ok && <CheckCircle2 className="w-2.5 h-2.5" />}
+                            </div>
+                            {target && (
+                              <Link
+                                to={buildSaveToToolsUrl(target)}
+                                onClick={() => stashPrefill(target)}
+                                className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors font-semibold"
+                                aria-label={`Open ${meta.label} in Tools with values prefilled`}
+                                title="Open in Tools with these values"
+                              >
+                                <ExternalLink className="w-2.5 h-2.5" />
+                                Save to Tools
+                              </Link>
+                            )}
                           </div>
                         );
                       })}
