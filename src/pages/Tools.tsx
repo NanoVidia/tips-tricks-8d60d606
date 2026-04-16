@@ -259,6 +259,42 @@ export default function Tools() {
   const [offlineReady, setOfflineReady] = useState(false);
   const [mcqOrder, setMcqOrder] = useState<number[]>(() => mcqs.map((_, i) => i));
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
+  const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
+
+  // Group bookmarks by type for the Favorites view
+  const favorites = useMemo(() => {
+    const calc: { id: string; title: string; subtitle: string }[] = [];
+    const protocols: typeof emergencyProtocols = [];
+    const drugs: typeof pregnancyDrugs = [];
+    const ddx: typeof ddxLibrary = [];
+    for (const raw of bookmarkIds) {
+      const [kind, ...rest] = raw.split(":");
+      const key = rest.join(":");
+      if (kind === "calc" && CALC_REGISTRY[key]) {
+        calc.push({ id: key, ...CALC_REGISTRY[key] });
+      } else if (kind === "protocol") {
+        const p = emergencyProtocols.find((x) => x.id === key);
+        if (p) protocols.push(p);
+      } else if (kind === "drug") {
+        const d = pregnancyDrugs.find((x) => x.name === key);
+        if (d) drugs.push(d);
+      } else if (kind === "ddx") {
+        const x = ddxLibrary.find((y) => y.presentation === key);
+        if (x) ddx.push(x);
+      }
+    }
+    return { calc, protocols, drugs, ddx, total: calc.length + protocols.length + drugs.length + ddx.length };
+  }, [bookmarkIds]);
+
+  const jumpToCalc = (id: string) => {
+    setActive("calc");
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        document.getElementById(`tool-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    });
+  };
+
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_TAB, active);
