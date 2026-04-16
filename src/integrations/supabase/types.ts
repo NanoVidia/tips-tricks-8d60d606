@@ -94,8 +94,6 @@ export type Database = {
           isSetofReturn: true
         }
       }
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       scenario_category: "clinic" | "or_labor" | "behavior" | "qa"
