@@ -230,7 +230,6 @@ export default function Index() {
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
-  const visibleTopics = showAllTopics ? featuredTopics : featuredTopics.slice(0, 8);
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto relative overflow-hidden">
