@@ -278,7 +278,7 @@ export default function Index() {
               <TrendingUp className="w-3 h-3 text-emerald-500" />
               <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{totalScenarios}</span>
             </div>
-          </div>
+          </motion.div>
 
           {/* Category Cards - enhanced with icon gradients */}
           <div className="grid grid-cols-2 gap-2.5 mb-3">
