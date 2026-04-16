@@ -95,46 +95,6 @@ const Logo = () => (
   </div>
 );
 
-  { icon: Baby, label: "Preterm Labor — Early Signs & Management", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
-  { icon: ShieldCheck, label: "Preeclampsia Detection & Prevention", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
-  { icon: Activity, label: "CTG Reading — Pattern Recognition Secrets", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
-  { icon: Syringe, label: "PPH Algorithm — HAEMOSTASIS Protocol", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
-  { icon: Scissors, label: "Cesarean Technique Refinements", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-  { icon: Brain, label: "Eclamptic Seizure — First 5 Minutes", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
-  { icon: Stethoscope, label: "VBAC Patient Selection & Counseling", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-  { icon: HelpCircle, label: "Ectopic Pregnancy — Diagnosis You Must Not Miss", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-  { icon: Heart, label: "Neonatal Resuscitation — The Golden Minute", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-  { icon: MessageCircle, label: "Breaking Bad News — SPIKES Protocol", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
-  { icon: Syringe, label: "Amniotomy — When & How to Perform", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
-  { icon: Activity, label: "Cord Prolapse — Immediate Response Steps", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-  { icon: ShieldCheck, label: "Gestational Diabetes — Insulin vs Metformin", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
-  { icon: Scissors, label: "Episiotomy Repair — Step-by-Step Technique", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-  { icon: Brain, label: "Placenta Accreta Spectrum — Surgical Planning", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
-  { icon: Baby, label: "Breech Presentation — ECV Technique & Timing", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
-  { icon: Stethoscope, label: "Ovarian Torsion — Rapid Diagnosis Clues", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-  { icon: HelpCircle, label: "HELLP Syndrome — Labs & Management", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-  { icon: Heart, label: "Shoulder Dystocia — McRoberts & Beyond", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-  { icon: MessageCircle, label: "Consent for Emergency C-Section — Key Points", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
-  { icon: Syringe, label: "Oxytocin Augmentation — Safe Dosing Protocol", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
-  { icon: Activity, label: "Fetal Bradycardia — Decision Tree", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
-  { icon: Brain, label: "Cervical Cerclage — Indications & Technique", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
-  { icon: ShieldCheck, label: "DVT in Pregnancy — Prophylaxis & Treatment", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-  { icon: Scissors, label: "Forceps vs Vacuum — When to Choose Which", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-];
-
-const Logo = () => (
-  <div className="relative w-11 h-11">
-    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-500/20 via-blue-500/20 to-emerald-500/20 blur-sm" />
-    <div className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-600 via-rose-700 to-rose-800 shadow-lg shadow-rose-500/25 flex items-center justify-center">
-      <svg viewBox="0 0 40 40" className="w-7 h-7" fill="none">
-        <path d="M20 35s-12-7.5-12-16c0-4.5 3.5-8 7.5-8 2.5 0 4.5 1.5 4.5 1.5S22 9.5 24.5 9.5c4 0 7.5 3.5 7.5 8 0 8.5-12 16-12 16z"
-          fill="white" fillOpacity="0.9" />
-        <polyline points="8,22 14,22 16,17 19,27 22,20 25,24 28,22 33,22"
-          stroke="hsl(0, 72%, 35%)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </div>
-  </div>
-);
 
 const i = t();
 
