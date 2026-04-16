@@ -458,14 +458,14 @@ export default function Index() {
             >
               <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm">
-                    <Sparkles className="w-3.5 h-3.5 text-white" />
-                  </div>
+                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full">
+                    {featuredTopics.length} topics
+                  </span>
                   <h2 className="text-xs font-bold text-foreground">Clinical Skills Bank</h2>
                 </div>
-                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full">
-                  {featuredTopics.length} topics
-                </span>
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
+                </div>
               </div>
 
               <div className="px-3 pb-2 space-y-1">
