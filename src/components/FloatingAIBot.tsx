@@ -144,7 +144,7 @@ export function FloatingAIBot() {
               id: t.id, type: "function" as const,
               function: { name: t.name, arguments: t.args },
             })),
-            uiTools: toolCalls.map((t) => ({ name: t.name, ok: true })),
+            uiTools: toolCalls.map((t) => ({ name: t.name, ok: true, args: t.args })),
           }),
         };
         convo = [...convo, assistantMsg];
@@ -156,14 +156,14 @@ export function FloatingAIBot() {
 
         // Execute tools client-side and append tool messages
         const toolMessages: Msg[] = [];
-        const uiTools: { name: string; ok: boolean }[] = [];
+        const uiTools: { name: string; ok: boolean; args: string }[] = [];
         for (const tc of toolCalls) {
           setRunningTool(tc.name);
           let args: Record<string, unknown> = {};
           try { args = JSON.parse(tc.args || "{}"); } catch { /* leave empty */ }
           const result = executeTool(tc.name, args);
           const ok = !("error" in result);
-          uiTools.push({ name: tc.name, ok });
+          uiTools.push({ name: tc.name, ok, args: tc.args });
           toolMessages.push({
             role: "tool",
             tool_call_id: tc.id,
