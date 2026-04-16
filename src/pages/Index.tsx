@@ -273,67 +273,60 @@ export default function Index() {
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto relative overflow-hidden">
-      {/* Ambient background effects */}
-      <div className="absolute top-0 right-0 w-72 h-[600px] bg-gradient-to-l from-blue-400/8 via-blue-300/4 to-transparent dark:from-blue-500/6 dark:via-blue-400/2 pointer-events-none" />
-      <div className="absolute top-40 -left-10 w-40 h-40 bg-gradient-to-br from-rose-300/8 to-transparent dark:from-rose-500/4 pointer-events-none rounded-full blur-3xl" />
-      <div className="absolute bottom-40 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-300/8 to-transparent dark:from-emerald-500/4 pointer-events-none rounded-full blur-3xl" />
+    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative overflow-hidden">
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
+        style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
+        aria-hidden="true"
+      />
+      <div className="h-[2px] gradient-gold relative z-10" />
 
-      {/* Premium gradient bar */}
-      <div className="h-1 bg-gradient-to-r from-rose-500 via-blue-500 to-emerald-500 relative z-10" />
-
-      {/* Header */}
-      <header className="relative px-4 pt-4 pb-3 overflow-hidden z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-rose-50/30 via-transparent to-transparent dark:from-rose-950/10" />
-
+      <header className="relative px-4 pt-5 pb-3 z-10">
         <div className="relative">
-          {/* Top bar */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2.5">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }}>
                 <Logo />
               </motion.div>
               <div className="min-w-0">
                 <motion.h1
-                  className="text-xl font-black tracking-tight relative overflow-hidden"
-                  style={{ color: 'hsl(215, 80%, 22%)' }}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1, type: "spring", stiffness: 150, damping: 12 }}
+                  className="font-editorial text-[22px] font-bold tracking-tight text-foreground leading-none"
+                  initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <span className="relative z-10">Tips & Tricks</span>
-                  <motion.span
-                    className="absolute inset-0 z-20 pointer-events-none"
-                    style={{
-                      background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%)",
-                      backgroundSize: "200% 100%",
-                    }}
-                    animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
-                  />
+                  Tips <span className="italic font-medium text-gold">&</span> Tricks
                 </motion.h1>
                 <motion.p
-                  className="text-[10px] text-muted-foreground leading-tight font-semibold"
-                  initial={{ x: -15, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.25, type: "spring", stiffness: 120, damping: 14 }}
+                  className="text-[9.5px] text-muted-foreground leading-snug font-medium mt-1"
+                  initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}
                 >
-                  {i.appSubtitle}
+                  <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
                 </motion.p>
               </div>
             </div>
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl bg-card border border-border/50 hover:bg-muted transition-all shadow-sm"
-              aria-label="Toggle dark mode"
+              className="p-2 rounded-xl bg-card border border-border/60 hover:border-gold/40 hover:bg-muted transition-all"
+              aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             >
-              {dark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-blue-500" />}
+              {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
             </button>
           </div>
+
+          <motion.div ref={searchBoxRef} className="relative" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25, duration: 0.5 }}>
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
+            <Input
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setSuggestOpen(true); }}
+              onFocus={() => { if (search.trim().length >= 2) setSuggestOpen(true); }}
+              onKeyDown={(e) => {
+                if (!suggestOpen || suggestions.length === 0) {
+                  if (e.key === "Enter" && !activeTab) setActiveTab("qa");
+                  return;
+                }
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setHighlightIdx((p) => (p + 1) % suggestions.length);
 
           {/* Search bar with auto-suggest */}
           <motion.div
