@@ -59,7 +59,7 @@ const categoryConfig = {
   },
 };
 
-const tabIds: ScenarioCategory[] = ["clinic", "or_labor", "behavior", "qa"];
+const tabIds: ScenarioCategory[] = ["qa", "clinic", "or_labor", "behavior"];
 
 const featuredTopics = [
   { icon: Baby, label: "Preterm Labor — Early Signs & Management", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
