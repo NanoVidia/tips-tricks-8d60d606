@@ -205,15 +205,19 @@ export default function Index() {
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
+    <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto relative overflow-hidden">
+      {/* Right-side blue gradient glow */}
+      <div className="absolute top-0 right-0 w-72 h-[600px] bg-gradient-to-l from-blue-400/12 via-blue-300/6 to-transparent dark:from-blue-500/8 dark:via-blue-400/3 pointer-events-none" />
+      <div className="absolute top-20 right-0 w-40 h-80 bg-gradient-to-bl from-sky-300/10 via-blue-200/5 to-transparent dark:from-sky-500/6 pointer-events-none blur-2xl" />
+
       {/* Premium gradient bar */}
-      <div className="h-1.5 bg-gradient-to-r from-rose-500 via-blue-500 to-emerald-500" />
+      <div className="h-1.5 bg-gradient-to-r from-rose-500 via-blue-500 to-emerald-500 relative z-10" />
 
       {/* Header with layered background */}
-      <header className="relative px-4 pt-5 pb-4 overflow-hidden">
+      <header className="relative px-4 pt-5 pb-4 overflow-hidden z-10">
         {/* Subtle background pattern */}
-        <div className="absolute inset-0 bg-gradient-to-b from-rose-50/50 via-background to-background dark:from-rose-950/20" />
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-100/30 to-transparent dark:from-blue-900/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute inset-0 bg-gradient-to-b from-rose-50/50 via-transparent to-transparent dark:from-rose-950/20" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-100/40 to-transparent dark:from-blue-900/15 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-rose-100/30 to-transparent dark:from-rose-900/10 rounded-full translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative">
