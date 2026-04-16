@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { AIChatDrawer } from "@/components/AIChatDrawer";
+import { FloatingAIBot } from "@/components/FloatingAIBot";
 import { Pagination } from "@/components/Pagination";
 import { t } from "@/lib/i18n";
 
@@ -515,6 +516,7 @@ export default function Index() {
       </main>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
+      <FloatingAIBot />
     </div>
   );
 }
