@@ -193,6 +193,47 @@ export default function Index() {
 
   useEffect(() => { setCurrentPage(1); }, [activeTab, debouncedSearch]);
 
+  // Auto-suggest: fetch top 5 across all categories as user types
+  useEffect(() => {
+    const q = search.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      setSuggestLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setSuggestLoading(true);
+    const handle = setTimeout(async () => {
+      try {
+        const { data, error } = await supabase.rpc("search_scenarios", { search_query: q });
+        if (cancelled) return;
+        if (error) throw error;
+        setSuggestions(((data as Scenario[]) || []).slice(0, 5));
+      } catch (e) {
+        if (!cancelled) setSuggestions([]);
+        console.error("Suggest error:", e);
+      } finally {
+        if (!cancelled) setSuggestLoading(false);
+      }
+    }, 180);
+    return () => { cancelled = true; clearTimeout(handle); };
+  }, [search]);
+
+  // Reset highlight when suggestions change
+  useEffect(() => { setHighlightIdx(-1); }, [suggestions]);
+
+  // Click outside to close
+  useEffect(() => {
+    if (!suggestOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target as Node)) {
+        setSuggestOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [suggestOpen]);
+
   const fetchScenarios = useCallback(async () => {
     if (!activeTab) return;
     setLoading(true);
