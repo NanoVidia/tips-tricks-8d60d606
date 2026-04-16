@@ -65,12 +65,11 @@ function ClinicalCard({ item, onAI, lang }: { item: Scenario; onAI: () => void; 
             </div>
           ))}
           <Button
-            variant="outline"
             size="sm"
             onClick={onAI}
-            className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5 gap-1.5"
+            className="w-full rounded-md bg-[hsl(210,80%,45%)] hover:bg-[hsl(210,80%,38%)] text-white font-medium gap-2 shadow-sm"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <MessageCircle className="w-4 h-4" />
             {isAr ? "مناقشة مع الذكاء الاصطناعي" : "Discuss with AI"}
           </Button>
         </div>
