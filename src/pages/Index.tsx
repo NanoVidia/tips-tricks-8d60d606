@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, Sparkles, Globe } from "lucide-react";
+import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
