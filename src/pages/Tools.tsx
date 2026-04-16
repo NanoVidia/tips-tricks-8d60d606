@@ -425,16 +425,20 @@ export default function Tools() {
                 <AccordionItem
                   key={p.id}
                   value={p.id}
-                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50"
+                  id={`protocol-${p.id}`}
+                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
                 >
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center gap-2.5 text-left">
-                      <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
-                        <Siren className="w-3.5 h-3.5 text-white" />
+                  <div className="flex items-center gap-2 pr-3">
+                    <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
+                      <div className="flex items-center gap-2.5 text-left">
+                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
+                          <Siren className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span className="text-sm font-bold">{p.title}</span>
                       </div>
-                      <span className="text-sm font-bold">{p.title}</span>
-                    </div>
-                  </AccordionTrigger>
+                    </AccordionTrigger>
+                    <BookmarkButton id={`protocol:${p.id}`} label={p.title} />
+                  </div>
                   <AccordionContent className="px-4 pb-4">
                     <ol className="space-y-1.5">
                       {p.steps.map((s, i) => (
