@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp } from "lucide-react";
+import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { AIChatDrawer } from "@/components/AIChatDrawer";
-import { DisclaimerSplash, useDisclaimer } from "@/components/DisclaimerSplash";
 import { Pagination } from "@/components/Pagination";
 import { t } from "@/lib/i18n";
 
@@ -26,44 +25,54 @@ const ITEMS_PER_PAGE = 30;
 const categoryConfig = {
   clinic: {
     icon: Stethoscope,
-    gradient: "from-blue-500 to-blue-600",
-    bgLight: "bg-blue-50 dark:bg-blue-950/40",
-    iconColor: "text-blue-500",
-    borderColor: "border-blue-200 dark:border-blue-800",
+    gradient: "from-sky-400 to-blue-600",
+    bgLight: "bg-sky-50 dark:bg-sky-950/30",
+    iconColor: "text-sky-500",
+    borderColor: "border-sky-200 dark:border-sky-800",
+    iconBg: "bg-gradient-to-br from-sky-400 to-blue-600",
   },
   or_labor: {
     icon: Scissors,
-    gradient: "from-rose-500 to-rose-600",
-    bgLight: "bg-rose-50 dark:bg-rose-950/40",
+    gradient: "from-rose-400 to-pink-600",
+    bgLight: "bg-rose-50 dark:bg-rose-950/30",
     iconColor: "text-rose-500",
     borderColor: "border-rose-200 dark:border-rose-800",
+    iconBg: "bg-gradient-to-br from-rose-400 to-pink-600",
   },
   behavior: {
     icon: MessageCircle,
-    gradient: "from-amber-500 to-amber-600",
-    bgLight: "bg-amber-50 dark:bg-amber-950/40",
+    gradient: "from-amber-400 to-orange-500",
+    bgLight: "bg-amber-50 dark:bg-amber-950/30",
     iconColor: "text-amber-500",
     borderColor: "border-amber-200 dark:border-amber-800",
+    iconBg: "bg-gradient-to-br from-amber-400 to-orange-500",
   },
   qa: {
     icon: HelpCircle,
-    gradient: "from-emerald-500 to-emerald-600",
-    bgLight: "bg-emerald-50 dark:bg-emerald-950/40",
+    gradient: "from-emerald-400 to-teal-600",
+    bgLight: "bg-emerald-50 dark:bg-emerald-950/30",
     iconColor: "text-emerald-500",
     borderColor: "border-emerald-200 dark:border-emerald-800",
+    iconBg: "bg-gradient-to-br from-emerald-400 to-teal-600",
   },
 };
 
 const tabIds: ScenarioCategory[] = ["clinic", "or_labor", "behavior", "qa"];
 
 const Logo = () => (
-  <svg viewBox="0 0 64 64" className="w-10 h-10" fill="none">
-    {[0, 60, 120, 180, 240, 300].map((angle) => (
-      <ellipse key={angle} cx="32" cy="18" rx="6" ry="12" className="fill-primary/30" transform={`rotate(${angle} 32 32)`} />
-    ))}
-    <circle cx="32" cy="32" r="6" className="fill-primary" />
-    <polyline points="8,32 20,32 24,22 28,42 32,28 36,36 40,32 56,32" className="stroke-primary" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-  </svg>
+  <div className="relative w-12 h-12">
+    {/* Outer glow ring */}
+    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-500/20 via-blue-500/20 to-emerald-500/20 blur-sm" />
+    <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-600 via-rose-700 to-rose-800 shadow-lg shadow-rose-500/25 flex items-center justify-center">
+      {/* Heart with pulse line */}
+      <svg viewBox="0 0 40 40" className="w-8 h-8" fill="none">
+        <path d="M20 35s-12-7.5-12-16c0-4.5 3.5-8 7.5-8 2.5 0 4.5 1.5 4.5 1.5S22 9.5 24.5 9.5c4 0 7.5 3.5 7.5 8 0 8.5-12 16-12 16z" 
+          fill="white" fillOpacity="0.9" />
+        <polyline points="8,22 14,22 16,17 19,27 22,20 25,24 28,22 33,22" 
+          stroke="hsl(0, 72%, 35%)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  </div>
 );
 
 const i = t();
@@ -116,7 +125,6 @@ export default function Index() {
   const [aiScenario, setAiScenario] = useState<Scenario | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
-  const { accepted, accept } = useDisclaimer();
 
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
@@ -193,98 +201,116 @@ export default function Index() {
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
-  
-
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
-      <div className="h-1 bg-gradient-to-r from-blue-500 via-rose-500 to-emerald-500" />
+      {/* Premium gradient bar */}
+      <div className="h-1.5 bg-gradient-to-r from-rose-500 via-blue-500 to-emerald-500" />
 
-      <header className="px-4 pt-4 pb-3">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2.5">
-            <Logo />
-            <div className="min-w-0">
-              <h1 className="text-lg font-extrabold tracking-tight" style={{ color: 'hsl(0, 72%, 30%)' }}>
-                Tips & Tricks
-              </h1>
-              <p className="text-[10px] text-muted-foreground leading-tight">{i.appSubtitle}</p>
+      {/* Header with layered background */}
+      <header className="relative px-4 pt-5 pb-4 overflow-hidden">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 bg-gradient-to-b from-rose-50/50 via-background to-background dark:from-rose-950/20" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-100/30 to-transparent dark:from-blue-900/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-rose-100/30 to-transparent dark:from-rose-900/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+        <div className="relative">
+          {/* Top bar: Logo + title + dark mode */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Logo />
+              <div className="min-w-0">
+                <h1 className="text-xl font-black tracking-tight" style={{ color: 'hsl(0, 72%, 30%)' }}>
+                  Tips & Tricks
+                </h1>
+                <p className="text-[10px] text-muted-foreground leading-tight font-medium">{i.appSubtitle}</p>
+              </div>
+            </div>
+            <button
+              onClick={toggleDark}
+              className="p-2 rounded-xl bg-card border border-border/50 hover:bg-muted transition-all shadow-sm"
+              aria-label="Toggle dark mode"
+            >
+              {dark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-blue-500" />}
+            </button>
+          </div>
+
+          {/* Stats banner - refined */}
+          <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl bg-card border border-border/50 shadow-sm mb-4">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 shadow-sm">
+              <Activity className="w-4 h-4 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-foreground">{i.appTitle}</p>
+              <p className="text-[10px] text-muted-foreground">{i.appCredential}</p>
+            </div>
+            <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200/50 dark:border-emerald-800/50">
+              <TrendingUp className="w-3 h-3 text-emerald-500" />
+              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{totalScenarios}</span>
             </div>
           </div>
-          <button onClick={toggleDark} className="p-1.5 rounded-full hover:bg-muted transition-colors" aria-label="Toggle dark mode">
-            {dark ? <Sun className="w-4 h-4 text-foreground" /> : <Moon className="w-4 h-4 text-foreground" />}
-          </button>
-        </div>
 
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 mb-3">
-          <BookOpen className="w-4 h-4 text-primary shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-semibold text-foreground">{i.appTitle}</p>
-            <p className="text-[10px] text-muted-foreground">{i.appCredential}</p>
-          </div>
-          <div className="flex items-center gap-1 bg-primary/10 px-2 py-0.5 rounded-full">
-            <TrendingUp className="w-3 h-3 text-primary" />
-            <span className="text-[11px] font-bold text-primary">{totalScenarios}</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          {tabIds.map((id) => {
-            const config = categoryConfig[id];
-            const Icon = config.icon;
-            const active = activeTab === id;
-            const count = categoryCounts[id];
-            return (
-              <button
-                key={id}
-                onClick={() => setActiveTab(active ? null : id)}
-                className={`relative overflow-hidden rounded-xl p-3 text-left transition-all duration-200 border ${
-                  active
-                    ? `${config.borderColor} ${config.bgLight} shadow-sm scale-[0.98]`
-                    : "border-border/50 bg-card hover:border-border hover:shadow-sm"
-                }`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className={`p-1.5 rounded-lg ${active ? config.bgLight : "bg-muted/60"}`}>
-                    <Icon className={`w-4 h-4 ${active ? config.iconColor : "text-muted-foreground"}`} />
+          {/* Category Cards - enhanced with icon gradients */}
+          <div className="grid grid-cols-2 gap-2.5 mb-3">
+            {tabIds.map((id) => {
+              const config = categoryConfig[id];
+              const Icon = config.icon;
+              const active = activeTab === id;
+              const count = categoryCounts[id];
+              return (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(active ? null : id)}
+                  className={`relative overflow-hidden rounded-2xl p-3.5 text-left transition-all duration-300 border ${
+                    active
+                      ? `${config.borderColor} ${config.bgLight} shadow-md scale-[0.97]`
+                      : "border-border/40 bg-card hover:border-border hover:shadow-md hover:scale-[0.99]"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2.5">
+                    <div className={`p-2 rounded-xl shadow-sm ${active ? config.iconBg : "bg-muted/80"}`}>
+                      <Icon className={`w-4 h-4 ${active ? "text-white" : "text-muted-foreground"}`} />
+                    </div>
+                    <span className={`text-xl font-black tabular-nums ${active ? config.iconColor : "text-muted-foreground/40"}`}>
+                      {count}
+                    </span>
                   </div>
-                  <span className={`text-lg font-bold ${active ? config.iconColor : "text-muted-foreground/60"}`}>
-                    {count}
-                  </span>
-                </div>
-                <p className={`text-xs font-semibold ${active ? "text-foreground" : "text-muted-foreground"}`}>
-                  {i.tabs[id]}
-                </p>
-                {active && (
-                  <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${config.gradient}`} />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {activeTab && (
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={i.searchPlaceholder}
-              className="h-10 bg-card border-border/60 rounded-xl text-sm pl-10"
-            />
+                  <p className={`text-xs font-bold ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    {i.tabs[id]}
+                  </p>
+                  {active && (
+                    <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${config.gradient}`} />
+                  )}
+                </button>
+              );
+            })}
           </div>
-        )}
+
+          {/* Search */}
+          {activeTab && (
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={i.searchPlaceholder}
+                className="h-11 bg-card border-border/50 rounded-2xl text-sm pl-10 shadow-sm"
+              />
+            </div>
+          )}
+        </div>
       </header>
 
+      {/* Content */}
       <main className="flex-1 px-4 pb-6">
         {!activeTab ? (
           <div className="text-center py-10 space-y-3">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <Stethoscope className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-950/40 dark:to-rose-900/20 flex items-center justify-center mx-auto mb-4 shadow-sm border border-rose-200/50 dark:border-rose-800/30">
+              <Heart className="w-7 h-7 text-rose-500" />
             </div>
-            <p className="text-sm font-semibold text-foreground">Select a category to explore</p>
-            <p className="text-xs text-muted-foreground max-w-[250px] mx-auto">
+            <p className="text-sm font-bold text-foreground">Select a category to explore</p>
+            <p className="text-xs text-muted-foreground max-w-[250px] mx-auto leading-relaxed">
               Tap a category above to browse clinical scenarios, tips and model answers
             </p>
           </div>
@@ -297,20 +323,24 @@ export default function Index() {
           <p className="text-center text-sm text-muted-foreground py-8">{i.noResults}</p>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-2 px-1">
+            <div className="flex items-center justify-between mb-2.5 px-1">
               <div className="flex items-center gap-2">
                 {(() => {
                   const Icon = categoryConfig[activeTab].icon;
-                  return <Icon className={`w-4 h-4 ${categoryConfig[activeTab].iconColor}`} />;
+                  return (
+                    <div className={`p-1 rounded-lg ${categoryConfig[activeTab].iconBg}`}>
+                      <Icon className="w-3.5 h-3.5 text-white" />
+                    </div>
+                  );
                 })()}
                 <h2 className="text-sm font-bold text-foreground">{i.tabs[activeTab]}</h2>
               </div>
-              <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              <span className="text-[10px] text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full font-medium">
                 {totalCount} items
               </span>
             </div>
 
-            <div className="bg-card rounded-xl border border-border/50 overflow-hidden">
+            <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
               <Accordion type="single" collapsible className="w-full">
                 {scenarios.map((item) => (
                   <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} />
