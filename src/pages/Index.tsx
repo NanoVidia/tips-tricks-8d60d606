@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity, Sparkles, ChevronRight, ChevronDown, Baby, Syringe, ShieldCheck, Brain, Phone, Bot, Zap, GraduationCap, Clock, Wrench } from "lucide-react";
+import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity, Sparkles, ChevronRight, ChevronDown, Baby, Syringe, ShieldCheck, Brain, Phone, Bot, Zap, GraduationCap, Clock, Wrench, X, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -155,6 +155,13 @@ export default function Index() {
   const [aiOpen, setAiOpen] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
+  // Auto-suggest state
+  const [suggestions, setSuggestions] = useState<Scenario[]>([]);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const [highlightIdx, setHighlightIdx] = useState(-1);
+  const searchBoxRef = useRef<HTMLDivElement>(null);
+
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
   const toggleDark = () => {
@@ -185,6 +192,47 @@ export default function Index() {
   }, [search]);
 
   useEffect(() => { setCurrentPage(1); }, [activeTab, debouncedSearch]);
+
+  // Auto-suggest: fetch top 5 across all categories as user types
+  useEffect(() => {
+    const q = search.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      setSuggestLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setSuggestLoading(true);
+    const handle = setTimeout(async () => {
+      try {
+        const { data, error } = await supabase.rpc("search_scenarios", { search_query: q });
+        if (cancelled) return;
+        if (error) throw error;
+        setSuggestions(((data as Scenario[]) || []).slice(0, 5));
+      } catch (e) {
+        if (!cancelled) setSuggestions([]);
+        console.error("Suggest error:", e);
+      } finally {
+        if (!cancelled) setSuggestLoading(false);
+      }
+    }, 180);
+    return () => { cancelled = true; clearTimeout(handle); };
+  }, [search]);
+
+  // Reset highlight when suggestions change
+  useEffect(() => { setHighlightIdx(-1); }, [suggestions]);
+
+  // Click outside to close
+  useEffect(() => {
+    if (!suggestOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target as Node)) {
+        setSuggestOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [suggestOpen]);
 
   const fetchScenarios = useCallback(async () => {
     if (!activeTab) return;
@@ -295,21 +343,145 @@ export default function Index() {
             </button>
           </div>
 
-          {/* Search bar — always present */}
+          {/* Search bar with auto-suggest */}
           <motion.div
+            ref={searchBoxRef}
             className="relative"
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
             <Input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onFocus={() => { if (!activeTab) setActiveTab("qa"); }}
+              onChange={(e) => { setSearch(e.target.value); setSuggestOpen(true); }}
+              onFocus={() => {
+                if (search.trim().length >= 2) setSuggestOpen(true);
+              }}
+              onKeyDown={(e) => {
+                if (!suggestOpen || suggestions.length === 0) {
+                  if (e.key === "Enter" && !activeTab) setActiveTab("qa");
+                  return;
+                }
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setHighlightIdx((p) => (p + 1) % suggestions.length);
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setHighlightIdx((p) => (p <= 0 ? suggestions.length - 1 : p - 1));
+                } else if (e.key === "Enter") {
+                  e.preventDefault();
+                  const pick = highlightIdx >= 0 ? suggestions[highlightIdx] : suggestions[0];
+                  if (pick) {
+                    setActiveTab(pick.category);
+                    setSuggestOpen(false);
+                    openAI(pick);
+                  }
+                } else if (e.key === "Escape") {
+                  setSuggestOpen(false);
+                }
+              }}
               placeholder={i.searchPlaceholder}
-              className="h-12 bg-card border-border/60 rounded-2xl text-sm pl-11 pr-3 shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30"
+              role="combobox"
+              aria-expanded={suggestOpen && suggestions.length > 0}
+              aria-controls="search-suggestions"
+              aria-autocomplete="list"
+              aria-activedescendant={highlightIdx >= 0 ? `suggest-${highlightIdx}` : undefined}
+              className="h-12 bg-card border-border/60 rounded-2xl text-sm pl-11 pr-10 shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => { setSearch(""); setSuggestOpen(false); }}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-muted transition z-10"
+              >
+                {suggestLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 text-muted-foreground animate-spin" />
+                ) : (
+                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                )}
+              </button>
+            )}
+
+            {/* Suggestions dropdown */}
+            <AnimatePresence>
+              {suggestOpen && search.trim().length >= 2 && (
+                <motion.div
+                  id="search-suggestions"
+                  role="listbox"
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.12 }}
+                  className="absolute left-0 right-0 top-full mt-2 bg-card border border-border/60 rounded-2xl shadow-xl shadow-black/5 overflow-hidden z-30"
+                >
+                  {suggestLoading && suggestions.length === 0 ? (
+                    <div className="flex items-center justify-center gap-2 py-4 text-xs text-muted-foreground">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Searching...
+                    </div>
+                  ) : suggestions.length === 0 ? (
+                    <div className="py-4 text-center text-xs text-muted-foreground">
+                      No matches for "{search.trim()}"
+                    </div>
+                  ) : (
+                    <ul className="py-1">
+                      {suggestions.map((s, idx) => {
+                        const cfg = categoryConfig[s.category];
+                        const Icon = cfg.icon;
+                        const isHi = idx === highlightIdx;
+                        return (
+                          <li key={s.id}>
+                            <button
+                              id={`suggest-${idx}`}
+                              role="option"
+                              aria-selected={isHi}
+                              type="button"
+                              onMouseEnter={() => setHighlightIdx(idx)}
+                              onClick={() => {
+                                setActiveTab(s.category);
+                                setSuggestOpen(false);
+                                openAI(s);
+                              }}
+                              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition ${
+                                isHi ? "bg-muted/70" : "hover:bg-muted/40"
+                              }`}
+                            >
+                              <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
+                                <Icon className="w-3 h-3 text-white" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-[12px] font-semibold text-foreground truncate leading-tight">
+                                  {s.title_en}
+                                </p>
+                                <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
+                                  {i.tabs[s.category]}
+                                </p>
+                              </div>
+                              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+                            </button>
+                          </li>
+                        );
+                      })}
+                      <li className="border-t border-border/40">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!activeTab) setActiveTab("qa");
+                            setSuggestOpen(false);
+                          }}
+                          className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-primary hover:bg-muted/40 transition uppercase tracking-wider"
+                        >
+                          <Search className="w-3 h-3" />
+                          See all results
+                        </button>
+                      </li>
+                    </ul>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
           {/* Compact category chips */}
