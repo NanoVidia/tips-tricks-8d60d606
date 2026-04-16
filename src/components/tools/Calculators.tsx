@@ -46,26 +46,29 @@ function ResultBox({
 }
 
 function CalcShell({
+  id,
   icon: Icon,
   title,
   subtitle,
   children,
 }: {
+  id: string;
   icon: any;
   title: string;
   subtitle?: string;
   children: React.ReactNode;
 }) {
   return (
-    <Card className="p-4 space-y-3 border-border/50">
+    <Card id={`tool-${id}`} className="p-4 space-y-3 border-border/50 scroll-mt-32">
       <div className="flex items-center gap-2 pb-2 border-b border-border/40">
         <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/70">
           <Icon className="w-3.5 h-3.5 text-primary-foreground" />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h3 className="text-sm font-bold text-foreground leading-tight">{title}</h3>
           {subtitle && <p className="text-[10px] text-muted-foreground leading-tight">{subtitle}</p>}
         </div>
+        <BookmarkButton id={`calc:${id}`} label={title} stopPropagation={false} />
       </div>
       {children}
     </Card>
