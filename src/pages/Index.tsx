@@ -338,14 +338,80 @@ export default function Index() {
       {/* Content */}
       <main className="flex-1 px-4 pb-6">
         {!activeTab ? (
-          <div className="text-center py-10 space-y-3">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-950/40 dark:to-rose-900/20 flex items-center justify-center mx-auto mb-4 shadow-sm border border-rose-200/50 dark:border-rose-800/30">
-              <Heart className="w-7 h-7 text-rose-500" />
-            </div>
-            <p className="text-sm font-bold text-foreground">Select a category to explore</p>
-            <p className="text-xs text-muted-foreground max-w-[250px] mx-auto leading-relaxed">
-              Tap a category above to browse clinical scenarios, tips and model answers
-            </p>
+          <div className="py-6 space-y-4">
+            {/* About the App */}
+            <motion.div
+              className="rounded-2xl bg-card border border-border/50 p-4 shadow-sm space-y-3"
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1, type: "spring", stiffness: 120 }}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm">
+                  <BookOpen className="w-4 h-4 text-white" />
+                </div>
+                <h2 className="text-sm font-bold text-foreground">About This App</h2>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                A comprehensive clinical reference for OB/GYN professionals. Browse real-world scenarios, expert clinical actions, and model patient communication scripts — all curated by <strong className="text-foreground">Dr. Sahar Elkhodiry</strong>, Consultant in Obstetrics & Gynecology.
+              </p>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                {[
+                  { icon: Stethoscope, label: "Clinical scenarios", color: "text-sky-500" },
+                  { icon: Scissors, label: "OR & Labor protocols", color: "text-rose-500" },
+                  { icon: MessageCircle, label: "Communication scripts", color: "text-amber-500" },
+                  { icon: HelpCircle, label: "Q&A Bank + Skills", color: "text-emerald-500" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-1.5">
+                    <item.icon className={`w-3.5 h-3.5 ${item.color} shrink-0`} />
+                    <span className="text-[10px] text-muted-foreground font-medium">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* AI Assistant highlight */}
+            <motion.div
+              className="rounded-2xl border border-blue-200/60 dark:border-blue-800/40 bg-gradient-to-br from-blue-50 to-sky-50/50 dark:from-blue-950/30 dark:to-sky-950/20 p-4 shadow-sm space-y-3"
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.25, type: "spring", stiffness: 120 }}
+            >
+              <div className="flex items-center gap-2.5">
+                <motion.div
+                  className="p-2 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm shadow-blue-500/20"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
+                >
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </motion.div>
+                <div>
+                  <h2 className="text-sm font-bold text-foreground">AI Medical Assistant</h2>
+                  <p className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Available 24/7</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Each scenario includes an <strong className="text-foreground">AI-powered discussion bot</strong> ready to help you <strong className="text-foreground">24 hours a day, 7 days a week</strong>. Open any clinical scenario, tap "Discuss with AI," and get instant, in-depth answers — differential diagnoses, management plans, evidence-based guidance, and more.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="flex -space-x-1">
+                  {["bg-green-400", "bg-green-400", "bg-green-400"].map((c, idx) => (
+                    <div key={idx} className={`w-2 h-2 rounded-full ${c} border border-white dark:border-gray-900`} />
+                  ))}
+                </div>
+                <span className="text-[10px] text-green-600 dark:text-green-400 font-semibold">Online now — Ready to discuss</span>
+              </div>
+            </motion.div>
+
+            {/* CTA */}
+            <motion.p
+              className="text-center text-xs text-muted-foreground font-medium pt-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              ↑ Select a category above to start exploring
+            </motion.p>
           </div>
         ) : loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
