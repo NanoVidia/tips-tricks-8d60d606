@@ -1,52 +1,60 @@
-import { useState, useMemo } from "react";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle } from "lucide-react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { clinicData, orLaborData, behaviorData, qaData, type ClinicalItem } from "@/data/clinicalData";
+import { supabase } from "@/integrations/supabase/client";
+import { AIChatDrawer } from "@/components/AIChatDrawer";
+import { DisclaimerSplash, useDisclaimer } from "@/components/DisclaimerSplash";
+
+type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
+
+interface Scenario {
+  id: string;
+  category: ScenarioCategory;
+  title_en: string;
+  title_ar: string;
+  situation_en: string;
+  situation_ar: string;
+  action_en: string;
+  action_ar: string;
+  script_en: string;
+  script_ar: string;
+  synonyms: string[] | null;
+}
 
 const tabs = [
-  { id: "clinic", label: "Clinic", icon: Stethoscope, data: clinicData },
-  { id: "or", label: "OR/Labor", icon: Scissors, data: orLaborData },
-  { id: "behavior", label: "Behavior", icon: MessageCircle, data: behaviorData },
-  { id: "qa", label: "Q&A Bank", icon: HelpCircle, data: qaData },
-] as const;
+  { id: "clinic" as ScenarioCategory, label: "Clinic", icon: Stethoscope },
+  { id: "or_labor" as ScenarioCategory, label: "OR/Labor", icon: Scissors },
+  { id: "behavior" as ScenarioCategory, label: "Behavior", icon: MessageCircle },
+  { id: "qa" as ScenarioCategory, label: "Q&A Bank", icon: HelpCircle },
+];
 
 const Logo = () => (
   <svg viewBox="0 0 64 64" className="w-14 h-14" fill="none">
-    {/* Flower petals */}
     {[0, 60, 120, 180, 240, 300].map((angle) => (
-      <ellipse
-        key={angle}
-        cx="32" cy="18" rx="6" ry="12"
-        className="fill-primary/30"
-        transform={`rotate(${angle} 32 32)`}
-      />
+      <ellipse key={angle} cx="32" cy="18" rx="6" ry="12" className="fill-primary/30" transform={`rotate(${angle} 32 32)`} />
     ))}
     <circle cx="32" cy="32" r="6" className="fill-primary" />
-    {/* Pulse line */}
-    <polyline
-      points="8,32 20,32 24,22 28,42 32,28 36,36 40,32 56,32"
-      className="stroke-primary"
-      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"
-    />
+    <polyline points="8,32 20,32 24,22 28,42 32,28 36,36 40,32 56,32" className="stroke-primary" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
   </svg>
 );
 
-function ClinicalCard({ item }: { item: ClinicalItem }) {
+function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
   return (
     <AccordionItem value={item.id} className="border-b border-border/50">
       <AccordionTrigger className="py-3 px-1 text-sm font-medium hover:no-underline">
         <div className="text-left">
-          <div>{item.title}</div>
-          <div dir="rtl" className="text-xs text-muted-foreground mt-0.5 font-normal">{item.titleAr}</div>
+          <div>{item.title_en}</div>
+          <div dir="rtl" className="text-xs text-muted-foreground mt-0.5 font-normal">{item.title_ar}</div>
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-1 pb-4">
         <div className="space-y-3">
           {[
-            { label: "Situation", en: item.situation, ar: item.situationAr },
-            { label: "Clinical Action", en: item.action, ar: item.actionAr },
-            { label: "Patient Script", en: item.script, ar: item.scriptAr },
+            { label: "Situation", en: item.situation_en, ar: item.situation_ar },
+            { label: "Clinical Action", en: item.action_en, ar: item.action_ar },
+            { label: "Patient Script", en: item.script_en, ar: item.script_ar },
           ].map((section) => (
             <div key={section.label} className="rounded-lg bg-muted/50 p-3">
               <div className="text-xs font-semibold text-primary mb-1.5">{section.label}</div>
@@ -54,6 +62,15 @@ function ClinicalCard({ item }: { item: ClinicalItem }) {
               <p dir="rtl" className="text-sm leading-relaxed text-muted-foreground mt-1.5">{section.ar}</p>
             </div>
           ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAI}
+            className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5 gap-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Discuss with AI
+          </Button>
         </div>
       </AccordionContent>
     </AccordionItem>
@@ -61,9 +78,14 @@ function ClinicalCard({ item }: { item: ClinicalItem }) {
 }
 
 export default function Index() {
-  const [activeTab, setActiveTab] = useState("clinic");
+  const [activeTab, setActiveTab] = useState<ScenarioCategory>("clinic");
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [aiScenario, setAiScenario] = useState<Scenario | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const { accepted, accept } = useDisclaimer();
 
   const toggleDark = () => {
     setDark((d) => {
@@ -72,20 +94,47 @@ export default function Index() {
     });
   };
 
-  const currentTab = tabs.find((t) => t.id === activeTab)!;
+  // Debounced search
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 250);
+    return () => clearTimeout(t);
+  }, [search]);
 
-  const filtered = useMemo(() => {
-    if (!search.trim()) return currentTab.data;
-    const q = search.toLowerCase();
-    return currentTab.data.filter(
-      (item) =>
-        item.title.toLowerCase().includes(q) ||
-        item.titleAr.includes(search) ||
-        item.situation.toLowerCase().includes(q) ||
-        item.action.toLowerCase().includes(q) ||
-        item.script.toLowerCase().includes(q)
-    );
-  }, [search, currentTab.data]);
+  const fetchScenarios = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (debouncedSearch.trim()) {
+        const { data, error } = await supabase.rpc("search_scenarios", {
+          search_query: debouncedSearch.trim(),
+          category_filter: activeTab,
+        });
+        if (error) throw error;
+        setScenarios((data as Scenario[]) || []);
+      } else {
+        const { data, error } = await supabase
+          .from("medical_scenarios")
+          .select("*")
+          .eq("category", activeTab)
+          .order("created_at");
+        if (error) throw error;
+        setScenarios((data as Scenario[]) || []);
+      }
+    } catch (e) {
+      console.error("Fetch error:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedSearch, activeTab]);
+
+  useEffect(() => { fetchScenarios(); }, [fetchScenarios]);
+
+  const openAI = (s: Scenario) => {
+    setAiScenario(s);
+    setAiOpen(true);
+  };
+
+  if (!accepted) return <DisclaimerSplash onAccept={accept} />;
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20 max-w-lg mx-auto">
@@ -98,11 +147,7 @@ export default function Index() {
             <p className="text-xs text-muted-foreground">Clinical Quick Guide</p>
           </div>
         </div>
-        <button
-          onClick={toggleDark}
-          className="p-2 rounded-full hover:bg-muted transition-colors"
-          aria-label="Toggle dark mode"
-        >
+        <button onClick={toggleDark} className="p-2 rounded-full hover:bg-muted transition-colors" aria-label="Toggle dark mode">
           {dark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
         </button>
       </header>
@@ -114,7 +159,7 @@ export default function Index() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Smart Search..."
+            placeholder="Smart Search — handles typos & synonyms..."
             className="pl-10 h-11 bg-card border-border/60 rounded-xl"
           />
         </div>
@@ -122,13 +167,19 @@ export default function Index() {
 
       {/* Content */}
       <main className="flex-1 px-4">
-        <Accordion type="single" collapsible className="w-full">
-          {filtered.length === 0 ? (
-            <p className="text-center text-sm text-muted-foreground py-8">No results found.</p>
-          ) : (
-            filtered.map((item) => <ClinicalCard key={item.id} item={item} />)
-          )}
-        </Accordion>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : scenarios.length === 0 ? (
+          <p className="text-center text-sm text-muted-foreground py-8">No results found.</p>
+        ) : (
+          <Accordion type="single" collapsible className="w-full">
+            {scenarios.map((item) => (
+              <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} />
+            ))}
+          </Accordion>
+        )}
       </main>
 
       {/* Bottom Nav */}
@@ -141,9 +192,7 @@ export default function Index() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex flex-col items-center py-2.5 gap-0.5 transition-colors ${
-                  active ? "text-primary" : "text-muted-foreground"
-                }`}
+                className={`flex-1 flex flex-col items-center py-2.5 gap-0.5 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}
               >
                 <Icon className="w-5 h-5" />
                 <span className="text-[10px] font-medium">{tab.label}</span>
@@ -152,6 +201,9 @@ export default function Index() {
           })}
         </div>
       </nav>
+
+      {/* AI Chat Drawer */}
+      <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
     </div>
   );
 }
