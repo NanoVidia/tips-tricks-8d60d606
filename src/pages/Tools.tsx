@@ -562,16 +562,20 @@ export default function Tools() {
                 <AccordionItem
                   key={d.presentation}
                   value={d.presentation}
-                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50"
+                  id={`ddx-${d.presentation}`}
+                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
                 >
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center gap-2.5 text-left">
-                      <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shrink-0">
-                        <Brain className="w-3.5 h-3.5 text-white" />
+                  <div className="flex items-center gap-2 pr-3">
+                    <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
+                      <div className="flex items-center gap-2.5 text-left">
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shrink-0">
+                          <Brain className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span className="text-sm font-bold">{d.presentation}</span>
                       </div>
-                      <span className="text-sm font-bold">{d.presentation}</span>
-                    </div>
-                  </AccordionTrigger>
+                    </AccordionTrigger>
+                    <BookmarkButton id={`ddx:${d.presentation}`} label={d.presentation} />
+                  </div>
                   <AccordionContent className="px-4 pb-4">
                     <p className="text-[10px] uppercase tracking-wider font-bold text-primary mb-1.5">Differentials</p>
                     <ul className="space-y-1 mb-3">
