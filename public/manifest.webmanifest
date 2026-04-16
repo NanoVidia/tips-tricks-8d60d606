@@ -1,0 +1,15 @@
+{
+  "name": "Tips & Tricks — OB/GYN Reference",
+  "short_name": "Tips & Tricks",
+  "description": "Bedside OB/GYN scenarios, scripts, calculators and AI assistant by Dr. Sahar Elkhodiry.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f3ee",
+  "theme_color": "#1a1a1a",
+  "orientation": "portrait",
+  "categories": ["medical", "education", "productivity"],
+  "icons": [
+    { "src": "/placeholder.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
