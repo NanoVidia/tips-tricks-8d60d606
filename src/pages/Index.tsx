@@ -81,6 +81,7 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState<ScenarioCategory>("clinic");
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
+  const [lang, setLang] = useState<"en" | "ar">("en");
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [loading, setLoading] = useState(true);
   const [aiScenario, setAiScenario] = useState<Scenario | null>(null);
