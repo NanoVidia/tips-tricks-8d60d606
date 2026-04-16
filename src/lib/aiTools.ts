@@ -105,3 +105,103 @@ export const TOOL_LABELS: Record<string, { label: string; icon: string }> = {
   calculate_bmi: { label: "BMI + weight gain", icon: "⚖️" },
   check_drug_safety: { label: "Drug safety check", icon: "💊" },
 };
+
+/* ---------------- Save-to-Tools bridge ----------------
+ * Maps an AI tool call → the matching /tools calculator id, plus a
+ * prefill payload that the calculator reads on mount via sessionStorage.
+ * `null` means: no matching UI calculator (e.g. drug safety opens the Drugs tab).
+ */
+export type SaveTarget = {
+  /** Tab id on the /tools page (calc | drugs | …). */
+  tab: "calc" | "drugs";
+  /** Calculator id for `?calc=…` (only for tab === "calc"). */
+  calcId?: string;
+  /** Values written to sessionStorage under `prefill:<calcId>` for the calc to consume. */
+  prefill?: Record<string, string | number | boolean>;
+  /** For drug safety: query string to seed the drug search. */
+  drugQuery?: string;
+};
+
+export function getSaveTarget(name: string, rawArgs: string): SaveTarget | null {
+  let args: Record<string, unknown> = {};
+  try { args = JSON.parse(rawArgs || "{}"); } catch { /* keep empty */ }
+
+  switch (name) {
+    case "calculate_edd": {
+      const lmp = typeof args.lmp === "string" ? args.lmp : "";
+      const cycle = typeof args.cycleLength === "number" ? args.cycleLength : 28;
+      return { tab: "calc", calcId: "edd", prefill: { lmp, cycle } };
+    }
+    case "calculate_bishop_score": {
+      // Map raw clinical values → 0..3 indices used by the Bishop UI.
+      const dilation = Number(args.dilation ?? 0);
+      const effacement = Number(args.effacement ?? 0);
+      const station = Number(args.station ?? -3);
+      const consistency = String(args.consistency ?? "firm");
+      const position = String(args.position ?? "posterior");
+
+      const dil = dilation === 0 ? 0 : dilation < 3 ? 1 : dilation < 5 ? 2 : 3;
+      const eff = effacement < 40 ? 0 : effacement < 60 ? 1 : effacement < 80 ? 2 : 3;
+      const sta = station <= -3 ? 0 : station <= -2 ? 1 : station <= 0 ? 2 : 3;
+      const cons = ({ firm: 0, medium: 1, soft: 2 } as const)[consistency as "firm"] ?? 0;
+      const pos = ({ posterior: 0, mid: 1, anterior: 2 } as const)[position as "posterior"] ?? 0;
+      return {
+        tab: "calc", calcId: "bishop",
+        prefill: { dilation: dil, effacement: eff, station: sta, consistency: cons, position: pos },
+      };
+    }
+    case "calculate_mgso4": {
+      const weight = typeof args.weightKg === "number" ? args.weightKg : 70;
+      const renal = !!args.renalImpairment;
+      return { tab: "calc", calcId: "mgso4", prefill: { weight, renal } };
+    }
+    case "calculate_bmi": {
+      const weight = Number(args.weightKg ?? 70);
+      const height = Number(args.heightCm ?? 165);
+      const twin = !!args.twin;
+      return { tab: "calc", calcId: "bmi", prefill: { weight, height, twin } };
+    }
+    case "check_drug_safety": {
+      const drugs = Array.isArray(args.drugs) ? (args.drugs as unknown[]).map(String) : [];
+      return { tab: "drugs", drugQuery: drugs[0] ?? "" };
+    }
+    default:
+      return null;
+  }
+}
+
+/** Build the URL for the /tools page with any required query params. */
+export function buildSaveToToolsUrl(target: SaveTarget): string {
+  const params = new URLSearchParams();
+  params.set("tab", target.tab);
+  if (target.calcId) params.set("calc", target.calcId);
+  if (target.drugQuery) params.set("q", target.drugQuery);
+  return `/tools?${params.toString()}`;
+}
+
+const PREFILL_PREFIX = "prefill:";
+
+/** Persist prefill payload so the calculator can pick it up on mount. */
+export function stashPrefill(target: SaveTarget) {
+  if (target.calcId && target.prefill && typeof window !== "undefined") {
+    try {
+      window.sessionStorage.setItem(
+        PREFILL_PREFIX + target.calcId,
+        JSON.stringify(target.prefill),
+      );
+    } catch { /* storage may be unavailable */ }
+  }
+}
+
+/** Read & clear the one-shot prefill for a given calc id. */
+export function consumePrefill<T = Record<string, unknown>>(calcId: string): T | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(PREFILL_PREFIX + calcId);
+    if (!raw) return null;
+    window.sessionStorage.removeItem(PREFILL_PREFIX + calcId);
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
