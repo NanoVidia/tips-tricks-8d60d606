@@ -25,7 +25,7 @@ interface Scenario {
   synonyms: string[] | null;
 }
 
-const ITEMS_PER_PAGE = 50;
+const ITEMS_PER_PAGE = 30;
 
 const categoryConfig = {
   clinic: {
@@ -143,14 +143,13 @@ export default function Index() {
   // Fetch category counts on mount
   useEffect(() => {
     async function fetchCounts() {
+      const results = await Promise.all(
+        tabIds.map((cat) =>
+          supabase.from("medical_scenarios").select("*", { count: "exact", head: true }).eq("category", cat)
+        )
+      );
       const counts: Record<string, number> = {};
-      for (const cat of tabIds) {
-        const { count } = await supabase
-          .from("medical_scenarios")
-          .select("*", { count: "exact", head: true })
-          .eq("category", cat);
-        counts[cat] = count || 0;
-      }
+      tabIds.forEach((cat, idx) => { counts[cat] = results[idx].count || 0; });
       setCategoryCounts(counts as Record<ScenarioCategory, number>);
     }
     fetchCounts();
