@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calculator, Baby, Heart, Droplet, Activity, Scale, AlertCircle } from "lucide-react";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
+import { consumePrefill } from "@/lib/aiTools";
 
 /* ---------- shared UI ---------- */
 
