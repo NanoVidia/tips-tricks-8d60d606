@@ -3,24 +3,36 @@ import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, X, Bot } from "lucide-react";
+import { Send, Loader2, X, Bot, Wrench, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { executeTool, TOOL_LABELS } from "@/lib/aiTools";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type ToolCall = { id: string; name: string; args: string };
+type Msg = {
+  role: "user" | "assistant" | "tool";
+  content: string;
+  tool_calls?: { id: string; type: "function"; function: { name: string; arguments: string } }[];
+  tool_call_id?: string;
+  /** UI-only: tool calls executed by THIS assistant turn, for inline chips */
+  uiTools?: { name: string; ok: boolean }[];
+};
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+const SCENARIO = {
+  title_en: "General OB/GYN Assistant",
+  situation_en: "The doctor is asking a general obstetrics and gynecology question.",
+  action_en: "Provide evidence-based, professional medical guidance. Use tools for any calculation or drug lookup.",
+  script_en: "Answer as a knowledgeable OB/GYN consultant.",
+};
 
-async function streamChat({
+/** One streaming round-trip with the gateway. Returns assistant text + any tool_calls. */
+async function streamOnce({
   messages,
   onDelta,
-  onDone,
-  onError,
 }: {
   messages: Msg[];
   onDelta: (t: string) => void;
-  onDone: () => void;
-  onError: (msg: string) => void;
-}) {
+}): Promise<{ content: string; toolCalls: ToolCall[] }> {
   const resp = await fetch(CHAT_URL, {
     method: "POST",
     headers: {
@@ -28,27 +40,25 @@ async function streamChat({
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
     body: JSON.stringify({
-      messages,
-      scenario: {
-        title_en: "General OB/GYN Assistant",
-        situation_en: "The doctor is asking a general obstetrics and gynecology question.",
-        action_en: "Provide evidence-based, professional medical guidance.",
-        script_en: "Answer as a knowledgeable OB/GYN consultant.",
-      },
+      // Strip UI-only fields before sending
+      messages: messages.map(({ role, content, tool_calls, tool_call_id }) => ({
+        role, content, ...(tool_calls && { tool_calls }), ...(tool_call_id && { tool_call_id }),
+      })),
+      scenario: SCENARIO,
     }),
   });
 
   if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: "Unknown error" }));
-    onError(err.error || `Error ${resp.status}`);
-    return;
+    const err = await resp.json().catch(() => ({ error: `Error ${resp.status}` }));
+    throw new Error(err.error || `Error ${resp.status}`);
   }
-
-  if (!resp.body) { onError("No response body"); return; }
+  if (!resp.body) throw new Error("No response body");
 
   const reader = resp.body.getReader();
   const decoder = new TextDecoder();
   let buf = "";
+  let content = "";
+  const toolCallsMap = new Map<number, ToolCall>();
 
   while (true) {
     const { done, value } = await reader.read();
@@ -62,14 +72,29 @@ async function streamChat({
       if (line.endsWith("\r")) line = line.slice(0, -1);
       if (!line.startsWith("data: ")) continue;
       const json = line.slice(6).trim();
-      if (json === "[DONE]") { onDone(); return; }
+      if (json === "[DONE]") return { content, toolCalls: [...toolCallsMap.values()] };
       try {
-        const c = JSON.parse(json).choices?.[0]?.delta?.content;
-        if (c) onDelta(c);
-      } catch { /* partial */ }
+        const delta = JSON.parse(json).choices?.[0]?.delta;
+        if (!delta) continue;
+        if (delta.content) {
+          content += delta.content;
+          onDelta(delta.content);
+        }
+        // Accumulate tool_calls deltas (OpenAI-style streaming)
+        if (Array.isArray(delta.tool_calls)) {
+          for (const tc of delta.tool_calls) {
+            const i = tc.index ?? 0;
+            const cur = toolCallsMap.get(i) ?? { id: "", name: "", args: "" };
+            if (tc.id) cur.id = tc.id;
+            if (tc.function?.name) cur.name = tc.function.name;
+            if (tc.function?.arguments) cur.args += tc.function.arguments;
+            toolCallsMap.set(i, cur);
+          }
+        }
+      } catch { /* partial chunk */ }
     }
   }
-  onDone();
+  return { content, toolCalls: [...toolCallsMap.values()] };
 }
 
 export function FloatingAIBot() {
@@ -77,11 +102,10 @@ export function FloatingAIBot() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [runningTool, setRunningTool] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, runningTool]);
 
   const send = async () => {
     if (!input.trim() || loading) return;
@@ -90,43 +114,90 @@ export function FloatingAIBot() {
     setInput("");
     setLoading(true);
 
-    let assistantSoFar = "";
-    const upsert = (chunk: string) => {
-      assistantSoFar += chunk;
-      setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (last?.role === "assistant") {
-          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
-        }
-        return [...prev, { role: "assistant", content: assistantSoFar }];
-      });
-    };
+    let convo: Msg[] = [...messages, userMsg];
 
-    await streamChat({
-      messages: [...messages, userMsg],
-      onDelta: upsert,
-      onDone: () => setLoading(false),
-      onError: (msg) => {
-        toast.error(msg);
-        setLoading(false);
-      },
-    });
+    try {
+      // Tool-calling loop — up to 4 rounds (most queries finish in 1–2)
+      for (let round = 0; round < 4; round++) {
+        let assistantSoFar = "";
+        const assistantIdx = convo.length; // where the next assistant msg will land
+
+        // Insert empty assistant placeholder for streaming text
+        setMessages([...convo, { role: "assistant", content: "" }]);
+
+        const { content, toolCalls } = await streamOnce({
+          messages: convo,
+          onDelta: (chunk) => {
+            assistantSoFar += chunk;
+            setMessages((prev) => prev.map((m, i) =>
+              i === assistantIdx ? { ...m, content: assistantSoFar } : m
+            ));
+          },
+        });
+
+        const assistantMsg: Msg = {
+          role: "assistant",
+          content,
+          ...(toolCalls.length && {
+            tool_calls: toolCalls.map((t) => ({
+              id: t.id, type: "function" as const,
+              function: { name: t.name, arguments: t.args },
+            })),
+            uiTools: toolCalls.map((t) => ({ name: t.name, ok: true })),
+          }),
+        };
+        convo = [...convo, assistantMsg];
+
+        if (!toolCalls.length) {
+          setMessages(convo);
+          break;
+        }
+
+        // Execute tools client-side and append tool messages
+        const toolMessages: Msg[] = [];
+        const uiTools: { name: string; ok: boolean }[] = [];
+        for (const tc of toolCalls) {
+          setRunningTool(tc.name);
+          let args: Record<string, unknown> = {};
+          try { args = JSON.parse(tc.args || "{}"); } catch { /* leave empty */ }
+          const result = executeTool(tc.name, args);
+          const ok = !("error" in result);
+          uiTools.push({ name: tc.name, ok });
+          toolMessages.push({
+            role: "tool",
+            tool_call_id: tc.id,
+            content: JSON.stringify(result),
+          });
+        }
+        setRunningTool(null);
+
+        // Update the assistant message with the actual ok/fail status from execution
+        assistantMsg.uiTools = uiTools;
+        convo = [...convo.slice(0, -1), assistantMsg, ...toolMessages];
+        setMessages(convo);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Chat failed");
+      setMessages((prev) => prev.filter((m) => !(m.role === "assistant" && m.content === "")));
+    } finally {
+      setLoading(false);
+      setRunningTool(null);
+    }
   };
 
   return (
     <>
-      {/* Floating Button */}
       <motion.button
         onClick={() => setOpen(!open)}
         className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center hover:shadow-xl hover:shadow-blue-500/40 transition-shadow"
         whileTap={{ scale: 0.9 }}
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+        aria-label={open ? "Close assistant" : "Open AI assistant"}
       >
         {open ? <X className="w-6 h-6" /> : <Bot className="w-7 h-7" />}
       </motion.button>
 
-      {/* Chat Popup */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -137,7 +208,6 @@ export function FloatingAIBot() {
             className="fixed bottom-24 right-4 left-4 z-50 max-w-md mx-auto bg-card border border-border rounded-2xl shadow-2xl shadow-black/10 flex flex-col overflow-hidden"
             style={{ maxHeight: "70vh" }}
           >
-            {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-border/50 bg-gradient-to-r from-blue-600 to-indigo-700">
               <div className="relative">
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -147,14 +217,15 @@ export function FloatingAIBot() {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold text-white">AI Medical Assistant</p>
-                <p className="text-[10px] text-blue-200">By Dr. Sahar Elkhodiry • Online 24/7</p>
+                <p className="text-[10px] text-blue-200 flex items-center gap-1">
+                  <Wrench className="w-2.5 h-2.5" /> 5 clinical tools • Online 24/7
+                </p>
               </div>
-              <button onClick={() => setOpen(false)} className="p-1 rounded-lg hover:bg-white/10 transition-colors">
+              <button onClick={() => setOpen(false)} className="p-1 rounded-lg hover:bg-white/10 transition-colors" aria-label="Close">
                 <X className="w-5 h-5 text-white" />
               </button>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-[200px] max-h-[50vh]">
               {messages.length === 0 && (
                 <div className="text-center py-6 space-y-3">
@@ -167,19 +238,20 @@ export function FloatingAIBot() {
                   </motion.div>
                   <div>
                     <p className="text-sm font-bold text-foreground">Welcome, Doctor! 👋</p>
-                    <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed max-w-[220px] mx-auto">
-                      Your AI medical assistant by Dr. Sahar Elkhodiry. Ask me anything about OB/GYN — available 24/7.
+                    <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed max-w-[240px] mx-auto">
+                      I can run clinical calculators and check drug safety in real time. Try asking:
                     </p>
                   </div>
                   <div className="space-y-1.5 pt-2">
                     {[
-                      "How to manage shoulder dystocia?",
-                      "Preeclampsia screening protocol?",
-                      "VBAC success criteria?",
+                      "Calculate EDD for LMP 2025-01-15, cycle 30 days",
+                      "Bishop score: 3cm, 70%, station -1, soft, anterior",
+                      "Is Warfarin and Methyldopa safe in pregnancy?",
+                      "MgSO4 dose for severe preeclampsia, normal renal function",
                     ].map((q) => (
                       <button
                         key={q}
-                        onClick={() => { setInput(q); }}
+                        onClick={() => setInput(q)}
                         className="block w-full text-[11px] text-left px-3 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-muted-foreground"
                       >
                         💡 {q}
@@ -189,28 +261,58 @@ export function FloatingAIBot() {
                 </div>
               )}
 
-              {messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                  {m.role === "assistant" && (
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mr-2 mt-1 shrink-0">
-                      <Bot className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                  <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm ${
-                    m.role === "user"
-                      ? "bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-br-md"
-                      : "bg-muted rounded-bl-md"
-                  }`}>
-                    {m.role === "assistant" ? (
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <ReactMarkdown>{m.content}</ReactMarkdown>
+              {messages.map((m, i) => {
+                if (m.role === "tool") return null; // Hidden from UI; status shown via chips on assistant msg
+                if (m.role === "assistant" && !m.content && !m.uiTools?.length) return null;
+                return (
+                  <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                    {m.role === "assistant" && (
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mr-2 mt-1 shrink-0">
+                        <Bot className="w-4 h-4 text-white" />
                       </div>
-                    ) : m.content}
+                    )}
+                    <div className={`max-w-[80%] space-y-1.5 ${m.role === "user" ? "items-end" : "items-start"}`}>
+                      {m.uiTools?.map((t, ti) => {
+                        const meta = TOOL_LABELS[t.name] ?? { label: t.name, icon: "🔧" };
+                        return (
+                          <div key={ti} className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40 w-fit">
+                            <span>{meta.icon}</span>
+                            <span className="font-semibold">{meta.label}</span>
+                            {t.ok && <CheckCircle2 className="w-2.5 h-2.5" />}
+                          </div>
+                        );
+                      })}
+                      {m.content && (
+                        <div className={`rounded-2xl px-3.5 py-2.5 text-sm ${
+                          m.role === "user"
+                            ? "bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-br-md"
+                            : "bg-muted rounded-bl-md"
+                        }`}>
+                          {m.role === "assistant" ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1.5 prose-ul:my-1.5">
+                              <ReactMarkdown>{m.content}</ReactMarkdown>
+                            </div>
+                          ) : m.content}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {runningTool && (
+                <div className="flex justify-start">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mr-2 shrink-0">
+                    <Wrench className="w-4 h-4 text-white animate-pulse" />
+                  </div>
+                  <div className="bg-muted rounded-2xl rounded-bl-md px-3.5 py-2 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Running {TOOL_LABELS[runningTool]?.label ?? runningTool}…
                   </div>
                 </div>
-              ))}
+              )}
 
-              {loading && messages[messages.length - 1]?.role !== "assistant" && (
+              {loading && !runningTool && messages[messages.length - 1]?.role === "user" && (
                 <div className="flex justify-start">
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mr-2 shrink-0">
                     <Bot className="w-4 h-4 text-white" />
@@ -223,13 +325,12 @@ export function FloatingAIBot() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Input */}
             <div className="flex gap-2 p-3 border-t border-border/50 bg-background/50">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
-                placeholder="Ask any OB/GYN question..."
+                placeholder="Ask anything — I'll use tools when needed…"
                 className="flex-1 h-10 rounded-xl text-sm"
                 disabled={loading}
               />
