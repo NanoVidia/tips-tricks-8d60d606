@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, ChevronRight } from "lucide-react";
+import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AIChatDrawer } from "@/components/AIChatDrawer";
 import { DisclaimerSplash, useDisclaimer } from "@/components/DisclaimerSplash";
 import { Pagination } from "@/components/Pagination";
-import { type Lang, t } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
@@ -15,13 +15,9 @@ interface Scenario {
   id: string;
   category: ScenarioCategory;
   title_en: string;
-  title_ar: string;
   situation_en: string;
-  situation_ar: string;
   action_en: string;
-  action_ar: string;
   script_en: string;
-  script_ar: string;
   synonyms: string[] | null;
 }
 
@@ -70,33 +66,29 @@ const Logo = () => (
   </svg>
 );
 
-function ClinicalCard({ item, onAI, lang }: { item: Scenario; onAI: () => void; lang: Lang }) {
-  const i = t(lang);
-  const isAr = lang === "ar";
+const i = t();
 
+function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
   return (
     <AccordionItem value={item.id} className="border-b border-border/40 last:border-b-0">
       <AccordionTrigger className="py-3.5 px-2 text-sm font-medium hover:no-underline group">
-        <div className={`flex items-center gap-2 ${isAr ? "text-right w-full flex-row-reverse" : "text-left"}`} dir={isAr ? "rtl" : "ltr"}>
+        <div className="flex items-center gap-2 text-left">
           <div className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0" />
           <span className="group-hover:text-primary transition-colors">
-            {isAr ? item.title_ar || item.title_en : item.title_en}
+            {item.title_en}
           </span>
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-2 pb-4">
         <div className="space-y-3">
           {[
-            { label: i.situation, text: isAr ? (item.situation_ar || item.situation_en) : item.situation_en, secondary: isAr ? item.situation_en : item.situation_ar },
-            { label: i.clinicalAction, text: isAr ? (item.action_ar || item.action_en) : item.action_en, secondary: isAr ? item.action_en : item.action_ar },
-            { label: i.patientScript, text: isAr ? (item.script_ar || item.script_en) : item.script_en, secondary: isAr ? item.script_en : item.script_ar },
+            { label: i.situation, text: item.situation_en },
+            { label: i.clinicalAction, text: item.action_en },
+            { label: i.patientScript, text: item.script_en },
           ].map((section) => (
             <div key={section.label} className="rounded-xl bg-muted/40 p-3 border border-border/30">
               <div className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1.5">{section.label}</div>
-              <p className={`text-sm leading-relaxed ${isAr ? "text-right" : ""}`} dir={isAr ? "rtl" : "ltr"}>{section.text}</p>
-              {section.secondary && (
-                <p className={`text-xs leading-relaxed text-muted-foreground mt-2 pt-2 border-t border-border/30 ${!isAr ? "text-right" : ""}`} dir={!isAr ? "rtl" : "ltr"}>{section.secondary}</p>
-              )}
+              <p className="text-sm leading-relaxed">{section.text}</p>
             </div>
           ))}
           <Button
@@ -117,7 +109,6 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState<ScenarioCategory | null>(null);
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
-  const [lang, setLang] = useState<Lang>("en");
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -127,8 +118,6 @@ export default function Index() {
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
   const { accepted, accept } = useDisclaimer();
 
-  const isAr = lang === "ar";
-  const i = t(lang);
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
   const toggleDark = () => {
@@ -138,9 +127,6 @@ export default function Index() {
     });
   };
 
-  const toggleLang = () => setLang((l) => (l === "en" ? "ar" : "en"));
-
-  // Fetch category counts on mount
   useEffect(() => {
     async function fetchCounts() {
       const results = await Promise.all(
@@ -155,14 +141,12 @@ export default function Index() {
     fetchCounts();
   }, []);
 
-  // Debounced search
   const [debouncedSearch, setDebouncedSearch] = useState("");
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 250);
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Reset page on tab/search change
   useEffect(() => { setCurrentPage(1); }, [activeTab, debouncedSearch]);
 
   const fetchScenarios = useCallback(async () => {
@@ -209,16 +193,14 @@ export default function Index() {
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
-  if (!accepted) return <DisclaimerSplash onAccept={accept} lang={lang} />;
+  if (!accepted) return <DisclaimerSplash onAccept={accept} />;
 
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto" dir={isAr ? "rtl" : "ltr"}>
-      {/* Top gradient bar */}
+    <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
       <div className="h-1 bg-gradient-to-r from-blue-500 via-rose-500 to-emerald-500" />
 
-      {/* Header */}
       <header className="px-4 pt-4 pb-3">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2.5">
@@ -230,20 +212,11 @@ export default function Index() {
               <p className="text-[10px] text-muted-foreground leading-tight">{i.appSubtitle}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={toggleLang}
-              className="px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-muted transition-colors text-primary border border-border"
-            >
-              {isAr ? "EN" : "عربي"}
-            </button>
-            <button onClick={toggleDark} className="p-1.5 rounded-full hover:bg-muted transition-colors" aria-label="Toggle dark mode">
-              {dark ? <Sun className="w-4 h-4 text-foreground" /> : <Moon className="w-4 h-4 text-foreground" />}
-            </button>
-          </div>
+          <button onClick={toggleDark} className="p-1.5 rounded-full hover:bg-muted transition-colors" aria-label="Toggle dark mode">
+            {dark ? <Sun className="w-4 h-4 text-foreground" /> : <Moon className="w-4 h-4 text-foreground" />}
+          </button>
         </div>
 
-        {/* Stats banner */}
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 mb-3">
           <BookOpen className="w-4 h-4 text-primary shrink-0" />
           <div className="flex-1 min-w-0">
@@ -256,7 +229,6 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Category Cards */}
         <div className="grid grid-cols-2 gap-2 mb-3">
           {tabIds.map((id) => {
             const config = categoryConfig[id];
@@ -292,46 +264,39 @@ export default function Index() {
           })}
         </div>
 
-        {/* Search - show when category selected */}
         {activeTab && (
           <div className="relative">
-            <Search className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground ${isAr ? "right-3" : "left-3"}`} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={i.searchPlaceholder}
-              className={`h-10 bg-card border-border/60 rounded-xl text-sm ${isAr ? "pr-10" : "pl-10"}`}
+              className="h-10 bg-card border-border/60 rounded-xl text-sm pl-10"
             />
           </div>
         )}
       </header>
 
-      {/* Content */}
       <main className="flex-1 px-4 pb-6">
         {!activeTab ? (
           <div className="text-center py-10 space-y-3">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Stethoscope className="w-8 h-8 text-primary" />
             </div>
-            <p className="text-sm font-semibold text-foreground">
-              {isAr ? "اختر قسماً للبدء" : "Select a category to explore"}
-            </p>
+            <p className="text-sm font-semibold text-foreground">Select a category to explore</p>
             <p className="text-xs text-muted-foreground max-w-[250px] mx-auto">
-              {isAr
-                ? "اضغط على أحد الأقسام أعلاه لعرض السيناريوهات السريرية والنصائح الطبية"
-                : "Tap a category above to browse clinical scenarios, tips and model answers"}
+              Tap a category above to browse clinical scenarios, tips and model answers
             </p>
           </div>
         ) : loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs text-muted-foreground">{isAr ? "جارٍ التحميل..." : "Loading..."}</p>
+            <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
         ) : scenarios.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-8">{i.noResults}</p>
         ) : (
           <>
-            {/* Section header */}
             <div className="flex items-center justify-between mb-2 px-1">
               <div className="flex items-center gap-2">
                 {(() => {
@@ -341,14 +306,14 @@ export default function Index() {
                 <h2 className="text-sm font-bold text-foreground">{i.tabs[activeTab]}</h2>
               </div>
               <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                {totalCount} {isAr ? "عنصر" : "items"}
+                {totalCount} items
               </span>
             </div>
 
             <div className="bg-card rounded-xl border border-border/50 overflow-hidden">
               <Accordion type="single" collapsible className="w-full">
                 {scenarios.map((item) => (
-                  <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} lang={lang} />
+                  <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} />
                 ))}
               </Accordion>
             </div>
@@ -356,7 +321,6 @@ export default function Index() {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
-              lang={lang}
             />
           </>
         )}
