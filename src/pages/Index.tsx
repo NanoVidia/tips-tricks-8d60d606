@@ -233,13 +233,22 @@ export default function Index() {
               </motion.div>
               <div className="min-w-0">
                 <motion.h1
-                  className="text-2xl font-black tracking-tight"
-                  style={{ color: 'hsl(0, 72%, 30%)' }}
+                  className="text-2xl font-black tracking-tight relative overflow-hidden"
+                  style={{ color: 'hsl(215, 80%, 22%)' }}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.1, type: "spring", stiffness: 150, damping: 12 }}
                 >
-                  Tips & Tricks
+                  <span className="relative z-10">Tips & Tricks</span>
+                  <motion.span
+                    className="absolute inset-0 z-20 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%)",
+                      backgroundSize: "200% 100%",
+                    }}
+                    animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
+                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
+                  />
                 </motion.h1>
                 <motion.p
                   className="text-xs text-muted-foreground leading-tight font-semibold mt-0.5"
