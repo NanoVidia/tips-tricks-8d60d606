@@ -172,11 +172,19 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20 max-w-lg mx-auto" dir={isAr ? "rtl" : "ltr"}>
       {/* Header */}
-      <header className="flex items-center justify-between px-4 pt-4 pb-2">
+      {/* Big Title */}
+      <div className="px-4 pt-4 pb-1 text-center">
+        <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: 'hsl(0, 72%, 30%)' }}>
+          Tips & Tricks
+        </h1>
+      </div>
+
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 pt-1 pb-2">
         <div className="flex items-center gap-3">
           <Logo />
           <div className="min-w-0">
-            <h1 className="text-base font-bold text-foreground leading-tight">{i.appTitle}</h1>
+            <h2 className="text-base font-bold text-foreground leading-tight">{i.appTitle}</h2>
             <p className="text-[11px] text-muted-foreground leading-snug">{i.appSubtitle}</p>
             <p className="text-[10px] text-muted-foreground/70 leading-snug">{i.appCredential}</p>
           </div>
