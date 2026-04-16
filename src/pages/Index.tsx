@@ -1,15 +1,26 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity, Sparkles, ChevronRight, ChevronDown, Baby, Syringe, ShieldCheck, Brain, Phone, Bot, Zap, GraduationCap, Clock, Wrench, X, Loader2 } from "lucide-react";
+import {
+  Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle,
+  Sparkles, ChevronRight, Baby, ShieldCheck, Activity, Wrench, X, Loader2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { AIChatDrawer } from "@/components/AIChatDrawer";
-import { FloatingAIBot } from "@/components/FloatingAIBot";
 import { Pagination } from "@/components/Pagination";
+import { StatsStrip } from "@/components/StatsStrip";
+import { CaseOfTheDay } from "@/components/CaseOfTheDay";
+import { OnboardingTour } from "@/components/OnboardingTour";
 import { t } from "@/lib/i18n";
+
+// Code-split the floating bot — it's not needed for first paint and ships React Markdown.
+const FloatingAIBot = lazy(() =>
+  import("@/components/FloatingAIBot").then((m) => ({ default: m.FloatingAIBot })),
+);
+
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
@@ -62,47 +73,28 @@ const categoryConfig = {
 
 const tabIds: ScenarioCategory[] = ["qa", "clinic", "or_labor", "behavior"];
 
-const featuredTopics = [
-  { icon: Baby, label: "Preterm Labor — Early Signs & Management", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
-  { icon: ShieldCheck, label: "Preeclampsia Detection & Prevention", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
-  { icon: Activity, label: "CTG Reading — Pattern Recognition Secrets", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
-  { icon: Syringe, label: "PPH Algorithm — HAEMOSTASIS Protocol", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
-  { icon: Scissors, label: "Cesarean Technique Refinements", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-  { icon: Brain, label: "Eclamptic Seizure — First 5 Minutes", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
-  { icon: Stethoscope, label: "VBAC Patient Selection & Counseling", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-  { icon: HelpCircle, label: "Ectopic Pregnancy — Diagnosis You Must Not Miss", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-  { icon: Heart, label: "Neonatal Resuscitation — The Golden Minute", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-  { icon: MessageCircle, label: "Breaking Bad News — SPIKES Protocol", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
-  { icon: Syringe, label: "Amniotomy — When & How to Perform", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
-  { icon: Activity, label: "Cord Prolapse — Immediate Response Steps", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-  { icon: ShieldCheck, label: "Gestational Diabetes — Insulin vs Metformin", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
-  { icon: Scissors, label: "Episiotomy Repair — Step-by-Step Technique", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-  { icon: Brain, label: "Placenta Accreta Spectrum — Surgical Planning", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
-  { icon: Baby, label: "Breech Presentation — ECV Technique & Timing", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
-  { icon: Stethoscope, label: "Ovarian Torsion — Rapid Diagnosis Clues", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-  { icon: HelpCircle, label: "HELLP Syndrome — Labs & Management", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-  { icon: Heart, label: "Shoulder Dystocia — McRoberts & Beyond", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-  { icon: MessageCircle, label: "Consent for Emergency C-Section — Key Points", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
-  { icon: Syringe, label: "Oxytocin Augmentation — Safe Dosing Protocol", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
-  { icon: Activity, label: "Fetal Bradycardia — Decision Tree", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
-  { icon: Brain, label: "Cervical Cerclage — Indications & Technique", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
-  { icon: ShieldCheck, label: "DVT in Pregnancy — Prophylaxis & Treatment", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-  { icon: Scissors, label: "Forceps vs Vacuum — When to Choose Which", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-];
-
+/* Refined editorial logo — gold caduceus on ink, evokes a medical journal masthead. */
 const Logo = () => (
-  <div className="relative w-11 h-11">
-    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-500/20 via-blue-500/20 to-emerald-500/20 blur-sm" />
-    <div className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-600 via-rose-700 to-rose-800 shadow-lg shadow-rose-500/25 flex items-center justify-center">
-      <svg viewBox="0 0 40 40" className="w-7 h-7" fill="none">
-        <path d="M20 35s-12-7.5-12-16c0-4.5 3.5-8 7.5-8 2.5 0 4.5 1.5 4.5 1.5S22 9.5 24.5 9.5c4 0 7.5 3.5 7.5 8 0 8.5-12 16-12 16z"
-          fill="white" fillOpacity="0.9" />
-        <polyline points="8,22 14,22 16,17 19,27 22,20 25,24 28,22 33,22"
-          stroke="hsl(0, 72%, 35%)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  <div className="relative w-11 h-11 shrink-0">
+    <div
+      className="relative w-11 h-11 rounded-xl gradient-ink flex items-center justify-center shadow-editorial overflow-hidden"
+      aria-label="Tips & Tricks logo"
+    >
+      <svg viewBox="0 0 40 40" className="w-6 h-6" fill="none" aria-hidden="true">
+        {/* Stylised bedside heart + ECG line, drawn in editorial gold */}
+        <path
+          d="M20 33s-11-6.8-11-14.5c0-4 3-7 6.8-7 2.3 0 4.2 1.4 4.2 1.4S21.9 11.5 24.2 11.5c3.8 0 6.8 3 6.8 7C31 26.2 20 33 20 33z"
+          fill="hsl(43 60% 58%)" fillOpacity="0.95"
+        />
+        <polyline
+          points="9,21 15,21 17,16 20,26 23,19 26,23 29,21 31,21"
+          stroke="hsl(0 0% 10%)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+        />
       </svg>
     </div>
   </div>
 );
+
 
 const i = t();
 
@@ -281,65 +273,43 @@ export default function Index() {
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto relative overflow-hidden">
-      {/* Ambient background effects */}
-      <div className="absolute top-0 right-0 w-72 h-[600px] bg-gradient-to-l from-blue-400/8 via-blue-300/4 to-transparent dark:from-blue-500/6 dark:via-blue-400/2 pointer-events-none" />
-      <div className="absolute top-40 -left-10 w-40 h-40 bg-gradient-to-br from-rose-300/8 to-transparent dark:from-rose-500/4 pointer-events-none rounded-full blur-3xl" />
-      <div className="absolute bottom-40 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-300/8 to-transparent dark:from-emerald-500/4 pointer-events-none rounded-full blur-3xl" />
+    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative overflow-hidden">
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
+        style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
+        aria-hidden="true"
+      />
+      <div className="h-[2px] gradient-gold relative z-10" />
 
-      {/* Premium gradient bar */}
-      <div className="h-1 bg-gradient-to-r from-rose-500 via-blue-500 to-emerald-500 relative z-10" />
-
-      {/* Header */}
-      <header className="relative px-4 pt-4 pb-3 overflow-hidden z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-rose-50/30 via-transparent to-transparent dark:from-rose-950/10" />
-
+      <header className="relative px-4 pt-5 pb-3 z-10">
         <div className="relative">
-          {/* Top bar */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2.5">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }}>
                 <Logo />
               </motion.div>
               <div className="min-w-0">
                 <motion.h1
-                  className="text-xl font-black tracking-tight relative overflow-hidden"
-                  style={{ color: 'hsl(215, 80%, 22%)' }}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1, type: "spring", stiffness: 150, damping: 12 }}
+                  className="font-editorial text-[22px] font-bold tracking-tight text-foreground leading-none"
+                  initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <span className="relative z-10">Tips & Tricks</span>
-                  <motion.span
-                    className="absolute inset-0 z-20 pointer-events-none"
-                    style={{
-                      background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%)",
-                      backgroundSize: "200% 100%",
-                    }}
-                    animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
-                  />
+                  Tips <span className="italic font-medium text-gold">&</span> Tricks
                 </motion.h1>
                 <motion.p
-                  className="text-[10px] text-muted-foreground leading-tight font-semibold"
-                  initial={{ x: -15, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.25, type: "spring", stiffness: 120, damping: 14 }}
+                  className="text-[9.5px] text-muted-foreground leading-snug font-medium mt-1"
+                  initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}
                 >
-                  {i.appSubtitle}
+                  <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
                 </motion.p>
               </div>
             </div>
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl bg-card border border-border/50 hover:bg-muted transition-all shadow-sm"
-              aria-label="Toggle dark mode"
+              className="p-2 rounded-xl bg-card border border-border/60 hover:border-gold/40 hover:bg-muted transition-all"
+              aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             >
-              {dark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-blue-500" />}
+              {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
             </button>
           </div>
 
