@@ -73,7 +73,28 @@ const categoryConfig = {
 
 const tabIds: ScenarioCategory[] = ["qa", "clinic", "or_labor", "behavior"];
 
-const featuredTopics = [
+/* Refined editorial logo — gold caduceus on ink, evokes a medical journal masthead. */
+const Logo = () => (
+  <div className="relative w-11 h-11 shrink-0">
+    <div
+      className="relative w-11 h-11 rounded-xl gradient-ink flex items-center justify-center shadow-editorial overflow-hidden"
+      aria-label="Tips & Tricks logo"
+    >
+      <svg viewBox="0 0 40 40" className="w-6 h-6" fill="none" aria-hidden="true">
+        {/* Stylised bedside heart + ECG line, drawn in editorial gold */}
+        <path
+          d="M20 33s-11-6.8-11-14.5c0-4 3-7 6.8-7 2.3 0 4.2 1.4 4.2 1.4S21.9 11.5 24.2 11.5c3.8 0 6.8 3 6.8 7C31 26.2 20 33 20 33z"
+          fill="hsl(43 60% 58%)" fillOpacity="0.95"
+        />
+        <polyline
+          points="9,21 15,21 17,16 20,26 23,19 26,23 29,21 31,21"
+          stroke="hsl(0 0% 10%)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+        />
+      </svg>
+    </div>
+  </div>
+);
+
   { icon: Baby, label: "Preterm Labor — Early Signs & Management", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
   { icon: ShieldCheck, label: "Preeclampsia Detection & Prevention", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
   { icon: Activity, label: "CTG Reading — Pattern Recognition Secrets", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
