@@ -148,9 +148,14 @@ export default function Index() {
             <p className="text-xs text-muted-foreground">Clinical Quick Guide</p>
           </div>
         </div>
-        <button onClick={toggleDark} className="p-2 rounded-full hover:bg-muted transition-colors" aria-label="Toggle dark mode">
-          {dark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setLang(l => l === "en" ? "ar" : "en")} className="p-2 rounded-full hover:bg-muted transition-colors" aria-label="Toggle language">
+            <Globe className="w-5 h-5 text-foreground" />
+          </button>
+          <button onClick={toggleDark} className="p-2 rounded-full hover:bg-muted transition-colors" aria-label="Toggle dark mode">
+            {dark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
+          </button>
+        </div>
       </header>
 
       {/* Search */}
