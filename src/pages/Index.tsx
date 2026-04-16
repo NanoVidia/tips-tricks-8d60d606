@@ -1,15 +1,26 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity, Sparkles, ChevronRight, ChevronDown, Baby, Syringe, ShieldCheck, Brain, Phone, Bot, Zap, GraduationCap, Clock, Wrench, X, Loader2 } from "lucide-react";
+import {
+  Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle,
+  Sparkles, ChevronRight, Baby, ShieldCheck, Activity, Wrench, X, Loader2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { AIChatDrawer } from "@/components/AIChatDrawer";
-import { FloatingAIBot } from "@/components/FloatingAIBot";
 import { Pagination } from "@/components/Pagination";
+import { StatsStrip } from "@/components/StatsStrip";
+import { CaseOfTheDay } from "@/components/CaseOfTheDay";
+import { OnboardingTour } from "@/components/OnboardingTour";
 import { t } from "@/lib/i18n";
+
+// Code-split the floating bot — it's not needed for first paint and ships React Markdown.
+const FloatingAIBot = lazy(() =>
+  import("@/components/FloatingAIBot").then((m) => ({ default: m.FloatingAIBot })),
+);
+
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
