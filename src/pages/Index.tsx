@@ -257,13 +257,22 @@ export default function Index() {
           </div>
 
           {/* Stats banner - refined */}
-          <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl bg-card border border-border/50 shadow-sm mb-4">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 shadow-sm">
+          <motion.div
+            className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-card border border-border/50 shadow-sm mb-4"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.35, type: "spring", stiffness: 120, damping: 14 }}
+          >
+            <motion.div
+              className="p-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 shadow-sm"
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            >
               <Activity className="w-4 h-4 text-white" />
-            </div>
+            </motion.div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-foreground">{i.appTitle}</p>
-              <p className="text-[10px] text-muted-foreground">{i.appCredential}</p>
+              <p className="text-sm font-bold text-foreground">{i.appTitle}</p>
+              <p className="text-[11px] text-muted-foreground">{i.appCredential}</p>
             </div>
             <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200/50 dark:border-emerald-800/50">
               <TrendingUp className="w-3 h-3 text-emerald-500" />
