@@ -382,6 +382,20 @@ export default function Index() {
                 </button>
               ))}
             </div>
+
+            <Link
+              to="/tools"
+              className="mt-5 group flex items-center gap-3 w-full p-3.5 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 hover:border-primary/40 transition-all"
+            >
+              <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-sm">
+                <Wrench className="w-4 h-4 text-primary-foreground" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-[13px] font-bold text-foreground">Clinical Tools</p>
+                <p className="text-[10px] text-muted-foreground leading-tight">Calculators • Emergency • Drugs • Guidelines • DDx • MCQ</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition" />
+            </Link>
           </motion.div>
         ) : loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
