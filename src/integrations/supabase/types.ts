@@ -14,16 +14,91 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      medical_scenarios: {
+        Row: {
+          action_ar: string
+          action_en: string
+          category: Database["public"]["Enums"]["scenario_category"]
+          created_at: string
+          id: string
+          script_ar: string
+          script_en: string
+          situation_ar: string
+          situation_en: string
+          synonyms: string[] | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          action_ar: string
+          action_en: string
+          category: Database["public"]["Enums"]["scenario_category"]
+          created_at?: string
+          id?: string
+          script_ar: string
+          script_en: string
+          situation_ar: string
+          situation_en: string
+          synonyms?: string[] | null
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          action_ar?: string
+          action_en?: string
+          category?: Database["public"]["Enums"]["scenario_category"]
+          created_at?: string
+          id?: string
+          script_ar?: string
+          script_en?: string
+          situation_ar?: string
+          situation_en?: string
+          synonyms?: string[] | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_scenarios: {
+        Args: {
+          category_filter?: Database["public"]["Enums"]["scenario_category"]
+          search_query: string
+        }
+        Returns: {
+          action_ar: string
+          action_en: string
+          category: Database["public"]["Enums"]["scenario_category"]
+          created_at: string
+          id: string
+          script_ar: string
+          script_en: string
+          situation_ar: string
+          situation_en: string
+          synonyms: string[] | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "medical_scenarios"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
-      [_ in never]: never
+      scenario_category: "clinic" | "or_labor" | "behavior" | "qa"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +225,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      scenario_category: ["clinic", "or_labor", "behavior", "qa"],
+    },
   },
 } as const
