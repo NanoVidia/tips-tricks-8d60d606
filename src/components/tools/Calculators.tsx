@@ -280,7 +280,7 @@ export function ApgarCalculator() {
   const [oneMin, setOneMin] = useState<ApgarSet>(init);
   const [fiveMin, setFiveMin] = useState<ApgarSet>(init);
   return (
-    <CalcShell icon={Heart} title="APGAR Score" subtitle="Score newborn at 1 & 5 minutes">
+    <CalcShell id="apgar" icon={Heart} title="APGAR Score" subtitle="Score newborn at 1 & 5 minutes">
       <ApgarBlock label="1 minute" value={oneMin} onChange={setOneMin} />
       <ApgarBlock label="5 minutes" value={fiveMin} onChange={setFiveMin} />
     </CalcShell>
