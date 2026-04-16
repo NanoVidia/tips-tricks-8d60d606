@@ -3,7 +3,8 @@ export type Lang = "en" | "ar";
 const translations = {
   en: {
     appTitle: "OB/GYN Reference",
-    appSubtitle: "Clinical Quick Guide",
+    appSubtitle: "Under the supervision of Dr. Sahar Al-Khudairi",
+    appCredential: "Consultant in Obstetrics & Gynecology — Sultanate of Oman",
     searchPlaceholder: "Smart Search — handles typos & synonyms...",
     noResults: "No results found.",
     situation: "Situation",
@@ -27,7 +28,8 @@ const translations = {
   },
   ar: {
     appTitle: "مرجع النساء والتوليد",
-    appSubtitle: "دليل سريري سريع",
+    appSubtitle: "تحت إشراف د. سحر الخضيري",
+    appCredential: "استشارية أمراض النساء والتوليد — سلطنة عُمان",
     searchPlaceholder: "بحث ذكي — يتعامل مع الأخطاء الإملائية...",
     noResults: "لا توجد نتائج.",
     situation: "الموقف",
