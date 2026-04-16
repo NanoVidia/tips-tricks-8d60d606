@@ -32,6 +32,20 @@
     --input: 214 32% 91%;
     --ring: 217 91% 60%;
 
+    /* Clinical semantic tokens */
+    --success: 152 60% 38%;
+    --success-foreground: 0 0% 100%;
+    --success-soft: 152 60% 95%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-soft: 45 100% 95%;
+    --danger: 0 84% 55%;
+    --danger-foreground: 0 0% 100%;
+    --danger-soft: 0 80% 96%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+    --info-soft: 214 95% 95%;
+
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
@@ -73,6 +87,15 @@
     --input: 217 33% 17%;
     --ring: 217 91% 60%;
 
+    --success: 152 55% 45%;
+    --success-soft: 152 50% 12%;
+    --warning: 38 92% 55%;
+    --warning-soft: 38 60% 12%;
+    --danger: 0 75% 60%;
+    --danger-soft: 0 60% 14%;
+    --info: 217 91% 60%;
+    --info-soft: 217 60% 14%;
+
     --sidebar-background: 222 47% 6%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 217 91% 60%;
@@ -91,4 +114,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { scrollbar-width: none; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
 }
