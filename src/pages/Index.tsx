@@ -303,37 +303,37 @@ export default function Index() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, type: "spring", stiffness: 120 }}
           >
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-rose-500 to-rose-600">
+            <div className="flex-1 flex items-center gap-1.5 px-2 py-2 rounded-xl bg-card border border-border/40 shadow-sm min-w-0">
+              <div className="p-1 rounded-md bg-gradient-to-br from-rose-500 to-rose-600 shrink-0">
                 <GraduationCap className="w-3 h-3 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium leading-tight">Scenarios</p>
-                <p className="text-sm font-black text-foreground tabular-nums">{totalScenarios}</p>
+                <p className="text-[9px] text-muted-foreground font-medium leading-tight truncate">Scenarios</p>
+                <p className="text-xs font-black text-foreground tabular-nums">{totalScenarios}</p>
               </div>
             </div>
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+            <div className="flex-1 flex items-center gap-1.5 px-2 py-2 rounded-xl bg-card border border-border/40 shadow-sm min-w-0">
+              <div className="p-1 rounded-md bg-gradient-to-br from-blue-500 to-indigo-600 shrink-0">
                 <Zap className="w-3 h-3 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium leading-tight">Categories</p>
-                <p className="text-sm font-black text-foreground">4</p>
+                <p className="text-[9px] text-muted-foreground font-medium leading-tight truncate">Categories</p>
+                <p className="text-xs font-black text-foreground">4</p>
               </div>
             </div>
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+            <div className="flex-1 flex items-center gap-1.5 px-2 py-2 rounded-xl bg-card border border-border/40 shadow-sm min-w-0">
+              <div className="p-1 rounded-md bg-gradient-to-br from-emerald-500 to-teal-600 shrink-0">
                 <Bot className="w-3 h-3 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium leading-tight">AI Bot</p>
-                <p className="text-sm font-black text-emerald-600 dark:text-emerald-400">24/7</p>
+                <p className="text-[9px] text-muted-foreground font-medium leading-tight truncate">AI Bot</p>
+                <p className="text-xs font-black text-emerald-600 dark:text-emerald-400">24/7</p>
               </div>
             </div>
           </motion.div>
 
           {/* Category Cards */}
-          <div className="grid grid-cols-4 gap-2 mb-3">
+          <div className="grid grid-cols-4 gap-1.5 mb-3">
             {tabIds.map((id, idx) => {
               const config = categoryConfig[id];
               const Icon = config.icon;
@@ -347,23 +347,23 @@ export default function Index() {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.15 + idx * 0.06, type: "spring", stiffness: 150, damping: 14 }}
                   whileTap={{ scale: 0.93 }}
-                  className={`relative overflow-hidden rounded-xl p-2.5 text-center transition-all duration-300 border ${
+                  className={`relative overflow-hidden rounded-xl p-2 text-center transition-all duration-300 border ${
                     active
                       ? `${config.borderColor} ${config.bgLight} shadow-md`
                       : "border-border/40 bg-card hover:shadow-sm"
                   }`}
                 >
                   <motion.div
-                    className={`mx-auto p-2 rounded-lg shadow-sm mb-1.5 w-fit ${active ? config.iconBg : "bg-muted/80"}`}
+                    className={`mx-auto p-1.5 rounded-lg shadow-sm mb-1 w-fit ${active ? config.iconBg : "bg-muted/80"}`}
                     animate={active ? { rotate: [0, -8, 8, -4, 0] } : {}}
                     transition={{ duration: 0.5 }}
                   >
-                    <Icon className={`w-4 h-4 ${active ? "text-white" : "text-muted-foreground"}`} />
+                    <Icon className={`w-3.5 h-3.5 ${active ? "text-white" : "text-muted-foreground"}`} />
                   </motion.div>
-                  <p className={`text-[10px] font-bold leading-tight ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                  <p className={`text-[9px] font-bold leading-tight truncate ${active ? "text-foreground" : "text-muted-foreground"}`}>
                     {i.tabs[id]}
                   </p>
-                  <p className={`text-xs font-black tabular-nums mt-0.5 ${active ? config.iconColor : "text-muted-foreground/40"}`}>
+                  <p className={`text-[11px] font-black tabular-nums mt-0.5 ${active ? config.iconColor : "text-muted-foreground/40"}`}>
                     {count}
                   </p>
                   {active && (
