@@ -220,12 +220,31 @@ export default function Index() {
           {/* Top bar: Logo + title + dark mode */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Logo />
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              >
+                <Logo />
+              </motion.div>
               <div className="min-w-0">
-                <h1 className="text-xl font-black tracking-tight" style={{ color: 'hsl(0, 72%, 30%)' }}>
+                <motion.h1
+                  className="text-2xl font-black tracking-tight"
+                  style={{ color: 'hsl(0, 72%, 30%)' }}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1, type: "spring", stiffness: 150, damping: 12 }}
+                >
                   Tips & Tricks
-                </h1>
-                <p className="text-[10px] text-muted-foreground leading-tight font-medium">{i.appSubtitle}</p>
+                </motion.h1>
+                <motion.p
+                  className="text-xs text-muted-foreground leading-tight font-semibold mt-0.5"
+                  initial={{ x: -15, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.25, type: "spring", stiffness: 120, damping: 14 }}
+                >
+                  {i.appSubtitle}
+                </motion.p>
               </div>
             </div>
             <button
