@@ -275,11 +275,26 @@ export function FloatingAIBot() {
                     <div className={`max-w-[80%] space-y-1.5 ${m.role === "user" ? "items-end" : "items-start"}`}>
                       {m.uiTools?.map((t, ti) => {
                         const meta = TOOL_LABELS[t.name] ?? { label: t.name, icon: "🔧" };
+                        const target = t.ok ? getSaveTarget(t.name, t.args) : null;
                         return (
-                          <div key={ti} className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40 w-fit">
-                            <span>{meta.icon}</span>
-                            <span className="font-semibold">{meta.label}</span>
-                            {t.ok && <CheckCircle2 className="w-2.5 h-2.5" />}
+                          <div key={ti} className="flex items-center gap-1.5 flex-wrap">
+                            <div className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40 w-fit">
+                              <span>{meta.icon}</span>
+                              <span className="font-semibold">{meta.label}</span>
+                              {t.ok && <CheckCircle2 className="w-2.5 h-2.5" />}
+                            </div>
+                            {target && (
+                              <Link
+                                to={buildSaveToToolsUrl(target)}
+                                onClick={() => stashPrefill(target)}
+                                className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors font-semibold"
+                                aria-label={`Open ${meta.label} in Tools with values prefilled`}
+                                title="Open in Tools with these values"
+                              >
+                                <ExternalLink className="w-2.5 h-2.5" />
+                                Save to Tools
+                              </Link>
+                            )}
                           </div>
                         );
                       })}
