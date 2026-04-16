@@ -380,7 +380,7 @@ export function BMICalculator() {
     : "";
 
   return (
-    <CalcShell icon={Scale} title="Pre-pregnancy BMI" subtitle="IOM 2009 weight-gain targets">
+    <CalcShell id="bmi" icon={Scale} title="Pre-pregnancy BMI" subtitle="IOM 2009 weight-gain targets">
       <div className="grid grid-cols-2 gap-2">
         <div>
           <Label htmlFor="bmi-w" className="text-xs">Weight (kg)</Label>
@@ -427,7 +427,7 @@ export function OvulationCalculator() {
   }, [lmp, c]);
 
   return (
-    <CalcShell icon={Calculator} title="Ovulation & Fertile Window" subtitle="Calendar method (regular cycles)">
+    <CalcShell id="ovulation" icon={Calculator} title="Ovulation & Fertile Window" subtitle="Calendar method (regular cycles)">
       <div className="space-y-2">
         <div>
           <Label htmlFor="ov-lmp" className="text-xs">First day of last period</Label>
@@ -495,7 +495,7 @@ export function GonadotropinCalculator() {
       : { t: "Normal responder", tone: "success" as const };
 
   return (
-    <CalcShell icon={Calculator} title="FSH Starting Dose" subtitle="IVF stimulation — La Marca / Nelson nomogram">
+    <CalcShell id="gonadotropin" icon={Calculator} title="FSH Starting Dose" subtitle="IVF stimulation — La Marca / Nelson nomogram">
       <div className="grid grid-cols-3 gap-2">
         <div>
           <Label htmlFor="g-amh" className="text-xs">AMH</Label>
