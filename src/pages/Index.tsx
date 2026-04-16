@@ -175,9 +175,10 @@ export default function Index() {
       <header className="flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-3">
           <Logo />
-          <div>
-            <h1 className="text-lg font-bold text-foreground leading-tight">{i.appTitle}</h1>
-            <p className="text-xs text-muted-foreground">{i.appSubtitle}</p>
+          <div className="min-w-0">
+            <h1 className="text-base font-bold text-foreground leading-tight">{i.appTitle}</h1>
+            <p className="text-[11px] text-muted-foreground leading-snug">{i.appSubtitle}</p>
+            <p className="text-[10px] text-muted-foreground/70 leading-snug">{i.appCredential}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
