@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -219,12 +220,31 @@ export default function Index() {
           {/* Top bar: Logo + title + dark mode */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Logo />
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              >
+                <Logo />
+              </motion.div>
               <div className="min-w-0">
-                <h1 className="text-xl font-black tracking-tight" style={{ color: 'hsl(0, 72%, 30%)' }}>
+                <motion.h1
+                  className="text-2xl font-black tracking-tight"
+                  style={{ color: 'hsl(0, 72%, 30%)' }}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1, type: "spring", stiffness: 150, damping: 12 }}
+                >
                   Tips & Tricks
-                </h1>
-                <p className="text-[10px] text-muted-foreground leading-tight font-medium">{i.appSubtitle}</p>
+                </motion.h1>
+                <motion.p
+                  className="text-xs text-muted-foreground leading-tight font-semibold mt-0.5"
+                  initial={{ x: -15, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.25, type: "spring", stiffness: 120, damping: 14 }}
+                >
+                  {i.appSubtitle}
+                </motion.p>
               </div>
             </div>
             <button
@@ -237,19 +257,28 @@ export default function Index() {
           </div>
 
           {/* Stats banner - refined */}
-          <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl bg-card border border-border/50 shadow-sm mb-4">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 shadow-sm">
+          <motion.div
+            className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-card border border-border/50 shadow-sm mb-4"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.35, type: "spring", stiffness: 120, damping: 14 }}
+          >
+            <motion.div
+              className="p-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 shadow-sm"
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            >
               <Activity className="w-4 h-4 text-white" />
-            </div>
+            </motion.div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-foreground">{i.appTitle}</p>
-              <p className="text-[10px] text-muted-foreground">{i.appCredential}</p>
+              <p className="text-sm font-bold text-foreground">{i.appTitle}</p>
+              <p className="text-[11px] text-muted-foreground">{i.appCredential}</p>
             </div>
             <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200/50 dark:border-emerald-800/50">
               <TrendingUp className="w-3 h-3 text-emerald-500" />
               <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{totalScenarios}</span>
             </div>
-          </div>
+          </motion.div>
 
           {/* Category Cards - enhanced with icon gradients */}
           <div className="grid grid-cols-2 gap-2.5 mb-3">
