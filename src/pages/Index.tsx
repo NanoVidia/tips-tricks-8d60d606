@@ -286,36 +286,47 @@ export default function Index() {
 
           {/* Category Cards - enhanced with icon gradients */}
           <div className="grid grid-cols-2 gap-2.5 mb-3">
-            {tabIds.map((id) => {
+            {tabIds.map((id, idx) => {
               const config = categoryConfig[id];
               const Icon = config.icon;
               const active = activeTab === id;
               const count = categoryCounts[id];
               return (
-                <button
+                <motion.button
                   key={id}
                   onClick={() => setActiveTab(active ? null : id)}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.15 + idx * 0.08, type: "spring", stiffness: 150, damping: 14 }}
+                  whileTap={{ scale: 0.95 }}
                   className={`relative overflow-hidden rounded-2xl p-3.5 text-left transition-all duration-300 border ${
                     active
-                      ? `${config.borderColor} ${config.bgLight} shadow-md scale-[0.97]`
-                      : "border-border/40 bg-card hover:border-border hover:shadow-md hover:scale-[0.99]"
+                      ? `${config.borderColor} ${config.bgLight} shadow-md`
+                      : "border-border/40 bg-card hover:border-border hover:shadow-md"
                   }`}
                 >
-                  <div className="flex items-start justify-between mb-2.5">
-                    <div className={`p-2 rounded-xl shadow-sm ${active ? config.iconBg : "bg-muted/80"}`}>
-                      <Icon className={`w-4 h-4 ${active ? "text-white" : "text-muted-foreground"}`} />
-                    </div>
-                    <span className={`text-xl font-black tabular-nums ${active ? config.iconColor : "text-muted-foreground/40"}`}>
+                  <div className="flex items-start justify-between mb-3">
+                    <motion.div
+                      className={`p-2.5 rounded-xl shadow-sm ${active ? config.iconBg : "bg-muted/80"}`}
+                      animate={active ? { rotate: [0, -8, 8, -4, 0] } : {}}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Icon className={`w-5 h-5 ${active ? "text-white" : "text-muted-foreground"}`} />
+                    </motion.div>
+                    <span className={`text-2xl font-black tabular-nums ${active ? config.iconColor : "text-muted-foreground/40"}`}>
                       {count}
                     </span>
                   </div>
-                  <p className={`text-xs font-bold ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                  <p className={`text-sm font-bold ${active ? "text-foreground" : "text-muted-foreground"}`}>
                     {i.tabs[id]}
                   </p>
                   {active && (
-                    <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${config.gradient}`} />
+                    <motion.div
+                      className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${config.gradient}`}
+                      layoutId="activeTab"
+                    />
                   )}
-                </button>
+                </motion.button>
               );
             })}
           </div>
