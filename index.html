@@ -2,26 +2,53 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Lovable App</title>
-    <meta name="description" content="OB/GYN educational reference app with smart search, bilingual content, and AI discussion.">
-    <meta name="author" content="Lovable" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5f3ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    
-    
+    <title>Tips & Tricks — OB/GYN Clinical Reference by Dr. Sahar Elkhodiry</title>
+    <meta name="description" content="Bedside OB/GYN reference: 200+ scenarios, scripts, calculators, emergency protocols & AI assistant. Curated by Dr. Sahar Elkhodiry, Consultant in Obstetrics & Gynecology, Oman." />
+    <meta name="author" content="Dr. Sahar Elkhodiry" />
+    <meta name="keywords" content="OB/GYN, obstetrics, gynecology, clinical reference, preeclampsia, PPH, Bishop score, MgSO4, EDD calculator, medical education" />
+    <link rel="canonical" href="https://tips-tricks.lovable.app/" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Editorial typography: Playfair Display + Inter, preconnected for fast LCP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,500&display=swap" rel="stylesheet" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    
+    <meta property="og:url" content="https://tips-tricks.lovable.app/" />
+    <meta property="og:title" content="Tips & Tricks — OB/GYN Clinical Reference" />
+    <meta property="og:description" content="200+ OB/GYN scenarios, scripts, calculators & AI assistant. By Dr. Sahar Elkhodiry, Consultant OB/GYN — Oman." />
+    <meta property="og:site_name" content="Tips & Tricks" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    
-    <meta property="og:title" content="Lovable App">
-  <meta name="twitter:title" content="Lovable App">
-  <meta property="og:description" content="OB/GYN educational reference app with smart search, bilingual content, and AI discussion.">
-  <meta name="twitter:description" content="OB/GYN educational reference app with smart search, bilingual content, and AI discussion.">
-</head>
+    <meta name="twitter:title" content="Tips & Tricks — OB/GYN Clinical Reference" />
+    <meta name="twitter:description" content="200+ scenarios, scripts, calculators & AI assistant for OB/GYN practice." />
+
+    <!-- Structured data for medical reference -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MedicalWebPage",
+      "name": "Tips & Tricks — OB/GYN Clinical Reference",
+      "description": "Curated bedside OB/GYN scenarios, scripts, calculators and an AI assistant.",
+      "url": "https://tips-tricks.lovable.app/",
+      "audience": { "@type": "MedicalAudience", "audienceType": "Clinician" },
+      "author": {
+        "@type": "Person",
+        "name": "Dr. Sahar Elkhodiry",
+        "jobTitle": "Consultant in Obstetrics & Gynecology",
+        "address": { "@type": "PostalAddress", "addressCountry": "OM" }
+      },
+      "specialty": "Obstetrics and Gynecology",
+      "inLanguage": ["en", "ar"]
+    }
+    </script>
+  </head>
 
   <body>
     <div id="root"></div>
