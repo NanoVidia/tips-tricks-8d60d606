@@ -3,7 +3,7 @@ export type Lang = "en" | "ar";
 const translations = {
   en: {
     appTitle: "OB/GYN Reference",
-    appSubtitle: "Under the supervision of Dr. Sahar Al-Khudairi",
+    appSubtitle: "Under the supervision of Dr. Sahar Elkhodiry",
     appCredential: "Consultant in Obstetrics & Gynecology — Sultanate of Oman",
     searchPlaceholder: "Smart Search — handles typos & synonyms...",
     noResults: "No results found.",
