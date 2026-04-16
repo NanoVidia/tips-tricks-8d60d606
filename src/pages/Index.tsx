@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity } from "lucide-react";
+import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity, Sparkles, ChevronRight, Baby, Syringe, ShieldCheck, Brain } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -403,12 +403,51 @@ export default function Index() {
               </div>
             </motion.div>
 
+            {/* Featured OB/GYN Topics */}
+            <motion.div
+              className="rounded-2xl bg-card border border-border/50 p-4 shadow-sm space-y-3"
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 120 }}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <h2 className="text-sm font-bold text-foreground">Featured OB/GYN Topics</h2>
+              </div>
+              <div className="space-y-1.5">
+                {[
+                  { icon: Baby, label: "Preterm Labor — Early Signs & Management", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
+                  { icon: ShieldCheck, label: "Preeclampsia Detection & Prevention", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
+                  { icon: Activity, label: "CTG Reading — Pattern Recognition Secrets", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
+                  { icon: Syringe, label: "PPH Algorithm — HAEMOSTASIS Protocol", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
+                  { icon: Scissors, label: "Cesarean Technique Refinements", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
+                  { icon: Brain, label: "Eclamptic Seizure — First 5 Minutes", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
+                  { icon: Stethoscope, label: "VBAC Patient Selection & Counseling", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
+                  { icon: HelpCircle, label: "Ectopic Pregnancy — Diagnosis You Must Not Miss", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
+                  { icon: Heart, label: "Neonatal Resuscitation — The Golden Minute", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
+                  { icon: MessageCircle, label: "Breaking Bad News — SPIKES Protocol", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
+                ].map((topic) => (
+                  <button
+                    key={topic.label}
+                    onClick={() => { setActiveTab("qa"); setSearch(topic.label.split("—")[0].trim()); }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl ${topic.bg} hover:opacity-80 transition-all text-left group`}
+                  >
+                    <topic.icon className={`w-3.5 h-3.5 ${topic.color} shrink-0`} />
+                    <span className="text-[11px] font-medium text-foreground flex-1 leading-tight">{topic.label}</span>
+                    <ChevronRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
             {/* CTA */}
             <motion.p
               className="text-center text-xs text-muted-foreground font-medium pt-1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.6 }}
             >
               ↑ Select a category above to start exploring
             </motion.p>
