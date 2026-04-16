@@ -122,7 +122,7 @@ export function EDDCalculator() {
   }, [lmp, cycleNum]);
 
   return (
-    <CalcShell icon={Baby} title="EDD & Gestational Age" subtitle="Naegele's rule (cycle-adjusted)">
+    <CalcShell id="edd" icon={Baby} title="EDD & Gestational Age" subtitle="Naegele's rule (cycle-adjusted)">
       <div className="space-y-2">
         <div>
           <Label htmlFor="edd-lmp" className="text-xs">LMP (first day)</Label>
