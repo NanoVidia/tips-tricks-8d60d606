@@ -152,7 +152,6 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [aiScenario, setAiScenario] = useState<Scenario | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
-  const [showAllTopics, setShowAllTopics] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
