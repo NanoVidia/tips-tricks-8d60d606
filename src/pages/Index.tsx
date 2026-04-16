@@ -155,6 +155,13 @@ export default function Index() {
   const [aiOpen, setAiOpen] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
+  // Auto-suggest state
+  const [suggestions, setSuggestions] = useState<Scenario[]>([]);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const [highlightIdx, setHighlightIdx] = useState(-1);
+  const searchBoxRef = useRef<HTMLDivElement>(null);
+
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
   const toggleDark = () => {
