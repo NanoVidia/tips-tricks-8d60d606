@@ -516,6 +516,7 @@ export default function Index() {
       </main>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
+      <FloatingAIBot />
     </div>
   );
 }
