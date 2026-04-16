@@ -405,6 +405,138 @@ export default function Tools() {
             {sections.map((s) => <TabsTrigger key={s.id} value={s.id}>{s.label}</TabsTrigger>)}
           </TabsList>
 
+          {/* FAVORITES */}
+          <TabsContent value="favorites" className="space-y-3 mt-0">
+            {favorites.total === 0 ? (
+              <Card className="p-8 border-border/50 text-center">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mb-3">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-base font-bold mb-1">No favorites yet</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed max-w-[260px] mx-auto">
+                  Tap the <Star className="w-3 h-3 inline mx-0.5 text-warning fill-warning" /> on any calculator,
+                  protocol, drug or DDx to pin it here for instant access.
+                </p>
+              </Card>
+            ) : (
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] text-muted-foreground tabular-nums">
+                    <span className="font-bold text-foreground">{favorites.total}</span> saved item{favorites.total === 1 ? "" : "s"}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (window.confirm("Remove all bookmarks?")) {
+                        clearBookmarks();
+                        toast({ title: "Cleared", description: "All favorites removed." });
+                      }
+                    }}
+                    className="h-7 text-[10px] gap-1 text-muted-foreground"
+                  >
+                    <Trash2 className="w-3 h-3" /> Clear all
+                  </Button>
+                </div>
+
+                {favorites.calc.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 px-1">
+                      Calculators
+                    </p>
+                    {favorites.calc.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => jumpToCalc(c.id)}
+                        className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:bg-muted/40 transition text-left"
+                      >
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/70">
+                          <Calculator className="w-3.5 h-3.5 text-primary-foreground" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[12px] font-bold text-foreground leading-tight">{c.title}</p>
+                          <p className="text-[10px] text-muted-foreground leading-tight">{c.subtitle}</p>
+                        </div>
+                        <BookmarkButton id={`calc:${c.id}`} label={c.title} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {favorites.protocols.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 px-1">
+                      Emergency protocols
+                    </p>
+                    {favorites.protocols.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setActive("emergency")}
+                        className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:bg-muted/40 transition text-left"
+                      >
+                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color}`}>
+                          <Siren className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <p className="text-[12px] font-bold text-foreground flex-1 leading-tight">{p.title}</p>
+                        <BookmarkButton id={`protocol:${p.id}`} label={p.title} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {favorites.drugs.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 px-1">
+                      Drugs
+                    </p>
+                    {favorites.drugs.map((d) => (
+                      <button
+                        key={d.name}
+                        type="button"
+                        onClick={() => setActive("drugs")}
+                        className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:bg-muted/40 transition text-left"
+                      >
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+                          <Pill className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[12px] font-bold text-foreground leading-tight">{d.name}</p>
+                          <p className="text-[10px] text-muted-foreground leading-tight truncate">FDA {d.category} • {d.trimester}</p>
+                        </div>
+                        <BookmarkButton id={`drug:${d.name}`} label={d.name} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {favorites.ddx.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 px-1">
+                      Differential diagnoses
+                    </p>
+                    {favorites.ddx.map((x) => (
+                      <button
+                        key={x.presentation}
+                        type="button"
+                        onClick={() => setActive("ddx")}
+                        className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:bg-muted/40 transition text-left"
+                      >
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600">
+                          <Brain className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <p className="text-[12px] font-bold text-foreground flex-1 leading-tight">{x.presentation}</p>
+                        <BookmarkButton id={`ddx:${x.presentation}`} label={x.presentation} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
+
           {/* CALCULATORS */}
           <TabsContent value="calc" className="space-y-3 mt-0">
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
