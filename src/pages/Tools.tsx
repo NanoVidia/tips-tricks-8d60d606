@@ -509,12 +509,13 @@ export default function Tools() {
 
             <div className="space-y-1.5">
               {filteredDrugs.map((d) => (
-                <Card key={d.name} className="p-3 border-border/50">
+                <Card key={d.name} id={`drug-${d.name}`} className="p-3 border-border/50 scroll-mt-32">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h4 className="text-sm font-bold">{d.name}</h4>
+                    <h4 className="text-sm font-bold flex-1">{d.name}</h4>
                     <Badge className={`${catColor(d.category)} text-[10px] shrink-0 border`}>
                       FDA {d.category}
                     </Badge>
+                    <BookmarkButton id={`drug:${d.name}`} label={d.name} />
                   </div>
                   <div className="grid grid-cols-2 gap-1 text-[10px] mb-1.5">
                     <div><span className="text-muted-foreground">Trimester:</span> <span className="font-semibold">{d.trimester}</span></div>
