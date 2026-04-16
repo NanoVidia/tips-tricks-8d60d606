@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity, Sparkles, ChevronRight, Baby, Syringe, ShieldCheck, Brain, Phone } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle, BookOpen, TrendingUp, Heart, Activity, Sparkles, ChevronRight, ChevronDown, Baby, Syringe, ShieldCheck, Brain, Phone, Bot, Zap, GraduationCap, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -61,16 +61,42 @@ const categoryConfig = {
 
 const tabIds: ScenarioCategory[] = ["clinic", "or_labor", "behavior", "qa"];
 
+const featuredTopics = [
+  { icon: Baby, label: "Preterm Labor — Early Signs & Management", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
+  { icon: ShieldCheck, label: "Preeclampsia Detection & Prevention", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
+  { icon: Activity, label: "CTG Reading — Pattern Recognition Secrets", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
+  { icon: Syringe, label: "PPH Algorithm — HAEMOSTASIS Protocol", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
+  { icon: Scissors, label: "Cesarean Technique Refinements", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
+  { icon: Brain, label: "Eclamptic Seizure — First 5 Minutes", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
+  { icon: Stethoscope, label: "VBAC Patient Selection & Counseling", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
+  { icon: HelpCircle, label: "Ectopic Pregnancy — Diagnosis You Must Not Miss", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
+  { icon: Heart, label: "Neonatal Resuscitation — The Golden Minute", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
+  { icon: MessageCircle, label: "Breaking Bad News — SPIKES Protocol", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
+  { icon: Syringe, label: "Amniotomy — When & How to Perform", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
+  { icon: Activity, label: "Cord Prolapse — Immediate Response Steps", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
+  { icon: ShieldCheck, label: "Gestational Diabetes — Insulin vs Metformin", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
+  { icon: Scissors, label: "Episiotomy Repair — Step-by-Step Technique", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
+  { icon: Brain, label: "Placenta Accreta Spectrum — Surgical Planning", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
+  { icon: Baby, label: "Breech Presentation — ECV Technique & Timing", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
+  { icon: Stethoscope, label: "Ovarian Torsion — Rapid Diagnosis Clues", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
+  { icon: HelpCircle, label: "HELLP Syndrome — Labs & Management", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
+  { icon: Heart, label: "Shoulder Dystocia — McRoberts & Beyond", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
+  { icon: MessageCircle, label: "Consent for Emergency C-Section — Key Points", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
+  { icon: Syringe, label: "Oxytocin Augmentation — Safe Dosing Protocol", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
+  { icon: Activity, label: "Fetal Bradycardia — Decision Tree", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
+  { icon: Brain, label: "Cervical Cerclage — Indications & Technique", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
+  { icon: ShieldCheck, label: "DVT in Pregnancy — Prophylaxis & Treatment", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
+  { icon: Scissors, label: "Forceps vs Vacuum — When to Choose Which", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
+];
+
 const Logo = () => (
-  <div className="relative w-12 h-12">
-    {/* Outer glow ring */}
+  <div className="relative w-11 h-11">
     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-500/20 via-blue-500/20 to-emerald-500/20 blur-sm" />
-    <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-600 via-rose-700 to-rose-800 shadow-lg shadow-rose-500/25 flex items-center justify-center">
-      {/* Heart with pulse line */}
-      <svg viewBox="0 0 40 40" className="w-8 h-8" fill="none">
-        <path d="M20 35s-12-7.5-12-16c0-4.5 3.5-8 7.5-8 2.5 0 4.5 1.5 4.5 1.5S22 9.5 24.5 9.5c4 0 7.5 3.5 7.5 8 0 8.5-12 16-12 16z" 
+    <div className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-600 via-rose-700 to-rose-800 shadow-lg shadow-rose-500/25 flex items-center justify-center">
+      <svg viewBox="0 0 40 40" className="w-7 h-7" fill="none">
+        <path d="M20 35s-12-7.5-12-16c0-4.5 3.5-8 7.5-8 2.5 0 4.5 1.5 4.5 1.5S22 9.5 24.5 9.5c4 0 7.5 3.5 7.5 8 0 8.5-12 16-12 16z"
           fill="white" fillOpacity="0.9" />
-        <polyline points="8,22 14,22 16,17 19,27 22,20 25,24 28,22 33,22" 
+        <polyline points="8,22 14,22 16,17 19,27 22,20 25,24 28,22 33,22"
           stroke="hsl(0, 72%, 35%)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </div>
@@ -126,6 +152,7 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [aiScenario, setAiScenario] = useState<Scenario | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
+  const [showAllTopics, setShowAllTopics] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
@@ -204,27 +231,26 @@ export default function Index() {
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
+  const visibleTopics = showAllTopics ? featuredTopics : featuredTopics.slice(0, 8);
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto relative overflow-hidden">
-      {/* Right-side blue gradient glow */}
-      <div className="absolute top-0 right-0 w-72 h-[600px] bg-gradient-to-l from-blue-400/12 via-blue-300/6 to-transparent dark:from-blue-500/8 dark:via-blue-400/3 pointer-events-none" />
-      <div className="absolute top-20 right-0 w-40 h-80 bg-gradient-to-bl from-sky-300/10 via-blue-200/5 to-transparent dark:from-sky-500/6 pointer-events-none blur-2xl" />
+      {/* Ambient background effects */}
+      <div className="absolute top-0 right-0 w-72 h-[600px] bg-gradient-to-l from-blue-400/8 via-blue-300/4 to-transparent dark:from-blue-500/6 dark:via-blue-400/2 pointer-events-none" />
+      <div className="absolute top-40 -left-10 w-40 h-40 bg-gradient-to-br from-rose-300/8 to-transparent dark:from-rose-500/4 pointer-events-none rounded-full blur-3xl" />
+      <div className="absolute bottom-40 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-300/8 to-transparent dark:from-emerald-500/4 pointer-events-none rounded-full blur-3xl" />
 
       {/* Premium gradient bar */}
-      <div className="h-1.5 bg-gradient-to-r from-rose-500 via-blue-500 to-emerald-500 relative z-10" />
+      <div className="h-1 bg-gradient-to-r from-rose-500 via-blue-500 to-emerald-500 relative z-10" />
 
-      {/* Header with layered background */}
-      <header className="relative px-4 pt-5 pb-4 overflow-hidden z-10">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 bg-gradient-to-b from-rose-50/50 via-transparent to-transparent dark:from-rose-950/20" />
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-100/40 to-transparent dark:from-blue-900/15 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-rose-100/30 to-transparent dark:from-rose-900/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+      {/* Header */}
+      <header className="relative px-4 pt-4 pb-3 overflow-hidden z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-rose-50/30 via-transparent to-transparent dark:from-rose-950/10" />
 
         <div className="relative">
-          {/* Top bar: Logo + title + dark mode */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
+          {/* Top bar */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2.5">
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -234,7 +260,7 @@ export default function Index() {
               </motion.div>
               <div className="min-w-0">
                 <motion.h1
-                  className="text-2xl font-black tracking-tight relative overflow-hidden"
+                  className="text-xl font-black tracking-tight relative overflow-hidden"
                   style={{ color: 'hsl(215, 80%, 22%)' }}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
@@ -252,7 +278,7 @@ export default function Index() {
                   />
                 </motion.h1>
                 <motion.p
-                  className="text-xs text-muted-foreground leading-tight font-semibold mt-0.5"
+                  className="text-[10px] text-muted-foreground leading-tight font-semibold"
                   initial={{ x: -15, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.25, type: "spring", stiffness: 120, damping: 14 }}
@@ -270,32 +296,44 @@ export default function Index() {
             </button>
           </div>
 
-          {/* Stats banner - refined */}
+          {/* Quick Stats Row */}
           <motion.div
-            className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-card border border-border/50 shadow-sm mb-4"
+            className="flex items-center gap-2 mb-3"
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35, type: "spring", stiffness: 120, damping: 14 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 120 }}
           >
-            <motion.div
-              className="p-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 shadow-sm"
-              animate={{ scale: [1, 1.08, 1] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            >
-              <Activity className="w-4 h-4 text-white" />
-            </motion.div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-foreground">{i.appTitle}</p>
-              <p className="text-[11px] text-muted-foreground">{i.appCredential}</p>
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-rose-500 to-rose-600">
+                <GraduationCap className="w-3 h-3 text-white" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground font-medium leading-tight">Scenarios</p>
+                <p className="text-sm font-black text-foreground tabular-nums">{totalScenarios}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200/50 dark:border-emerald-800/50">
-              <TrendingUp className="w-3 h-3 text-emerald-500" />
-              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{totalScenarios}</span>
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+                <Zap className="w-3 h-3 text-white" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground font-medium leading-tight">Categories</p>
+                <p className="text-sm font-black text-foreground">4</p>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+                <Bot className="w-3 h-3 text-white" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground font-medium leading-tight">AI Bot</p>
+                <p className="text-sm font-black text-emerald-600 dark:text-emerald-400">24/7</p>
+              </div>
             </div>
           </motion.div>
 
-          {/* Category Cards - enhanced with icon gradients */}
-          <div className="grid grid-cols-2 gap-2.5 mb-3">
+          {/* Category Cards */}
+          <div className="grid grid-cols-4 gap-2 mb-3">
             {tabIds.map((id, idx) => {
               const config = categoryConfig[id];
               const Icon = config.icon;
@@ -307,32 +345,30 @@ export default function Index() {
                   onClick={() => setActiveTab(active ? null : id)}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.15 + idx * 0.08, type: "spring", stiffness: 150, damping: 14 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`relative overflow-hidden rounded-2xl p-3.5 text-left transition-all duration-300 border ${
+                  transition={{ delay: 0.15 + idx * 0.06, type: "spring", stiffness: 150, damping: 14 }}
+                  whileTap={{ scale: 0.93 }}
+                  className={`relative overflow-hidden rounded-xl p-2.5 text-center transition-all duration-300 border ${
                     active
                       ? `${config.borderColor} ${config.bgLight} shadow-md`
-                      : "border-border/40 bg-card hover:border-border hover:shadow-md"
+                      : "border-border/40 bg-card hover:shadow-sm"
                   }`}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <motion.div
-                      className={`p-2.5 rounded-xl shadow-sm ${active ? config.iconBg : "bg-muted/80"}`}
-                      animate={active ? { rotate: [0, -8, 8, -4, 0] } : {}}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <Icon className={`w-5 h-5 ${active ? "text-white" : "text-muted-foreground"}`} />
-                    </motion.div>
-                    <span className={`text-2xl font-black tabular-nums ${active ? config.iconColor : "text-muted-foreground/40"}`}>
-                      {count}
-                    </span>
-                  </div>
-                  <p className={`text-sm font-bold ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                  <motion.div
+                    className={`mx-auto p-2 rounded-lg shadow-sm mb-1.5 w-fit ${active ? config.iconBg : "bg-muted/80"}`}
+                    animate={active ? { rotate: [0, -8, 8, -4, 0] } : {}}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Icon className={`w-4 h-4 ${active ? "text-white" : "text-muted-foreground"}`} />
+                  </motion.div>
+                  <p className={`text-[10px] font-bold leading-tight ${active ? "text-foreground" : "text-muted-foreground"}`}>
                     {i.tabs[id]}
+                  </p>
+                  <p className={`text-xs font-black tabular-nums mt-0.5 ${active ? config.iconColor : "text-muted-foreground/40"}`}>
+                    {count}
                   </p>
                   {active && (
                     <motion.div
-                      className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${config.gradient}`}
+                      className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${config.gradient}`}
                       layoutId="activeTab"
                     />
                   )}
@@ -343,15 +379,19 @@ export default function Index() {
 
           {/* Search */}
           {activeTab && (
-            <div className="relative">
+            <motion.div
+              className="relative"
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+            >
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={i.searchPlaceholder}
-                className="h-11 bg-card border-border/50 rounded-2xl text-sm pl-10 shadow-sm"
+                className="h-10 bg-card border-border/50 rounded-xl text-sm pl-10 shadow-sm"
               />
-            </div>
+            </motion.div>
           )}
         </div>
       </header>
@@ -359,165 +399,150 @@ export default function Index() {
       {/* Content */}
       <main className="flex-1 px-4 pb-6">
         {!activeTab ? (
-          <div className="py-6 space-y-4">
-            {/* Featured OB/GYN Topics — Question Bank first */}
+          <div className="space-y-3">
+            {/* Hero CTA — AI + WhatsApp compact */}
             <motion.div
-              className="rounded-2xl bg-card border border-border/50 p-4 shadow-sm space-y-3"
+              className="rounded-2xl overflow-hidden border border-border/40 shadow-sm"
               initial={{ y: 15, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1, type: "spring", stiffness: 120 }}
             >
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm">
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <h2 className="text-sm font-bold text-foreground">Featured OB/GYN Topics</h2>
-              </div>
-              <div className="space-y-1.5">
-                {[
-                  { icon: Baby, label: "Preterm Labor — Early Signs & Management", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
-                  { icon: ShieldCheck, label: "Preeclampsia Detection & Prevention", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
-                  { icon: Activity, label: "CTG Reading — Pattern Recognition Secrets", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
-                  { icon: Syringe, label: "PPH Algorithm — HAEMOSTASIS Protocol", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
-                  { icon: Scissors, label: "Cesarean Technique Refinements", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-                  { icon: Brain, label: "Eclamptic Seizure — First 5 Minutes", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
-                  { icon: Stethoscope, label: "VBAC Patient Selection & Counseling", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-                  { icon: HelpCircle, label: "Ectopic Pregnancy — Diagnosis You Must Not Miss", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-                  { icon: Heart, label: "Neonatal Resuscitation — The Golden Minute", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-                  { icon: MessageCircle, label: "Breaking Bad News — SPIKES Protocol", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
-                  { icon: Syringe, label: "Amniotomy — When & How to Perform", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
-                  { icon: Activity, label: "Cord Prolapse — Immediate Response Steps", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-                  { icon: ShieldCheck, label: "Gestational Diabetes — Insulin vs Metformin", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
-                  { icon: Scissors, label: "Episiotomy Repair — Step-by-Step Technique", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-                  { icon: Brain, label: "Placenta Accreta Spectrum — Surgical Planning", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
-                  { icon: Baby, label: "Breech Presentation — ECV Technique & Timing", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
-                  { icon: Stethoscope, label: "Ovarian Torsion — Rapid Diagnosis Clues", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-                  { icon: HelpCircle, label: "HELLP Syndrome — Labs & Management", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
-                  { icon: Heart, label: "Shoulder Dystocia — McRoberts & Beyond", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-                  { icon: MessageCircle, label: "Consent for Emergency C-Section — Key Points", color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
-                  { icon: Syringe, label: "Oxytocin Augmentation — Safe Dosing Protocol", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
-                  { icon: Activity, label: "Fetal Bradycardia — Decision Tree", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
-                  { icon: Brain, label: "Cervical Cerclage — Indications & Technique", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
-                  { icon: ShieldCheck, label: "DVT in Pregnancy — Prophylaxis & Treatment", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-                  { icon: Scissors, label: "Forceps vs Vacuum — When to Choose Which", color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-                ].map((topic) => (
-                  <button
-                    key={topic.label}
-                    onClick={() => { setActiveTab("qa"); setSearch(topic.label.split("—")[0].trim()); }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl ${topic.bg} hover:opacity-80 transition-all text-left group`}
+              <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 dark:from-blue-700 dark:via-blue-800 dark:to-indigo-800 px-4 py-3.5">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    className="p-2.5 rounded-xl bg-white/15 backdrop-blur-sm"
+                    animate={{ scale: [1, 1.08, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                   >
-                    <topic.icon className={`w-3.5 h-3.5 ${topic.color} shrink-0`} />
-                    <span className="text-[11px] font-medium text-foreground flex-1 leading-tight">{topic.label}</span>
-                    <ChevronRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                  </button>
-                ))}
+                    <Bot className="w-5 h-5 text-white" />
+                  </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-sm font-bold text-white">AI Medical Assistant</h2>
+                    <p className="text-[10px] text-white/70 leading-tight mt-0.5">
+                      Discuss any clinical scenario 24/7 — instant expert guidance
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-400/20 border border-green-400/30">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-[9px] font-bold text-green-300">LIVE</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-card px-4 py-3 flex items-center gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] text-muted-foreground">
+                    By <strong className="text-foreground">Dr. Sahar Elkhodiry</strong>
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">Consultant OB/GYN</p>
+                </div>
+                <a
+                  href="https://wa.me/966500000000"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-[10px] font-bold transition-colors shadow-sm"
+                >
+                  <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                  WhatsApp
+                </a>
               </div>
             </motion.div>
 
-            {/* About the App */}
+            {/* Featured Topics — with show more/less */}
             <motion.div
-              className="rounded-2xl bg-card border border-border/50 p-4 shadow-sm space-y-3"
+              className="rounded-2xl bg-card border border-border/40 shadow-sm overflow-hidden"
               initial={{ y: 15, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.25, type: "spring", stiffness: 120 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 120 }}
             >
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm">
-                  <BookOpen className="w-4 h-4 text-white" />
+              <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm">
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <h2 className="text-xs font-bold text-foreground">Clinical Skills Bank</h2>
                 </div>
-                <h2 className="text-sm font-bold text-foreground">About This App</h2>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full">
+                  {featuredTopics.length} topics
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                A comprehensive clinical reference for OB/GYN professionals. Browse real-world scenarios, expert clinical actions, and model patient communication scripts — all curated by <strong className="text-foreground">Dr. Sahar Elkhodiry</strong>, Consultant in Obstetrics & Gynecology.
+
+              <div className="px-3 pb-2 space-y-1">
+                <AnimatePresence initial={false}>
+                  {visibleTopics.map((topic, idx) => (
+                    <motion.button
+                      key={topic.label}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, delay: idx > 7 ? (idx - 8) * 0.03 : 0 }}
+                      onClick={() => { setActiveTab("qa"); setSearch(topic.label.split("—")[0].trim()); }}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl ${topic.bg} hover:opacity-80 transition-all text-left group`}
+                    >
+                      <topic.icon className={`w-3.5 h-3.5 ${topic.color} shrink-0`} />
+                      <span className="text-[11px] font-medium text-foreground flex-1 leading-tight">{topic.label}</span>
+                      <ChevronRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                    </motion.button>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              <button
+                onClick={() => setShowAllTopics(!showAllTopics)}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-bold text-primary hover:bg-muted/50 transition-colors border-t border-border/30"
+              >
+                {showAllTopics ? "Show Less" : `Show All ${featuredTopics.length} Topics`}
+                <motion.div animate={{ rotate: showAllTopics ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </motion.div>
+              </button>
+            </motion.div>
+
+            {/* About — compact */}
+            <motion.div
+              className="rounded-2xl bg-card border border-border/40 p-4 shadow-sm"
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3, type: "spring", stiffness: 120 }}
+            >
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm">
+                  <BookOpen className="w-3.5 h-3.5 text-white" />
+                </div>
+                <h2 className="text-xs font-bold text-foreground">About This App</h2>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+                A comprehensive clinical reference for OB/GYN professionals — real-world scenarios, expert actions, and patient scripts curated by <strong className="text-foreground">Dr. Sahar Elkhodiry</strong>.
               </p>
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="grid grid-cols-2 gap-1.5">
                 {[
-                  { icon: Stethoscope, label: "Clinical scenarios", color: "text-sky-500" },
-                  { icon: Scissors, label: "OR & Labor protocols", color: "text-rose-500" },
-                  { icon: MessageCircle, label: "Communication scripts", color: "text-amber-500" },
-                  { icon: HelpCircle, label: "Q&A Bank + Skills", color: "text-emerald-500" },
+                  { icon: Stethoscope, label: "Clinical scenarios", color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
+                  { icon: Scissors, label: "OR & Labor protocols", color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30" },
+                  { icon: MessageCircle, label: "Communication", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30" },
+                  { icon: HelpCircle, label: "Q&A + Skills Bank", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
                 ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-1.5">
-                    <item.icon className={`w-3.5 h-3.5 ${item.color} shrink-0`} />
-                    <span className="text-[10px] text-muted-foreground font-medium">{item.label}</span>
+                  <div key={item.label} className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg ${item.bg}`}>
+                    <item.icon className={`w-3 h-3 ${item.color} shrink-0`} />
+                    <span className="text-[10px] text-foreground font-medium">{item.label}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
 
-            {/* AI Assistant highlight */}
+            {/* CTA */}
             <motion.div
-              className="rounded-2xl border border-blue-200/60 dark:border-blue-800/40 bg-gradient-to-br from-blue-50 to-sky-50/50 dark:from-blue-950/30 dark:to-sky-950/20 p-4 shadow-sm space-y-3"
-              initial={{ y: 15, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.25, type: "spring", stiffness: 120 }}
-            >
-              <div className="flex items-center gap-2.5">
-                <motion.div
-                  className="p-2 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm shadow-blue-500/20"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
-                >
-                  <MessageCircle className="w-4 h-4 text-white" />
-                </motion.div>
-                <div>
-                  <h2 className="text-sm font-bold text-foreground">AI Medical Assistant</h2>
-                  <p className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Available 24/7</p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Each scenario includes an <strong className="text-foreground">AI-powered discussion bot</strong> ready to help you <strong className="text-foreground">24 hours a day, 7 days a week</strong>. Open any clinical scenario, tap "Discuss with AI," and get instant, in-depth answers — differential diagnoses, management plans, evidence-based guidance, and more.
-              </p>
-              <div className="flex items-center gap-2 pt-1">
-                <div className="flex -space-x-1">
-                  {["bg-green-400", "bg-green-400", "bg-green-400"].map((c, idx) => (
-                    <div key={idx} className={`w-2 h-2 rounded-full ${c} border border-white dark:border-gray-900`} />
-                  ))}
-                </div>
-                <span className="text-[10px] text-green-600 dark:text-green-400 font-semibold">Online now — Ready to discuss</span>
-              </div>
-            </motion.div>
-
-            {/* Dr. Sahar Contact + WhatsApp */}
-            <motion.div
-              className="rounded-2xl border border-green-200/60 dark:border-green-800/40 bg-gradient-to-br from-green-50 to-emerald-50/50 dark:from-green-950/30 dark:to-emerald-950/20 p-4 shadow-sm space-y-3"
-              initial={{ y: 15, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, type: "spring", stiffness: 120 }}
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-sm shadow-green-500/20">
-                  <Phone className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold text-foreground">Dr. Sahar Elkhodiry</h2>
-                  <p className="text-[10px] text-green-600 dark:text-green-400 font-semibold">Consultant OB/GYN</p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Need a faster answer? The <strong className="text-foreground">AI Robot</strong> is available 24/7 to discuss every clinical point. For direct consultation, reach <strong className="text-foreground">Dr. Sahar</strong> via WhatsApp anytime.
-              </p>
-              <a
-                href="https://wa.me/966500000000"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-bold shadow-md shadow-green-500/20 transition-all"
-              >
-                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                Contact Dr. Sahar on WhatsApp
-              </a>
-            </motion.div>
-
-            <motion.p
-              className="text-center text-xs text-muted-foreground font-medium pt-1"
+              className="flex items-center justify-center gap-2 py-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.5 }}
             >
-              ↑ Select a category above to start exploring
-            </motion.p>
+              <div className="h-px flex-1 bg-border/50" />
+              <p className="text-[10px] text-muted-foreground font-medium px-2">
+                Select a category above to explore
+              </p>
+              <div className="h-px flex-1 bg-border/50" />
+            </motion.div>
           </div>
         ) : loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
