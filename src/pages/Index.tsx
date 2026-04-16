@@ -40,26 +40,28 @@ const Logo = () => (
   </svg>
 );
 
-function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
+function ClinicalCard({ item, onAI, lang }: { item: Scenario; onAI: () => void; lang: "en" | "ar" }) {
+  const isAr = lang === "ar";
   return (
     <AccordionItem value={item.id} className="border-b border-border/50">
       <AccordionTrigger className="py-3 px-1 text-sm font-medium hover:no-underline">
-        <div className="text-left">
-          <div>{item.title_en}</div>
-          <div dir="rtl" className="text-xs text-muted-foreground mt-0.5 font-normal">{item.title_ar}</div>
+        <div className={`text-left ${isAr ? "text-right w-full" : ""}`} dir={isAr ? "rtl" : "ltr"}>
+          <div>{isAr ? item.title_ar || item.title_en : item.title_en}</div>
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-1 pb-4">
         <div className="space-y-3">
           {[
-            { label: "Situation", en: item.situation_en, ar: item.situation_ar },
-            { label: "Clinical Action", en: item.action_en, ar: item.action_ar },
-            { label: "Patient Script", en: item.script_en, ar: item.script_ar },
+            { label: isAr ? "الموقف" : "Situation", text: isAr ? (item.situation_ar || item.situation_en) : item.situation_en, secondary: isAr ? item.situation_en : item.situation_ar },
+            { label: isAr ? "الإجراء السريري" : "Clinical Action", text: isAr ? (item.action_ar || item.action_en) : item.action_en, secondary: isAr ? item.action_en : item.action_ar },
+            { label: isAr ? "نص المريض" : "Patient Script", text: isAr ? (item.script_ar || item.script_en) : item.script_en, secondary: isAr ? item.script_en : item.script_ar },
           ].map((section) => (
             <div key={section.label} className="rounded-lg bg-muted/50 p-3">
               <div className="text-xs font-semibold text-primary mb-1.5">{section.label}</div>
-              <p className="text-sm leading-relaxed">{section.en}</p>
-              <p dir="rtl" className="text-sm leading-relaxed text-muted-foreground mt-1.5">{section.ar}</p>
+              <p className={`text-sm leading-relaxed ${isAr ? "text-right" : ""}`} dir={isAr ? "rtl" : "ltr"}>{section.text}</p>
+              {section.secondary && (
+                <p className={`text-sm leading-relaxed text-muted-foreground mt-1.5 ${!isAr ? "text-right" : ""}`} dir={!isAr ? "rtl" : "ltr"}>{section.secondary}</p>
+              )}
             </div>
           ))}
           <Button
@@ -69,7 +71,7 @@ function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
             className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5 gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            Discuss with AI
+            {isAr ? "مناقشة مع الذكاء الاصطناعي" : "Discuss with AI"}
           </Button>
         </div>
       </AccordionContent>
