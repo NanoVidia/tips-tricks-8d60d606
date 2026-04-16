@@ -313,21 +313,6 @@ export default function Index() {
             </button>
           </div>
 
-          <motion.div ref={searchBoxRef} className="relative" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25, duration: 0.5 }}>
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
-            <Input
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setSuggestOpen(true); }}
-              onFocus={() => { if (search.trim().length >= 2) setSuggestOpen(true); }}
-              onKeyDown={(e) => {
-                if (!suggestOpen || suggestions.length === 0) {
-                  if (e.key === "Enter" && !activeTab) setActiveTab("qa");
-                  return;
-                }
-                if (e.key === "ArrowDown") {
-                  e.preventDefault();
-                  setHighlightIdx((p) => (p + 1) % suggestions.length);
-
           {/* Search bar with auto-suggest */}
           <motion.div
             ref={searchBoxRef}
