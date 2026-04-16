@@ -391,8 +391,13 @@ export default function Tools() {
                     : "bg-card border-border/50 text-muted-foreground hover:bg-muted/50"
                 }`}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className={`w-3 h-3 ${s.id === "favorites" && favorites.total > 0 && !isActive ? "fill-warning text-warning" : ""}`} />
                 {s.label}
+                {s.id === "favorites" && favorites.total > 0 && (
+                  <span className={`text-[9px] tabular-nums px-1.5 rounded-full ${isActive ? "bg-white/25" : "bg-warning/20 text-warning"}`}>
+                    {favorites.total}
+                  </span>
+                )}
               </button>
             );
           })}
