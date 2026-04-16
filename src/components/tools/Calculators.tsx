@@ -307,6 +307,14 @@ export function ApgarCalculator() {
 export function MgSO4Calculator() {
   const [weight, setWeight] = useState("70");
   const [renal, setRenal] = useState(false);
+
+  useEffect(() => {
+    const p = consumePrefill<{ weight?: number; renal?: boolean }>("mgso4");
+    if (!p) return;
+    if (typeof p.weight === "number") setWeight(String(p.weight));
+    if (typeof p.renal === "boolean") setRenal(p.renal);
+  }, []);
+
   const w = clampNum(weight, 30, 200);
   const wErr = weight !== "" && w === null ? "Enter 30–200 kg" : null;
   const recurrent = w !== null && w >= 70 ? 4 : 2;
