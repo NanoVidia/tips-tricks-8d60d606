@@ -382,6 +382,31 @@ export default function Index() {
               ))}
             </div>
           </motion.div>
+        ) : loading ? (
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs text-muted-foreground">Loading...</p>
+          </div>
+        ) : scenarios.length === 0 ? (
+          <p className="text-center text-sm text-muted-foreground py-8">{i.noResults}</p>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-2.5 px-1">
+              <div className="flex items-center gap-2">
+                {(() => {
+                  const Icon = categoryConfig[activeTab].icon;
+                  return (
+                    <div className={`p-1 rounded-lg ${categoryConfig[activeTab].iconBg}`}>
+                      <Icon className="w-3.5 h-3.5 text-white" />
+                    </div>
+                  );
+                })()}
+                <h2 className="text-sm font-bold text-foreground">{i.tabs[activeTab]}</h2>
+              </div>
+              <span className="text-[10px] text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full font-medium">
+                {totalCount} items
+              </span>
+            </div>
 
             <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
               <Accordion type="single" collapsible className="w-full">
