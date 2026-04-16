@@ -102,6 +102,14 @@ export function EDDCalculator() {
   const [lmp, setLmp] = useState("");
   const [cycle, setCycle] = useState("28");
 
+  // Hydrate values pushed by the AI bot ("Save to Tools").
+  useEffect(() => {
+    const p = consumePrefill<{ lmp?: string; cycle?: number }>("edd");
+    if (!p) return;
+    if (p.lmp) setLmp(p.lmp);
+    if (typeof p.cycle === "number") setCycle(String(p.cycle));
+  }, []);
+
   const cycleNum = clampNum(cycle, 21, 45);
   const cycleErr = cycle !== "" && cycleNum === null ? "Enter 21–45 days" : null;
 
@@ -170,6 +178,12 @@ export function EDDCalculator() {
 
 export function BishopCalculator() {
   const [scores, setScores] = useState({ dilation: 0, effacement: 0, station: 0, consistency: 0, position: 0 });
+
+  useEffect(() => {
+    const p = consumePrefill<typeof scores>("bishop");
+    if (p) setScores((s) => ({ ...s, ...p }));
+  }, []);
+
   const total = Object.values(scores).reduce((a, b) => a + b, 0);
   const MAX = 13; // 3+3+3+2+2
 
@@ -341,6 +355,14 @@ export function BMICalculator() {
   const [w, setW] = useState("70");
   const [h, setH] = useState("165");
   const [twin, setTwin] = useState(false);
+
+  useEffect(() => {
+    const p = consumePrefill<{ weight?: number; height?: number; twin?: boolean }>("bmi");
+    if (!p) return;
+    if (typeof p.weight === "number") setW(String(p.weight));
+    if (typeof p.height === "number") setH(String(p.height));
+    if (typeof p.twin === "boolean") setTwin(p.twin);
+  }, []);
 
   const W = clampNum(w, 30, 250);
   const H = clampNum(h, 120, 220);
