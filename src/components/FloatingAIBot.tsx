@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, X, Bot, Wrench, CheckCircle2 } from "lucide-react";
+import { Send, Loader2, X, Bot, Wrench, CheckCircle2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { executeTool, TOOL_LABELS } from "@/lib/aiTools";
+import { executeTool, TOOL_LABELS, getSaveTarget, buildSaveToToolsUrl, stashPrefill } from "@/lib/aiTools";
 
 type ToolCall = { id: string; name: string; args: string };
 type Msg = {
@@ -13,8 +14,8 @@ type Msg = {
   content: string;
   tool_calls?: { id: string; type: "function"; function: { name: string; arguments: string } }[];
   tool_call_id?: string;
-  /** UI-only: tool calls executed by THIS assistant turn, for inline chips */
-  uiTools?: { name: string; ok: boolean }[];
+  /** UI-only: tool calls executed by THIS assistant turn, for inline chips + Save-to-Tools button */
+  uiTools?: { name: string; ok: boolean; args: string }[];
 };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
