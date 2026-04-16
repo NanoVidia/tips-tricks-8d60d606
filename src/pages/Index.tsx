@@ -25,7 +25,7 @@ interface Scenario {
   synonyms: string[] | null;
 }
 
-const ITEMS_PER_PAGE = 50;
+const ITEMS_PER_PAGE = 30;
 
 const categoryConfig = {
   clinic: {
