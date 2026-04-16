@@ -303,31 +303,31 @@ export default function Index() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, type: "spring", stiffness: 120 }}
           >
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-rose-500 to-rose-600">
+            <div className="flex-1 flex items-center gap-1.5 px-2 py-2 rounded-xl bg-card border border-border/40 shadow-sm min-w-0">
+              <div className="p-1 rounded-md bg-gradient-to-br from-rose-500 to-rose-600 shrink-0">
                 <GraduationCap className="w-3 h-3 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium leading-tight">Scenarios</p>
-                <p className="text-sm font-black text-foreground tabular-nums">{totalScenarios}</p>
+                <p className="text-[9px] text-muted-foreground font-medium leading-tight truncate">Scenarios</p>
+                <p className="text-xs font-black text-foreground tabular-nums">{totalScenarios}</p>
               </div>
             </div>
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+            <div className="flex-1 flex items-center gap-1.5 px-2 py-2 rounded-xl bg-card border border-border/40 shadow-sm min-w-0">
+              <div className="p-1 rounded-md bg-gradient-to-br from-blue-500 to-indigo-600 shrink-0">
                 <Zap className="w-3 h-3 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium leading-tight">Categories</p>
-                <p className="text-sm font-black text-foreground">4</p>
+                <p className="text-[9px] text-muted-foreground font-medium leading-tight truncate">Categories</p>
+                <p className="text-xs font-black text-foreground">4</p>
               </div>
             </div>
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/40 shadow-sm">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+            <div className="flex-1 flex items-center gap-1.5 px-2 py-2 rounded-xl bg-card border border-border/40 shadow-sm min-w-0">
+              <div className="p-1 rounded-md bg-gradient-to-br from-emerald-500 to-teal-600 shrink-0">
                 <Bot className="w-3 h-3 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium leading-tight">AI Bot</p>
-                <p className="text-sm font-black text-emerald-600 dark:text-emerald-400">24/7</p>
+                <p className="text-[9px] text-muted-foreground font-medium leading-tight truncate">AI Bot</p>
+                <p className="text-xs font-black text-emerald-600 dark:text-emerald-400">24/7</p>
               </div>
             </div>
           </motion.div>
