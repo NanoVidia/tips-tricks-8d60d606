@@ -1,17 +1,15 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { type Lang, t } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  lang: Lang;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange, lang }: PaginationProps) {
+export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   if (totalPages <= 1) return null;
-  const i = t(lang);
-  const isAr = lang === "ar";
+  const i = t();
 
   const maxVisible = 5;
   let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
@@ -22,13 +20,13 @@ export function Pagination({ currentPage, totalPages, onPageChange, lang }: Pagi
   for (let p = start; p <= end; p++) pages.push(p);
 
   return (
-    <div className="flex items-center justify-center gap-1 py-4" dir={isAr ? "rtl" : "ltr"}>
+    <div className="flex items-center justify-center gap-1 py-4">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className="p-2 rounded-lg hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors"
       >
-        {isAr ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+        <ChevronLeft className="w-4 h-4" />
       </button>
 
       {start > 1 && (
@@ -64,10 +62,10 @@ export function Pagination({ currentPage, totalPages, onPageChange, lang }: Pagi
         disabled={currentPage === totalPages}
         className="p-2 rounded-lg hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors"
       >
-        {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+        <ChevronRight className="w-4 h-4" />
       </button>
 
-      <span className="text-[10px] text-muted-foreground mr-2 ml-2">
+      <span className="text-[10px] text-muted-foreground ml-2">
         {i.page} {currentPage} {i.of} {totalPages}
       </span>
     </div>

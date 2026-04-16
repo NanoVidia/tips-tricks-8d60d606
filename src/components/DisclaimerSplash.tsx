@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { type Lang, t } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 
-export function DisclaimerSplash({ onAccept, lang }: { onAccept: () => void; lang: Lang }) {
-  const i = t(lang);
-  const isAr = lang === "ar";
+export function DisclaimerSplash({ onAccept }: { onAccept: () => void }) {
+  const i = t();
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background flex items-center justify-center p-6" dir={isAr ? "rtl" : "ltr"}>
+    <div className="fixed inset-0 z-[100] bg-background flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-6">
         <svg viewBox="0 0 64 64" className="w-20 h-20 mx-auto" fill="none">
           {[0, 60, 120, 180, 240, 300].map((angle) => (
@@ -28,14 +27,6 @@ export function DisclaimerSplash({ onAccept, lang }: { onAccept: () => void; lan
         <Button onClick={onAccept} className="w-full h-12 rounded-xl text-base">
           {i.continueBtn}
         </Button>
-
-        {/* Language switcher on disclaimer too */}
-        <button
-          onClick={() => {/* handled by parent */}}
-          className="text-xs text-muted-foreground underline"
-        >
-          {isAr ? "English" : "العربية"}
-        </button>
       </div>
     </div>
   );
