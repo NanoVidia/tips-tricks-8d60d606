@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calculator, Siren, Pill, BookMarked, Brain, GraduationCap, WifiOff, Search, Check, X, ChevronRight, AlertTriangle } from "lucide-react";
+import {
+  ArrowLeft, Calculator, Siren, Pill, BookMarked, Brain, GraduationCap, WifiOff,
+  Search, Check, X, ChevronRight, AlertTriangle, Shuffle, RotateCcw,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,7 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
-  EDDCalculator, BishopCalculator, ApgarCalculator, MgSO4Calculator, BMICalculator, OvulationCalculator, GonadotropinCalculator,
+  EDDCalculator, BishopCalculator, ApgarCalculator, MgSO4Calculator,
+  BMICalculator, OvulationCalculator, GonadotropinCalculator,
 } from "@/components/tools/Calculators";
 import { emergencyProtocols, pregnancyDrugs, guidelines, ddxLibrary } from "@/data/toolsData";
 import { toast } from "@/hooks/use-toast";
@@ -23,6 +27,8 @@ const sections = [
   { id: "mcq", label: "MCQ", icon: GraduationCap, color: "from-cyan-500 to-blue-600" },
   { id: "offline", label: "Offline", icon: WifiOff, color: "from-slate-500 to-slate-700" },
 ] as const;
+
+const STORAGE_TAB = "tools.activeTab";
 
 const mcqs = [
   {
@@ -75,33 +81,47 @@ const mcqs = [
   },
 ];
 
-function MCQCard({ data, idx }: { data: typeof mcqs[0]; idx: number }) {
+function MCQCard({
+  data, idx, onAnswer,
+}: {
+  data: typeof mcqs[0];
+  idx: number;
+  onAnswer: (correct: boolean) => void;
+}) {
   const [picked, setPicked] = useState<number | null>(null);
   const reveal = picked !== null;
+  const handlePick = (i: number) => {
+    if (reveal) return;
+    setPicked(i);
+    onAnswer(i === data.correct);
+  };
   return (
     <Card className="p-4 border-border/50">
       <div className="flex items-start gap-2 mb-3">
         <Badge variant="outline" className="text-[10px] shrink-0">Q{idx + 1}</Badge>
         <p className="text-sm font-medium leading-snug">{data.q}</p>
       </div>
-      <div className="space-y-1.5">
+      <div className="space-y-1.5" role="radiogroup" aria-label={`Question ${idx + 1}`}>
         {data.opts.map((o, i) => {
           const isCorrect = i === data.correct;
           const isPicked = i === picked;
           let cls = "border-border/50 bg-card hover:bg-muted/50";
-          if (reveal && isCorrect) cls = "border-emerald-500/60 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-200";
-          else if (reveal && isPicked && !isCorrect) cls = "border-red-500/60 bg-red-50 dark:bg-red-950/30 text-red-900 dark:text-red-200";
+          if (reveal && isCorrect) cls = "border-success/60 bg-success-soft text-success";
+          else if (reveal && isPicked && !isCorrect) cls = "border-danger/60 bg-danger-soft text-danger";
           return (
             <button
               key={i}
+              type="button"
+              role="radio"
+              aria-checked={isPicked}
               disabled={reveal}
-              onClick={() => setPicked(i)}
+              onClick={() => handlePick(i)}
               className={`w-full text-left px-3 py-2 rounded-lg border text-xs font-medium transition flex items-center gap-2 ${cls}`}
             >
               <span className="font-bold opacity-60">{String.fromCharCode(65 + i)}.</span>
               <span className="flex-1">{o}</span>
-              {reveal && isCorrect && <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
-              {reveal && isPicked && !isCorrect && <X className="w-3.5 h-3.5 text-red-600 shrink-0" />}
+              {reveal && isCorrect && <Check className="w-3.5 h-3.5 text-success shrink-0" />}
+              {reveal && isPicked && !isCorrect && <X className="w-3.5 h-3.5 text-danger shrink-0" />}
             </button>
           );
         })}
@@ -110,16 +130,23 @@ function MCQCard({ data, idx }: { data: typeof mcqs[0]; idx: number }) {
         <div className="mt-3 p-2.5 rounded-lg bg-muted/50 border border-border/40">
           <p className="text-[10px] uppercase tracking-wider font-bold text-primary mb-1">Explanation</p>
           <p className="text-[11px] leading-relaxed text-muted-foreground">{data.explain}</p>
-          <button onClick={() => setPicked(null)} className="text-[10px] font-bold text-primary mt-2 hover:underline">Try again</button>
         </div>
       )}
     </Card>
   );
 }
 
+const COMMON_DRUGS = [
+  "warfarin", "heparin", "aspirin", "ibuprofen", "naproxen", "fluconazole", "itraconazole",
+  "ssri", "sertraline", "fluoxetine", "tramadol", "methotrexate", "macrolide", "erythromycin",
+  "clarithromycin", "statin", "simvastatin", "ocp", "rifampicin", "lamotrigine", "magnesium",
+  "nifedipine", "metformin", "contrast", "nsaid", "azole", "labetalol",
+];
+
 function DrugInteractionChecker() {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
+
   const interactions: Record<string, string> = {
     "warfarin+nsaid": "MAJOR — increased bleeding risk via platelet inhibition + GI mucosal damage. Avoid combo.",
     "warfarin+azole": "MAJOR — fluconazole/itraconazole inhibit CYP2C9 → ↑INR. Reduce warfarin dose 50%.",
@@ -132,35 +159,71 @@ function DrugInteractionChecker() {
     "metformin+contrast": "CAUTION — hold 48 h around iodinated contrast; lactic acidosis risk if AKI.",
     "ssri+nsaid": "MODERATE — ↑GI bleeding risk. Consider PPI cover.",
   };
+
   const norm = (s: string) => s.toLowerCase().trim().replace(/s$/, "");
-  const A = norm(a), B = norm(b);
-  const key = [A, B].sort().join("+");
-  const matchKey = Object.keys(interactions).find((k) => {
-    const [x, y] = k.split("+");
-    return (A.includes(x) || x.includes(A)) && (B.includes(y) || y.includes(B)) ||
-           (A.includes(y) || y.includes(A)) && (B.includes(x) || x.includes(B));
-  });
-  const result = matchKey ? interactions[matchKey] : a && b ? "No major interaction in our common-pairs database. Always cross-check with full reference (BNF/Lexicomp)." : null;
-  const severity = result?.startsWith("MAJOR") ? "red" : result?.startsWith("MODERATE") ? "amber" : result?.startsWith("CAUTION") ? "amber" : "emerald";
+
+  const result = useMemo(() => {
+    if (!a.trim() || !b.trim()) return null;
+    const A = norm(a);
+    const B = norm(b);
+    if (!A || !B) return null;
+
+    const matchKey = Object.keys(interactions).find((k) => {
+      const [x, y] = k.split("+");
+      const ax = A.includes(x) || x.includes(A);
+      const by = B.includes(y) || y.includes(B);
+      const ay = A.includes(y) || y.includes(A);
+      const bx = B.includes(x) || x.includes(B);
+      return (ax && by) || (ay && bx);
+    });
+    return matchKey
+      ? interactions[matchKey]
+      : "No major interaction in our common-pairs database. Always cross-check with full reference (BNF/Lexicomp).";
+  }, [a, b]);
+
+  const severity: "danger" | "warning" | "success" = result?.startsWith("MAJOR")
+    ? "danger"
+    : result?.startsWith("MODERATE") || result?.startsWith("CAUTION")
+    ? "warning"
+    : "success";
+
+  const sevClass = {
+    danger: "bg-danger-soft border-danger/40 text-danger",
+    warning: "bg-warning-soft border-warning/40 text-warning",
+    success: "bg-success-soft border-success/40 text-success",
+  }[severity];
 
   return (
     <Card className="p-4 border-border/50 space-y-3">
       <div className="flex items-center gap-2">
-        <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600">
-          <AlertTriangle className="w-3.5 h-3.5 text-white" />
+        <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-warning/70">
+          <AlertTriangle className="w-3.5 h-3.5 text-warning-foreground" />
         </div>
         <h3 className="text-sm font-bold">Drug Interaction Checker</h3>
       </div>
+      <datalist id="drug-list">
+        {COMMON_DRUGS.map((d) => <option key={d} value={d} />)}
+      </datalist>
       <div className="grid grid-cols-2 gap-2">
-        <Input placeholder="Drug A (e.g. warfarin)" value={a} onChange={(e) => setA(e.target.value)} className="h-9 text-xs" />
-        <Input placeholder="Drug B (e.g. fluconazole)" value={b} onChange={(e) => setB(e.target.value)} className="h-9 text-xs" />
+        <Input
+          list="drug-list"
+          placeholder="Drug A (e.g. warfarin)"
+          value={a}
+          onChange={(e) => setA(e.target.value)}
+          className="h-9 text-xs"
+          aria-label="First drug"
+        />
+        <Input
+          list="drug-list"
+          placeholder="Drug B (e.g. fluconazole)"
+          value={b}
+          onChange={(e) => setB(e.target.value)}
+          className="h-9 text-xs"
+          aria-label="Second drug"
+        />
       </div>
       {result && (
-        <div className={`p-3 rounded-xl border text-xs leading-relaxed ${
-          severity === "red" ? "bg-red-50 dark:bg-red-950/30 border-red-300 dark:border-red-800 text-red-900 dark:text-red-200" :
-          severity === "amber" ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200" :
-          "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200"
-        }`}>
+        <div className={`p-3 rounded-xl border text-xs leading-relaxed font-medium ${sevClass}`} role="alert">
           {result}
         </div>
       )}
@@ -168,10 +231,23 @@ function DrugInteractionChecker() {
   );
 }
 
+const FDA_FILTERS = ["All", "A", "B", "C", "D", "X"] as const;
+
 export default function Tools() {
-  const [active, setActive] = useState<string>("calc");
+  const [active, setActive] = useState<string>(() => {
+    if (typeof window === "undefined") return "calc";
+    const saved = window.localStorage.getItem(STORAGE_TAB);
+    return saved && sections.some((s) => s.id === saved) ? saved : "calc";
+  });
   const [drugSearch, setDrugSearch] = useState("");
+  const [drugFilter, setDrugFilter] = useState<(typeof FDA_FILTERS)[number]>("All");
   const [offlineReady, setOfflineReady] = useState(false);
+  const [mcqOrder, setMcqOrder] = useState<number[]>(() => mcqs.map((_, i) => i));
+  const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_TAB, active);
+  }, [active]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -193,14 +269,42 @@ export default function Tools() {
     }
   };
 
-  const filteredDrugs = pregnancyDrugs.filter((d) => d.name.toLowerCase().includes(drugSearch.toLowerCase()) || d.notes.toLowerCase().includes(drugSearch.toLowerCase()));
+  const filteredDrugs = useMemo(() => {
+    const q = drugSearch.toLowerCase().trim();
+    return pregnancyDrugs.filter((d) => {
+      const matchSearch =
+        !q ||
+        d.name.toLowerCase().includes(q) ||
+        d.notes.toLowerCase().includes(q);
+      const matchCat = drugFilter === "All" || d.category.includes(drugFilter);
+      return matchSearch && matchCat;
+    });
+  }, [drugSearch, drugFilter]);
 
   const catColor = (c: string) =>
-    c.includes("X") ? "bg-red-500/15 text-red-700 dark:text-red-300 border-red-500/30" :
-    c.includes("D") ? "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30" :
-    c.includes("C") ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30" :
-    c.includes("B") ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30" :
-    "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30";
+    c.includes("X") ? "bg-danger-soft text-danger border-danger/30" :
+    c.includes("D") ? "bg-warning-soft text-warning border-warning/30" :
+    c.includes("C") ? "bg-warning-soft text-warning border-warning/30" :
+    c.includes("B") ? "bg-success-soft text-success border-success/30" :
+    "bg-info-soft text-info border-info/30";
+
+  const shuffleMcq = () => {
+    const arr = [...mcqOrder];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    setMcqOrder(arr);
+    setMcqAnswers({});
+  };
+
+  const resetMcq = () => {
+    setMcqAnswers({});
+    setMcqOrder(mcqs.map((_, i) => i));
+  };
+
+  const mcqScore = Object.values(mcqAnswers).filter(Boolean).length;
+  const mcqAnswered = Object.keys(mcqAnswers).length;
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
@@ -208,7 +312,7 @@ export default function Tools() {
 
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border/40 px-4 py-3">
         <div className="flex items-center gap-2 mb-3">
-          <Link to="/" className="p-1.5 -ml-1.5 rounded-lg hover:bg-muted transition">
+          <Link to="/" aria-label="Back to home" className="p-1.5 -ml-1.5 rounded-lg hover:bg-muted transition">
             <ArrowLeft className="w-4 h-4 text-foreground" />
           </Link>
           <div className="flex-1 min-w-0">
@@ -217,14 +321,19 @@ export default function Tools() {
           </div>
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-1 px-1 pb-1">
+        <nav
+          aria-label="Tools sections"
+          className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-1 px-1 pb-1"
+        >
           {sections.map((s) => {
             const Icon = s.icon;
             const isActive = active === s.id;
             return (
               <button
                 key={s.id}
+                type="button"
                 onClick={() => setActive(s.id)}
+                aria-current={isActive ? "page" : undefined}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition ${
                   isActive
                     ? `bg-gradient-to-r ${s.color} text-white border-transparent shadow-sm`
@@ -236,7 +345,7 @@ export default function Tools() {
               </button>
             );
           })}
-        </div>
+        </nav>
       </header>
 
       <main className="flex-1 px-4 py-4">
@@ -262,7 +371,11 @@ export default function Tools() {
           <TabsContent value="emergency" className="space-y-3 mt-0">
             <Accordion type="single" collapsible className="space-y-2">
               {emergencyProtocols.map((p) => (
-                <AccordionItem key={p.id} value={p.id} className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50">
+                <AccordionItem
+                  key={p.id}
+                  value={p.id}
+                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50"
+                >
                   <AccordionTrigger className="px-4 py-3 hover:no-underline">
                     <div className="flex items-center gap-2.5 text-left">
                       <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
@@ -275,14 +388,14 @@ export default function Tools() {
                     <ol className="space-y-1.5">
                       {p.steps.map((s, i) => (
                         <li key={i} className="flex gap-2 text-[12px] leading-relaxed">
-                          <span className="font-black text-primary shrink-0 tabular-nums">{i + 1}.</span>
+                          <span className="font-black text-primary shrink-0 tabular-nums w-5">{i + 1}.</span>
                           <span>{s}</span>
                         </li>
                       ))}
                     </ol>
-                    <div className="mt-3 p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-emerald-700 dark:text-emerald-400 mb-0.5">Targets</p>
-                      <p className="text-[11px] text-emerald-900 dark:text-emerald-200">{p.targets}</p>
+                    <div className="mt-3 p-2.5 rounded-lg bg-success-soft border border-success/30">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-success mb-0.5">Targets</p>
+                      <p className="text-[11px] text-success">{p.targets}</p>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -293,27 +406,60 @@ export default function Tools() {
           {/* DRUGS */}
           <TabsContent value="drugs" className="space-y-3 mt-0">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
               <Input
                 value={drugSearch}
                 onChange={(e) => setDrugSearch(e.target.value)}
                 placeholder="Search drugs in pregnancy / lactation..."
-                className="h-10 pl-9 text-xs"
+                className="h-10 pl-9 pr-9 text-xs"
+                aria-label="Search drugs"
               />
+              {drugSearch && (
+                <button
+                  type="button"
+                  onClick={() => setDrugSearch("")}
+                  aria-label="Clear search"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-muted"
+                >
+                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+              )}
             </div>
-            <div className="flex gap-1 text-[9px] flex-wrap">
-              <Badge className={catColor("A")}>A: Safe</Badge>
-              <Badge className={catColor("B")}>B: Likely safe</Badge>
-              <Badge className={catColor("C")}>C: Caution</Badge>
-              <Badge className={catColor("D")}>D: Risk</Badge>
-              <Badge className={catColor("X")}>X: Contraindicated</Badge>
+
+            <div className="flex gap-1 flex-wrap" role="tablist" aria-label="FDA category filter">
+              {FDA_FILTERS.map((f) => {
+                const isActive = drugFilter === f;
+                return (
+                  <button
+                    key={f}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => setDrugFilter(f)}
+                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition ${
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card border-border/50 text-muted-foreground hover:bg-muted/50"
+                    }`}
+                  >
+                    {f === "All" ? "All" : `FDA ${f}`}
+                  </button>
+                );
+              })}
             </div>
+
+            <p className="text-[10px] text-muted-foreground tabular-nums">
+              {filteredDrugs.length} of {pregnancyDrugs.length} drugs
+            </p>
+
             <div className="space-y-1.5">
               {filteredDrugs.map((d) => (
                 <Card key={d.name} className="p-3 border-border/50">
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <h4 className="text-sm font-bold">{d.name}</h4>
-                    <Badge className={`${catColor(d.category)} text-[10px] shrink-0 border`}>FDA {d.category}</Badge>
+                    <Badge className={`${catColor(d.category)} text-[10px] shrink-0 border`}>
+                      FDA {d.category}
+                    </Badge>
                   </div>
                   <div className="grid grid-cols-2 gap-1 text-[10px] mb-1.5">
                     <div><span className="text-muted-foreground">Trimester:</span> <span className="font-semibold">{d.trimester}</span></div>
@@ -322,7 +468,9 @@ export default function Tools() {
                   <p className="text-[11px] text-muted-foreground leading-snug">{d.notes}</p>
                 </Card>
               ))}
-              {filteredDrugs.length === 0 && <p className="text-center text-xs text-muted-foreground py-6">No drug found.</p>}
+              {filteredDrugs.length === 0 && (
+                <p className="text-center text-xs text-muted-foreground py-6">No drug matches your filter.</p>
+              )}
             </div>
           </TabsContent>
 
@@ -355,7 +503,11 @@ export default function Tools() {
           <TabsContent value="ddx" className="space-y-3 mt-0">
             <Accordion type="single" collapsible className="space-y-2">
               {ddxLibrary.map((d) => (
-                <AccordionItem key={d.presentation} value={d.presentation} className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50">
+                <AccordionItem
+                  key={d.presentation}
+                  value={d.presentation}
+                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50"
+                >
                   <AccordionTrigger className="px-4 py-3 hover:no-underline">
                     <div className="flex items-center gap-2.5 text-left">
                       <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shrink-0">
@@ -374,9 +526,9 @@ export default function Tools() {
                         </li>
                       ))}
                     </ul>
-                    <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-red-700 dark:text-red-400 mb-0.5">Red Flags</p>
-                      <p className="text-[11px] text-red-900 dark:text-red-200">{d.redFlags}</p>
+                    <div className="p-2.5 rounded-lg bg-danger-soft border border-danger/30">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-danger mb-0.5">Red Flags</p>
+                      <p className="text-[11px] text-danger">{d.redFlags}</p>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -388,10 +540,45 @@ export default function Tools() {
 
           {/* MCQ */}
           <TabsContent value="mcq" className="space-y-3 mt-0">
-            <p className="text-[11px] text-muted-foreground text-center mb-2">
-              {mcqs.length} board-style questions • OB/GYN core
-            </p>
-            {mcqs.map((m, i) => <MCQCard key={i} data={m} idx={i} />)}
+            <Card className="p-3 border-border/50 flex items-center justify-between gap-2">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Score</p>
+                <p className="text-base font-black tabular-nums">
+                  {mcqScore} / {mcqAnswered}
+                  <span className="text-[10px] font-medium text-muted-foreground ml-1">
+                    of {mcqs.length}
+                  </span>
+                </p>
+              </div>
+              <div className="flex gap-1.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={shuffleMcq}
+                  className="h-8 text-[10px] gap-1"
+                >
+                  <Shuffle className="w-3 h-3" /> Shuffle
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={resetMcq}
+                  className="h-8 text-[10px] gap-1"
+                >
+                  <RotateCcw className="w-3 h-3" /> Reset
+                </Button>
+              </div>
+            </Card>
+            {mcqOrder.map((origIdx, displayIdx) => (
+              <MCQCard
+                key={`${origIdx}-${mcqOrder.join(",")}`}
+                data={mcqs[origIdx]}
+                idx={displayIdx}
+                onAnswer={(c) => setMcqAnswers((p) => ({ ...p, [origIdx]: c }))}
+              />
+            ))}
           </TabsContent>
 
           {/* OFFLINE */}
@@ -405,9 +592,9 @@ export default function Tools() {
                 Cache the app on your device so you can access calculators, protocols, drugs and guidelines inside the OR or remote clinics — no internet needed.
               </p>
               {offlineReady ? (
-                <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-                  <Check className="w-4 h-4 text-emerald-600" />
-                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Offline mode active</span>
+                <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-success-soft border border-success/30">
+                  <Check className="w-4 h-4 text-success" />
+                  <span className="text-xs font-bold text-success">Offline mode active</span>
                 </div>
               ) : (
                 <Button onClick={enableOffline} className="w-full">
