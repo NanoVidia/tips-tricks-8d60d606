@@ -193,7 +193,7 @@ export default function Index() {
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
-  if (!accepted) return <DisclaimerSplash onAccept={accept} />;
+  
 
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
