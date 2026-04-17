@@ -377,7 +377,11 @@ export default function Index() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
+            {/* Decorative gradient ring */}
+            <div className="absolute -inset-[1.5px] rounded-2xl bg-gradient-to-r from-primary/40 via-accent/30 to-primary/40 opacity-70 blur-[1px] pointer-events-none" aria-hidden="true" />
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-lg gradient-gold shadow-gold pointer-events-none">
+              <Search className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={2.5} />
+            </div>
             <Input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setSuggestOpen(true); }}
