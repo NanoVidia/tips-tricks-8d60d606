@@ -290,7 +290,7 @@ export default function Index() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, activeTab, currentPage]);
+  }, [debouncedSearch, activeTab, currentPage, recent.add]);
 
   useEffect(() => { fetchScenarios(); }, [fetchScenarios]);
 
