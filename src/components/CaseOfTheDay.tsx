@@ -90,7 +90,7 @@ export function CaseOfTheDay({ onOpen }: { onOpen: (c: DailyCase) => void }) {
     >
       {/* Gold corner ribbon */}
       <div className="absolute top-0 right-0 w-24 h-24 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-3 right-[-32px] rotate-45 gradient-gold text-[8px] font-black uppercase tracking-[0.2em] text-ink py-1 px-10 shadow-gold/40 shadow-md" style={{ color: "hsl(0 0% 10%)" }}>
+        <div className="absolute top-3 right-[-32px] rotate-45 gradient-gold text-[8px] font-black uppercase tracking-[0.2em] text-primary-foreground py-1 px-10 shadow-gold/40 shadow-md">
           Today
         </div>
       </div>
