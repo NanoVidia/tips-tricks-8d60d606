@@ -1,139 +1,139 @@
-/* Editorial Clinical — Playfair Display headlines + Inter body, warm cream + ink + gold accent.
-   Fonts loaded via Google Fonts in index.html for fastest contentful paint. */
+/* Editorial Clinical — Blue / Slate / White palette.
+   Playfair Display headlines + Inter body. Fonts loaded via Google Fonts in index.html. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Warm paper background, deep ink foreground — editorial feel */
-    --background: 40 30% 96%;          /* #f5f3ee warm cream */
-    --foreground: 0 0% 10%;            /* #1a1a1a ink */
+    /* Cool white background, deep slate-blue foreground */
+    --background: 210 40% 98%;          /* #f6f9fc cool paper */
+    --foreground: 215 35% 18%;          /* #1f2d44 slate ink */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 215 35% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 215 35% 18%;
 
-    /* Primary stays clinical navy for trust + actions */
-    --primary: 215 80% 22%;            /* deep editorial navy */
-    --primary-foreground: 40 30% 96%;
+    /* Primary — clinical blue */
+    --primary: 215 75% 38%;             /* #1d4ea8 trust blue */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 40 25% 92%;
-    --secondary-foreground: 0 0% 18%;
+    --secondary: 210 30% 94%;
+    --secondary-foreground: 215 35% 22%;
 
-    --muted: 40 20% 93%;
-    --muted-foreground: 0 0% 38%;
+    --muted: 210 25% 94%;
+    --muted-foreground: 215 15% 45%;
 
-    /* Editorial gold accent — used sparingly for hover, dividers, premium chips */
-    --accent: 43 60% 53%;              /* #c9a84c gold */
-    --accent-foreground: 0 0% 10%;
+    /* Accent — softer steel blue (replaces gold) */
+    --accent: 210 60% 55%;              /* #4d8fd9 */
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 70% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 15% 86%;
-    --input: 40 15% 86%;
-    --ring: 215 80% 22%;
+    --border: 210 25% 88%;
+    --input: 210 25% 88%;
+    --ring: 215 75% 38%;
 
-    /* Clinical semantic tokens (kept) */
-    --success: 152 60% 32%;
-    --success-foreground: 40 30% 96%;
+    /* Clinical semantic tokens */
+    --success: 152 55% 38%;
+    --success-foreground: 210 40% 98%;
     --success-soft: 152 35% 92%;
     --warning: 38 88% 45%;
-    --warning-foreground: 0 0% 10%;
+    --warning-foreground: 215 35% 18%;
     --warning-soft: 45 80% 92%;
     --danger: 0 72% 48%;
-    --danger-foreground: 40 30% 96%;
+    --danger-foreground: 210 40% 98%;
     --danger-soft: 0 65% 95%;
-    --info: 215 80% 22%;
-    --info-foreground: 40 30% 96%;
-    --info-soft: 215 50% 92%;
+    --info: 215 75% 38%;
+    --info-foreground: 210 40% 98%;
+    --info-soft: 215 60% 92%;
 
     --radius: 0.75rem;
 
-    /* Editorial-specific tokens */
-    --gold: 43 60% 53%;                /* #c9a84c */
-    --gold-soft: 43 70% 88%;
-    --ink-soft: 0 0% 18%;              /* #2d2d2d secondary ink */
-    --paper: 40 30% 96%;
-    --paper-deep: 40 25% 92%;
+    /* Editorial-specific tokens — re-tuned for blue/slate/white */
+    --gold: 210 70% 50%;                /* now: editorial blue accent (alias kept for back-compat) */
+    --gold-soft: 210 70% 92%;
+    --ink-soft: 215 30% 28%;
+    --paper: 210 40% 98%;
+    --paper-deep: 210 30% 94%;
 
     /* Composed gradients & shadows */
-    --gradient-paper: linear-gradient(180deg, hsl(40 30% 97%) 0%, hsl(40 25% 94%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(43 60% 58%), hsl(38 65% 45%));
-    --gradient-ink: linear-gradient(135deg, hsl(0 0% 10%), hsl(215 40% 15%));
-    --shadow-editorial: 0 1px 2px hsl(0 0% 10% / 0.04), 0 8px 24px -12px hsl(0 0% 10% / 0.10);
-    --shadow-gold: 0 8px 24px -8px hsl(43 60% 53% / 0.35);
+    --gradient-paper: linear-gradient(180deg, hsl(210 40% 99%) 0%, hsl(210 30% 95%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(210 70% 55%), hsl(215 75% 38%));
+    --gradient-ink: linear-gradient(135deg, hsl(215 45% 22%), hsl(215 60% 14%));
+    --shadow-editorial: 0 1px 2px hsl(215 35% 18% / 0.05), 0 8px 24px -12px hsl(215 35% 18% / 0.12);
+    --shadow-gold: 0 8px 24px -8px hsl(210 70% 50% / 0.35);
     --transition-editorial: cubic-bezier(0.22, 1, 0.36, 1);
 
-    --sidebar-background: 40 30% 97%;
-    --sidebar-foreground: 0 0% 18%;
-    --sidebar-primary: 215 80% 22%;
-    --sidebar-primary-foreground: 40 30% 96%;
-    --sidebar-accent: 40 20% 93%;
-    --sidebar-accent-foreground: 0 0% 18%;
-    --sidebar-border: 40 15% 86%;
-    --sidebar-ring: 215 80% 22%;
+    --sidebar-background: 210 40% 99%;
+    --sidebar-foreground: 215 30% 28%;
+    --sidebar-primary: 215 75% 38%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 25% 94%;
+    --sidebar-accent-foreground: 215 35% 22%;
+    --sidebar-border: 210 25% 88%;
+    --sidebar-ring: 215 75% 38%;
   }
 
   .dark {
-    --background: 0 0% 8%;             /* #141414 deep ink */
-    --foreground: 40 25% 92%;
+    --background: 215 40% 8%;           /* deep slate */
+    --foreground: 210 30% 92%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 40 25% 92%;
+    --card: 215 35% 12%;
+    --card-foreground: 210 30% 92%;
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 40 25% 92%;
+    --popover: 215 35% 12%;
+    --popover-foreground: 210 30% 92%;
 
-    --primary: 43 60% 58%;             /* gold becomes primary in dark for premium feel */
-    --primary-foreground: 0 0% 10%;
+    --primary: 210 70% 60%;             /* lighter blue in dark for accent */
+    --primary-foreground: 215 40% 8%;
 
-    --secondary: 0 0% 16%;
-    --secondary-foreground: 40 25% 92%;
+    --secondary: 215 30% 18%;
+    --secondary-foreground: 210 30% 92%;
 
-    --muted: 0 0% 16%;
-    --muted-foreground: 40 12% 65%;
+    --muted: 215 30% 18%;
+    --muted-foreground: 210 15% 65%;
 
-    --accent: 43 60% 58%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 210 70% 60%;
+    --accent-foreground: 215 40% 8%;
 
     --destructive: 0 65% 50%;
-    --destructive-foreground: 40 25% 92%;
+    --destructive-foreground: 210 30% 92%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 43 60% 58%;
+    --border: 215 25% 22%;
+    --input: 215 25% 22%;
+    --ring: 210 70% 60%;
 
-    --success: 152 50% 45%;
+    --success: 152 50% 48%;
     --success-soft: 152 30% 14%;
     --warning: 38 85% 55%;
     --warning-soft: 38 50% 14%;
     --danger: 0 70% 55%;
     --danger-soft: 0 50% 16%;
-    --info: 43 60% 58%;
-    --info-soft: 43 30% 14%;
+    --info: 210 70% 60%;
+    --info-soft: 215 30% 14%;
 
-    --gold: 43 60% 58%;
-    --gold-soft: 43 30% 18%;
-    --ink-soft: 40 12% 80%;
-    --paper: 0 0% 8%;
-    --paper-deep: 0 0% 12%;
+    --gold: 210 70% 60%;
+    --gold-soft: 215 35% 18%;
+    --ink-soft: 210 15% 78%;
+    --paper: 215 40% 8%;
+    --paper-deep: 215 35% 12%;
 
-    --gradient-paper: linear-gradient(180deg, hsl(0 0% 9%) 0%, hsl(0 0% 7%) 100%);
-    --gradient-ink: linear-gradient(135deg, hsl(0 0% 14%), hsl(0 0% 8%));
+    --gradient-paper: linear-gradient(180deg, hsl(215 40% 9%) 0%, hsl(215 40% 7%) 100%);
+    --gradient-ink: linear-gradient(135deg, hsl(215 35% 16%), hsl(215 50% 8%));
     --shadow-editorial: 0 1px 2px hsl(0 0% 0% / 0.5), 0 12px 32px -12px hsl(0 0% 0% / 0.6);
 
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 40 12% 80%;
-    --sidebar-primary: 43 60% 58%;
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 0 0% 16%;
-    --sidebar-accent-foreground: 40 25% 92%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 43 60% 58%;
+    --sidebar-background: 215 40% 8%;
+    --sidebar-foreground: 210 15% 78%;
+    --sidebar-primary: 210 70% 60%;
+    --sidebar-primary-foreground: 215 40% 8%;
+    --sidebar-accent: 215 30% 18%;
+    --sidebar-accent-foreground: 210 30% 92%;
+    --sidebar-border: 215 25% 22%;
+    --sidebar-ring: 210 70% 60%;
   }
 }
 
@@ -162,7 +162,7 @@
   .scrollbar-none { scrollbar-width: none; }
   .tabular-nums { font-variant-numeric: tabular-nums; }
 
-  /* Editorial accents */
+  /* Editorial accents (kept gold-* names for back-compat; now blue tones) */
   .text-gold { color: hsl(var(--gold)); }
   .bg-gold { background-color: hsl(var(--gold)); }
   .bg-gold-soft { background-color: hsl(var(--gold-soft)); }
@@ -175,7 +175,7 @@
   .shadow-editorial { box-shadow: var(--shadow-editorial); }
   .shadow-gold { box-shadow: var(--shadow-gold); }
 
-  /* Hairline divider à la editorial magazine */
+  /* Hairline divider */
   .divider-editorial {
     background-image: linear-gradient(90deg, transparent, hsl(var(--border)) 20%, hsl(var(--border)) 80%, transparent);
     height: 1px;
