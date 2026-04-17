@@ -7,15 +7,15 @@ interface StatsStripProps {
 }
 
 /**
- * Editorial stats strip — masonry-style numerals with serif display, designed
- * to evoke a magazine masthead. Each tile auto-counts when it enters the viewport.
+ * Editorial stats strip — 2×2 on mobile (so numerals never clip),
+ * 4-up from sm: upward. Numerals use tabular-nums + clamp sizing.
  */
 export function StatsStrip({ total, byCategory }: StatsStripProps) {
   const stats = [
-    { value: total, label: "Curated scenarios", accent: false },
-    { value: byCategory.qa ?? 0, label: "Q&A bank", accent: true },
-    { value: byCategory.or_labor ?? 0, label: "OR & labor", accent: false },
-    { value: 7, label: "Calculators", accent: false },
+    { value: total, label: "Curated scenarios", suffix: "+", accent: false },
+    { value: byCategory.qa ?? 0, label: "Q&A bank", suffix: "", accent: true },
+    { value: byCategory.or_labor ?? 0, label: "OR & labor", suffix: "", accent: false },
+    { value: 7, label: "Calculators", suffix: "", accent: false },
   ];
 
   return (
@@ -23,14 +23,13 @@ export function StatsStrip({ total, byCategory }: StatsStripProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className=""
       aria-label="Library statistics"
     >
-      <div className="grid grid-cols-4 gap-2 px-1">
-        {stats.map((s, i) => (
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {stats.map((s) => (
           <div
             key={s.label}
-            className={`relative rounded-xl px-2 py-3 text-center border transition-colors ${
+            className={`relative rounded-xl px-3 py-4 border transition-colors overflow-hidden flex flex-col items-center justify-center min-h-[88px] ${
               s.accent
                 ? "bg-gold-soft border-gold/30"
                 : "bg-card border-border/50"
@@ -38,12 +37,10 @@ export function StatsStrip({ total, byCategory }: StatsStripProps) {
           >
             <CountUp
               to={s.value}
-              className={`block font-editorial text-2xl font-bold leading-none ${
-                s.accent ? "text-foreground" : "text-foreground"
-              }`}
-              suffix={i === 0 ? "+" : ""}
+              suffix={s.suffix}
+              className="block font-editorial font-bold leading-none text-foreground tabular-nums tracking-tight text-[clamp(1.25rem,7vw,1.75rem)] max-w-full truncate"
             />
-            <span className="block eyebrow text-muted-foreground mt-1.5 leading-tight text-[9px]">
+            <span className="block eyebrow text-muted-foreground mt-2 leading-tight text-[9px] text-center">
               {s.label}
             </span>
           </div>
