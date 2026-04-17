@@ -431,7 +431,52 @@ export default function Index() {
               </button>
             )}
 
-            {/* Suggestions dropdown */}
+            {/* Popular search chips — shown on focus when query is empty */}
+            <AnimatePresence>
+              {searchFocused && search.trim().length < 2 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -4, height: 0 }}
+                  transition={{ duration: 0.18 }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-2.5 pb-0.5">
+                    <div className="flex items-center gap-1.5 mb-2 px-0.5">
+                      <Sparkles className="w-3 h-3 text-primary" />
+                      <span className="eyebrow text-muted-foreground">Popular searches</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { label: "Preeclampsia", cat: "qa" as const },
+                        { label: "PPH", cat: "qa" as const },
+                        { label: "Shoulder dystocia", cat: "or_labor" as const },
+                        { label: "GDM", cat: "qa" as const },
+                        { label: "Cervical insufficiency", cat: "clinic" as const },
+                        { label: "Anxious patient", cat: "behavior" as const },
+                      ].map((chip) => (
+                        <button
+                          key={chip.label}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setActiveTab(chip.cat);
+                            setSearch(chip.label);
+                            setSuggestOpen(true);
+                            setSearchFocused(false);
+                          }}
+                          className="group inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/5 border border-primary/20 text-[11px] font-semibold text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                        >
+                          <Search className="w-2.5 h-2.5 opacity-70 group-hover:opacity-100" />
+                          {chip.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <AnimatePresence>
               {suggestOpen && search.trim().length >= 2 && (
                 <motion.div
