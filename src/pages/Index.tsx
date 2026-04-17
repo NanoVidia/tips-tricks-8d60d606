@@ -292,7 +292,7 @@ export default function Index() {
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative overflow-hidden">
+    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative">
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
         style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
