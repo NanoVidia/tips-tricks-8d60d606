@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ExternalLink, GitCompare, Trophy, Clock, FileText, BookOpen, TrendingUp } from "lucide-react";
 import { EXAMS, type ExamMeta } from "@/data/examsData";
 import { ExamSimulator } from "@/components/exams/ExamSimulator";
+import { DisclaimerBanner } from "@/components/Disclaimer";
 import {
   LineChart,
   Line,
