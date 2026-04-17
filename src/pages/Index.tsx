@@ -289,25 +289,34 @@ export default function Index() {
         style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
         aria-hidden="true"
       />
-      <div className="h-[2px] gradient-gold relative z-10" />
+      <div className="h-[3px] gradient-gold relative z-10" />
 
-      <header className="relative px-4 pt-5 pb-3 z-10">
+      <header className="relative px-4 pt-4 pb-3 z-10 border-b border-border/50 bg-card/60 backdrop-blur-md">
         <div className="relative">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
+          {/* Issue line — magazine-style date + edition */}
+          <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-1 h-1 rounded-full bg-gold" />
+              <span>{issueDate()}</span>
+            </span>
+            <span className="text-gold/90">Vol. I · Clinical Edition</span>
+          </div>
+
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3 min-w-0">
               <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }}>
                 <Logo />
               </motion.div>
               <div className="min-w-0">
                 <motion.h1
-                  className="font-editorial text-[22px] font-bold tracking-tight text-foreground leading-none"
+                  className="font-editorial text-[24px] font-bold tracking-tight text-foreground leading-none"
                   initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
                   Tips <span className="italic font-medium text-gold">&</span> Tricks
                 </motion.h1>
                 <motion.p
-                  className="text-[9.5px] text-muted-foreground leading-snug font-medium mt-1"
+                  className="text-[10px] text-muted-foreground leading-snug font-medium mt-1 truncate"
                   initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}
                 >
                   <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
@@ -316,12 +325,15 @@ export default function Index() {
             </div>
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl bg-card border border-border/60 hover:border-gold/40 hover:bg-muted transition-all"
+              className="p-2.5 rounded-xl bg-card border border-border/60 hover:border-gold/50 hover:bg-muted transition-all shrink-0"
               aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             >
               {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
             </button>
           </div>
+
+          {/* Hairline divider */}
+          <div className="divider-editorial mb-3" aria-hidden="true" />
 
           {/* Search bar with auto-suggest */}
           <motion.div
