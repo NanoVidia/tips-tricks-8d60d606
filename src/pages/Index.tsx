@@ -164,6 +164,15 @@ export default function Index() {
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
+  // Sticky header compact mode on scroll
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
   const toggleDark = () => {
@@ -283,44 +292,71 @@ export default function Index() {
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative overflow-hidden">
+    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative">
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
         style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
         aria-hidden="true"
       />
-      <div className="h-[3px] gradient-gold relative z-10" />
+      <div className="h-[3px] gradient-gold relative z-20" />
 
-      <header className="relative px-4 pt-4 pb-3 z-10 border-b border-border/50 bg-card/60 backdrop-blur-md">
+      <header
+        className={`sticky top-0 z-20 px-4 transition-all duration-300 border-b bg-card/80 backdrop-blur-md ${
+          scrolled ? "pt-2 pb-2 border-border/70 shadow-editorial" : "pt-4 pb-3 border-border/50"
+        }`}
+      >
         <div className="relative">
-          {/* Issue line — magazine-style date + edition */}
-          <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block w-1 h-1 rounded-full bg-gold" />
-              <span>{issueDate()}</span>
-            </span>
-            <span className="text-gold/90">Vol. I · Clinical Edition</span>
-          </div>
+          {/* Issue line — hidden in compact mode */}
+          <AnimatePresence initial={false}>
+            {!scrolled && (
+              <motion.div
+                key="issue-line"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <span className="inline-block w-1 h-1 rounded-full bg-gold" />
+                    <span>{issueDate()}</span>
+                  </span>
+                  <span className="text-gold/90">Vol. I · Clinical Edition</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <div className="flex items-center justify-between mb-3">
+          {/* Masthead — collapses to small in compact mode */}
+          <div className={`flex items-center justify-between transition-all ${scrolled ? "mb-2" : "mb-3"}`}>
             <div className="flex items-center gap-3 min-w-0">
-              <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }}>
+              <motion.div
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: scrolled ? 0.78 : 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 18 }}
+              >
                 <Logo />
               </motion.div>
               <div className="min-w-0">
-                <motion.h1
-                  className="font-editorial text-[24px] font-bold tracking-tight text-foreground leading-none"
-                  initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                >
+                <h1 className={`font-editorial font-bold tracking-tight text-foreground leading-none transition-all ${
+                  scrolled ? "text-[18px]" : "text-[24px]"
+                }`}>
                   Tips <span className="italic font-medium text-gold">&</span> Tricks
-                </motion.h1>
-                <motion.p
-                  className="text-[10px] text-muted-foreground leading-snug font-medium mt-1 truncate"
-                  initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}
-                >
-                  <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
-                </motion.p>
+                </h1>
+                <AnimatePresence initial={false}>
+                  {!scrolled && (
+                    <motion.p
+                      key="subtitle"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="text-[10px] text-muted-foreground leading-snug font-medium mt-1 truncate overflow-hidden"
+                    >
+                      <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
             <button
@@ -332,8 +368,8 @@ export default function Index() {
             </button>
           </div>
 
-          {/* Hairline divider */}
-          <div className="divider-editorial mb-3" aria-hidden="true" />
+          {/* Hairline divider — hidden in compact */}
+          {!scrolled && <div className="divider-editorial mb-3" aria-hidden="true" />}
 
           {/* Search bar with auto-suggest */}
           <motion.div
@@ -526,25 +562,32 @@ export default function Index() {
       <main className="flex-1 px-4 pb-6">
         {!activeTab ? (
           <motion.div
-            className="flex flex-col items-center justify-center text-center pt-10 pb-8 px-2"
+            className="pt-3 pb-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.5 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
           >
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-rose-500/10 via-blue-500/10 to-emerald-500/10 mb-4">
-              <Sparkles className="w-6 h-6 text-primary" />
-            </div>
-            <h2 className="text-xl font-bold text-foreground tracking-tight mb-2 leading-snug">
-              Clinical wisdom,<br />one search away
-            </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed max-w-[260px] mb-6">
-              {totalScenarios}+ OB/GYN scenarios, scripts & protocols by Dr. Sahar Elkhodiry.
-            </p>
+            {/* Editorial stats */}
+            <StatsStrip total={totalScenarios} byCategory={categoryCounts} />
 
-            <div className="w-full space-y-1.5">
-              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 mb-2">
-                Try searching
+            {/* Case of the Day */}
+            <CaseOfTheDay onOpen={(c) => openAI(c as unknown as Scenario)} />
+
+            {/* Editorial intro headline */}
+            <div className="text-center px-2 mt-2 mb-5">
+              <span className="eyebrow text-gold">Editor's note</span>
+              <h2 className="font-editorial text-[22px] font-bold text-foreground tracking-tight mt-2 mb-2 leading-tight">
+                Clinical wisdom,<br />
+                <span className="italic text-gold">one search away.</span>
+              </h2>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
+                {totalScenarios}+ OB/GYN scenarios, scripts & protocols — curated by Dr. Sahar Elkhodiry.
               </p>
+            </div>
+
+            {/* Try-searching shortcuts */}
+            <div className="w-full space-y-1.5">
+              <p className="eyebrow text-muted-foreground/70 mb-2 px-1">Try searching</p>
               {[
                 { icon: ShieldCheck, label: "Preeclampsia management" },
                 { icon: Activity, label: "PPH protocol" },
@@ -553,27 +596,31 @@ export default function Index() {
                 <button
                   key={s.label}
                   onClick={() => { setActiveTab("qa"); setSearch(s.label); }}
-                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-card border border-border/40 hover:border-primary/40 hover:bg-muted/40 transition-all text-left"
+                  className="w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:bg-muted/40 transition-all text-left group"
                 >
-                  <s.icon className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="text-[12px] text-foreground font-medium flex-1">{s.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
+                  <div className="p-1.5 rounded-lg bg-muted/60 group-hover:bg-gold-soft transition-colors">
+                    <s.icon className="w-3.5 h-3.5 text-foreground shrink-0" />
+                  </div>
+                  <span className="text-[12px] text-foreground font-semibold flex-1">{s.label}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 group-hover:text-gold group-hover:translate-x-0.5 transition" />
                 </button>
               ))}
             </div>
 
+            {/* Tools CTA */}
             <Link
               to="/tools"
-              className="mt-5 group flex items-center gap-3 w-full p-3.5 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 hover:border-primary/40 transition-all"
+              className="mt-5 group flex items-center gap-3 w-full p-4 rounded-2xl gradient-ink border border-gold/30 hover:border-gold/60 transition-all shadow-editorial"
+              style={{ color: "hsl(40 30% 96%)" }}
             >
-              <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-sm">
-                <Wrench className="w-4 h-4 text-primary-foreground" />
+              <div className="p-2 rounded-xl bg-gold/20 ring-1 ring-gold/40">
+                <Wrench className="w-4 h-4 text-gold" />
               </div>
               <div className="flex-1 text-left">
-                <p className="text-[13px] font-bold text-foreground">Clinical Tools</p>
-                <p className="text-[10px] text-muted-foreground leading-tight">Calculators • Emergency • Drugs • Guidelines • DDx • MCQ</p>
+                <p className="text-[13px] font-bold leading-tight" style={{ color: "hsl(40 30% 96%)" }}>Clinical Tools Suite</p>
+                <p className="text-[10px] leading-tight mt-0.5 opacity-70">Calculators · Emergency · Drugs · DDx · MCQ</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition" />
+              <ChevronRight className="w-4 h-4 text-gold group-hover:translate-x-1 transition" />
             </Link>
           </motion.div>
         ) : loading ? (
@@ -619,7 +666,8 @@ export default function Index() {
       </main>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
-      <FloatingAIBot />
+      <Suspense fallback={null}><FloatingAIBot /></Suspense>
+      <OnboardingTour />
     </div>
   );
 }
