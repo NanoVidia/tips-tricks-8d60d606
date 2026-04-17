@@ -6,8 +6,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Tools from "./pages/Tools.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { FreezeOverlay } from "./components/FreezeOverlay";
 
 const queryClient = new QueryClient();
+
+// Global freeze flag — entire app is non-interactive until you say "فك التجميد".
+const APP_FROZEN = true;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,6 +26,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      {APP_FROZEN && <FreezeOverlay />}
     </TooltipProvider>
   </QueryClientProvider>
 );
