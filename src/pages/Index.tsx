@@ -734,7 +734,7 @@ export default function Index() {
                 })()}
                 <h2 className="text-sm font-bold text-foreground">{i.tabs[activeTab]}</h2>
               </div>
-              <span className="text-[10px] text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full font-medium">
+              <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full font-bold">
                 {totalCount} items
               </span>
             </div>
