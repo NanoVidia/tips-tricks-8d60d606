@@ -455,6 +455,7 @@ export function FloatingAIBot() {
                           ) : m.content}
                         </div>
                       )}
+                      {m.role === "assistant" && m.content && <InlineDisclaimer />}
                     </div>
                   </div>
                 );
