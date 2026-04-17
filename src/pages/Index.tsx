@@ -417,7 +417,7 @@ export default function Index() {
               aria-controls="search-suggestions"
               aria-autocomplete="list"
               aria-activedescendant={highlightIdx >= 0 ? `suggest-${highlightIdx}` : undefined}
-              className="h-12 bg-card border-border/60 rounded-2xl text-sm pl-11 pr-10 shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30"
+              className="relative h-12 bg-card border-border/60 rounded-2xl text-sm pl-12 pr-10 shadow-editorial focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/50 transition-all"
             />
             {search && (
               <button
