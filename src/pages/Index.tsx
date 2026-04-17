@@ -536,9 +536,8 @@ export default function Index() {
                   <span className="tracking-wide">{i.tabs[id]}</span>
                   <span
                     className={`text-[9px] tabular-nums px-1.5 py-0.5 rounded-md font-black ${
-                      active ? "text-foreground" : "bg-muted text-muted-foreground"
+                      active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                     }`}
-                    style={active ? { backgroundColor: "hsl(0 0% 10% / 0.08)" } : undefined}
                   >
                     {categoryCounts[id]}
                   </span>
