@@ -628,7 +628,52 @@ export default function Index() {
               <CaseOfTheDay onOpen={(c) => openAI(c as unknown as Scenario)} />
             </section>
 
-            {/* 4️⃣ Browse by category — overview of full library */}
+            {/* 3.5 Recent searches — only when user has history */}
+            {recent.items.length > 0 && (
+              <section aria-labelledby="recent">
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h3 id="recent" className="eyebrow text-foreground/80 flex items-center gap-1.5">
+                    <Clock className="w-3 h-3 text-gold" />
+                    Recent searches
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={recent.clear}
+                    className="flex items-center gap-1 text-[9px] uppercase tracking-wider font-bold text-muted-foreground hover:text-destructive transition px-1.5 py-1 rounded-md hover:bg-destructive/10"
+                    aria-label="Clear recent searches"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Clear
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {recent.items.map((q) => (
+                    <div
+                      key={q}
+                      className="group inline-flex items-center gap-1 rounded-full bg-card border border-border/50 hover:border-gold/40 transition-all overflow-hidden"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => { setActiveTab("qa"); setSearch(q); }}
+                        className="flex items-center gap-1.5 pl-3 pr-1 py-1.5 text-[11px] font-semibold text-foreground"
+                      >
+                        <Clock className="w-2.5 h-2.5 text-muted-foreground" />
+                        {q}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => recent.remove(q)}
+                        aria-label={`Remove ${q}`}
+                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
+                      >
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             <section aria-labelledby="browse-cat">
               <h3 id="browse-cat" className="eyebrow text-foreground/80 mb-2 px-1">Browse the library</h3>
               <div className="grid grid-cols-2 gap-2">
