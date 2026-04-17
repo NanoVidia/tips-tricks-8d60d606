@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Send, Loader2, X, Bot, Wrench, CheckCircle2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { executeTool, TOOL_LABELS, getSaveTarget, buildSaveToToolsUrl, stashPrefill } from "@/lib/aiTools";
+import { InlineDisclaimer } from "@/components/Disclaimer";
 
 type ToolCall = { id: string; name: string; args: string };
 type Msg = {
