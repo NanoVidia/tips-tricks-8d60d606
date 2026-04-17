@@ -570,53 +570,75 @@ export default function Index() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Editorial category chips — refined pro look */}
+          {/* Category cards — 2x2 grid, doctor-friendly */}
           <motion.div
-            className="flex items-center gap-2 mt-4 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            className="grid grid-cols-2 gap-2.5 mt-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.4 }}
           >
-            {tabIds.map((id) => {
+            {tabIds.map((id, idx) => {
               const config = categoryConfig[id];
               const Icon = config.icon;
               const active = activeTab === id;
+              const descriptions: Record<ScenarioCategory, string> = {
+                qa: "Quick clinical questions & answers",
+                clinic: "Outpatient consultations & exams",
+                or_labor: "Surgery & delivery scenarios",
+                behavior: "Patient communication scripts",
+              };
               return (
-                <button
+                <motion.button
                   key={id}
                   onClick={() => setActiveTab(active ? null : id)}
                   aria-pressed={active}
-                  className={`group relative flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border ${
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + idx * 0.05 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={`group relative overflow-hidden flex flex-col items-start gap-2 p-3 rounded-2xl text-left border transition-all ${
                     active
-                      ? "border-primary/40 bg-primary/5 text-foreground shadow-editorial"
-                      : "border-border/60 bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground hover:bg-muted/40"
+                      ? "border-primary/50 bg-primary/[0.04] shadow-editorial"
+                      : "border-border/60 bg-card hover:border-primary/30 hover:bg-muted/30"
                   }`}
                 >
-                  <span
-                    className={`flex items-center justify-center w-6 h-6 rounded-full transition-all ${
-                      active
-                        ? "gradient-gold text-primary-foreground shadow-gold"
-                        : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                    }`}
-                  >
-                    <Icon className="w-3 h-3" strokeWidth={2.5} />
+                  {/* Top row: icon + count */}
+                  <div className="flex items-center justify-between w-full">
+                    <span
+                      className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all ${
+                        active
+                          ? "gradient-gold text-primary-foreground shadow-gold"
+                          : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" strokeWidth={2.4} />
+                    </span>
+                    <span
+                      className={`text-[10px] tabular-nums px-2 py-0.5 rounded-full font-black ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted/70 text-muted-foreground"
+                      }`}
+                    >
+                      {categoryCounts[id]}
+                    </span>
+                  </div>
+                  {/* Title */}
+                  <span className="text-[13px] font-bold tracking-tight text-foreground leading-tight">
+                    {i.tabs[id]}
                   </span>
-                  <span className="tracking-wide">{i.tabs[id]}</span>
-                  <span
-                    className={`text-[9px] tabular-nums px-1.5 py-0.5 rounded-full font-black min-w-[20px] text-center ${
-                      active ? "bg-primary text-primary-foreground" : "bg-muted/70 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                    }`}
-                  >
-                    {categoryCounts[id]}
+                  {/* Description */}
+                  <span className="text-[10.5px] text-muted-foreground leading-snug line-clamp-2">
+                    {descriptions[id]}
                   </span>
                   {active && (
                     <motion.span
-                      layoutId="active-tab-underline"
-                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-[2px] gradient-gold rounded-full"
+                      layoutId="active-cat-bar"
+                      className="absolute top-0 left-0 right-0 h-[2px] gradient-gold"
                       transition={{ type: "spring", stiffness: 400, damping: 32 }}
                     />
                   )}
-                </button>
+                </motion.button>
               );
             })}
           </motion.div>
