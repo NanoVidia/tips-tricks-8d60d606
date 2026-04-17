@@ -188,15 +188,80 @@ export function FloatingAIBot() {
 
   return (
     <>
+      {/* 3D-style floating AI orb — compact (44px) and futuristic */}
       <motion.button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center hover:shadow-xl hover:shadow-blue-500/40 transition-shadow"
-        whileTap={{ scale: 0.9 }}
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
         aria-label={open ? "Close assistant" : "Open AI assistant"}
+        whileTap={{ scale: 0.88 }}
+        whileHover={{ scale: 1.08 }}
+        animate={{ y: [0, -3, 0] }}
+        transition={{ y: { duration: 3.2, repeat: Infinity, ease: "easeInOut" } }}
+        className="group fixed bottom-5 right-5 z-50 w-11 h-11 rounded-full flex items-center justify-center"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 25%, hsl(215 100% 70%) 0%, hsl(220 85% 45%) 35%, hsl(235 75% 22%) 75%, hsl(240 60% 12%) 100%)",
+          boxShadow:
+            "0 10px 22px -6px hsl(220 85% 30% / 0.55), 0 4px 10px -2px hsl(220 80% 20% / 0.45), inset 0 1.5px 1.5px hsl(0 0% 100% / 0.55), inset 0 -2.5px 4px hsl(235 80% 8% / 0.6), inset 0 0 0 0.5px hsl(220 60% 60% / 0.4)",
+        }}
       >
-        {open ? <X className="w-6 h-6" /> : <Bot className="w-7 h-7" />}
+        {/* Outer rotating conic ring (energy aura) */}
+        <span
+          aria-hidden
+          className="absolute -inset-[3px] rounded-full opacity-70 group-hover:opacity-100 transition-opacity"
+          style={{
+            background:
+              "conic-gradient(from 0deg, transparent 0%, hsl(195 100% 65% / 0.7) 25%, transparent 50%, hsl(265 90% 70% / 0.6) 75%, transparent 100%)",
+            filter: "blur(3px)",
+            animation: "spin 4s linear infinite",
+          }}
+        />
+        {/* Inner glass dome */}
+        <span
+          aria-hidden
+          className="absolute inset-[3px] rounded-full pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at 35% 25%, hsl(0 0% 100% / 0.45) 0%, hsl(0 0% 100% / 0.08) 28%, transparent 55%)",
+          }}
+        />
+        {/* Top specular highlight */}
+        <span
+          aria-hidden
+          className="absolute top-[3px] left-[6px] w-3.5 h-1.5 rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse, hsl(0 0% 100% / 0.85) 0%, transparent 70%)",
+            filter: "blur(0.5px)",
+          }}
+        />
+        {/* Pulsing core glow behind icon */}
+        <motion.span
+          aria-hidden
+          className="absolute inset-2 rounded-full pointer-events-none"
+          animate={{ opacity: [0.35, 0.7, 0.35], scale: [0.85, 1.05, 0.85] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            background: "radial-gradient(circle, hsl(195 100% 75% / 0.55) 0%, transparent 65%)",
+          }}
+        />
+        {/* Icon */}
+        <motion.span
+          className="relative z-10 text-white drop-shadow-[0_1px_2px_hsl(220_80%_15%/0.8)]"
+          animate={open ? { rotate: 90 } : { rotate: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 18 }}
+        >
+          {open ? <X className="w-4 h-4" strokeWidth={2.6} /> : <Bot className="w-4 h-4" strokeWidth={2.4} />}
+        </motion.span>
+        {/* Status dot */}
+        {!open && (
+          <span
+            aria-hidden
+            className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-background"
+            style={{
+              background: "radial-gradient(circle at 30% 30%, hsl(140 90% 70%), hsl(150 85% 40%))",
+              boxShadow: "0 0 6px hsl(140 90% 50% / 0.8)",
+            }}
+          />
+        )}
       </motion.button>
 
       <AnimatePresence>
