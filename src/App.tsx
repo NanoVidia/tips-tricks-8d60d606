@@ -33,7 +33,8 @@ const App = () => {
     setDevUnlocked(localStorage.getItem(DEV_KEY) === "1");
   }, []);
 
-  const showFreeze = APP_FROZEN && !devUnlocked;
+  const onAdmin = typeof window !== "undefined" && window.location.pathname.startsWith("/admin");
+  const showFreeze = APP_FROZEN && !devUnlocked && !onAdmin;
 
   return (
     <QueryClientProvider client={queryClient}>
