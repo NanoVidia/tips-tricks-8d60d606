@@ -124,99 +124,141 @@ export function SurgeryLibrary() {
         )}
       </div>
 
-      {/* Category chips */}
-      <div className="flex flex-wrap gap-1.5">
-        {surgeryCategories.map((c) => {
-          const active = category === c.id;
-          const count = c.id === "All" ? surgeries.length : surgeries.filter((s) => s.category === c.id).length;
-          return (
+      {/* INDEX VIEW: category cards */}
+      {isIndexView ? (
+        <>
+          <div className="flex items-center justify-between pt-1">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Browse by category</h3>
             <button
-              key={c.id}
-              onClick={() => setCategory(c.id)}
-              className={`text-[11px] font-medium px-2.5 py-1 rounded-full border transition ${
-                active
+              onClick={() => setCategory("All")}
+              className="text-[11px] text-primary hover:underline"
+            >
+              View all →
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {surgeryCategories
+              .filter((c) => c.id !== "All")
+              .map((c) => {
+                const count = surgeries.filter((s) => s.category === c.id).length;
+                return (
+                  <Card
+                    key={c.id}
+                    onClick={() => setCategory(c.id as SurgeryCategory)}
+                    className="p-3 cursor-pointer border-border/50 hover:border-primary/50 hover:bg-muted/30 transition group"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <FolderOpen className="w-4 h-4 text-primary mb-1.5" />
+                        <h4 className="text-sm font-semibold leading-tight">{c.label}</h4>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{count} procedure{count !== 1 ? "s" : ""}</p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition shrink-0" />
+                    </div>
+                  </Card>
+                );
+              })}
+          </div>
+          <p className="text-[10px] text-center text-muted-foreground pt-2">
+            Tip: use search above to find a procedure across all categories.
+          </p>
+        </>
+      ) : (
+        <>
+          {/* Back / context bar */}
+          <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => { setCategory(null); setDifficulty(0); }}
+              className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition"
+            >
+              <ArrowLeft className="w-3 h-3" />
+              All categories
+            </button>
+            <span className="text-[11px] text-muted-foreground">
+              {category && category !== "All" ? (
+                <>
+                  <Badge variant="secondary" className="text-[10px] mr-1">{category}</Badge>
+                  {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+                </>
+              ) : (
+                <>{filtered.length} of {surgeries.length}</>
+              )}
+            </span>
+          </div>
+
+          {/* Difficulty filter (only inside category/search view) */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] text-muted-foreground font-medium">Difficulty:</span>
+            <button
+              onClick={() => setDifficulty(0)}
+              className={`text-[11px] px-2 py-0.5 rounded-full border transition ${
+                difficulty === 0
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card border-border/50 text-muted-foreground hover:bg-muted/60"
               }`}
             >
-              {c.label}
-              <span className="ml-1 opacity-60">{count}</span>
+              All
             </button>
-          );
-        })}
-      </div>
+            {[1, 2, 3, 4, 5].map((d) => {
+              const active = difficulty === d;
+              const count = surgeries.filter((s) => s.difficulty === d && (!category || category === "All" || s.category === category)).length;
+              return (
+                <button
+                  key={d}
+                  onClick={() => setDifficulty(active ? 0 : d)}
+                  title={`${DIFF_LABELS[d]} (${count})`}
+                  className={`text-[11px] px-2 py-0.5 rounded-full border transition flex items-center gap-0.5 ${
+                    active
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card border-border/50 text-muted-foreground hover:bg-muted/60"
+                  }`}
+                >
+                  <span className={active ? "" : DIFF_COLORS[d]}>{"★".repeat(d)}</span>
+                  <span className="opacity-60 ml-0.5">{count}</span>
+                </button>
+              );
+            })}
+          </div>
 
-      {/* Difficulty filter */}
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] text-muted-foreground font-medium">Difficulty:</span>
-        <div className="flex gap-1">
-          <button
-            onClick={() => setDifficulty(0)}
-            className={`text-[11px] px-2 py-0.5 rounded-full border transition ${
-              difficulty === 0
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card border-border/50 text-muted-foreground hover:bg-muted/60"
-            }`}
-          >
-            All
-          </button>
-          {[1, 2, 3, 4, 5].map((d) => {
-            const active = difficulty === d;
-            const count = surgeries.filter((s) => s.difficulty === d && (category === "All" || s.category === category)).length;
-            return (
-              <button
-                key={d}
-                onClick={() => setDifficulty(active ? 0 : d)}
-                title={`${DIFF_LABELS[d]} (${count})`}
-                className={`text-[11px] px-2 py-0.5 rounded-full border transition flex items-center gap-0.5 ${
-                  active
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card border-border/50 text-muted-foreground hover:bg-muted/60"
-                }`}
-              >
-                <span className={active ? "" : DIFF_COLORS[d]}>{"★".repeat(d)}</span>
-                <span className="opacity-60 ml-0.5">{count}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      {filtered.length === 0 ? (
-        <Card className="p-8 text-center border-border/50">
-          <Filter className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
-          <p className="text-sm text-muted-foreground">No surgeries match your search.</p>
-        </Card>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map((s) => (
-            <Card
-              key={s.id}
-              className="p-3 border-border/50 cursor-pointer hover:bg-muted/30 transition group"
-              onClick={() => setSelected(s)}
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                    <Badge variant="outline" className="text-[9px] shrink-0">{s.category}</Badge>
-                    <DifficultyStars level={s.difficulty} />
-                  </div>
-                  <h3 className="text-sm font-semibold leading-snug">{s.name}</h3>
-                  <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">{s.summary}</p>
-                  <div className="flex flex-wrap gap-1 mt-1.5">
-                    {s.approach.map((a) => (
-                      <span key={a} className="text-[9px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">{a}</span>
-                    ))}
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">⏱ {s.duration}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center gap-1.5 shrink-0">
-                  <BookmarkButton id={`surgery-${s.id}`} label={s.name} size="sm" />
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-foreground transition" />
-                </div>
-              </div>
+          {/* Procedure list */}
+          {filtered.length === 0 ? (
+            <Card className="p-8 text-center border-border/50">
+              <Filter className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
+              <p className="text-sm text-muted-foreground">No surgeries match your search.</p>
             </Card>
-          ))}
-        </div>
+          ) : (
+            <div className="space-y-2">
+              {filtered.map((s) => (
+                <Card
+                  key={s.id}
+                  className="p-3 border-border/50 cursor-pointer hover:bg-muted/30 transition group"
+                  onClick={() => setSelected(s)}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                        <Badge variant="outline" className="text-[9px] shrink-0">{s.category}</Badge>
+                        <DifficultyStars level={s.difficulty} />
+                      </div>
+                      <h3 className="text-sm font-semibold leading-snug">{s.name}</h3>
+                      <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">{s.summary}</p>
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {s.approach.map((a) => (
+                          <span key={a} className="text-[9px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">{a}</span>
+                        ))}
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">⏱ {s.duration}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center gap-1.5 shrink-0">
+                      <BookmarkButton id={`surgery-${s.id}`} label={s.name} size="sm" />
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-foreground transition" />
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* Detail Dialog */}
