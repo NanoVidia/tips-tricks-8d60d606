@@ -570,75 +570,50 @@ export default function Index() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Category cards — 2x2 grid, doctor-friendly */}
+          {/* Category tabs — clean horizontal segmented control */}
           <motion.div
-            className="grid grid-cols-2 gap-2.5 mt-4"
-            initial={{ opacity: 0, y: 8 }}
+            role="tablist"
+            aria-label="Scenario categories"
+            className="relative flex items-stretch mt-4 p-1 rounded-xl bg-muted/60 border border-border/50"
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.4 }}
+            transition={{ delay: 0.25, duration: 0.35 }}
           >
-            {tabIds.map((id, idx) => {
+            {tabIds.map((id) => {
               const config = categoryConfig[id];
               const Icon = config.icon;
               const active = activeTab === id;
-              const descriptions: Record<ScenarioCategory, string> = {
-                qa: "Quick clinical questions & answers",
-                clinic: "Outpatient consultations & exams",
-                or_labor: "Surgery & delivery scenarios",
-                behavior: "Patient communication scripts",
-              };
               return (
-                <motion.button
+                <button
                   key={id}
+                  role="tab"
+                  aria-selected={active}
                   onClick={() => setActiveTab(active ? null : id)}
-                  aria-pressed={active}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + idx * 0.05 }}
-                  whileTap={{ scale: 0.97 }}
-                  className={`group relative overflow-hidden flex flex-col items-start gap-2 p-3 rounded-2xl text-left border transition-all ${
+                  className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 px-1 py-2 rounded-lg text-[10px] font-bold tracking-tight transition-colors ${
                     active
-                      ? "border-primary/50 bg-primary/[0.04] shadow-editorial"
-                      : "border-border/60 bg-card hover:border-primary/30 hover:bg-muted/30"
+                      ? "text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {/* Top row: icon + count */}
-                  <div className="flex items-center justify-between w-full">
-                    <span
-                      className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all ${
-                        active
-                          ? "gradient-gold text-primary-foreground shadow-gold"
-                          : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" strokeWidth={2.4} />
-                    </span>
-                    <span
-                      className={`text-[10px] tabular-nums px-2 py-0.5 rounded-full font-black ${
-                        active
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted/70 text-muted-foreground"
-                      }`}
-                    >
-                      {categoryCounts[id]}
-                    </span>
-                  </div>
-                  {/* Title */}
-                  <span className="text-[13px] font-bold tracking-tight text-foreground leading-tight">
-                    {i.tabs[id]}
-                  </span>
-                  {/* Description */}
-                  <span className="text-[10.5px] text-muted-foreground leading-snug line-clamp-2">
-                    {descriptions[id]}
-                  </span>
                   {active && (
                     <motion.span
-                      layoutId="active-cat-bar"
-                      className="absolute top-0 left-0 right-0 h-[2px] gradient-gold"
-                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                      layoutId="active-tab-pill"
+                      className="absolute inset-0 rounded-lg gradient-gold shadow-gold"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
-                </motion.button>
+                  <span className="relative flex items-center gap-1 leading-none">
+                    <Icon className="w-3 h-3" strokeWidth={2.5} />
+                    <span className="truncate">{i.tabs[id]}</span>
+                  </span>
+                  <span
+                    className={`relative text-[9px] tabular-nums leading-none font-black ${
+                      active ? "text-primary-foreground/85" : "text-muted-foreground/70"
+                    }`}
+                  >
+                    {categoryCounts[id]}
+                  </span>
+                </button>
               );
             })}
           </motion.div>
