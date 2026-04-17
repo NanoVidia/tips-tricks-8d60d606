@@ -228,6 +228,7 @@ export default function Exams() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        <DisclaimerBanner />
         {/* Hero */}
         <motion.section
           initial={{ opacity: 0, y: 10 }}
