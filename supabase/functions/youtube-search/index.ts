@@ -94,9 +94,11 @@ If you cannot find a verified video, return: {"videoId": null}.`;
 
     if (!pplxRes.ok) {
       const text = await pplxRes.text();
+      console.error(`Perplexity ${pplxRes.status}: ${text}`);
+      // Fail soft so the client shows manual search fallback instead of an error screen
       return new Response(
-        JSON.stringify({ error: `Perplexity ${pplxRes.status}: ${text}` }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({ found: false, reason: "search-unavailable", status: pplxRes.status }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
