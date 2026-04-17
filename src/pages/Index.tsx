@@ -570,50 +570,85 @@ export default function Index() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Category tabs — 2x2 grid, segmented-control style */}
+          {/* Category tabs — 2x2 grid with rich motion & gradient flair */}
           <motion.div
             role="tablist"
             aria-label="Scenario categories"
-            className="relative grid grid-cols-2 gap-1 mt-4 p-1 rounded-xl bg-muted/60 border border-border/50"
+            className="relative grid grid-cols-2 gap-2 mt-4"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.35 }}
+            transition={{ delay: 0.2, duration: 0.35 }}
           >
-            {tabIds.map((id) => {
+            {tabIds.map((id, idx) => {
               const config = categoryConfig[id];
               const Icon = config.icon;
               const active = activeTab === id;
               return (
-                <button
+                <motion.button
                   key={id}
                   role="tab"
                   aria-selected={active}
                   onClick={() => setActiveTab(active ? null : id)}
-                  className={`relative flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-[11px] font-bold tracking-tight transition-colors ${
+                  initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: 0.25 + idx * 0.06, type: "spring", stiffness: 280, damping: 22 }}
+                  whileHover={{ y: -2, scale: 1.015 }}
+                  whileTap={{ scale: 0.96 }}
+                  className={`group relative overflow-hidden flex items-center gap-2 px-2.5 py-3 rounded-xl border text-[11px] font-bold tracking-tight transition-all ${
                     active
-                      ? "text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "border-transparent text-primary-foreground shadow-gold"
+                      : "border-border/60 bg-card text-foreground hover:border-primary/30 hover:shadow-editorial"
                   }`}
                 >
+                  {/* Animated gradient backdrop when active */}
                   {active && (
                     <motion.span
                       layoutId="active-tab-pill"
-                      className="absolute inset-0 rounded-lg gradient-gold shadow-gold"
+                      className={`absolute inset-0 bg-gradient-to-br ${config.gradient}`}
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
-                  <Icon className="relative w-3.5 h-3.5 shrink-0" strokeWidth={2.5} />
-                  <span className="relative truncate">{i.tabs[id]}</span>
+                  {/* Soft hover glow when inactive */}
+                  {!active && (
+                    <span
+                      className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${config.gradient}`}
+                      style={{ mixBlendMode: "soft-light" }}
+                      aria-hidden
+                    />
+                  )}
+                  {/* Sheen sweep on hover */}
                   <span
-                    className={`relative text-[9px] tabular-nums font-black px-1.5 py-0.5 rounded-full ${
+                    className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none"
+                    aria-hidden
+                  />
+
+                  {/* Icon chip */}
+                  <motion.span
+                    animate={active ? { rotate: [0, -8, 6, 0] } : { rotate: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className={`relative flex items-center justify-center w-7 h-7 rounded-lg shrink-0 transition-all ${
                       active
-                        ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-background/70 text-muted-foreground"
+                        ? "bg-white/20 text-primary-foreground backdrop-blur-sm"
+                        : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  </motion.span>
+
+                  {/* Label */}
+                  <span className="relative flex-1 text-left truncate">{i.tabs[id]}</span>
+
+                  {/* Count badge */}
+                  <span
+                    className={`relative text-[9px] tabular-nums font-black px-1.5 py-0.5 rounded-full transition-colors ${
+                      active
+                        ? "bg-white/25 text-primary-foreground"
+                        : "bg-muted/70 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                     }`}
                   >
                     {categoryCounts[id]}
                   </span>
-                </button>
+                </motion.button>
               );
             })}
           </motion.div>
