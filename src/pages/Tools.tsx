@@ -21,6 +21,7 @@ import { SurgeryLibrary } from "@/components/tools/SurgeryLibrary";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { emergencyProtocols, pregnancyDrugs, guidelines, ddxLibrary } from "@/data/toolsData";
 import { toast } from "@/hooks/use-toast";
+import { DisclaimerBanner } from "@/components/Disclaimer";
 
 const sections = [
   { id: "favorites", label: "Favorites", icon: Star, color: "from-amber-400 to-orange-500" },
@@ -408,6 +409,7 @@ export default function Tools() {
       </header>
 
       <main className="flex-1 px-4 py-4">
+        <DisclaimerBanner className="mb-3" />
         <Tabs value={active} onValueChange={setActive} className="w-full">
           <TabsList className="hidden">
             {sections.map((s) => <TabsTrigger key={s.id} value={s.id}>{s.label}</TabsTrigger>)}

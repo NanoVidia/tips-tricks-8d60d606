@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { InlineDisclaimer } from "@/components/Disclaimer";
 
 interface Scenario {
   title_en: string;
@@ -143,16 +144,19 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
           )}
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
-                m.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted"
-              }`}>
-                {m.role === "assistant" ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
-                  </div>
-                ) : m.content}
+              <div className={`max-w-[85%] space-y-1 ${m.role === "user" ? "items-end" : "items-start"}`}>
+                <div className={`rounded-xl px-3 py-2 text-sm ${
+                  m.role === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
+                }`}>
+                  {m.role === "assistant" ? (
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <ReactMarkdown>{m.content}</ReactMarkdown>
+                    </div>
+                  ) : m.content}
+                </div>
+                {m.role === "assistant" && m.content && <InlineDisclaimer />}
               </div>
             </div>
           ))}
