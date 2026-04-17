@@ -562,25 +562,32 @@ export default function Index() {
       <main className="flex-1 px-4 pb-6">
         {!activeTab ? (
           <motion.div
-            className="flex flex-col items-center justify-center text-center pt-10 pb-8 px-2"
+            className="pt-3 pb-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.5 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
           >
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-rose-500/10 via-blue-500/10 to-emerald-500/10 mb-4">
-              <Sparkles className="w-6 h-6 text-primary" />
-            </div>
-            <h2 className="text-xl font-bold text-foreground tracking-tight mb-2 leading-snug">
-              Clinical wisdom,<br />one search away
-            </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed max-w-[260px] mb-6">
-              {totalScenarios}+ OB/GYN scenarios, scripts & protocols by Dr. Sahar Elkhodiry.
-            </p>
+            {/* Editorial stats */}
+            <StatsStrip total={totalScenarios} byCategory={categoryCounts} />
 
-            <div className="w-full space-y-1.5">
-              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 mb-2">
-                Try searching
+            {/* Case of the Day */}
+            <CaseOfTheDay onOpen={(c) => openAI(c as unknown as Scenario)} />
+
+            {/* Editorial intro headline */}
+            <div className="text-center px-2 mt-2 mb-5">
+              <span className="eyebrow text-gold">Editor's note</span>
+              <h2 className="font-editorial text-[22px] font-bold text-foreground tracking-tight mt-2 mb-2 leading-tight">
+                Clinical wisdom,<br />
+                <span className="italic text-gold">one search away.</span>
+              </h2>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
+                {totalScenarios}+ OB/GYN scenarios, scripts & protocols — curated by Dr. Sahar Elkhodiry.
               </p>
+            </div>
+
+            {/* Try-searching shortcuts */}
+            <div className="w-full space-y-1.5">
+              <p className="eyebrow text-muted-foreground/70 mb-2 px-1">Try searching</p>
               {[
                 { icon: ShieldCheck, label: "Preeclampsia management" },
                 { icon: Activity, label: "PPH protocol" },
@@ -589,27 +596,31 @@ export default function Index() {
                 <button
                   key={s.label}
                   onClick={() => { setActiveTab("qa"); setSearch(s.label); }}
-                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-card border border-border/40 hover:border-primary/40 hover:bg-muted/40 transition-all text-left"
+                  className="w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:bg-muted/40 transition-all text-left group"
                 >
-                  <s.icon className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="text-[12px] text-foreground font-medium flex-1">{s.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
+                  <div className="p-1.5 rounded-lg bg-muted/60 group-hover:bg-gold-soft transition-colors">
+                    <s.icon className="w-3.5 h-3.5 text-foreground shrink-0" />
+                  </div>
+                  <span className="text-[12px] text-foreground font-semibold flex-1">{s.label}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 group-hover:text-gold group-hover:translate-x-0.5 transition" />
                 </button>
               ))}
             </div>
 
+            {/* Tools CTA */}
             <Link
               to="/tools"
-              className="mt-5 group flex items-center gap-3 w-full p-3.5 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 hover:border-primary/40 transition-all"
+              className="mt-5 group flex items-center gap-3 w-full p-4 rounded-2xl gradient-ink border border-gold/30 hover:border-gold/60 transition-all shadow-editorial"
+              style={{ color: "hsl(40 30% 96%)" }}
             >
-              <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-sm">
-                <Wrench className="w-4 h-4 text-primary-foreground" />
+              <div className="p-2 rounded-xl bg-gold/20 ring-1 ring-gold/40">
+                <Wrench className="w-4 h-4 text-gold" />
               </div>
               <div className="flex-1 text-left">
-                <p className="text-[13px] font-bold text-foreground">Clinical Tools</p>
-                <p className="text-[10px] text-muted-foreground leading-tight">Calculators • Emergency • Drugs • Guidelines • DDx • MCQ</p>
+                <p className="text-[13px] font-bold leading-tight" style={{ color: "hsl(40 30% 96%)" }}>Clinical Tools Suite</p>
+                <p className="text-[10px] leading-tight mt-0.5 opacity-70">Calculators · Emergency · Drugs · DDx · MCQ</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition" />
+              <ChevronRight className="w-4 h-4 text-gold group-hover:translate-x-1 transition" />
             </Link>
           </motion.div>
         ) : loading ? (
