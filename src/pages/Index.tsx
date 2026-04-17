@@ -75,13 +75,13 @@ const tabIds: ScenarioCategory[] = ["qa", "clinic", "or_labor", "behavior"];
 
 /* Refined editorial logo — gold caduceus on ink, evokes a medical journal masthead. */
 const Logo = () => (
-  <div className="relative w-11 h-11 shrink-0">
+  <div className="relative w-12 h-12 shrink-0">
     <div
-      className="relative w-11 h-11 rounded-xl gradient-ink flex items-center justify-center shadow-editorial overflow-hidden"
+      className="relative w-12 h-12 rounded-xl gradient-ink flex items-center justify-center shadow-editorial overflow-hidden ring-1 ring-gold/30"
       aria-label="Tips & Tricks logo"
     >
-      <svg viewBox="0 0 40 40" className="w-6 h-6" fill="none" aria-hidden="true">
-        {/* Stylised bedside heart + ECG line, drawn in editorial gold */}
+      <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 30% 25%, hsl(43 60% 58% / 0.35), transparent 60%)" }} aria-hidden="true" />
+      <svg viewBox="0 0 40 40" className="w-7 h-7 relative" fill="none" aria-hidden="true">
         <path
           d="M20 33s-11-6.8-11-14.5c0-4 3-7 6.8-7 2.3 0 4.2 1.4 4.2 1.4S21.9 11.5 24.2 11.5c3.8 0 6.8 3 6.8 7C31 26.2 20 33 20 33z"
           fill="hsl(43 60% 58%)" fillOpacity="0.95"
@@ -92,8 +92,18 @@ const Logo = () => (
         />
       </svg>
     </div>
+    <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-gold ring-2 ring-background flex items-center justify-center" aria-hidden="true">
+      <div className="w-1 h-1 rounded-full bg-ink" style={{ background: "hsl(0 0% 10%)" }} />
+    </div>
   </div>
 );
+
+/** Today's date — formatted as a magazine issue line. */
+const issueDate = () => {
+  try {
+    return new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  } catch { return ""; }
+};
 
 
 const i = t();
