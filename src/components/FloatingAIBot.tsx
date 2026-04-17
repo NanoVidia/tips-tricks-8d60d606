@@ -188,136 +188,158 @@ export function FloatingAIBot() {
 
   return (
     <>
-      {/* 3D-style floating AI orb — compact (44px) and futuristic */}
+      {/* Full 3D robot character — head + torso + arms + legs */}
       <motion.button
         onClick={() => setOpen(!open)}
         aria-label={open ? "Close assistant" : "Open AI assistant"}
-        whileTap={{ scale: 0.88 }}
-        whileHover={{ scale: 1.08 }}
-        animate={{ y: [0, -3, 0] }}
-        transition={{ y: { duration: 3.2, repeat: Infinity, ease: "easeInOut" } }}
-        className="group fixed bottom-5 right-5 z-50 w-11 h-11 rounded-full flex items-center justify-center"
-        style={{
-          background:
-            "radial-gradient(circle at 30% 25%, hsl(215 100% 70%) 0%, hsl(220 85% 45%) 35%, hsl(235 75% 22%) 75%, hsl(240 60% 12%) 100%)",
-          boxShadow:
-            "0 10px 22px -6px hsl(220 85% 30% / 0.55), 0 4px 10px -2px hsl(220 80% 20% / 0.45), inset 0 1.5px 1.5px hsl(0 0% 100% / 0.55), inset 0 -2.5px 4px hsl(235 80% 8% / 0.6), inset 0 0 0 0.5px hsl(220 60% 60% / 0.4)",
-        }}
+        whileTap={{ scale: 0.92 }}
+        whileHover={{ scale: 1.06 }}
+        animate={{ y: [0, -4, 0] }}
+        transition={{ y: { duration: 2.6, repeat: Infinity, ease: "easeInOut" } }}
+        className="group fixed bottom-5 right-5 z-50 w-14 h-[72px] flex items-end justify-center bg-transparent border-0 p-0"
       >
-        {/* Outer rotating conic ring (energy aura) */}
-        <span
-          aria-hidden
-          className="absolute -inset-[3px] rounded-full opacity-70 group-hover:opacity-100 transition-opacity"
-          style={{
-            background:
-              "conic-gradient(from 0deg, transparent 0%, hsl(195 100% 65% / 0.7) 25%, transparent 50%, hsl(265 90% 70% / 0.6) 75%, transparent 100%)",
-            filter: "blur(3px)",
-            animation: "spin 4s linear infinite",
-          }}
-        />
-        {/* Inner glass dome */}
-        <span
-          aria-hidden
-          className="absolute inset-[3px] rounded-full pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse at 35% 25%, hsl(0 0% 100% / 0.45) 0%, hsl(0 0% 100% / 0.08) 28%, transparent 55%)",
-          }}
-        />
-        {/* Top specular highlight */}
-        <span
-          aria-hidden
-          className="absolute top-[3px] left-[6px] w-3.5 h-1.5 rounded-full pointer-events-none"
-          style={{
-            background: "radial-gradient(ellipse, hsl(0 0% 100% / 0.85) 0%, transparent 70%)",
-            filter: "blur(0.5px)",
-          }}
-        />
-        {/* Pulsing core glow behind icon */}
+        {/* Ground shadow */}
         <motion.span
           aria-hidden
-          className="absolute inset-2 rounded-full pointer-events-none"
-          animate={{ opacity: [0.35, 0.7, 0.35], scale: [0.85, 1.05, 0.85] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            background: "radial-gradient(circle, hsl(195 100% 75% / 0.55) 0%, transparent 65%)",
-          }}
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-10 h-2 rounded-[50%] pointer-events-none"
+          animate={{ scaleX: [1, 0.85, 1], opacity: [0.45, 0.3, 0.45] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+          style={{ background: "radial-gradient(ellipse, hsl(220 60% 15% / 0.55) 0%, transparent 70%)", filter: "blur(2px)" }}
         />
-        {/* 3D Robot character */}
-        <motion.span
-          className="relative z-10"
-          animate={open ? { rotate: 90, scale: 0.9 } : { rotate: 0, scale: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 18 }}
+
+        {/* Robot SVG */}
+        <svg
+          width="56"
+          height="72"
+          viewBox="0 0 56 72"
+          fill="none"
+          className="relative z-10 drop-shadow-[0_4px_8px_hsl(220_70%_20%/0.45)]"
         >
-          {open ? (
-            <X className="w-4 h-4 text-white drop-shadow-[0_1px_2px_hsl(220_80%_15%/0.8)]" strokeWidth={2.6} />
-          ) : (
-            <svg width="22" height="22" viewBox="0 0 32 32" fill="none" className="drop-shadow-[0_1px_2px_hsl(220_80%_15%/0.9)]">
-              <defs>
-                <linearGradient id="bot-body" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(0 0% 100%)" />
-                  <stop offset="45%" stopColor="hsl(210 30% 92%)" />
-                  <stop offset="100%" stopColor="hsl(215 25% 70%)" />
-                </linearGradient>
-                <linearGradient id="bot-face" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(220 60% 18%)" />
-                  <stop offset="100%" stopColor="hsl(225 70% 8%)" />
-                </linearGradient>
-                <radialGradient id="bot-eye" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="hsl(180 100% 90%)" />
-                  <stop offset="60%" stopColor="hsl(195 100% 60%)" />
-                  <stop offset="100%" stopColor="hsl(210 100% 45%)" />
-                </radialGradient>
-              </defs>
-              {/* Antenna */}
-              <line x1="16" y1="2.5" x2="16" y2="6" stroke="hsl(215 25% 75%)" strokeWidth="1.2" strokeLinecap="round" />
-              <circle cx="16" cy="2.2" r="1.3" fill="hsl(0 90% 60%)">
-                <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite" />
-              </circle>
-              {/* Head shell */}
-              <rect x="6" y="5.5" width="20" height="16" rx="5.5" fill="url(#bot-body)" stroke="hsl(215 30% 55%)" strokeWidth="0.5" />
-              {/* Top highlight strip */}
-              <rect x="8" y="6.5" width="16" height="2" rx="1" fill="hsl(0 0% 100% / 0.55)" />
-              {/* Face screen */}
-              <rect x="9" y="9.5" width="14" height="9" rx="3" fill="url(#bot-face)" stroke="hsl(220 50% 25%)" strokeWidth="0.4" />
-              {/* Eyes */}
-              <circle cx="13" cy="14" r="1.7" fill="url(#bot-eye)">
-                <animate attributeName="r" values="1.7;0.4;1.7" dur="3.5s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="19" cy="14" r="1.7" fill="url(#bot-eye)">
-                <animate attributeName="r" values="1.7;0.4;1.7" dur="3.5s" repeatCount="indefinite" />
-              </circle>
-              {/* Eye glow */}
-              <circle cx="13" cy="14" r="0.5" fill="hsl(0 0% 100%)" />
-              <circle cx="19" cy="14" r="0.5" fill="hsl(0 0% 100%)" />
-              {/* Mouth indicator */}
-              <rect x="13.5" y="16.5" width="5" height="0.8" rx="0.4" fill="hsl(195 100% 65%)" opacity="0.7" />
-              {/* Side ear pods */}
-              <rect x="4.5" y="11" width="2" height="5" rx="1" fill="hsl(215 25% 70%)" />
-              <rect x="25.5" y="11" width="2" height="5" rx="1" fill="hsl(215 25% 70%)" />
-              <circle cx="5.5" cy="13.5" r="0.6" fill="hsl(195 100% 60%)" />
-              <circle cx="26.5" cy="13.5" r="0.6" fill="hsl(195 100% 60%)" />
-              {/* Neck/collar */}
-              <rect x="11" y="22" width="10" height="2" rx="1" fill="hsl(215 25% 60%)" />
-              <rect x="12" y="24.5" width="8" height="3.5" rx="1.5" fill="url(#bot-body)" stroke="hsl(215 30% 55%)" strokeWidth="0.4" />
-              {/* Chest panel light */}
-              <circle cx="16" cy="26.2" r="0.7" fill="hsl(140 90% 55%)">
-                <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
-              </circle>
-            </svg>
+          <defs>
+            <linearGradient id="robot-shell" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="hsl(0 0% 100%)" />
+              <stop offset="40%" stopColor="hsl(210 30% 90%)" />
+              <stop offset="100%" stopColor="hsl(215 25% 55%)" />
+            </linearGradient>
+            <linearGradient id="robot-shell-side" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="hsl(215 30% 55%)" />
+              <stop offset="50%" stopColor="hsl(210 30% 88%)" />
+              <stop offset="100%" stopColor="hsl(215 30% 50%)" />
+            </linearGradient>
+            <linearGradient id="robot-face" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="hsl(225 65% 14%)" />
+              <stop offset="100%" stopColor="hsl(230 75% 6%)" />
+            </linearGradient>
+            <linearGradient id="robot-accent" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="hsl(215 80% 55%)" />
+              <stop offset="100%" stopColor="hsl(225 75% 35%)" />
+            </linearGradient>
+            <radialGradient id="robot-eye" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stopColor="hsl(180 100% 92%)" />
+              <stop offset="55%" stopColor="hsl(195 100% 60%)" />
+              <stop offset="100%" stopColor="hsl(210 100% 40%)" />
+            </radialGradient>
+          </defs>
+
+          {/* Antenna */}
+          <line x1="28" y1="2" x2="28" y2="7" stroke="hsl(215 25% 65%)" strokeWidth="1.4" strokeLinecap="round" />
+          <circle cx="28" cy="2" r="1.6" fill="hsl(0 90% 60%)">
+            <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite" />
+          </circle>
+
+          {/* HEAD */}
+          <rect x="14" y="7" width="28" height="20" rx="6" fill="url(#robot-shell)" stroke="hsl(215 35% 45%)" strokeWidth="0.6" />
+          {/* Head highlight strip */}
+          <rect x="16" y="8.5" width="24" height="2.2" rx="1.1" fill="hsl(0 0% 100% / 0.6)" />
+          {/* Face screen */}
+          <rect x="17" y="12" width="22" height="11" rx="3.5" fill="url(#robot-face)" stroke="hsl(220 50% 20%)" strokeWidth="0.5" />
+          {/* Eyes */}
+          <motion.g>
+            <circle cx="23" cy="17" r="2.2" fill="url(#robot-eye)">
+              <animate attributeName="r" values="2.2;0.5;2.2" dur="4s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="33" cy="17" r="2.2" fill="url(#robot-eye)">
+              <animate attributeName="r" values="2.2;0.5;2.2" dur="4s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="23.5" cy="16.3" r="0.6" fill="hsl(0 0% 100%)" />
+            <circle cx="33.5" cy="16.3" r="0.6" fill="hsl(0 0% 100%)" />
+          </motion.g>
+          {/* Mouth bar */}
+          <rect x="24" y="20" width="8" height="1" rx="0.5" fill="hsl(195 100% 65%)" opacity="0.8">
+            <animate attributeName="width" values="8;3;8" dur="3s" repeatCount="indefinite" />
+          </rect>
+          {/* Side ear pods */}
+          <rect x="11.5" y="14" width="2.5" height="6" rx="1.2" fill="hsl(215 25% 55%)" />
+          <rect x="42" y="14" width="2.5" height="6" rx="1.2" fill="hsl(215 25% 55%)" />
+          <circle cx="12.7" cy="17" r="0.7" fill="hsl(195 100% 60%)" />
+          <circle cx="43.2" cy="17" r="0.7" fill="hsl(195 100% 60%)" />
+
+          {/* Neck */}
+          <rect x="24" y="27" width="8" height="3" rx="1" fill="hsl(215 25% 50%)" />
+          <rect x="22" y="29.5" width="12" height="1.5" rx="0.8" fill="hsl(215 30% 40%)" />
+
+          {/* TORSO */}
+          <rect x="13" y="31" width="30" height="22" rx="5" fill="url(#robot-shell)" stroke="hsl(215 35% 45%)" strokeWidth="0.6" />
+          {/* Torso side shading */}
+          <rect x="13" y="31" width="3" height="22" rx="2" fill="hsl(215 35% 50% / 0.5)" />
+          <rect x="40" y="31" width="3" height="22" rx="2" fill="hsl(215 35% 50% / 0.5)" />
+          {/* Chest panel */}
+          <rect x="20" y="35" width="16" height="13" rx="2.5" fill="url(#robot-accent)" stroke="hsl(220 60% 28%)" strokeWidth="0.5" />
+          {/* Core reactor */}
+          <circle cx="28" cy="41.5" r="3.5" fill="hsl(225 70% 12%)" stroke="hsl(195 100% 55%)" strokeWidth="0.6" />
+          <motion.circle cx="28" cy="41.5" r="2.2" fill="hsl(195 100% 65%)">
+            <animate attributeName="r" values="2.2;1.4;2.2" dur="1.8s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="1;0.5;1" dur="1.8s" repeatCount="indefinite" />
+          </motion.circle>
+          <circle cx="28" cy="41.5" r="0.8" fill="hsl(0 0% 100%)" />
+          {/* Status LEDs */}
+          <circle cx="22.5" cy="46" r="0.7" fill="hsl(140 90% 55%)">
+            <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="25" cy="46" r="0.7" fill="hsl(45 95% 60%)">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.1s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="33.5" cy="46" r="0.7" fill="hsl(0 90% 60%)" opacity="0.7" />
+
+          {/* ARMS — animated subtle sway */}
+          <motion.g
+            style={{ transformOrigin: "13px 33px" }}
+            animate={{ rotate: [-3, 3, -3] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <rect x="7" y="32" width="5" height="14" rx="2.5" fill="url(#robot-shell-side)" stroke="hsl(215 35% 45%)" strokeWidth="0.4" />
+            <circle cx="9.5" cy="48" r="3" fill="url(#robot-shell)" stroke="hsl(215 35% 45%)" strokeWidth="0.5" />
+            <circle cx="9.5" cy="48" r="1" fill="hsl(195 100% 55%)" opacity="0.7" />
+          </motion.g>
+          <motion.g
+            style={{ transformOrigin: "43px 33px" }}
+            animate={{ rotate: [3, -3, 3] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <rect x="44" y="32" width="5" height="14" rx="2.5" fill="url(#robot-shell-side)" stroke="hsl(215 35% 45%)" strokeWidth="0.4" />
+            <circle cx="46.5" cy="48" r="3" fill="url(#robot-shell)" stroke="hsl(215 35% 45%)" strokeWidth="0.5" />
+            <circle cx="46.5" cy="48" r="1" fill="hsl(195 100% 55%)" opacity="0.7" />
+          </motion.g>
+
+          {/* LEGS */}
+          <rect x="18" y="53" width="7" height="13" rx="2.5" fill="url(#robot-shell-side)" stroke="hsl(215 35% 45%)" strokeWidth="0.5" />
+          <rect x="31" y="53" width="7" height="13" rx="2.5" fill="url(#robot-shell-side)" stroke="hsl(215 35% 45%)" strokeWidth="0.5" />
+          {/* Knee joints */}
+          <circle cx="21.5" cy="60" r="1.2" fill="hsl(220 60% 35%)" />
+          <circle cx="34.5" cy="60" r="1.2" fill="hsl(220 60% 35%)" />
+          {/* Feet */}
+          <ellipse cx="21.5" cy="67" rx="5" ry="2.2" fill="url(#robot-shell)" stroke="hsl(215 35% 45%)" strokeWidth="0.5" />
+          <ellipse cx="34.5" cy="67" rx="5" ry="2.2" fill="url(#robot-shell)" stroke="hsl(215 35% 45%)" strokeWidth="0.5" />
+
+          {/* X overlay when open */}
+          {open && (
+            <>
+              <rect x="0" y="0" width="56" height="72" fill="hsl(220 70% 10% / 0.55)" rx="8" />
+              <line x1="20" y1="28" x2="36" y2="44" stroke="hsl(0 0% 100%)" strokeWidth="3.5" strokeLinecap="round" />
+              <line x1="36" y1="28" x2="20" y2="44" stroke="hsl(0 0% 100%)" strokeWidth="3.5" strokeLinecap="round" />
+            </>
           )}
-        </motion.span>
-        {/* Status dot */}
-        {!open && (
-          <span
-            aria-hidden
-            className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-background"
-            style={{
-              background: "radial-gradient(circle at 30% 30%, hsl(140 90% 70%), hsl(150 85% 40%))",
-              boxShadow: "0 0 6px hsl(140 90% 50% / 0.8)",
-            }}
-          />
-        )}
+        </svg>
       </motion.button>
 
       <AnimatePresence>
