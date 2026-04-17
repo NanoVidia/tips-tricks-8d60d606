@@ -381,8 +381,10 @@ export default function Index() {
               value={search}
               onChange={(e) => { setSearch(e.target.value); setSuggestOpen(true); }}
               onFocus={() => {
+                setSearchFocused(true);
                 if (search.trim().length >= 2) setSuggestOpen(true);
               }}
+              onBlur={() => { setTimeout(() => setSearchFocused(false), 150); }}
               onKeyDown={(e) => {
                 if (!suggestOpen || suggestions.length === 0) {
                   if (e.key === "Enter" && !activeTab) setActiveTab("qa");
