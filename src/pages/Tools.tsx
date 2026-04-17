@@ -408,6 +408,7 @@ export default function Tools() {
       </header>
 
       <main className="flex-1 px-4 py-4">
+        <DisclaimerBanner className="mb-3" />
         <Tabs value={active} onValueChange={setActive} className="w-full">
           <TabsList className="hidden">
             {sections.map((s) => <TabsTrigger key={s.id} value={s.id}>{s.label}</TabsTrigger>)}
