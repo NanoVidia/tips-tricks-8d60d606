@@ -240,19 +240,39 @@ export function SurgeryLibrary() {
                   ))}
                 </div>
 
-                {/* YouTube */}
+                {/* YouTube — nocookie embed + fallback links so a blocked/dead video never strands the user */}
                 <div className="space-y-1.5">
                   <h4 className="text-sm font-bold flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-red-400" /> Video</h4>
                   <div className="aspect-video rounded-lg overflow-hidden bg-black">
                     <iframe
-                      src={`https://www.youtube.com/embed/${selected.videoId}`}
+                      key={selected.videoId}
+                      src={`https://www.youtube-nocookie.com/embed/${selected.videoId}?rel=0&modestbranding=1`}
                       title={selected.videoTitle}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                       allowFullScreen
+                      referrerPolicy="strict-origin-when-cross-origin"
                       className="w-full h-full"
                     />
                   </div>
                   <p className="text-[10px] text-muted-foreground">{selected.videoTitle} — {selected.videoChannel}</p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <a
+                      href={`https://www.youtube.com/watch?v=${selected.videoId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition"
+                    >
+                      ▶ Open on YouTube
+                    </a>
+                    <a
+                      href={`https://www.youtube.com/results?search_query=${encodeURIComponent(selected.title + " surgical technique")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] px-2 py-1 rounded-md bg-muted text-foreground hover:bg-accent/20 transition"
+                    >
+                      🔎 Search more videos
+                    </a>
+                  </div>
                 </div>
 
                 {/* Accordion sections */}
