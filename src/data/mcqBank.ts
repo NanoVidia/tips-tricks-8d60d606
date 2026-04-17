@@ -327,12 +327,17 @@ export const MCQ_BANK: MCQ[] = [
   },
 ];
 
+import { MCQ_BANK_EXTRA } from "./mcqBankExtra";
+
+// Combined bank used by the simulator and filter helper
+export const ALL_MCQS: MCQ[] = [...MCQ_BANK, ...MCQ_BANK_EXTRA];
+
 export const filterMCQs = (opts: {
   examId?: ExamId;
   topic?: Topic | "All";
   difficulty?: Difficulty | "All";
 }): MCQ[] => {
-  return MCQ_BANK.filter((q) => {
+  return ALL_MCQS.filter((q) => {
     if (opts.examId && q.exams.length > 0 && !q.exams.includes(opts.examId)) {
       // soft filter — generic questions (empty exams array) always pass
       return q.exams.length === 0;
