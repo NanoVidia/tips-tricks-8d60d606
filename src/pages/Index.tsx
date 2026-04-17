@@ -599,7 +599,7 @@ export default function Index() {
                 transition={{ delay: 0.25 + idx * 0.06, type: "spring", stiffness: 280, damping: 22 }}
                 whileHover={{ y: -2, scale: 1.015 }}
                 whileTap={{ scale: 0.96 }}
-                className={`group relative overflow-hidden flex items-center gap-2 px-2.5 py-3 rounded-xl border text-[11px] font-bold tracking-tight transition-all ${
+                className={`group relative overflow-hidden flex items-center gap-1.5 pl-2 pr-1.5 py-3 rounded-xl border text-[11px] font-bold tracking-tight transition-all ${
                   active
                     ? "border-transparent text-primary-foreground shadow-gold"
                     : "border-border/60 bg-card text-foreground hover:border-primary/30 hover:shadow-editorial"
@@ -626,7 +626,7 @@ export default function Index() {
                 <motion.span
                   animate={active ? { rotate: [0, -8, 6, 0] } : { rotate: 0 }}
                   transition={{ duration: 0.5 }}
-                  className={`relative flex items-center justify-center w-7 h-7 rounded-lg shrink-0 transition-all ${
+                  className={`relative flex items-center justify-center w-6 h-6 rounded-lg shrink-0 transition-all ${
                     active
                       ? "bg-white/20 text-primary-foreground backdrop-blur-sm"
                       : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
@@ -634,9 +634,9 @@ export default function Index() {
                 >
                   <Icon className="w-3.5 h-3.5" strokeWidth={2.5} />
                 </motion.span>
-                <span className="relative flex-1 text-left truncate">{i.tabs[id]}</span>
+                <span className="relative flex-1 min-w-0 text-left leading-tight break-words">{i.tabs[id]}</span>
                 <span
-                  className={`relative text-[9px] tabular-nums font-black px-1.5 py-0.5 rounded-full transition-colors ${
+                  className={`relative shrink-0 text-[9px] tabular-nums font-black px-1.5 py-0.5 rounded-full transition-colors ${
                     active
                       ? "bg-white/25 text-primary-foreground"
                       : "bg-muted/70 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
