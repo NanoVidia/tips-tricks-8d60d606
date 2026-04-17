@@ -21,6 +21,7 @@ import { SurgeryLibrary } from "@/components/tools/SurgeryLibrary";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { emergencyProtocols, pregnancyDrugs, guidelines, ddxLibrary } from "@/data/toolsData";
 import { toast } from "@/hooks/use-toast";
+import { DisclaimerBanner } from "@/components/Disclaimer";
 
 const sections = [
   { id: "favorites", label: "Favorites", icon: Star, color: "from-amber-400 to-orange-500" },
