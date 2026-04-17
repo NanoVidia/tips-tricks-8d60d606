@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, Play, ChevronRight, Star as StarIcon, Filter, X, Check } from "lucide-react";
+import { Search, Play, ChevronRight, Star as StarIcon, Filter, X, Check, ArrowLeft, FolderOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
