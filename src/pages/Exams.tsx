@@ -1,12 +1,181 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ExternalLink, GitCompare, Trophy, Clock, FileText, BookOpen } from "lucide-react";
+import { ArrowLeft, ExternalLink, GitCompare, Trophy, Clock, FileText, BookOpen, TrendingUp } from "lucide-react";
 import { EXAMS, type ExamMeta } from "@/data/examsData";
 import { ExamSimulator } from "@/components/exams/ExamSimulator";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+  Legend,
+} from "recharts";
+
+interface ProgressEntry {
+  date: string;
+  total: number;
+  score: number;
+  durationSec: number;
+}
+type ProgressMap = Record<string, ProgressEntry[]>;
+
+const LINE_COLORS = [
+  "hsl(var(--primary))",
+  "hsl(var(--accent))",
+  "hsl(var(--success))",
+  "hsl(var(--warning))",
+  "hsl(var(--info))",
+  "hsl(var(--danger))",
+];
+
+function loadProgress(): ProgressMap {
+  const out: ProgressMap = {};
+  if (typeof window === "undefined") return out;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key?.startsWith("exam_progress_")) continue;
+    const examId = key.replace("exam_progress_", "");
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key) || "[]") as ProgressEntry[];
+      if (Array.isArray(parsed) && parsed.length > 0) out[examId] = parsed;
+    } catch {
+      /* ignore */
+    }
+  }
+  return out;
+}
+
+function ProgressChart() {
+  const [progress, setProgress] = useState<ProgressMap>({});
+  const [activeExams, setActiveExams] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const data = loadProgress();
+    setProgress(data);
+    setActiveExams(new Set(Object.keys(data)));
+  }, []);
+
+  const examIds = Object.keys(progress);
+
+  const chartData = useMemo(() => {
+    const rows: Array<Record<string, string | number>> = [];
+    examIds.forEach((examId) => {
+      progress[examId].forEach((e) => {
+        const pct = e.total > 0 ? Math.round((e.score / e.total) * 100) : 0;
+        const label = new Date(e.date).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+        rows.push({ date: label, ts: new Date(e.date).getTime(), [examId]: pct });
+      });
+    });
+    return rows.sort((a, b) => (a.ts as number) - (b.ts as number));
+  }, [progress, examIds]);
+
+  const toggleExam = (id: string) => {
+    setActiveExams((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  if (examIds.length === 0) {
+    return (
+      <Card className="p-8 text-center">
+        <TrendingUp className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
+        <h3 className="font-serif text-lg text-foreground mb-1">My Progress</h3>
+        <p className="text-sm text-muted-foreground">
+          Complete a simulation to see your score progression here.
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-5">
+      <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          <h3 className="font-serif text-lg text-foreground">My Progress</h3>
+        </div>
+        <Badge variant="secondary" className="text-xs">
+          {Object.values(progress).reduce((a, b) => a + b.length, 0)} attempts
+        </Badge>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {examIds.map((id) => {
+          const isActive = activeExams.has(id);
+          return (
+            <button
+              key={id}
+              onClick={() => toggleExam(id)}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                isActive
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:border-accent"
+              }`}
+            >
+              {id} ({progress[id].length})
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="h-[260px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+            <YAxis
+              domain={[0, 100]}
+              tick={{ fontSize: 11 }}
+              stroke="hsl(var(--muted-foreground))"
+              tickFormatter={(v) => `${v}%`}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "hsl(var(--background))",
+                border: "1px solid hsl(var(--border))",
+                borderRadius: 8,
+                fontSize: 12,
+              }}
+              formatter={(v: number) => [`${v}%`, ""]}
+            />
+            <ReferenceLine
+              y={60}
+              stroke="hsl(var(--success))"
+              strokeDasharray="4 4"
+              label={{ value: "Pass 60%", position: "right", fontSize: 10, fill: "hsl(var(--success))" }}
+            />
+            <Legend wrapperStyle={{ fontSize: 11 }} />
+            {examIds.map((id, i) =>
+              activeExams.has(id) ? (
+                <Line
+                  key={id}
+                  type="monotone"
+                  dataKey={id}
+                  stroke={LINE_COLORS[i % LINE_COLORS.length]}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                  connectNulls
+                />
+              ) : null,
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
 
 const COUNTRIES = [
   { code: "SA", flag: "🇸🇦", name: "Saudi Arabia" },
