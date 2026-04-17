@@ -1,9 +1,42 @@
 
-User wants me to continue the OB/GYN Surgery Library work that was cancelled earlier. Let me check current state of surgeriesData.ts and Tools.tsx to understand what's done and what's left.
 
-From context: `src/data/surgeriesData.ts` was created (~1800 lines, likely ~50 surgeries based on summary). Tools.tsx has existing tabs but no Surgeries tab yet. Need to:
-1. Expand data to 100+
-2. Build SurgeryLibrary component
-3. Wire new tab into /tools
+## Plan: Score Progress Chart + Expanded MCQ Bank
 
-Let me present a concise plan.
+### What we're building
+
+**1. Score Progress Chart on `/exams` page**
+
+A new section between the hero and the country filter showing a line chart of score history over time, per exam. Uses Recharts (already installed via `chart.tsx`).
+
+- Read all `exam_progress_*` keys from localStorage on mount
+- Each stored result has: `{ examId, date, total, score, durationSec }`
+- Chart: X-axis = date, Y-axis = score %, one colored line per exam (up to 20 results each)
+- Exam selector tabs/chips to toggle which exam's line is visible
+- Pass mark reference line at 60%
+- Empty state: "Complete a simulation to see your progress here"
+- Placed in a Card with heading "My Progress"
+
+**2. Expand MCQ Bank from ~19 → 200+ questions**
+
+Current bank has only 19 questions — way too few for a realistic exam simulation (real exams are 100–200 questions). We'll add ~180+ new MCQs covering all 13 topics evenly:
+
+- ~15 questions per topic across easy/medium/hard
+- Each with stem, 4 options, correct answer, explanation, reference
+- Tagged with relevant `exams[]` where applicable
+- This ensures the simulator slider (5–150) actually works meaningfully
+
+### Files to change
+
+| File | Action |
+|------|--------|
+| `src/data/mcqBank.ts` | Add ~180 new MCQ entries |
+| `src/pages/Exams.tsx` | Add progress chart section with Recharts LineChart |
+| `src/components/exams/ExamSimulator.tsx` | No changes needed (already reads/writes localStorage correctly) |
+
+### Technical details
+
+- Chart uses `ChartContainer` from `src/components/ui/chart.tsx` with `LineChart`, `Line`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip`
+- localStorage key pattern: `exam_progress_{examId}` — already established
+- No new dependencies needed
+- No backend changes
+
