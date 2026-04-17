@@ -33,15 +33,18 @@ const App = () => {
     setDevUnlocked(localStorage.getItem(DEV_KEY) === "1");
   }, []);
 
-  // Auto-unlock inside Lovable editor iframe (developer view only).
-  // Published site (tips-tricks.lovable.app) stays frozen for visitors.
-  const inLovableEditor =
-    typeof window !== "undefined" &&
-    window.self !== window.top &&
-    /lovable\.(app|dev)$/.test(window.location.hostname);
+  // Auto-unlock on Lovable preview/sandbox domains (developer view).
+  // Only the published custom domain (tips-tricks.lovable.app) stays frozen for visitors.
+  const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+  const isLovablePreview =
+    hostname.includes("id-preview--") ||
+    hostname.includes("lovableproject.com") ||
+    hostname.endsWith(".lovable.dev") ||
+    hostname === "localhost" ||
+    hostname === "127.0.0.1";
 
   const onAdmin = typeof window !== "undefined" && window.location.pathname.startsWith("/admin");
-  const showFreeze = APP_FROZEN && !devUnlocked && !onAdmin && !inLovableEditor;
+  const showFreeze = APP_FROZEN && !devUnlocked && !onAdmin && !isLovablePreview;
 
   return (
     <QueryClientProvider client={queryClient}>
