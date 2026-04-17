@@ -1,1 +1,10 @@
 project_id = "hebhetjvcauitozkxggt"
+
+[functions.generate-mcq]
+verify_jwt = false
+
+[functions.chat]
+verify_jwt = false
+
+[functions.admin-notifications]
+verify_jwt = false

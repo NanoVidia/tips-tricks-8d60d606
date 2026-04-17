@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle,
-  Sparkles, ChevronRight, Baby, ShieldCheck, Activity, Wrench, X, Loader2,
+  Sparkles, ChevronRight, Baby, ShieldCheck, Activity, Wrench, X, Loader2, Trophy,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -802,6 +802,21 @@ export default function Index() {
                 <p className="text-[10px] leading-tight mt-0.5 opacity-70 truncate">Calculators · Emergency · Drugs · DDx · MCQ</p>
               </div>
               <ChevronRight className="w-4 h-4 text-gold group-hover:translate-x-1 transition shrink-0" />
+            </Link>
+
+            {/* 7️⃣ Exams Hub CTA — Gulf licensing exam simulator */}
+            <Link
+              to="/exams"
+              className="group flex items-center gap-3 w-full p-4 rounded-2xl bg-gradient-to-br from-primary to-accent border border-primary/40 hover:shadow-[var(--shadow-gold)] transition-all"
+            >
+              <div className="p-2 rounded-xl bg-white/20 ring-1 ring-white/30 shrink-0">
+                <Trophy className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1 text-left min-w-0">
+                <p className="text-[13px] font-bold leading-tight text-white">Gulf Licensing Exams · OB/GYN</p>
+                <p className="text-[10px] leading-tight mt-0.5 text-white/80 truncate">Simulate SCFHS · DHA · DOH · MRCOG · QCHP · KMLE · NHRA · OMSB</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition shrink-0" />
             </Link>
           </motion.div>
         ) : loading ? (

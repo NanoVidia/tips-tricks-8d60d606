@@ -7,6 +7,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Tools from "./pages/Tools.tsx";
 import Admin from "./pages/Admin.tsx";
+import Exams from "./pages/Exams.tsx";
+import ExamsCompare from "./pages/ExamsCompare.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { FreezeOverlay } from "./components/FreezeOverlay";
 import { useLocalNotifications } from "./hooks/useLocalNotifications";
@@ -56,6 +58,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tools" element={<Tools />} />
+            <Route path="/exams" element={<Exams />} />
+            <Route path="/exams/compare" element={<ExamsCompare />} />
             <Route path="/admin" element={<Admin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
