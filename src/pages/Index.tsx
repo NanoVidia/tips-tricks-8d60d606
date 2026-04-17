@@ -514,9 +514,9 @@ export default function Index() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Editorial category chips with gold underline for active state */}
+          {/* Editorial category chips — refined pro look */}
           <motion.div
-            className="flex items-center gap-2 mt-4 overflow-x-auto scrollbar-none -mx-1 px-1"
+            className="flex items-center gap-2 mt-4 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -530,17 +530,25 @@ export default function Index() {
                   key={id}
                   onClick={() => setActiveTab(active ? null : id)}
                   aria-pressed={active}
-                  className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all border ${
+                  className={`group relative flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border ${
                     active
-                      ? "border-gold/50 bg-gold-soft text-foreground shadow-sm"
-                      : "border-border/50 bg-card text-muted-foreground hover:border-gold/30 hover:text-foreground hover:bg-muted/40"
+                      ? "border-primary/40 bg-primary/5 text-foreground shadow-editorial"
+                      : "border-border/60 bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground hover:bg-muted/40"
                   }`}
                 >
-                  <Icon className={`w-3 h-3 ${active ? "text-gold" : ""}`} />
+                  <span
+                    className={`flex items-center justify-center w-6 h-6 rounded-full transition-all ${
+                      active
+                        ? "gradient-gold text-primary-foreground shadow-gold"
+                        : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                    }`}
+                  >
+                    <Icon className="w-3 h-3" strokeWidth={2.5} />
+                  </span>
                   <span className="tracking-wide">{i.tabs[id]}</span>
                   <span
-                    className={`text-[9px] tabular-nums px-1.5 py-0.5 rounded-md font-black ${
-                      active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    className={`text-[9px] tabular-nums px-1.5 py-0.5 rounded-full font-black min-w-[20px] text-center ${
+                      active ? "bg-primary text-primary-foreground" : "bg-muted/70 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                     }`}
                   >
                     {categoryCounts[id]}
@@ -548,7 +556,7 @@ export default function Index() {
                   {active && (
                     <motion.span
                       layoutId="active-tab-underline"
-                      className="absolute -bottom-[5px] left-3 right-3 h-[2px] bg-gold rounded-full"
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-[2px] gradient-gold rounded-full"
                       transition={{ type: "spring", stiffness: 400, damping: 32 }}
                     />
                   )}
