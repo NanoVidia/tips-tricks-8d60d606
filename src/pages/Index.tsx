@@ -740,7 +740,7 @@ export default function Index() {
               </span>
             </div>
 
-            <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
+            <div className="space-y-0">
               <Accordion type="single" collapsible className="w-full">
                 {scenarios.map((item) => (
                   <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} />
