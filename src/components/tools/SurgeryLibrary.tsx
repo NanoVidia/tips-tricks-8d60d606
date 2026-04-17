@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { surgeries, surgeryCategories, type Surgery, type SurgeryCategory } from "@/data/surgeriesData";
+import { SurgeryVideo } from "@/components/tools/SurgeryVideo";
 
 const DIFF_LABELS = ["", "Basic", "Intermediate", "Advanced", "Expert", "Master"] as const;
 const DIFF_COLORS = ["", "text-emerald-400", "text-blue-400", "text-amber-400", "text-orange-400", "text-red-400"] as const;
@@ -284,40 +285,13 @@ export function SurgeryLibrary() {
                   ))}
                 </div>
 
-                {/* YouTube — nocookie embed + fallback links so a blocked/dead video never strands the user */}
-                <div className="space-y-1.5">
-                  <h4 className="text-sm font-bold flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-red-400" /> Video</h4>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-black">
-                    <iframe
-                      key={selected.videoId}
-                      src={`https://www.youtube-nocookie.com/embed/${selected.videoId}?rel=0&modestbranding=1`}
-                      title={selected.videoTitle}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                      allowFullScreen
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      className="w-full h-full"
-                    />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground">{selected.videoTitle} — {selected.videoChannel}</p>
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    <a
-                      href={`https://www.youtube.com/watch?v=${selected.videoId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition"
-                    >
-                      ▶ Open on YouTube
-                    </a>
-                    <a
-                      href={`https://www.youtube.com/results?search_query=${encodeURIComponent(selected.name + " surgical technique")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] px-2 py-1 rounded-md bg-muted text-foreground hover:bg-accent/20 transition"
-                    >
-                      🔎 Search more videos
-                    </a>
-                  </div>
-                </div>
+                {/* YouTube — checks availability via oEmbed; falls back to verified search panel */}
+                <SurgeryVideo
+                  videoId={selected.videoId}
+                  title={selected.videoTitle}
+                  channel={selected.videoChannel}
+                  surgeryName={selected.name}
+                />
 
                 {/* Accordion sections */}
                 <Accordion type="multiple" className="w-full">
