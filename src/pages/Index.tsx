@@ -298,38 +298,65 @@ export default function Index() {
         style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
         aria-hidden="true"
       />
-      <div className="h-[3px] gradient-gold relative z-10" />
+      <div className="h-[3px] gradient-gold relative z-20" />
 
-      <header className="relative px-4 pt-4 pb-3 z-10 border-b border-border/50 bg-card/60 backdrop-blur-md">
+      <header
+        className={`sticky top-0 z-20 px-4 transition-all duration-300 border-b bg-card/80 backdrop-blur-md ${
+          scrolled ? "pt-2 pb-2 border-border/70 shadow-editorial" : "pt-4 pb-3 border-border/50"
+        }`}
+      >
         <div className="relative">
-          {/* Issue line — magazine-style date + edition */}
-          <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block w-1 h-1 rounded-full bg-gold" />
-              <span>{issueDate()}</span>
-            </span>
-            <span className="text-gold/90">Vol. I · Clinical Edition</span>
-          </div>
+          {/* Issue line — hidden in compact mode */}
+          <AnimatePresence initial={false}>
+            {!scrolled && (
+              <motion.div
+                key="issue-line"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <span className="inline-block w-1 h-1 rounded-full bg-gold" />
+                    <span>{issueDate()}</span>
+                  </span>
+                  <span className="text-gold/90">Vol. I · Clinical Edition</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <div className="flex items-center justify-between mb-3">
+          {/* Masthead — collapses to small in compact mode */}
+          <div className={`flex items-center justify-between transition-all ${scrolled ? "mb-2" : "mb-3"}`}>
             <div className="flex items-center gap-3 min-w-0">
-              <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }}>
+              <motion.div
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: scrolled ? 0.78 : 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 18 }}
+              >
                 <Logo />
               </motion.div>
               <div className="min-w-0">
-                <motion.h1
-                  className="font-editorial text-[24px] font-bold tracking-tight text-foreground leading-none"
-                  initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                >
+                <h1 className={`font-editorial font-bold tracking-tight text-foreground leading-none transition-all ${
+                  scrolled ? "text-[18px]" : "text-[24px]"
+                }`}>
                   Tips <span className="italic font-medium text-gold">&</span> Tricks
-                </motion.h1>
-                <motion.p
-                  className="text-[10px] text-muted-foreground leading-snug font-medium mt-1 truncate"
-                  initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}
-                >
-                  <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
-                </motion.p>
+                </h1>
+                <AnimatePresence initial={false}>
+                  {!scrolled && (
+                    <motion.p
+                      key="subtitle"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="text-[10px] text-muted-foreground leading-snug font-medium mt-1 truncate overflow-hidden"
+                    >
+                      <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
             <button
@@ -341,8 +368,8 @@ export default function Index() {
             </button>
           </div>
 
-          {/* Hairline divider */}
-          <div className="divider-editorial mb-3" aria-hidden="true" />
+          {/* Hairline divider — hidden in compact */}
+          {!scrolled && <div className="divider-editorial mb-3" aria-hidden="true" />}
 
           {/* Search bar with auto-suggest */}
           <motion.div
