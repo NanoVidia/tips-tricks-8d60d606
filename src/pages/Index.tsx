@@ -562,19 +562,13 @@ export default function Index() {
       <main className="flex-1 px-4 pb-6">
         {!activeTab ? (
           <motion.div
-            className="pt-3 pb-6"
+            className="pt-4 pb-6 space-y-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.5 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
           >
-            {/* Editorial stats */}
-            <StatsStrip total={totalScenarios} byCategory={categoryCounts} />
-
-            {/* Case of the Day */}
-            <CaseOfTheDay onOpen={(c) => openAI(c as unknown as Scenario)} />
-
-            {/* Editorial intro headline */}
-            <div className="text-center px-2 mt-2 mb-5">
+            {/* 1️⃣ Welcome — sets context immediately */}
+            <header className="text-center px-2">
               <span className="eyebrow text-gold">Editor's note</span>
               <h2 className="font-editorial text-[22px] font-bold text-foreground tracking-tight mt-2 mb-2 leading-tight">
                 Clinical wisdom,<br />
@@ -583,44 +577,98 @@ export default function Index() {
               <p className="text-xs text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
                 {totalScenarios}+ OB/GYN scenarios, scripts & protocols — curated by Dr. Sahar Elkhodiry.
               </p>
-            </div>
+            </header>
 
-            {/* Try-searching shortcuts */}
-            <div className="w-full space-y-1.5">
-              <p className="eyebrow text-muted-foreground/70 mb-2 px-1">Try searching</p>
-              {[
-                { icon: ShieldCheck, label: "Preeclampsia management" },
-                { icon: Activity, label: "PPH protocol" },
-                { icon: Baby, label: "Shoulder dystocia" },
-              ].map((s) => (
-                <button
-                  key={s.label}
-                  onClick={() => { setActiveTab("qa"); setSearch(s.label); }}
-                  className="w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:bg-muted/40 transition-all text-left group"
-                >
-                  <div className="p-1.5 rounded-lg bg-muted/60 group-hover:bg-gold-soft transition-colors">
-                    <s.icon className="w-3.5 h-3.5 text-foreground shrink-0" />
-                  </div>
-                  <span className="text-[12px] text-foreground font-semibold flex-1">{s.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 group-hover:text-gold group-hover:translate-x-0.5 transition" />
-                </button>
-              ))}
-            </div>
+            {/* 2️⃣ Quick start — most likely first action */}
+            <section aria-labelledby="quick-start">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <h3 id="quick-start" className="eyebrow text-foreground/80 flex items-center gap-1.5">
+                  <Search className="w-3 h-3 text-gold" />
+                  Quick start
+                </h3>
+                <span className="text-[9px] text-muted-foreground">Tap to search</span>
+              </div>
+              <div className="space-y-1.5">
+                {[
+                  { icon: ShieldCheck, label: "Preeclampsia management", tag: "Emergency" },
+                  { icon: Activity, label: "PPH protocol", tag: "Emergency" },
+                  { icon: Baby, label: "Shoulder dystocia", tag: "Labor" },
+                ].map((s) => (
+                  <button
+                    key={s.label}
+                    onClick={() => { setActiveTab("qa"); setSearch(s.label); }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:bg-muted/40 transition-all text-left group"
+                  >
+                    <div className="p-1.5 rounded-lg bg-muted/60 group-hover:bg-gold-soft transition-colors shrink-0">
+                      <s.icon className="w-3.5 h-3.5 text-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[12px] text-foreground font-semibold block truncate">{s.label}</span>
+                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">{s.tag}</span>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 group-hover:text-gold group-hover:translate-x-0.5 transition" />
+                  </button>
+                ))}
+              </div>
+            </section>
 
-            {/* Tools CTA */}
+            {/* 3️⃣ Today's teaching case — daily engagement */}
+            <section aria-labelledby="today-case">
+              <h3 id="today-case" className="eyebrow text-foreground/80 mb-2 px-1 flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-gold" />
+                Today's teaching case
+              </h3>
+              <CaseOfTheDay onOpen={(c) => openAI(c as unknown as Scenario)} />
+            </section>
+
+            {/* 4️⃣ Browse by category — overview of full library */}
+            <section aria-labelledby="browse-cat">
+              <h3 id="browse-cat" className="eyebrow text-foreground/80 mb-2 px-1">Browse the library</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {tabIds.map((id) => {
+                  const cfg = categoryConfig[id];
+                  const Icon = cfg.icon;
+                  return (
+                    <button
+                      key={id}
+                      onClick={() => setActiveTab(id)}
+                      className="group flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:shadow-editorial transition-all text-left"
+                    >
+                      <div className={`p-2 rounded-lg ${cfg.iconBg} shrink-0`}>
+                        <Icon className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-bold text-foreground truncate leading-tight">{i.tabs[id]}</p>
+                        <p className="text-[9px] text-muted-foreground tabular-nums mt-0.5">
+                          {categoryCounts[id]} entries
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* 5️⃣ Library stats — trust signal */}
+            <section aria-labelledby="stats">
+              <h3 id="stats" className="eyebrow text-foreground/80 mb-1 px-1">By the numbers</h3>
+              <StatsStrip total={totalScenarios} byCategory={categoryCounts} />
+            </section>
+
+            {/* 6️⃣ Tools CTA — final action point */}
             <Link
               to="/tools"
-              className="mt-5 group flex items-center gap-3 w-full p-4 rounded-2xl gradient-ink border border-gold/30 hover:border-gold/60 transition-all shadow-editorial"
+              className="group flex items-center gap-3 w-full p-4 rounded-2xl gradient-ink border border-gold/30 hover:border-gold/60 transition-all shadow-editorial"
               style={{ color: "hsl(40 30% 96%)" }}
             >
-              <div className="p-2 rounded-xl bg-gold/20 ring-1 ring-gold/40">
+              <div className="p-2 rounded-xl bg-gold/20 ring-1 ring-gold/40 shrink-0">
                 <Wrench className="w-4 h-4 text-gold" />
               </div>
-              <div className="flex-1 text-left">
+              <div className="flex-1 text-left min-w-0">
                 <p className="text-[13px] font-bold leading-tight" style={{ color: "hsl(40 30% 96%)" }}>Clinical Tools Suite</p>
-                <p className="text-[10px] leading-tight mt-0.5 opacity-70">Calculators · Emergency · Drugs · DDx · MCQ</p>
+                <p className="text-[10px] leading-tight mt-0.5 opacity-70 truncate">Calculators · Emergency · Drugs · DDx · MCQ</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-gold group-hover:translate-x-1 transition" />
+              <ChevronRight className="w-4 h-4 text-gold group-hover:translate-x-1 transition shrink-0" />
             </Link>
           </motion.div>
         ) : loading ? (

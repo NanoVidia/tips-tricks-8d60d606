@@ -23,7 +23,7 @@ export function StatsStrip({ total, byCategory }: StatsStripProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="mt-5 mb-6"
+      className=""
       aria-label="Library statistics"
     >
       <div className="grid grid-cols-4 gap-2 px-1">
