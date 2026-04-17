@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { surgeries, surgeryCategories, type Surgery, type SurgeryCategory } from "@/data/surgeriesData";
+import { SurgeryVideo } from "@/components/tools/SurgeryVideo";
 
 const DIFF_LABELS = ["", "Basic", "Intermediate", "Advanced", "Expert", "Master"] as const;
 const DIFF_COLORS = ["", "text-emerald-400", "text-blue-400", "text-amber-400", "text-orange-400", "text-red-400"] as const;
