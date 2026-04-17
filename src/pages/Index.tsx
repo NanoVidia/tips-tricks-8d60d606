@@ -75,22 +75,36 @@ const categoryConfig = {
 
 const tabIds: ScenarioCategory[] = ["qa", "clinic", "or_labor", "behavior"];
 
-/* Calm minimal logo — quiet monogram mark with subtle medical cross. */
+/* Calm clinical mark — abstract stethoscope arc forming a "T". */
 const Logo = () => (
   <div className="relative w-11 h-11 shrink-0">
     <div
-      className="relative w-11 h-11 rounded-2xl bg-card border border-primary/20 flex items-center justify-center shadow-editorial"
+      className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-card to-muted/60 border border-primary/15 flex items-center justify-center shadow-editorial overflow-hidden"
       aria-label="Tips & Tricks logo"
     >
-      <svg viewBox="0 0 32 32" className="w-6 h-6" fill="none" aria-hidden="true">
-        {/* soft cross */}
-        <rect x="14" y="6" width="4" height="20" rx="1.5" fill="hsl(var(--primary))" fillOpacity="0.9" />
-        <rect x="6" y="14" width="20" height="4" rx="1.5" fill="hsl(var(--primary))" fillOpacity="0.9" />
-        {/* highlight dot */}
-        <circle cx="16" cy="16" r="1.6" fill="hsl(var(--card))" />
+      {/* corner accent */}
+      <span className="absolute top-1 right-1 w-1 h-1 rounded-full bg-primary/70" aria-hidden="true" />
+      <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none" aria-hidden="true">
+        {/* stethoscope arc */}
+        <path
+          d="M9 6 V14 a7 7 0 0 0 14 0 V6"
+          stroke="hsl(var(--primary))"
+          strokeWidth="2"
+          strokeLinecap="round"
+          fill="none"
+        />
+        {/* vertical stem (T) */}
+        <path
+          d="M16 21 V25"
+          stroke="hsl(var(--primary))"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        {/* chest piece */}
+        <circle cx="16" cy="26.5" r="2.2" fill="hsl(var(--primary))" />
+        <circle cx="16" cy="26.5" r="0.9" fill="hsl(var(--card))" />
       </svg>
     </div>
-    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-background" aria-hidden="true" />
   </div>
 );
 
