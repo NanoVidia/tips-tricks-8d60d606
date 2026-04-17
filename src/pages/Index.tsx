@@ -476,9 +476,9 @@ export default function Index() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Compact category chips */}
+          {/* Editorial category chips with gold underline for active state */}
           <motion.div
-            className="flex items-center gap-1.5 mt-3 overflow-x-auto scrollbar-none"
+            className="flex items-center gap-2 mt-4 overflow-x-auto scrollbar-none -mx-1 px-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -491,15 +491,30 @@ export default function Index() {
                 <button
                   key={id}
                   onClick={() => setActiveTab(active ? null : id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all border ${
+                  aria-pressed={active}
+                  className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all border ${
                     active
-                      ? `${config.borderColor} ${config.bgLight} ${config.iconColor}`
-                      : "border-border/40 bg-card text-muted-foreground hover:bg-muted/50"
+                      ? "border-gold/50 bg-gold-soft text-foreground shadow-sm"
+                      : "border-border/50 bg-card text-muted-foreground hover:border-gold/30 hover:text-foreground hover:bg-muted/40"
                   }`}
                 >
-                  <Icon className="w-3 h-3" />
-                  {i.tabs[id]}
-                  <span className="text-[10px] opacity-60 tabular-nums">{categoryCounts[id]}</span>
+                  <Icon className={`w-3 h-3 ${active ? "text-gold" : ""}`} />
+                  <span className="tracking-wide">{i.tabs[id]}</span>
+                  <span
+                    className={`text-[9px] tabular-nums px-1.5 py-0.5 rounded-md font-black ${
+                      active ? "text-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                    style={active ? { backgroundColor: "hsl(0 0% 10% / 0.08)" } : undefined}
+                  >
+                    {categoryCounts[id]}
+                  </span>
+                  {active && (
+                    <motion.span
+                      layoutId="active-tab-underline"
+                      className="absolute -bottom-[5px] left-3 right-3 h-[2px] bg-gold rounded-full"
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    />
+                  )}
                 </button>
               );
             })}
