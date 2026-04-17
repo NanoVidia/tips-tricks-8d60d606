@@ -1,5 +1,6 @@
-// Searches YouTube for a verified, embeddable surgical video using Perplexity,
-// then validates the returned videoId via YouTube oEmbed before returning it.
+// Finds a verified, embeddable YouTube surgical video using Lovable AI Gateway
+// (google/gemini-3-flash-preview) with structured tool-calling, then validates
+// the returned videoId via YouTube oEmbed before returning it.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,7 +11,7 @@ const corsHeaders = {
 const TRUSTED = [
   "RCOG", "ACOG", "AAGL", "IRCAD", "Nucleus Medical Media",
   "Surgery 101", "ESGO", "IUGA", "Osmosis", "Armando Hasudungan",
-  "Lecturio", "Geeky Medics", "JOGC", "AJOG",
+  "Lecturio", "Geeky Medics",
 ];
 
 async function isEmbeddable(id: string): Promise<boolean> {
@@ -37,10 +38,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
-    if (!PERPLEXITY_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "PERPLEXITY_API_KEY not configured" }),
+        JSON.stringify({ error: "LOVABLE_API_KEY not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -53,60 +54,89 @@ Deno.serve(async (req) => {
       );
     }
 
-    const prompt = `Find ONE recent (last 5 years) educational YouTube video demonstrating the surgical procedure: "${surgeryName}".
-Prefer videos from these trusted medical channels: ${TRUSTED.join(", ")}.
-The video MUST be public, embeddable, and currently available.
-Return ONLY a JSON object with these exact keys: videoId (the 11-character YouTube ID), title (video title), channel (channel name), url (full youtube.com URL).
-If you cannot find a verified video, return: {"videoId": null}.`;
+    const systemPrompt = `You are a precise medical-education research assistant.
+Your task is to identify ONE high-quality, publicly available, embeddable YouTube video
+that demonstrates a specific obstetric/gynecologic surgical procedure.
 
-    const pplxRes = await fetch("https://api.perplexity.ai/chat/completions", {
+Rules:
+- Only return videos you are highly confident actually exist on YouTube right now.
+- Strongly prefer recognized educational/medical channels: ${TRUSTED.join(", ")}.
+- The video must be educational (technique demonstration, narrated surgery, animation, or lecture).
+- The 11-character YouTube videoId MUST be from a real public video, never invented.
+- If you are not confident a real video exists, return videoId = null.`;
+
+    const userPrompt = `Find ONE educational YouTube video for the surgical procedure: "${surgeryName}".`;
+
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "sonar",
+        model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You are a precise medical-education research assistant. Return only valid JSON." },
-          { role: "user", content: prompt },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
-        search_domain_filter: ["youtube.com"],
-        temperature: 0.1,
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "video_result",
-            schema: {
-              type: "object",
-              properties: {
-                videoId: { type: ["string", "null"] },
-                title: { type: "string" },
-                channel: { type: "string" },
-                url: { type: "string" },
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "return_youtube_video",
+              description:
+                "Return a single verified YouTube video that demonstrates the requested surgical procedure.",
+              parameters: {
+                type: "object",
+                properties: {
+                  videoId: {
+                    type: ["string", "null"],
+                    description:
+                      "The 11-character YouTube video ID, or null if no confident match exists.",
+                  },
+                  title: { type: "string", description: "Video title." },
+                  channel: { type: "string", description: "YouTube channel name." },
+                  url: { type: "string", description: "Full https://www.youtube.com/watch?v=... URL." },
+                },
+                required: ["videoId", "title", "channel", "url"],
+                additionalProperties: false,
               },
-              required: ["videoId"],
             },
           },
-        },
+        ],
+        tool_choice: { type: "function", function: { name: "return_youtube_video" } },
       }),
     });
 
-    if (!pplxRes.ok) {
-      const text = await pplxRes.text();
-      console.error(`Perplexity ${pplxRes.status}: ${text}`);
-      // Fail soft so the client shows manual search fallback instead of an error screen
+    if (!aiRes.ok) {
+      const text = await aiRes.text();
+      console.error(`Lovable AI ${aiRes.status}: ${text}`);
+
+      if (aiRes.status === 429) {
+        return new Response(
+          JSON.stringify({ found: false, reason: "rate-limited" }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      if (aiRes.status === 402) {
+        return new Response(
+          JSON.stringify({ found: false, reason: "ai-credits-exhausted" }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(
-        JSON.stringify({ found: false, reason: "search-unavailable", status: pplxRes.status }),
+        JSON.stringify({ found: false, reason: "ai-error", status: aiRes.status }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const pplxData = await pplxRes.json();
-    const content = pplxData?.choices?.[0]?.message?.content ?? "{}";
+    const aiData = await aiRes.json();
+    const toolCall = aiData?.choices?.[0]?.message?.tool_calls?.[0];
+    const argsStr = toolCall?.function?.arguments ?? "{}";
+
     let parsed: { videoId?: string | null; title?: string; channel?: string; url?: string } = {};
     try {
-      parsed = JSON.parse(content);
+      parsed = typeof argsStr === "string" ? JSON.parse(argsStr) : argsStr;
     } catch {
       parsed = {};
     }
@@ -116,7 +146,7 @@ If you cannot find a verified video, return: {"videoId": null}.`;
 
     if (!id) {
       return new Response(
-        JSON.stringify({ found: false }),
+        JSON.stringify({ found: false, reason: "no-match" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -139,9 +169,10 @@ If you cannot find a verified video, return: {"videoId": null}.`;
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
+    console.error("youtube-search error:", e);
     return new Response(
-      JSON.stringify({ error: String(e) }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({ found: false, reason: "exception", error: String(e) }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });
