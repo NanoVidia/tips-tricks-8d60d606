@@ -78,11 +78,13 @@ function MCQBlock({ mcqs }: { mcqs: Surgery["mcqs"] }) {
 export function SurgeryLibrary() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<SurgeryCategory | "All">("All");
+  const [difficulty, setDifficulty] = useState<number>(0); // 0 = all
   const [selected, setSelected] = useState<Surgery | null>(null);
 
   const filtered = useMemo(() => {
     let list = surgeries;
     if (category !== "All") list = list.filter((s) => s.category === category);
+    if (difficulty > 0) list = list.filter((s) => s.difficulty === difficulty);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -94,7 +96,7 @@ export function SurgeryLibrary() {
       );
     }
     return list;
-  }, [search, category]);
+  }, [search, category, difficulty]);
 
   return (
     <div className="space-y-3">
