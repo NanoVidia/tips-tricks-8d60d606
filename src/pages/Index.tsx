@@ -164,6 +164,15 @@ export default function Index() {
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
+  // Sticky header compact mode on scroll
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
   const toggleDark = () => {
