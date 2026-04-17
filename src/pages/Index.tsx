@@ -576,6 +576,9 @@ export default function Index() {
 
       {/* Content */}
       <main className="flex-1 px-4 pb-6">
+        <div className="pt-3">
+          <DisclaimerBanner />
+        </div>
         {/* Category tabs — scrolls with the page (not sticky) */}
         <motion.div
           role="tablist"
