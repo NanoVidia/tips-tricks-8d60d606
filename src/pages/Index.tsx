@@ -178,6 +178,8 @@ export default function Index() {
   // Recent searches (last 5, persisted in localStorage)
   const recent = useRecentSearches();
 
+  const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+
   const toggleDark = () => {
     setDark((d) => {
       document.documentElement.classList.toggle("dark", !d);
