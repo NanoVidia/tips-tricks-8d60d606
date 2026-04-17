@@ -55,17 +55,18 @@ Deno.serve(async (req) => {
     }
 
     const systemPrompt = `You are a precise medical-education research assistant.
-Your task is to identify ONE high-quality, publicly available, embeddable YouTube video
-that demonstrates a specific obstetric/gynecologic surgical procedure.
+Your task is to identify up to 5 high-quality, publicly available, embeddable YouTube videos
+that demonstrate a specific obstetric/gynecologic surgical procedure.
 
 Rules:
 - Only return videos you are highly confident actually exist on YouTube right now.
 - Strongly prefer recognized educational/medical channels: ${TRUSTED.join(", ")}.
-- The video must be educational (technique demonstration, narrated surgery, animation, or lecture).
-- The 11-character YouTube videoId MUST be from a real public video, never invented.
-- If you are not confident a real video exists, return videoId = null.`;
+- Each video must be educational (technique demonstration, narrated surgery, animation, or lecture).
+- Each 11-character YouTube videoId MUST be from a real public video, never invented.
+- Order candidates by your confidence (most confident first).
+- If you cannot confidently provide any real video, return an empty candidates array.`;
 
-    const userPrompt = `Find ONE educational YouTube video for the surgical procedure: "${surgeryName}".`;
+    const userPrompt = `Provide up to 5 candidate educational YouTube videos for the surgical procedure: "${surgeryName}".`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -83,28 +84,35 @@ Rules:
           {
             type: "function",
             function: {
-              name: "return_youtube_video",
+              name: "return_youtube_candidates",
               description:
-                "Return a single verified YouTube video that demonstrates the requested surgical procedure.",
+                "Return up to 5 candidate YouTube videos demonstrating the requested surgical procedure, ordered by confidence.",
               parameters: {
                 type: "object",
                 properties: {
-                  videoId: {
-                    type: ["string", "null"],
-                    description:
-                      "The 11-character YouTube video ID, or null if no confident match exists.",
+                  candidates: {
+                    type: "array",
+                    maxItems: 5,
+                    items: {
+                      type: "object",
+                      properties: {
+                        videoId: { type: "string", description: "11-character YouTube video ID." },
+                        title: { type: "string" },
+                        channel: { type: "string" },
+                        url: { type: "string", description: "Full YouTube watch URL." },
+                      },
+                      required: ["videoId", "title", "channel", "url"],
+                      additionalProperties: false,
+                    },
                   },
-                  title: { type: "string", description: "Video title." },
-                  channel: { type: "string", description: "YouTube channel name." },
-                  url: { type: "string", description: "Full https://www.youtube.com/watch?v=... URL." },
                 },
-                required: ["videoId", "title", "channel", "url"],
+                required: ["candidates"],
                 additionalProperties: false,
               },
             },
           },
         ],
-        tool_choice: { type: "function", function: { name: "return_youtube_video" } },
+        tool_choice: { type: "function", function: { name: "return_youtube_candidates" } },
       }),
     });
 
@@ -134,38 +142,36 @@ Rules:
     const toolCall = aiData?.choices?.[0]?.message?.tool_calls?.[0];
     const argsStr = toolCall?.function?.arguments ?? "{}";
 
-    let parsed: { videoId?: string | null; title?: string; channel?: string; url?: string } = {};
+    let parsed: { candidates?: Array<{ videoId?: string; title?: string; channel?: string; url?: string }> } = {};
     try {
       parsed = typeof argsStr === "string" ? JSON.parse(argsStr) : argsStr;
     } catch {
       parsed = {};
     }
 
-    let id = parsed.videoId ? extractId(parsed.videoId) : null;
-    if (!id && parsed.url) id = extractId(parsed.url);
+    const candidates = parsed.candidates ?? [];
+    const tried: string[] = [];
 
-    if (!id) {
-      return new Response(
-        JSON.stringify({ found: false, reason: "no-match" }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
-    const ok = await isEmbeddable(id);
-    if (!ok) {
-      return new Response(
-        JSON.stringify({ found: false, reason: "not-embeddable", attemptedId: id }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    for (const cand of candidates) {
+      const id = extractId(cand.videoId ?? "") ?? extractId(cand.url ?? "");
+      if (!id || tried.includes(id)) continue;
+      tried.push(id);
+      const ok = await isEmbeddable(id);
+      if (ok) {
+        return new Response(
+          JSON.stringify({
+            found: true,
+            videoId: id,
+            title: cand.title ?? surgeryName,
+            channel: cand.channel ?? "YouTube",
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
     }
 
     return new Response(
-      JSON.stringify({
-        found: true,
-        videoId: id,
-        title: parsed.title ?? surgeryName,
-        channel: parsed.channel ?? "YouTube",
-      }),
+      JSON.stringify({ found: false, reason: "no-embeddable-candidate", tried }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
