@@ -85,7 +85,7 @@ export function SurgeryLibrary() {
 
   const filtered = useMemo(() => {
     let list = surgeries;
-    if (category !== "All") list = list.filter((s) => s.category === category);
+    if (category && category !== "All") list = list.filter((s) => s.category === category);
     if (difficulty > 0) list = list.filter((s) => s.difficulty === difficulty);
     if (search.trim()) {
       const q = search.toLowerCase();
