@@ -112,33 +112,37 @@ const i = t();
 
 function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
   return (
-    <AccordionItem value={item.id} className="border-b border-border/40 last:border-b-0">
-      <AccordionTrigger className="py-3.5 px-2 text-sm font-medium hover:no-underline group">
-        <div className="flex items-center gap-2 text-left">
-          <div className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0" />
-          <span className="group-hover:text-primary transition-colors">
+    <AccordionItem
+      value={item.id}
+      className="border-0 mb-2 last:mb-0 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/[0.06] via-primary/[0.03] to-transparent border border-primary/15 hover:border-primary/30 hover:from-primary/[0.10] hover:via-primary/[0.05] transition-all data-[state=open]:from-primary/[0.10] data-[state=open]:via-primary/[0.06] data-[state=open]:border-primary/30 data-[state=open]:shadow-editorial"
+    >
+      <AccordionTrigger className="py-3.5 px-3.5 text-sm font-medium hover:no-underline group">
+        <div className="flex items-center gap-2.5 text-left flex-1">
+          <div className="w-1 self-stretch rounded-full bg-gradient-to-b from-primary to-primary/40 shrink-0" aria-hidden="true" />
+          <span className="group-hover:text-primary transition-colors font-semibold text-foreground">
             {item.title_en}
           </span>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="px-2 pb-4">
-        <div className="space-y-3">
+      <AccordionContent className="px-3.5 pb-4">
+        <div className="space-y-2.5">
           {[
             { label: i.situation, text: item.situation_en },
             { label: i.clinicalAction, text: item.action_en },
             { label: i.patientScript, text: item.script_en },
           ].map((section) => (
-            <div key={section.label} className="rounded-xl bg-muted/40 p-3 border border-border/30">
+            <div key={section.label} className="rounded-xl bg-card/70 backdrop-blur-sm p-3 border border-primary/10">
               <div className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1.5">{section.label}</div>
-              <p className="text-sm leading-relaxed">{section.text}</p>
+              <p className="text-sm leading-relaxed text-foreground">{section.text}</p>
             </div>
           ))}
           <Button
             size="sm"
             onClick={onAI}
-            className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium gap-2 shadow-md shadow-blue-500/20 h-10"
+            className="w-full rounded-xl gradient-ink text-paper font-medium gap-2 shadow-editorial hover:shadow-gold h-10 border border-gold/20"
+            style={{ color: "hsl(40 30% 96%)" }}
           >
-            <MessageCircle className="w-4 h-4" />
+            <MessageCircle className="w-4 h-4 text-gold" />
             {i.discussAI}
           </Button>
         </div>
