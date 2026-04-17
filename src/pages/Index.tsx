@@ -75,13 +75,13 @@ const tabIds: ScenarioCategory[] = ["qa", "clinic", "or_labor", "behavior"];
 
 /* Refined editorial logo — gold caduceus on ink, evokes a medical journal masthead. */
 const Logo = () => (
-  <div className="relative w-11 h-11 shrink-0">
+  <div className="relative w-12 h-12 shrink-0">
     <div
-      className="relative w-11 h-11 rounded-xl gradient-ink flex items-center justify-center shadow-editorial overflow-hidden"
+      className="relative w-12 h-12 rounded-xl gradient-ink flex items-center justify-center shadow-editorial overflow-hidden ring-1 ring-gold/30"
       aria-label="Tips & Tricks logo"
     >
-      <svg viewBox="0 0 40 40" className="w-6 h-6" fill="none" aria-hidden="true">
-        {/* Stylised bedside heart + ECG line, drawn in editorial gold */}
+      <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 30% 25%, hsl(43 60% 58% / 0.35), transparent 60%)" }} aria-hidden="true" />
+      <svg viewBox="0 0 40 40" className="w-7 h-7 relative" fill="none" aria-hidden="true">
         <path
           d="M20 33s-11-6.8-11-14.5c0-4 3-7 6.8-7 2.3 0 4.2 1.4 4.2 1.4S21.9 11.5 24.2 11.5c3.8 0 6.8 3 6.8 7C31 26.2 20 33 20 33z"
           fill="hsl(43 60% 58%)" fillOpacity="0.95"
@@ -92,8 +92,18 @@ const Logo = () => (
         />
       </svg>
     </div>
+    <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-gold ring-2 ring-background flex items-center justify-center" aria-hidden="true">
+      <div className="w-1 h-1 rounded-full bg-ink" style={{ background: "hsl(0 0% 10%)" }} />
+    </div>
   </div>
 );
+
+/** Today's date — formatted as a magazine issue line. */
+const issueDate = () => {
+  try {
+    return new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  } catch { return ""; }
+};
 
 
 const i = t();
@@ -279,25 +289,34 @@ export default function Index() {
         style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
         aria-hidden="true"
       />
-      <div className="h-[2px] gradient-gold relative z-10" />
+      <div className="h-[3px] gradient-gold relative z-10" />
 
-      <header className="relative px-4 pt-5 pb-3 z-10">
+      <header className="relative px-4 pt-4 pb-3 z-10 border-b border-border/50 bg-card/60 backdrop-blur-md">
         <div className="relative">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
+          {/* Issue line — magazine-style date + edition */}
+          <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-1 h-1 rounded-full bg-gold" />
+              <span>{issueDate()}</span>
+            </span>
+            <span className="text-gold/90">Vol. I · Clinical Edition</span>
+          </div>
+
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3 min-w-0">
               <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }}>
                 <Logo />
               </motion.div>
               <div className="min-w-0">
                 <motion.h1
-                  className="font-editorial text-[22px] font-bold tracking-tight text-foreground leading-none"
+                  className="font-editorial text-[24px] font-bold tracking-tight text-foreground leading-none"
                   initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
                   Tips <span className="italic font-medium text-gold">&</span> Tricks
                 </motion.h1>
                 <motion.p
-                  className="text-[9.5px] text-muted-foreground leading-snug font-medium mt-1"
+                  className="text-[10px] text-muted-foreground leading-snug font-medium mt-1 truncate"
                   initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}
                 >
                   <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
@@ -306,12 +325,15 @@ export default function Index() {
             </div>
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl bg-card border border-border/60 hover:border-gold/40 hover:bg-muted transition-all"
+              className="p-2.5 rounded-xl bg-card border border-border/60 hover:border-gold/50 hover:bg-muted transition-all shrink-0"
               aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             >
               {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
             </button>
           </div>
+
+          {/* Hairline divider */}
+          <div className="divider-editorial mb-3" aria-hidden="true" />
 
           {/* Search bar with auto-suggest */}
           <motion.div
@@ -454,9 +476,9 @@ export default function Index() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Compact category chips */}
+          {/* Editorial category chips with gold underline for active state */}
           <motion.div
-            className="flex items-center gap-1.5 mt-3 overflow-x-auto scrollbar-none"
+            className="flex items-center gap-2 mt-4 overflow-x-auto scrollbar-none -mx-1 px-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -469,15 +491,30 @@ export default function Index() {
                 <button
                   key={id}
                   onClick={() => setActiveTab(active ? null : id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all border ${
+                  aria-pressed={active}
+                  className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all border ${
                     active
-                      ? `${config.borderColor} ${config.bgLight} ${config.iconColor}`
-                      : "border-border/40 bg-card text-muted-foreground hover:bg-muted/50"
+                      ? "border-gold/50 bg-gold-soft text-foreground shadow-sm"
+                      : "border-border/50 bg-card text-muted-foreground hover:border-gold/30 hover:text-foreground hover:bg-muted/40"
                   }`}
                 >
-                  <Icon className="w-3 h-3" />
-                  {i.tabs[id]}
-                  <span className="text-[10px] opacity-60 tabular-nums">{categoryCounts[id]}</span>
+                  <Icon className={`w-3 h-3 ${active ? "text-gold" : ""}`} />
+                  <span className="tracking-wide">{i.tabs[id]}</span>
+                  <span
+                    className={`text-[9px] tabular-nums px-1.5 py-0.5 rounded-md font-black ${
+                      active ? "text-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                    style={active ? { backgroundColor: "hsl(0 0% 10% / 0.08)" } : undefined}
+                  >
+                    {categoryCounts[id]}
+                  </span>
+                  {active && (
+                    <motion.span
+                      layoutId="active-tab-underline"
+                      className="absolute -bottom-[5px] left-3 right-3 h-[2px] bg-gold rounded-full"
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    />
+                  )}
                 </button>
               );
             })}
