@@ -144,7 +144,41 @@ export function SurgeryLibrary() {
         })}
       </div>
 
-      {/* Results */}
+      {/* Difficulty filter */}
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] text-muted-foreground font-medium">Difficulty:</span>
+        <div className="flex gap-1">
+          <button
+            onClick={() => setDifficulty(0)}
+            className={`text-[11px] px-2 py-0.5 rounded-full border transition ${
+              difficulty === 0
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card border-border/50 text-muted-foreground hover:bg-muted/60"
+            }`}
+          >
+            All
+          </button>
+          {[1, 2, 3, 4, 5].map((d) => {
+            const active = difficulty === d;
+            const count = surgeries.filter((s) => s.difficulty === d && (category === "All" || s.category === category)).length;
+            return (
+              <button
+                key={d}
+                onClick={() => setDifficulty(active ? 0 : d)}
+                title={`${DIFF_LABELS[d]} (${count})`}
+                className={`text-[11px] px-2 py-0.5 rounded-full border transition flex items-center gap-0.5 ${
+                  active
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card border-border/50 text-muted-foreground hover:bg-muted/60"
+                }`}
+              >
+                <span className={active ? "" : DIFF_COLORS[d]}>{"★".repeat(d)}</span>
+                <span className="opacity-60 ml-0.5">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
       {filtered.length === 0 ? (
         <Card className="p-8 text-center border-border/50">
           <Filter className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
