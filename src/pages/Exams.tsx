@@ -245,6 +245,9 @@ export default function Exams() {
           </p>
         </motion.section>
 
+        {/* Progress chart */}
+        <ProgressChart />
+
         {/* Country filter */}
         <section>
           <h2 className="font-serif text-xl text-foreground mb-3">Choose your country</h2>
