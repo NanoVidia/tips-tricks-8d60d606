@@ -781,6 +781,11 @@ export default function Tools() {
             ))}
           </TabsContent>
 
+          {/* SURGERIES */}
+          <TabsContent value="surgeries" className="space-y-3 mt-0">
+            <SurgeryLibrary />
+          </TabsContent>
+
           {/* OFFLINE */}
           <TabsContent value="offline" className="space-y-3 mt-0">
             <Card className="p-5 border-border/50 text-center">
