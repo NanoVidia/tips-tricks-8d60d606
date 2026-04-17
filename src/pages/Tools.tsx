@@ -17,6 +17,7 @@ import {
   BMICalculator, OvulationCalculator, GonadotropinCalculator,
 } from "@/components/tools/Calculators";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
+import { SurgeryLibrary } from "@/components/tools/SurgeryLibrary";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { emergencyProtocols, pregnancyDrugs, guidelines, ddxLibrary } from "@/data/toolsData";
 import { toast } from "@/hooks/use-toast";
@@ -29,6 +30,7 @@ const sections = [
   { id: "guidelines", label: "Guidelines", icon: BookMarked, color: "from-purple-500 to-pink-600" },
   { id: "ddx", label: "DDx", icon: Brain, color: "from-amber-500 to-orange-600" },
   { id: "mcq", label: "MCQ", icon: GraduationCap, color: "from-cyan-500 to-blue-600" },
+  { id: "surgeries", label: "Surgeries", icon: Scissors, color: "from-rose-500 to-pink-600" },
   { id: "offline", label: "Offline", icon: WifiOff, color: "from-slate-500 to-slate-700" },
 ] as const;
 
