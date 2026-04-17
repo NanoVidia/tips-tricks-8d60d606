@@ -162,6 +162,7 @@ export default function Index() {
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [suggestLoading, setSuggestLoading] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
+  const [searchFocused, setSearchFocused] = useState(false);
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
   // Sticky header compact mode on scroll
