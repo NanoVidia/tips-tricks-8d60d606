@@ -77,9 +77,11 @@ function MCQBlock({ mcqs }: { mcqs: Surgery["mcqs"] }) {
 
 export function SurgeryLibrary() {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<SurgeryCategory | "All">("All");
+  const [category, setCategory] = useState<SurgeryCategory | "All" | null>(null); // null = index view
   const [difficulty, setDifficulty] = useState<number>(0); // 0 = all
   const [selected, setSelected] = useState<Surgery | null>(null);
+
+  const isIndexView = category === null && !search.trim();
 
   const filtered = useMemo(() => {
     let list = surgeries;
