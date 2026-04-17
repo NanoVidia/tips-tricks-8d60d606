@@ -265,7 +265,7 @@ export function SurgeryLibrary() {
                       ▶ Open on YouTube
                     </a>
                     <a
-                      href={`https://www.youtube.com/results?search_query=${encodeURIComponent(selected.title + " surgical technique")}`}
+                      href={`https://www.youtube.com/results?search_query=${encodeURIComponent(selected.name + " surgical technique")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[11px] px-2 py-1 rounded-md bg-muted text-foreground hover:bg-accent/20 transition"
