@@ -112,9 +112,9 @@ export const surgeries: Surgery[] = [
       "Single-layer closure is acceptable but increases rupture risk in next pregnancy",
       "Skin closure with sutures > staples for less wound complications",
     ],
-    videoId: "0-hI8rpz8K0",
-    videoTitle: "Cesarean Section - Surgical Technique",
-    videoChannel: "Nucleus Medical Media",
+    videoId: "S5S_OJkFPRg",
+    videoTitle: "Doctor Explains: C section",
+    videoChannel: "Doctor Myro",
     references: [
       { label: "RCOG GTG 7 — CS", url: "https://www.rcog.org.uk/guidance/" },
       { label: "ACOG Practice Bulletin 205", url: "https://www.acog.org/" },
@@ -162,9 +162,9 @@ export const surgeries: Surgery[] = [
     complications: ["Higher blood loss", "Future uterine rupture 4–9%", "Adhesions"],
     postOp: ["Document clearly — CRITICAL for future pregnancies", "VBAC contraindicated"],
     pearls: ["All future deliveries by elective CS at 36–37 weeks before labor onset"],
-    videoId: "p5RsWspmkWI",
-    videoTitle: "Classical Cesarean Section Technique",
-    videoChannel: "AAGL",
+    videoId: "3GZ3fAZ_w90",
+    videoTitle: "Classical Caesarean Section",
+    videoChannel: "MedNav",
     references: [{ label: "ACOG CO 764", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -198,9 +198,9 @@ export const surgeries: Surgery[] = [
     complications: ["Cephalohematoma (5–15%)", "Subgaleal hemorrhage (rare but life-threatening)", "Retinal hemorrhages", "Maternal perineal trauma (less than forceps)"],
     postOp: ["Neonatal observation 24 h", "Document indication, station, position, number of pulls"],
     pearls: ["Vacuum has lower maternal trauma but higher fetal scalp injury vs forceps", "Never combine vacuum and forceps (sequential use ↑ trauma 5-fold)"],
-    videoId: "9kc5uEfwo2M",
-    videoTitle: "Ventouse / Vacuum Delivery",
-    videoChannel: "Geeky Medics",
+    videoId: "qPef0mue1RE",
+    videoTitle: "Vacuum delivery Demonstration For OSCE | Excel MRCOG",
+    videoChannel: "Excel MRCOG",
     references: [{ label: "RCOG GTG 26", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -233,9 +233,9 @@ export const surgeries: Surgery[] = [
     complications: ["3rd/4th degree tear (↑ vs vacuum)", "Facial nerve palsy", "Skull fracture (rare)", "Retinal hemorrhages"],
     postOp: ["Inspect for tears", "Document type and rotation"],
     pearls: ["Kielland forceps for rotational delivery (specialist skill)", "Mid-cavity = head 1/5 palpable abdominally, station 0 to +1"],
-    videoId: "S0wA0nZUYUk",
-    videoTitle: "Forceps Delivery Technique",
-    videoChannel: "RCOG",
+    videoId: "luXTLgL0XSk",
+    videoTitle: "Wrigley&#39;s Outlet Forceps or Obstetric forceps, Assisted delievery PG teaching",
+    videoChannel: "Prof Dr Shikha Pandey",
     references: [{ label: "RCOG GTG 26", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -269,9 +269,9 @@ export const surgeries: Surgery[] = [
     complications: ["Uterine perforation", "Endometritis", "PPH", "Uterine inversion"],
     postOp: ["IV antibiotics 24 h", "Monitor for delayed bleeding", "Anti-D if Rh-negative"],
     pearls: ["If no plane found → suspect accreta → STOP, call senior, prepare for hysterectomy"],
-    videoId: "gJ8K1xBl-Yk",
-    videoTitle: "Manual Removal of Placenta",
-    videoChannel: "Surgery 101",
+    videoId: "TR7X44nFYDY",
+    videoTitle: "Management of a Retained Placenta by Manual Removal.",
+    videoChannel: "KLMNS Education Videos",
     references: [{ label: "WHO PPH Guidelines", url: "https://www.who.int/" }],
     mcqs: [
       {
@@ -303,9 +303,9 @@ export const surgeries: Surgery[] = [
     complications: ["Hematoma", "Infection", "Dyspareunia", "Fecal incontinence (3rd/4th)", "Recto-vaginal fistula"],
     postOp: ["Laxatives (lactulose) for 10 days for OASIS", "Broad-spectrum antibiotics for OASIS", "Pelvic floor physiotherapy", "Follow-up at 6–12 weeks"],
     pearls: ["Always do PR after suturing", "Counsel re: future delivery — elective CS if symptomatic"],
-    videoId: "2KuFGcSWO1I",
-    videoTitle: "OASIS Repair Technique",
-    videoChannel: "RCOG",
+    videoId: "86YBAjim_Rw",
+    videoTitle: "How To - Perineal Repair #suturing #ubcmedicine",
+    videoChannel: "UBC Medicine - Educational Media",
     references: [{ label: "RCOG GTG 29", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -337,9 +337,9 @@ export const surgeries: Surgery[] = [
     complications: ["Membrane rupture", "Chorioamnionitis", "Cervical laceration", "Suture displacement", "Dystocia in labor"],
     postOp: ["Remove at 36–37 wk or earlier if labor/PROM", "No restricted activity required"],
     pearls: ["History-indicated cerclage best evidence (Berghella meta-analysis)", "Rescue cerclage controversial but may delay delivery by ~5 wk"],
-    videoId: "I9HDiOXEAm4",
-    videoTitle: "McDonald Cerclage Technique",
-    videoChannel: "AAGL",
+    videoId: "muYaqSY_FQY",
+    videoTitle: "Cervical cerclage for the MRCOG: RCOG Guideline. Preterm Birth. McDonald or Shirodkar suture.",
+    videoChannel: "Prof Arri Coomarasamy OBE MRCOG",
     references: [{ label: "ACOG PB 234", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -373,9 +373,9 @@ export const surgeries: Surgery[] = [
     complications: ["Transient bradycardia (5%)", "Placental abruption (<1%)", "Cord accident", "Emergency CS (<1%)"],
     postOp: ["Anti-D 1500 IU IM if Rh-negative", "Re-check presentation in 1 wk"],
     pearls: ["Success rate ~50% (higher in multiparous)", "Can repeat if reverts"],
-    videoId: "bjOe3Q7XVQ8",
-    videoTitle: "External Cephalic Version",
-    videoChannel: "RCOG",
+    videoId: "zRBpkdL4JYA",
+    videoTitle: "External cephalic version for a breech fetus",
+    videoChannel: "Shannon M. Clark, MD, MMS, FACOG",
     references: [{ label: "RCOG GTG 20a", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -412,9 +412,9 @@ export const surgeries: Surgery[] = [
     complications: ["Suture erosion / pyometra", "Uterine necrosis (rare)", "Synechiae", "Future pregnancy possible"],
     postOp: ["IV antibiotics 48 h", "Monitor for fever / sepsis", "Counsel re: future fertility (good outcomes reported)"],
     pearls: ["If B-Lynch fails → uterine artery ligation → internal iliac ligation → hysterectomy", "Success rate ~90%"],
-    videoId: "5gz4Y6PyWrI",
-    videoTitle: "B-Lynch Suture for PPH",
-    videoChannel: "RCOG",
+    videoId: "sskjFqJ17hk",
+    videoTitle: "How to perform a B-Lynch Uterine Compression Suture",
+    videoChannel: "MedNav",
     references: [{ label: "B-Lynch original paper BJOG 1997", url: "https://www.cblynch.com/" }],
     mcqs: [
       {
@@ -449,9 +449,9 @@ export const surgeries: Surgery[] = [
     complications: ["Failure (~15%)", "Uterine perforation", "Infection", "Pressure necrosis if over-inflated"],
     postOp: ["IV antibiotics", "Monitor drainage", "Deflate slowly with team ready"],
     pearls: ["Quickest surgical option — should be in every labor ward", "If fails → laparotomy for B-Lynch / vessel ligation"],
-    videoId: "iz7d-JYtNYs",
-    videoTitle: "Bakri Balloon Insertion",
-    videoChannel: "Cook Medical",
+    videoId: "Xmjn6sHKyT0",
+    videoTitle: "Bakri Balloon for Postpartum Hemorrhage",
+    videoChannel: "EM:RAP Medical Education ",
     references: [{ label: "RCOG GTG 52 — PPH", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -488,9 +488,9 @@ export const surgeries: Surgery[] = [
     complications: ["Massive blood loss", "Ureteric injury (5–10%)", "Bladder injury", "VTE", "Infection", "Loss of fertility (counsel post-op)"],
     postOp: ["ICU 24–48 h", "VTE prophylaxis", "Psychological support", "Debrief patient"],
     pearls: ["Subtotal faster and safer in emergency", "Placenta accreta — leave placenta in situ if hysterectomy planned (no manual removal)"],
-    videoId: "bGBHQOSOd9k",
-    videoTitle: "Peripartum Hysterectomy",
-    videoChannel: "AAGL",
+    videoId: "eARQK_GyJXo",
+    videoTitle: "Hysterectomy pedicle fixation stitch - Fore and Aft #obgyn #surgeon #or #suture #hysterectomy #hyst",
+    videoChannel: "Dr. Katelyn Tondo-Steele",
     references: [{ label: "RCOG GTG 27a — Placenta Accreta", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -531,9 +531,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bleeding", "Bladder/ureter/bowel injury", "VTE", "Infection", "Vault hematoma/abscess", "Vault prolapse later"],
     postOp: ["Mobilize early", "Catheter 24 h", "LMWH 28 days post-op", "Return to work 6 wk"],
     pearls: ["Always identify ureter before clamping infundibulopelvic ligament", "Consider LAVH or TLH first — open reserved for very large uteri or malignancy"],
-    videoId: "JeXLKhRVNeA",
-    videoTitle: "Total Abdominal Hysterectomy",
-    videoChannel: "Surgery 101",
+    videoId: "6f31l6OtOHo",
+    videoTitle: "Learn how to perform a hysterectomy in 10 steps | Gynaecology made easy",
+    videoChannel: "Miss Gynae",
     references: [{ label: "ACOG PB 89", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -572,9 +572,9 @@ export const surgeries: Surgery[] = [
     complications: ["Vascular injury at entry", "Bowel injury", "Ureteric injury", "Vault dehiscence (~1%)", "Conversion to open"],
     postOp: ["Same-day or next-day discharge", "Return to work 2 wk", "No heavy lifting 6 wk", "No intercourse 6 wk"],
     pearls: ["Less pain, faster recovery vs TAH", "Vault dehiscence higher with laparoscopic vs vaginal closure", "Power morcellation banned for malignancy — use bag"],
-    videoId: "ObOlKBpgjzk",
-    videoTitle: "Total Laparoscopic Hysterectomy",
-    videoChannel: "AAGL",
+    videoId: "gMMJIvwjOD4",
+    videoTitle: "Animation of Total Laparoscopic Hysterectomy",
+    videoChannel: "R P Stone Clinic",
     references: [{ label: "AAGL Position Statement", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -610,9 +610,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bladder injury", "Bleeding", "Vault hematoma", "Cuff cellulitis"],
     postOp: ["Catheter 12–24 h", "Discharge day 1–2", "Return to activity 4–6 wk"],
     pearls: ["VH > LH > TAH in evidence (Cochrane) — choose vaginal when feasible", "ACOG recommends vaginal as default route"],
-    videoId: "ksYWCY8krfE",
-    videoTitle: "Vaginal Hysterectomy Step by Step",
-    videoChannel: "AAGL",
+    videoId: "uUHlTWdF2c4",
+    videoTitle: "Vaginal Hysterectomy Surgical Skills Curriculum: Task Video",
+    videoChannel: "Green Journal",
     references: [{ label: "ACOG CO 701", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -646,9 +646,9 @@ export const surgeries: Surgery[] = [
     complications: ["Hemorrhage", "Conversion to hysterectomy (1–2%)", "Adhesions", "Recurrence (~30% at 5 y)", "Uterine rupture in pregnancy if cavity entered"],
     postOp: ["Counsel re: CS for future deliveries if cavity entered", "Conceive after 6 mo", "Iron supplementation"],
     pearls: ["Single uterine incision when possible", "Enter cavity = elective CS for future deliveries"],
-    videoId: "SE9iAhKr1qI",
-    videoTitle: "Open Myomectomy Technique",
-    videoChannel: "AAGL",
+    videoId: "aXyP0nv_wdk",
+    videoTitle: "Myomectomy - Making the skin incision",
+    videoChannel: "openmichigan",
     references: [{ label: "ACOG PB 228", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -682,9 +682,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bleeding", "Conversion", "Adhesions", "Dissemination of occult sarcoma (uncontained morcellation)"],
     postOp: ["Discharge day 1", "Conceive after 6 mo"],
     pearls: ["Always contained morcellation post-FDA warning", "Robotic option for complex cases"],
-    videoId: "5j-V8yrKcJk",
-    videoTitle: "Laparoscopic Myomectomy",
-    videoChannel: "AAGL",
+    videoId: "nrXDh95dxo8",
+    videoTitle: "Laparoscopic myomectomy",
+    videoChannel: "TVASurg",
     references: [{ label: "AAGL Practice Report", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -719,9 +719,9 @@ export const surgeries: Surgery[] = [
     complications: ["Cyst rupture (spill — important if malignant)", "Bleeding", "Reduced ovarian reserve", "Adhesions"],
     postOp: ["Histology essential", "Discharge same day or next"],
     pearls: ["For endometriomas: balance excision (better recurrence) vs ovarian reserve damage", "Suturing > bipolar for reserve preservation"],
-    videoId: "Z-_vM2jZj1U",
-    videoTitle: "Laparoscopic Ovarian Cystectomy",
-    videoChannel: "AAGL",
+    videoId: "cBQRxC38Vas",
+    videoTitle: "Laparoscopic Ovarian Cystectomy I Patient Positioning &amp; Port Placement Part 2",
+    videoChannel: "The Life Plus Multispeciality Hospital",
     references: [{ label: "RCOG GTG 62", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -754,9 +754,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bleeding", "Damage to ovarian blood supply", "Persistent trophoblast (after partial salpingectomy for ectopic)"],
     postOp: ["Anti-D if Rh-negative (ectopic)", "Follow-up βhCG to zero if ectopic"],
     pearls: ["Salpingectomy > salpingostomy for ectopic if contralateral tube healthy (lower persistent trophoblast)", "Opportunistic salpingectomy reduces ovarian cancer risk ~40–65%"],
-    videoId: "iEY6MlKcSXU",
-    videoTitle: "Laparoscopic Salpingectomy",
-    videoChannel: "AAGL",
+    videoId: "JqHp3yVLbz4",
+    videoTitle: "Can I get pregnant after I had my tubes removed??",
+    videoChannel: "Shannon M. Clark, MD, MMS, FACOG",
     references: [{ label: "ACOG CO 774", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -792,9 +792,9 @@ export const surgeries: Surgery[] = [
     complications: ["Vascular injury at entry (rare but serious)", "Bowel injury", "Visceral injury", "CO2 embolism (rare)", "Port-site hernia"],
     postOp: ["Same-day discharge", "Shoulder tip pain (CO2)", "Return to work 1 wk"],
     pearls: ["Hasson open entry safer in patients with previous surgery", "Always inspect under camera as you place secondary ports"],
-    videoId: "EZw7fHN0dpg",
-    videoTitle: "Diagnostic Laparoscopy",
-    videoChannel: "Surgery 101",
+    videoId: "W-ZPa1NzcgM",
+    videoTitle: "Diagnostic Pelvic Laparoscopy Exam",
+    videoChannel: "Nucleus Medical Media",
     references: [{ label: "RCOG Consent Advice 2", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -828,9 +828,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bowel injury", "Ureteric injury", "Reduced ovarian reserve (endometrioma stripping)", "Recurrence (~20% at 5 y)"],
     postOp: ["Hormonal suppression post-op (COC, LNG-IUS, GnRH-a) reduces recurrence", "Pain follow-up", "Fertility planning"],
     pearls: ["Excision > ablation for deep disease", "Multidisciplinary approach for stage IV"],
-    videoId: "DPHMaDH8oo4",
-    videoTitle: "Excision of Endometriosis",
-    videoChannel: "Endometriosis Foundation",
+    videoId: "LVjJkjHPXbU",
+    videoTitle: "Mayo Clinic Minute - When surgery for endometriosis is the answer",
+    videoChannel: "Mayo Clinic",
     references: [{ label: "ESHRE Endometriosis 2022", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -863,9 +863,9 @@ export const surgeries: Surgery[] = [
     complications: ["Vasovagal", "Uterine perforation (<1%)", "Fluid overload (with hypotonic media)", "Infection"],
     postOp: ["Spotting/cramping for 1–2 days", "Histology results in 1–2 wk"],
     pearls: ["Office hysteroscopy without anesthesia is feasible and well-tolerated", "Saline distension safer than glycine"],
-    videoId: "M0XOwT8w4mY",
-    videoTitle: "Office Hysteroscopy",
-    videoChannel: "AAGL",
+    videoId: "LYkuGF_eEwk",
+    videoTitle: "Having a Hysteroscopy - Patient Guide",
+    videoChannel: "ouhnhs",
     references: [{ label: "RCOG Green-top 59", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -897,9 +897,9 @@ export const surgeries: Surgery[] = [
     complications: ["Perforation", "Fluid overload", "Bleeding", "Recurrence"],
     postOp: ["Discharge same day", "Histology", "Hormonal therapy if multiple/recurrent"],
     pearls: ["Mechanical morcellation faster, less fluid use, no electrosurgery", "Always histology — 5% have premalignant changes"],
-    videoId: "WLIxz8uAHEo",
-    videoTitle: "Hysteroscopic Polypectomy",
-    videoChannel: "AAGL",
+    videoId: "n9B-ETF9yaE",
+    videoTitle: "What Happens During a Hysteroscopic Polypectomy?  #UterinePolyp #Hysteroscopy #Polypectomy",
+    videoChannel: "Anatomedia",
     references: [{ label: "AAGL Practice Report Polyps", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -932,9 +932,9 @@ export const surgeries: Surgery[] = [
     complications: ["Fluid overload / hyponatremia", "Perforation", "Hemorrhage", "Adhesions (Asherman)", "Need for repeat procedure"],
     postOp: ["Estrogen + LNG-IUS or balloon to prevent adhesions if extensive", "Conceive after 3 mo"],
     pearls: ["Stop if fluid deficit >2.5 L bipolar / 1 L hypotonic", "Type 2 fibroids may need staged procedure"],
-    videoId: "g0RChqwdv8w",
-    videoTitle: "Hysteroscopic Myomectomy",
-    videoChannel: "AAGL",
+    videoId: "mEYI7PkVRHg",
+    videoTitle: "Hysteroscopy Explained: Remove Uterine Polyps &amp; Fibroids Without Surgery!",
+    videoChannel: "Curious679",
     references: [{ label: "AAGL Submucous Fibroids", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -965,9 +965,9 @@ export const surgeries: Surgery[] = [
     complications: ["Perforation", "Burns to bowel/bladder", "Hematometra", "Pregnancy still possible (high-risk if occurs)"],
     postOp: ["Watery discharge 2–4 wk", "60–80% reduction in flow; ~30% amenorrhea", "Repeat procedure or hysterectomy if fails"],
     pearls: ["NovaSure most evidence", "Pregnancy after ablation = high risk — counsel re: contraception/sterilization at same time"],
-    videoId: "AaMNGn7gRZM",
-    videoTitle: "Endometrial Ablation",
-    videoChannel: "Hologic",
+    videoId: "8monad_WsE4",
+    videoTitle: "NovaSure Advanced Endometrial Ablation Animation",
+    videoChannel: "Hologic, Inc.",
     references: [{ label: "NICE NG88 HMB", url: "https://www.nice.org.uk/" }],
     mcqs: [
       {
@@ -1001,9 +1001,9 @@ export const surgeries: Surgery[] = [
     complications: ["Perforation", "Re-formation of adhesions (high)", "Persistent infertility"],
     postOp: ["Hormonal regimen", "Second look", "Fertility outcomes depend on severity (60–80% pregnancy rates for mild-moderate)"],
     pearls: ["Cold scissors > electrosurgery (less thermal damage)", "Balloon stent prevents reformation"],
-    videoId: "DwZflqlcTu0",
-    videoTitle: "Asherman's Syndrome Treatment",
-    videoChannel: "AAGL",
+    videoId: "oDC6aaiHO9A",
+    videoTitle: "Real time video of hysteroscopy Adhesiolysis for Ashermann&#39;s syndrome -Fertility enhancing surgery",
+    videoChannel: "Delhi IVF-Best IVF Clinic in India",
     references: [{ label: "AAGL Asherman 2017", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -1035,9 +1035,9 @@ export const surgeries: Surgery[] = [
     complications: ["Perforation (especially fundal)", "Adhesions", "Cervical incompetence (rare)"],
     postOp: ["Conceive after 1 cycle", "Confirm correction with HSG/SIS"],
     pearls: ["Counsel re: TRUST trial — minimal benefit for infertility alone", "Strong evidence for RPL"],
-    videoId: "VgrJGYOdRdE",
-    videoTitle: "Hysteroscopic Septum Resection",
-    videoChannel: "AAGL",
+    videoId: "uAaqn7ShCh8",
+    videoTitle: "Deviated Septum Surgery (Septoplasty)",
+    videoChannel: "Fauquier ENT",
     references: [{ label: "ESHRE Recurrent Miscarriage", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -1073,9 +1073,9 @@ export const surgeries: Surgery[] = [
     complications: ["Ureteric injury (1–5%)", "Bladder dysfunction", "Lymphedema", "Sexual dysfunction"],
     postOp: ["Catheter 7–14 days", "Suprapubic catheter sometimes", "Adjuvant CRT if positive nodes/margins"],
     pearls: ["LACC trial 2018 — open > MIS for oncologic outcomes in cervical cancer", "Sentinel node mapping reducing morbidity"],
-    videoId: "OLZxVWbS2_g",
-    videoTitle: "Radical Hysterectomy for Cervical Cancer",
-    videoChannel: "ESGO",
+    videoId: "yFW_b6cpv3w",
+    videoTitle: "Radical Hysterectomy and Survival in Cervical Cancer",
+    videoChannel: "NEJM Group",
     references: [{ label: "ESGO Cervical Cancer Guidelines", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -1111,9 +1111,9 @@ export const surgeries: Surgery[] = [
     complications: ["Hemorrhage", "Bowel injury / anastomotic leak", "VTE", "Ileus", "Wound complications"],
     postOp: ["HDU/ICU", "VTE prophylaxis 28 days", "Adjuvant chemotherapy", "Genetic counseling (BRCA testing)"],
     pearls: ["Optimal cytoreduction (R0/<1 cm) is the strongest prognostic factor", "Neoadjuvant chemo for unresectable stage III/IV"],
-    videoId: "Hd-lVDM0WSA",
-    videoTitle: "Ovarian Cancer Cytoreduction",
-    videoChannel: "ESGO",
+    videoId: "dkFmuNMrGiQ",
+    videoTitle: "Ovarian Cancer Surgery",
+    videoChannel: "Stanford Health Care",
     references: [{ label: "ESGO-ESMO Ovarian", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -1145,9 +1145,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bleeding (4%)", "Infection", "Cervical stenosis", "Cervical insufficiency / preterm birth (cone > LEEP)", "Inadequate margins requiring re-treatment"],
     postOp: ["No tampons/intercourse 4 wk", "Follow-up cytology + HPV at 6 mo and annually", "Counsel re: future pregnancy risks"],
     pearls: ["Cone size ≥10 mm height linked to PTB risk", "AIS: cone with negative margins, then surveillance"],
-    videoId: "u_89e16gmik",
-    videoTitle: "LEEP Procedure",
-    videoChannel: "ASCCP",
+    videoId: "Me-cLlkxC3U",
+    videoTitle: "LEEP or Cone Biopsy Instructions",
+    videoChannel: "Dr2Women",
     references: [{ label: "ASCCP Management Guidelines", url: "https://www.asccp.org/" }],
     mcqs: [
       {
@@ -1179,9 +1179,9 @@ export const surgeries: Surgery[] = [
     complications: ["Wound breakdown (50%)", "Lymphedema (30–50%)", "Lymphocele", "Sexual/urinary dysfunction"],
     postOp: ["Drains 7+ days", "Compression stockings", "Pelvic floor physiotherapy", "Adjuvant RT if margins close/positive"],
     pearls: ["GROINSS-V trials: SLN safe alternative to full lymphadenectomy in selected", "Triple incision standard"],
-    videoId: "8HPJfSPVtL8",
-    videoTitle: "Radical Vulvectomy",
-    videoChannel: "ESGO",
+    videoId: "4HcuSBw8p-s",
+    videoTitle: "Inguinofemoral lymph node dissection, steps",
+    videoChannel: "Dr. Katelyn Tondo-Steele",
     references: [{ label: "ESGO Vulvar Cancer", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -1215,9 +1215,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bladder perforation (TVT 5%, TOT <1%)", "Voiding dysfunction", "Mesh erosion (2–3%)", "Chronic pain/dyspareunia", "Vascular injury (rare)"],
     postOp: ["Same-day discharge", "Voiding trial before discharge", "Avoid heavy lifting 6 wk"],
     pearls: ["NICE 2019 paused mesh in UK; reintroduced 2024 with conditions", "Always cystoscopy with TVT", "Long-term cure ~80%"],
-    videoId: "ItIfUuYQz4Y",
-    videoTitle: "TVT Procedure",
-    videoChannel: "IUGA",
+    videoId: "fjpJbzJmLBQ",
+    videoTitle: "Urethral Sling for Urinary Stress Incontinence",
+    videoChannel: "UNC Health Rex",
     references: [{ label: "NICE NG123", url: "https://www.nice.org.uk/" }],
     mcqs: [
       {
@@ -1250,9 +1250,9 @@ export const surgeries: Surgery[] = [
     complications: ["Mesh erosion (2–3%)", "Sacral hemorrhage", "Bowel injury", "Sexual dysfunction", "Recurrent prolapse"],
     postOp: ["Catheter overnight", "VTE prophylaxis", "Avoid heavy lifting 6 wk"],
     pearls: ["Best long-term success for apical prolapse", "Robotic increasingly used"],
-    videoId: "5vpwSvF38Gg",
-    videoTitle: "Laparoscopic Sacrocolpopexy",
-    videoChannel: "IUGA",
+    videoId: "H5wZWG3UjZo",
+    videoTitle: "MESH MANAGEMENT for Robotic Sacrocolpopexy",
+    videoChannel: "StitchKit®",
     references: [{ label: "IUGA / ICS Joint", url: "https://www.iuga.org/" }],
     mcqs: [
       {
@@ -1284,9 +1284,9 @@ export const surgeries: Surgery[] = [
     complications: ["Recurrence (~30%)", "Dyspareunia", "Bleeding/hematoma", "Voiding dysfunction (anterior)"],
     postOp: ["Catheter overnight", "Avoid heavy lifting 6 wk"],
     pearls: ["Always assess and correct apical compartment first", "Native tissue preferred over mesh for compartment repair (FDA warning)"],
-    videoId: "B2QiJDzM3yQ",
-    videoTitle: "Anterior Colporrhaphy",
-    videoChannel: "IUGA",
+    videoId: "wFJ2VdAtous",
+    videoTitle: "Anterior Colporrhaphy | Cystocoele repair | step wise demonstration",
+    videoChannel: "Urogynecology for Beginners",
     references: [{ label: "IUGA Native Tissue Repair", url: "https://www.iuga.org/" }],
     mcqs: [
       {
@@ -1319,9 +1319,9 @@ export const surgeries: Surgery[] = [
     complications: ["Buttock pain (transient)", "Pudendal nerve injury", "Hemorrhage", "Recurrence (anterior compartment ~30%)"],
     postOp: ["Catheter overnight", "Pain managed within days"],
     pearls: ["Capio device facilitates suture placement", "Bilateral SSLF improves apical support"],
-    videoId: "p9o0V5fUcTw",
-    videoTitle: "Sacrospinous Ligament Fixation",
-    videoChannel: "IUGA",
+    videoId: "bc2IQ6NZoWQ",
+    videoTitle: "Sacrospinous Ligament Fixation - Capio Stitch Demonstration | Dr Kunal Rathod",
+    videoChannel: "Dr Kunal Rathod",
     references: [{ label: "AUGS Practice Bulletin", url: "https://www.augs.org/" }],
     mcqs: [
       {
@@ -1351,9 +1351,9 @@ export const surgeries: Surgery[] = [
     complications: ["UI", "Regret (rare if well counseled)", "Difficult future endometrial sampling"],
     postOp: ["Same-day discharge possible", "Quick recovery"],
     pearls: ["Success rate >90%, low morbidity — ideal for frail elderly", "Always discuss permanence"],
-    videoId: "h-tRq-JvQYo",
-    videoTitle: "Colpocleisis Procedure",
-    videoChannel: "IUGA",
+    videoId: "qKmsHudI03o",
+    videoTitle: "Colpocleisis",
+    videoChannel: "Andrey Petrikovets MD FACOG",
     references: [{ label: "AUGS Colpocleisis", url: "https://www.augs.org/" }],
     mcqs: [
       {
@@ -1387,9 +1387,9 @@ export const surgeries: Surgery[] = [
     complications: ["Failure (Pearl Index 0.5/100 woman-years)", "Ectopic if pregnancy occurs", "Regret (1–25% depending on age)"],
     postOp: ["Same-day discharge", "Effective immediately if completed"],
     pearls: ["Opportunistic salpingectomy at CS/hysterectomy reduces ovarian cancer ~40–65%", "Younger age + relationship change = higher regret"],
-    videoId: "BRtbtqtQuqA",
-    videoTitle: "Laparoscopic Bilateral Salpingectomy",
-    videoChannel: "AAGL",
+    videoId: "JqHp3yVLbz4",
+    videoTitle: "Can I get pregnant after I had my tubes removed??",
+    videoChannel: "Shannon M. Clark, MD, MMS, FACOG",
     references: [{ label: "ACOG CO 774", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -1420,9 +1420,9 @@ export const surgeries: Surgery[] = [
     complications: ["Ectopic (~5%)", "Failure to conceive", "Adhesions"],
     postOp: ["HSG 3 mo to confirm patency", "Conceive within 1 yr if successful"],
     pearls: ["IVF often more cost-effective and faster", "Best results: ring/clip sterilization with >4 cm remaining tube"],
-    videoId: "5N7ufhTKO0c",
-    videoTitle: "Tubal Reanastomosis",
-    videoChannel: "AAGL",
+    videoId: "Yul08UrpKj0",
+    videoTitle: "A Tubal Reversal with Dr. Mor - Creating life one microsurgery at a time",
+    videoChannel: "California Center for Reproductive Health",
     references: [{ label: "ASRM Reversal of Sterilization", url: "https://www.asrm.org/" }],
     mcqs: [
       {
@@ -1455,9 +1455,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bleeding (intraperitoneal/vaginal)", "Pelvic infection (<1%)", "OHSS exacerbation", "Bowel/ureter injury (rare)"],
     postOp: ["Discharge same day", "Watch for OHSS symptoms over 1–2 wk", "Embryo transfer 3–5 days later"],
     pearls: ["GnRH agonist trigger reduces OHSS in high responders", "Antibiotic prophylaxis controversial — give if endometriosis/PID history"],
-    videoId: "8ihn1y1iUH0",
-    videoTitle: "Egg Retrieval (TVOR)",
-    videoChannel: "ASRM",
+    videoId: "nu-h1QMfHxo",
+    videoTitle: "POV #eggretrieval #ivf",
+    videoChannel: "Lora Shahine, MD",
     references: [{ label: "ESHRE Good Practice ART", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -1490,9 +1490,9 @@ export const surgeries: Surgery[] = [
     complications: ["Failed implantation (most common 'complication')", "Multiple pregnancy if >1 embryo", "Ectopic pregnancy"],
     postOp: ["No bed rest necessary (Cochrane)", "Luteal support (vaginal progesterone)", "Pregnancy test 10–14 days"],
     pearls: ["Single embryo transfer recommended in most patients", "Soft catheter > rigid", "USS guidance improves success"],
-    videoId: "JcvDkXCx0Mw",
-    videoTitle: "Embryo Transfer Technique",
-    videoChannel: "ASRM",
+    videoId: "fnYBLYfFx2Y",
+    videoTitle: "How Does In Vitro Fertilization (IVF) Work? A Step-by-Step Explanation",
+    videoChannel: "Cleveland Clinic",
     references: [{ label: "ASRM Practice Committee", url: "https://www.asrm.org/" }],
     mcqs: [
       {
@@ -1525,9 +1525,9 @@ export const surgeries: Surgery[] = [
     complications: ["Reduced ovarian reserve (avoid excess drilling)", "Adhesions", "Premature ovarian insufficiency"],
     postOp: ["Same day discharge", "Resume conception attempts immediately", "Reassess at 6 mo"],
     pearls: ["Equally effective as gonadotropins, lower OHSS and multiple pregnancy", "Effect lasts 6–12 mo"],
-    videoId: "kTm5uK5C9HE",
-    videoTitle: "Laparoscopic Ovarian Drilling",
-    videoChannel: "AAGL",
+    videoId: "qL3sdZRHYqw",
+    videoTitle: "Laparoscopic Ovarian Drilling for PCOS - What is it? Can Ovarian Drilling cure PCOS?",
+    videoChannel: "ERemedium",
     references: [{ label: "ESHRE PCOS 2023", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -1564,9 +1564,9 @@ export const surgeries: Surgery[] = [
     complications: ["Persistent trophoblast (8–15%) requiring MTX", "Recurrent ectopic", "Bleeding"],
     postOp: ["Weekly βhCG to undetectable", "MTX if plateau or rise"],
     pearls: ["Salpingectomy preferred if contralateral tube healthy (no persistent trophoblast)", "Always confirm hCG declines to zero"],
-    videoId: "BpEDwZMSXjE",
-    videoTitle: "Laparoscopic Salpingostomy",
-    videoChannel: "AAGL",
+    videoId: "JqHp3yVLbz4",
+    videoTitle: "Can I get pregnant after I had my tubes removed??",
+    videoChannel: "Shannon M. Clark, MD, MMS, FACOG",
     references: [{ label: "ACOG PB 193 Ectopic", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -1599,9 +1599,9 @@ export const surgeries: Surgery[] = [
     complications: ["Loss of ovary if delayed presentation", "Recurrent torsion (~5%)", "Adhesions"],
     postOp: ["Same-day or next-day discharge", "Follow-up USS at 6–8 wk"],
     pearls: ["Conserve ovary even if dusky — color recovers in >90%", "Embolic risk from untwisting is THEORETICAL — do not perform oophorectomy first"],
-    videoId: "rYG-rrIwmA0",
-    videoTitle: "Ovarian Torsion Detorsion",
-    videoChannel: "AAGL",
+    videoId: "BEzTzmfWbQg",
+    videoTitle: "What is ovarian torsion? #shorts",
+    videoChannel: "Natalie Crawford, MD",
     references: [{ label: "ACOG CO 783", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -1635,9 +1635,9 @@ export const surgeries: Surgery[] = [
     complications: ["Uterine perforation (1%)", "Cervical injury", "Asherman's syndrome", "Infection", "Retained products"],
     postOp: ["Discharge same day", "Bleeding 1–2 wk", "Pregnancy test at 4 wk to exclude molar"],
     pearls: ["Always consider molar pregnancy if heavy bleeding, hyperemesis, or grape-like products → urgent histology + βhCG follow-up"],
-    videoId: "4QLqmFOY30Y",
-    videoTitle: "Surgical Management of Miscarriage",
-    videoChannel: "Surgery 101",
+    videoId: "35KVncbMpKA",
+    videoTitle: "#OBGYN shows first trimester abortion simulation #shorts #medicalstudent",
+    videoChannel: "Dr. Jennifer Lincoln",
     references: [{ label: "RCOG GTG 25", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -1670,9 +1670,9 @@ export const surgeries: Surgery[] = [
     complications: ["Re-accumulation", "Infection / abscess", "Necrotizing fasciitis (rare)", "Need for embolization or laparotomy if retroperitoneal extension"],
     postOp: ["Remove pack at 24 h", "Continue antibiotics", "Image (CT) if suspicious of broad ligament hematoma"],
     pearls: ["Broad ligament / retroperitoneal hematomas often need interventional radiology embolization", "Always exclude DIC"],
-    videoId: "iJL4eQ5LlMk",
-    videoTitle: "Vulvar Hematoma Management",
-    videoChannel: "ACOG",
+    videoId: "YEbtBEiAbmI",
+    videoTitle: "Vaginal lacerations during childbirth 🥲 #anatomy #surgery #pregnancy #obgyn",
+    videoChannel: "Med Twins",
     references: [{ label: "RCOG GTG 52 — PPH", url: "https://www.rcog.org.uk/" }],
     mcqs: [
       {
@@ -1708,9 +1708,9 @@ export const surgeries: Surgery[] = [
     complications: ["Incomplete evacuation", "Perforation", "Infection", "Bleeding"],
     postOp: ["Discharge in 30 min", "NSAIDs analgesia", "Effective contraception immediately if desired"],
     pearls: ["Equivalent efficacy to electric vacuum, more accessible", "WHO-recommended for low-resource settings"],
-    videoId: "AfbSTk5aHNk",
-    videoTitle: "MVA Technique",
-    videoChannel: "Ipas",
+    videoId: "GuBjk3Br7GE",
+    videoTitle: "A Comprehensive Guide to Manual Vacuum Aspiration (MVA) Procedure- Ipas MVA® Plus (EN)",
+    videoChannel: "DKT WomanCare Global",
     references: [{ label: "WHO Abortion Care Guideline 2022", url: "https://www.who.int/" }],
     mcqs: [
       {
@@ -1739,9 +1739,9 @@ export const surgeries: Surgery[] = [
     complications: ["Recurrence (10–15%)", "Bleeding", "Cellulitis", "Catheter expulsion"],
     postOp: ["Sitz baths", "Word catheter removal at 4 wk", "Histology if any suspicion"],
     pearls: ["Always biopsy in postmenopausal women — exclude vulvar carcinoma", "Word catheter outpatient and well-tolerated"],
-    videoId: "XXcXuQF_oYM",
-    videoTitle: "Bartholin Cyst Word Catheter",
-    videoChannel: "Surgery 101",
+    videoId: "8-ZMKU24VMU",
+    videoTitle: "How to Remove a Bartholin&#39;s Cyst in UNDER 10 MINUTES!",
+    videoChannel: "NP Skills Made Easy Workshops & CE Courses",
     references: [{ label: "ACOG CO 673", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -1773,9 +1773,9 @@ export const surgeries: Surgery[] = [
     complications: ["Cecal injury", "Stump leak", "Infection"],
     postOp: ["Same as primary procedure", "Histology"],
     pearls: ["MANDATORY for mucinous ovarian neoplasms — exclude appendiceal primary", "Patient consent essential pre-op"],
-    videoId: "yz2T-MGAuiE",
-    videoTitle: "Laparoscopic Appendicectomy",
-    videoChannel: "Surgery 101",
+    videoId: "4tMTwurCQNA",
+    videoTitle: "The Z-stitch #appendix #suturing #surgery #doctor",
+    videoChannel: "Knife Skills",
     references: [{ label: "ESGO Mucinous Ovarian", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -1808,9 +1808,9 @@ export const surgeries: Surgery[] = [
     complications: ["Failed instrumental → CS (~30%)", "Fetal trauma (cephalohematoma, SGH)", "Third/fourth degree tear", "PPH"],
     postOp: ["Cord gases", "Paediatric review of neonate", "Perineal inspection and repair", "VTE prophylaxis"],
     pearls: ["Document decision-to-delivery interval", "Kielland's forceps reserved for experienced operators", "Sequential instruments (vacuum then forceps) increases neonatal morbidity"],
-    videoId: "Y3S5v2z1Xlk",
-    videoTitle: "Trial of Instrumental Delivery",
-    videoChannel: "RCOG",
+    videoId: "m9byc1nqbcE",
+    videoTitle: "Forcept Delivery Part3  #delivery #doctor #nursingexperts #pregnancy #nursingcare",
+    videoChannel: "Ayesha Md suleman",
     references: [{ label: "RCOG GTG 26", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -1842,9 +1842,9 @@ export const surgeries: Surgery[] = [
     complications: ["PPROM", "Chorioamnionitis", "Cervical laceration at delivery", "Suture migration"],
     postOp: ["Pelvic rest", "Remove at 36–37 weeks or onset of labour", "Steroids if PTL"],
     pearls: ["Shirodkar is higher but more invasive", "Rescue cerclage success inversely proportional to dilation", "Abdominal cerclage for failed vaginal cerclage"],
-    videoId: "r6c6V8V0-9M",
-    videoTitle: "McDonald Cerclage Technique",
-    videoChannel: "ACOG",
+    videoId: "muYaqSY_FQY",
+    videoTitle: "Cervical cerclage for the MRCOG: RCOG Guideline. Preterm Birth. McDonald or Shirodkar suture.",
+    videoChannel: "Prof Arri Coomarasamy OBE MRCOG",
     references: [{ label: "ACOG PB 142", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -1877,9 +1877,9 @@ export const surgeries: Surgery[] = [
     complications: ["Ureteric injury (rare)", "Failure → internal iliac ligation or hysterectomy", "Broad ligament hematoma"],
     postOp: ["Monitor UOP", "Hb check", "LMWH when bleeding stops"],
     pearls: ["Success rate 80–95% — always try before internal iliac", "Menses and fertility preserved", "Go through myometrium, not around vessels, to avoid ureter"],
-    videoId: "H6Z7MuAcD8Q",
-    videoTitle: "O'Leary Stitch for PPH",
-    videoChannel: "AAGL",
+    videoId: "I5bnUmRkMUQ",
+    videoTitle: "Ligation of the Uterine Artery - O&#39;Leary Technique",
+    videoChannel: "Incision",
     references: [{ label: "RCOG GTG 52 — PPH", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -1912,9 +1912,9 @@ export const surgeries: Surgery[] = [
     complications: ["Iliac vein injury (catastrophic)", "Ureteric injury", "Buttock claudication", "Hypoxic neuropathy"],
     postOp: ["ICU monitoring", "Serial Hb", "Ambulate when stable"],
     pearls: ["Reduces pulse pressure by 85% → allows clotting", "Preserves fertility", "Dissect ureter off vessel FIRST"],
-    videoId: "V9h3K3z5rNc",
-    videoTitle: "Internal Iliac Artery Ligation",
-    videoChannel: "IRCAD",
+    videoId: "I5bnUmRkMUQ",
+    videoTitle: "Ligation of the Uterine Artery - O&#39;Leary Technique",
+    videoChannel: "Incision",
     references: [{ label: "FIGO PPH Guideline", url: "https://www.figo.org/" }],
     mcqs: [
       {
@@ -1946,9 +1946,9 @@ export const surgeries: Surgery[] = [
     complications: ["Massive haemorrhage and shock", "Re-inversion", "Infection", "Future recurrence"],
     postOp: ["Continue uterotonics 24 h", "Broad-spectrum antibiotics", "Monitor for ongoing bleeding"],
     pearls: ["Shock disproportionate to blood loss — neurogenic component", "Keep placenta attached until reduction", "Time is critical — the longer the delay, the harder reduction"],
-    videoId: "qL1W3f3d9qA",
-    videoTitle: "Uterine Inversion Management",
-    videoChannel: "RCOG",
+    videoId: "OW0Yq2nWyuY",
+    videoTitle: "Uterine inversion | Reproductive system physiology | NCLEX-RN | Khan Academy",
+    videoChannel: "khanacademymedicine",
     references: [{ label: "RCOG Green-top 56", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -1983,9 +1983,9 @@ export const surgeries: Surgery[] = [
     complications: ["Brachial plexus injury (Erb's palsy)", "Clavicular/humeral fracture", "Hypoxic injury", "Maternal 3rd/4th degree tear, PPH"],
     postOp: ["Neonatal assessment", "Cord gases", "Debrief and document", "Consider risk management review"],
     pearls: ["McRoberts + suprapubic pressure resolves ~90%", "Never apply fundal pressure", "Time each manoeuvre — 30 seconds each"],
-    videoId: "KUhJjSaB6yE",
-    videoTitle: "Shoulder Dystocia Drill",
-    videoChannel: "RCOG",
+    videoId: "i5YSX6sL1MI",
+    videoTitle: "Shoulder dystocia",
+    videoChannel: "Geeky Medics",
     references: [{ label: "RCOG GTG 42", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -2016,9 +2016,9 @@ export const surgeries: Surgery[] = [
     complications: ["Fetal hypoxia/death", "Maternal surgical risks of crash CS"],
     postOp: ["Cord gases", "Paediatric review", "Debrief"],
     pearls: ["Most common with malpresentation and polyhydramnios", "Do not replace cord in uterus", "ARM at high station is a risk factor"],
-    videoId: "rYh2w8UhTyw",
-    videoTitle: "Cord Prolapse Management",
-    videoChannel: "RCOG",
+    videoId: "uGYQwHGAJeM",
+    videoTitle: "Prolapsed Cord: Complications in Labor - Care of the Childbearing Family | Lecturio Nursing",
+    videoChannel: "Lecturio Nursing",
     references: [{ label: "RCOG GTG 50", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -2052,9 +2052,9 @@ export const surgeries: Surgery[] = [
     complications: ["Miscarriage (~0.1–0.3%)", "Amnionitis", "Rh sensitization", "PPROM", "Fetal injury (rare)"],
     postOp: ["Rest 24 h", "Report fluid loss, bleeding, contractions, fever"],
     pearls: ["Ideal 15–20 weeks for karyotype", "CVS earlier (11–13 wk) but higher loss risk", "Always document pre/post fetal heart"],
-    videoId: "vE1eY9SEGyA",
-    videoTitle: "Amniocentesis Procedure",
-    videoChannel: "ISUOG",
+    videoId: "Ga7nqCk8ao8",
+    videoTitle: "Amniocentesis",
+    videoChannel: "Washington State Department of Health",
     references: [{ label: "ISUOG Practice Guidelines", url: "https://www.isuog.org/" }],
     mcqs: [
       {
@@ -2087,9 +2087,9 @@ export const surgeries: Surgery[] = [
     complications: ["Scalp laceration/infection", "Failed sampling", "False reassurance"],
     postOp: ["Continue CTG monitoring", "Act on pH result"],
     pearls: ["pH ≥7.25 normal; 7.20–7.25 borderline; <7.20 act (deliver)", "Lactate >4.8 mmol/L = deliver", "Trend is more important than single value"],
-    videoId: "R9JZJHzKd6Q",
-    videoTitle: "Fetal Blood Sampling",
-    videoChannel: "RCOG",
+    videoId: "VStnA7TaE1A",
+    videoTitle: "What is a fetal scalp electrode? #birth #childbirth #laboranddelivery #fetalscalpeletrode",
+    videoChannel: "Shannon M. Clark, MD, MMS, FACOG",
     references: [{ label: "NICE CG190", url: "https://www.nice.org.uk/" }],
     mcqs: [
       {
@@ -2122,9 +2122,9 @@ export const surgeries: Surgery[] = [
     complications: ["Incomplete evacuation", "Uterine perforation (1/1000)", "Infection", "Haemorrhage", "Asherman's (rare)"],
     postOp: ["Anti-D if Rh-negative", "Contraception counselling", "Histology"],
     pearls: ["Equivalent to EVA for <10 weeks, cheaper and no anaesthesia needed", "Watch for missed twin pregnancy", "Discuss contraception before discharge"],
-    videoId: "i3xBHBqTrDc",
-    videoTitle: "MVA Technique",
-    videoChannel: "WHO",
+    videoId: "35KVncbMpKA",
+    videoTitle: "#OBGYN shows first trimester abortion simulation #shorts #medicalstudent",
+    videoChannel: "Dr. Jennifer Lincoln",
     references: [{ label: "WHO Safe Abortion", url: "https://www.who.int/" }],
     mcqs: [
       {
@@ -2156,9 +2156,9 @@ export const surgeries: Surgery[] = [
     complications: ["Retained placenta (~10%)", "Haemorrhage", "Uterine rupture (scarred uterus)", "Infection", "Failure → surgical evacuation"],
     postOp: ["Anti-D if Rh-negative", "Lactation suppression counselling", "Psychological support", "Contraception"],
     pearls: ["Halve misoprostol dose after 24 weeks", "Offer feticide at 21+6 per RCOG to avoid live birth", "Bereavement care package essential"],
-    videoId: "jPfXjXhtPa0",
-    videoTitle: "Medical Induction TOP",
-    videoChannel: "RCOG",
+    videoId: "35KVncbMpKA",
+    videoTitle: "#OBGYN shows first trimester abortion simulation #shorts #medicalstudent",
+    videoChannel: "Dr. Jennifer Lincoln",
     references: [{ label: "RCOG Care of Women Requesting Induced Abortion", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -2189,9 +2189,9 @@ export const surgeries: Surgery[] = [
     complications: ["Failure → instrumental or CS", "Cord prolapse (rare)", "Maternal trauma"],
     postOp: ["Usual postnatal care"],
     pearls: ["Success rate ~50–75%", "Consider before moving to Kielland's or rotational vacuum", "Document station and position before and after"],
-    videoId: "E6h9h1U1qDM",
-    videoTitle: "Manual Rotation OP to OA",
-    videoChannel: "ACOG",
+    videoId: "urVhSGKn42M",
+    videoTitle: "OP baby position (sunny side up) #birth",
+    videoChannel: "Alice Turner",
     references: [{ label: "ACOG Operative Vaginal Delivery", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -2223,9 +2223,9 @@ export const surgeries: Surgery[] = [
     complications: ["Urethral/bladder injury", "Chronic pelvic pain/instability", "Infection", "Fistula"],
     postOp: ["Foley 10 days", "Binder, crutches", "Physiotherapy"],
     pearls: ["Almost never done in high-income settings", "WHO reserves for obstructed labour with no access to CS", "Abduct thighs slowly to avoid urethral tear"],
-    videoId: "XkFzM5n6K3E",
-    videoTitle: "Symphysiotomy",
-    videoChannel: "WHO",
+    videoId: "2kddmLcTWBo",
+    videoTitle: "Symphysiotomy for obstructed labour: a systematic review and meta-analysis - Amie Wilson",
+    videoChannel: "MARCH Centre LSHTM",
     references: [{ label: "WHO Obstetric Emergency", url: "https://www.who.int/" }],
     mcqs: [
       {
@@ -2257,9 +2257,9 @@ export const surgeries: Surgery[] = [
     complications: ["Cyclical bleeding from residual endometrium (~5%)", "Cervical stump prolapse", "Future cervical pathology"],
     postOp: ["Continue cervical screening", "Early mobilization"],
     pearls: ["Faster and less bowel/bladder injury than TAH", "Patient must understand smear continuation", "Amputate with reverse cone to remove as much endometrium as possible"],
-    videoId: "0QoH9b1kMpg",
-    videoTitle: "Subtotal Hysterectomy",
-    videoChannel: "AAGL",
+    videoId: "_ZBWpPtfW6Q",
+    videoTitle: "Pros and Cons of A Partial Hysterectomy",
+    videoChannel: "Dardur Gynecology - Taiwo Durowade, MD FACOG",
     references: [{ label: "AAGL Position", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -2296,9 +2296,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bladder dysfunction (up to 30%)", "Ureteric fistula", "Lymphocele", "Sexual dysfunction", "Lower-limb lymphoedema"],
     postOp: ["Suprapubic catheter 7–10 days", "Trial of void", "Adjuvant CRT if Sedlis criteria met"],
     pearls: ["LACC trial: open > minimally invasive for oncologic outcome in early cervical cancer", "Sentinel node mapping emerging", "Nerve-sparing reduces bladder dysfunction"],
-    videoId: "3GV1U8rH2VY",
-    videoTitle: "Open Radical Hysterectomy",
-    videoChannel: "ESGO",
+    videoId: "yFW_b6cpv3w",
+    videoTitle: "Radical Hysterectomy and Survival in Cervical Cancer",
+    videoChannel: "NEJM Group",
     references: [{ label: "ESGO Cervical Cancer Guidelines", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -2331,9 +2331,9 @@ export const surgeries: Surgery[] = [
     complications: ["Vessel/nerve injury", "Lymphocele (5–15%)", "Lymphoedema (lower limb)", "Infection"],
     postOp: ["Early mobilization", "Compression stockings", "Monitor for lymphocele"],
     pearls: ["Sentinel node with ICG reduces morbidity in endometrial/cervical cancer", "Always spare obturator nerve", "Ligate lymphatics to prevent lymphocele"],
-    videoId: "u1YQ4jCFwMo",
-    videoTitle: "Laparoscopic Pelvic Node Dissection",
-    videoChannel: "ESGO",
+    videoId: "CgTU-yDVS1U",
+    videoTitle: "Extended pelvic lymph node dissection: The Monoblock Technique",
+    videoChannel: "European School of Urology",
     references: [{ label: "ESGO Endometrial Cancer", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -2365,9 +2365,9 @@ export const surgeries: Surgery[] = [
     complications: ["ICG allergy (rare)", "Missed nodal disease if empty hemipelvis"],
     postOp: ["Adjuvant therapy per final pathology"],
     pearls: ["FIRES trial: high sensitivity and NPV", "If no SLN on one side, do full lymphadenectomy that side", "Superficial + deep cervical injection best"],
-    videoId: "g5xX0vnK2IM",
-    videoTitle: "Sentinel Node Endometrial",
-    videoChannel: "SGO",
+    videoId: "iIHYq4PisLI",
+    videoTitle: "Dr. Glaucomflecken Explains: Omitting Sentinel-Node Biopsy in Small Breast Cancers (INSEMA)",
+    videoChannel: "NEJM Group",
     references: [{ label: "SGO SLN Algorithm", url: "https://www.sgo.org/" }],
     mcqs: [
       {
@@ -2402,9 +2402,9 @@ export const surgeries: Surgery[] = [
     complications: ["Major: bowel leak, VTE, sepsis, haemorrhage", "Stoma", "Prolonged ICU stay"],
     postOp: ["ICU", "Early chemotherapy start (within 6 weeks)", "Nutritional support"],
     pearls: ["R0 = no macroscopic residual — strongest prognostic factor", "Neoadjuvant chemo + interval debulking = non-inferior (EORTC 55971)", "High-volume centres have better outcomes"],
-    videoId: "1SN8i6Y5UHc",
-    videoTitle: "Ovarian Cytoreduction",
-    videoChannel: "ESGO",
+    videoId: "dkFmuNMrGiQ",
+    videoTitle: "Ovarian Cancer Surgery",
+    videoChannel: "Stanford Health Care",
     references: [{ label: "ESGO Ovarian Cancer Guidelines", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -2436,9 +2436,9 @@ export const surgeries: Surgery[] = [
     complications: ["Wound breakdown (30–50%)", "Lymphoedema (lower limb)", "Lymphocyst", "Sexual/body-image issues", "Recurrence"],
     postOp: ["Suction drains", "Prophylactic antibiotics", "Compression stockings, physiotherapy", "Psychosexual support"],
     pearls: ["Triple-incision technique reduced morbidity vs en-bloc", "SLN acceptable for unifocal <4 cm, no suspicious groin nodes", "Margin <8 mm increases recurrence"],
-    videoId: "hBTjL0GOwDA",
-    videoTitle: "Radical Vulvectomy",
-    videoChannel: "ESGO",
+    videoId: "LMp7k8uQzpo",
+    videoTitle: "What Is A Radical Vulvectomy? - The Operating Table",
+    videoChannel: "The Operating Table",
     references: [{ label: "ESGO Vulvar Cancer", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -2471,9 +2471,9 @@ export const surgeries: Surgery[] = [
     complications: ["Mortality 2–5%", "Major morbidity >50%", "Fistulas", "Sepsis", "Prolonged recovery"],
     postOp: ["ICU", "Stoma care", "Nutrition", "Psychosexual rehabilitation"],
     pearls: ["5-year survival 30–60% in selected patients", "Only curative option for central post-RT recurrence", "Strict patient selection mandatory"],
-    videoId: "4ZjG4EW6b9Y",
-    videoTitle: "Pelvic Exenteration",
-    videoChannel: "ESGO",
+    videoId: "nf5KEE4BK2E",
+    videoTitle: "Pelvic exenteration surgeries TOG",
+    videoChannel: "Mrcog intense preparation Part 2 and 3",
     references: [{ label: "ESGO Recurrent Cervical Cancer", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -2506,9 +2506,9 @@ export const surgeries: Surgery[] = [
     complications: ["Voiding dysfunction", "De novo urgency", "Posterior compartment prolapse over time", "Bladder injury"],
     postOp: ["Catheter 24–48 h", "Trial of void", "Avoid lifting 6 weeks"],
     pearls: ["Mid-urethral sling is gold-standard now", "Burch useful when mesh contraindicated", "Laparoscopic = open outcomes"],
-    videoId: "oVvjBfy-2ME",
-    videoTitle: "Burch Colposuspension",
-    videoChannel: "IUGA",
+    videoId: "AkIXaN1NNcE",
+    videoTitle: "Stress Urinary Incontinence - CIMS Hospital",
+    videoChannel: "Marengo CIMS Hospital",
     references: [{ label: "IUGA SUI Guidelines", url: "https://www.iuga.org/" }],
     mcqs: [
       {
@@ -2542,9 +2542,9 @@ export const surgeries: Surgery[] = [
     complications: ["Recurrent fistula", "Stricture", "Urinary retention"],
     postOp: ["Foley 14–21 days", "No PV intercourse 3 months", "Cystogram before catheter removal if large fistula"],
     pearls: ["Success rate 80–95% for first attempt", "Tension-free closure most important", "Interpose Martius flap for radiation/recurrent"],
-    videoId: "mJxkZHuZL-Q",
-    videoTitle: "VVF Repair Vaginal",
-    videoChannel: "FIGO",
+    videoId: "8UV_wjxxXWA",
+    videoTitle: "Vesicovaginal Fistula Causes by dr anil Kumar T",
+    videoChannel: "Dr Anil Kumar T",
     references: [{ label: "FIGO Fistula", url: "https://www.figo.org/" }],
     mcqs: [
       {
@@ -2576,9 +2576,9 @@ export const surgeries: Surgery[] = [
     complications: ["Cervical stenosis", "Haematometra", "Recurrent prolapse", "Cervical incompetence if future pregnancy"],
     postOp: ["Early mobilization", "Avoid heavy lifting 6 weeks", "Continue smears"],
     pearls: ["Rarely done in fertility-wishing women", "Sacrohysteropexy alternative for uterine preservation", "Ensure cervical cytology up to date"],
-    videoId: "wA3zG6k3h4E",
-    videoTitle: "Manchester Repair",
-    videoChannel: "IUGA",
+    videoId: "jaY2Z-GzVcw",
+    videoTitle: "Fothergills Repair ; Manchester Surgery",
+    videoChannel: "OBS & GYNO PROFESSOR",
     references: [{ label: "IUGA POP", url: "https://www.iuga.org/" }],
     mcqs: [
       {
@@ -2611,9 +2611,9 @@ export const surgeries: Surgery[] = [
     complications: ["Ureteric kinking/injury (highest among prolapse procedures)", "Recurrent prolapse", "Dyspareunia"],
     postOp: ["Intermittent catheterization if retention", "Avoid lifting 6 weeks"],
     pearls: ["Cystoscopy mandatory — ureter injury 1–11%", "Effective native-tissue alternative to mesh", "Deep bites for durability"],
-    videoId: "3M7v3F7g1iE",
-    videoTitle: "Uterosacral Suspension",
-    videoChannel: "AUGS",
+    videoId: "hDN9pgzR2PI",
+    videoTitle: "Con: Robotic Uterosacral Ligament Suspension for Pelvic Organ Prolapse Repair with Dr. Wolter",
+    videoChannel: "Grand Rounds in Urology",
     references: [{ label: "AUGS POP Guidelines", url: "https://www.augs.org/" }],
     mcqs: [
       {
@@ -2644,9 +2644,9 @@ export const surgeries: Surgery[] = [
     complications: ["De novo SUI (up to 30%)", "Regret (rare with counselling)", "Infection"],
     postOp: ["Catheter 24–48 h", "Oestrogen cream"],
     pearls: ["Success 95%+", "Much shorter OR time vs sacrocolpopexy", "Always ask about occult SUI pre-op"],
-    videoId: "zEG0CZy9C5M",
-    videoTitle: "Le Fort Colpocleisis",
-    videoChannel: "AUGS",
+    videoId: "qKmsHudI03o",
+    videoTitle: "Colpocleisis",
+    videoChannel: "Andrey Petrikovets MD FACOG",
     references: [{ label: "AUGS Colpocleisis", url: "https://www.augs.org/" }],
     mcqs: [
       {
@@ -2677,9 +2677,9 @@ export const surgeries: Surgery[] = [
     complications: ["Retained fragments", "Bowel/vessel injury", "Persistent pain (device not always cause)"],
     postOp: ["Plain X-ray to confirm complete removal if concern", "Contraception counselling"],
     pearls: ["Symptom resolution ~75% after removal", "Complete removal requires cornual resection — simple pull rarely succeeds", "Counsel on permanent alternative before removal"],
-    videoId: "p7eJGfN6M0Q",
-    videoTitle: "Essure Removal",
-    videoChannel: "AAGL",
+    videoId: "dydZFfquojg",
+    videoTitle: "Operative Hysteroscopy for Polyps and Fibroids Removal, Hysteroscopic Polypectomy #drrakshitamalik",
+    videoChannel: "Medication Knowledge",
     references: [{ label: "AAGL Essure Statement", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -2711,9 +2711,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bowel injury (1–5% with dense adhesions)", "Recurrence of adhesions", "Hernia at trocar site"],
     postOp: ["Early feeding", "Mobilize early", "Symptomatic improvement variable"],
     pearls: ["Palmer's point entry if midline scar", "Less visceral injury with laparoscopic vs open", "Only ~50% of CPP patients improve — counsel carefully"],
-    videoId: "hZqGjW8BBYg",
-    videoTitle: "Lap Adhesiolysis",
-    videoChannel: "AAGL",
+    videoId: "U36O18Whc9c",
+    videoTitle: "18.102MUL Laparoscopic Intracorporeal Suturing: Fundamentals and Tips &amp; Tricks for New Learners",
+    videoChannel: "SocietyLapSurgeons",
     references: [{ label: "ESGE Adhesion", url: "https://www.esge.com/" }],
     mcqs: [
       {
@@ -2745,9 +2745,9 @@ export const surgeries: Surgery[] = [
     complications: ["Similar to laparoscopic", "Port-site hernia", "Prolonged setup time"],
     postOp: ["Same-day or overnight discharge", "Early ambulation"],
     pearls: ["Advantages in obesity, narrow pelvis", "No proven oncologic benefit over laparoscopy", "High cost — institution dependent"],
-    videoId: "dG6V4eOx6mY",
-    videoTitle: "Robotic Hysterectomy",
-    videoChannel: "Intuitive Surgical",
+    videoId: "FQeb6Ea415E",
+    videoTitle: "Robotic hysterectomy for high BMI patients | TVASurg",
+    videoChannel: "TVASurg",
     references: [{ label: "AAGL Robotic", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -2780,9 +2780,9 @@ export const surgeries: Surgery[] = [
     complications: ["Umbilical hernia (up to 3%)", "Longer OR time", "Instrument crowding"],
     postOp: ["Same as multi-port lap", "Cosmetic outcome superior"],
     pearls: ["Learning curve steep", "Fascial closure critical", "Best for experienced laparoscopists only"],
-    videoId: "oN9E7JvL0Lw",
-    videoTitle: "Single-Port Laparoscopy",
-    videoChannel: "AAGL",
+    videoId: "gMh8G51jbBo",
+    videoTitle: "Single Incision Laparoscopic Surgery - Dean Potter Jr., M.D. - Mayo Clinic",
+    videoChannel: "Mayo Clinic",
     references: [{ label: "AAGL SILS Position", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -2815,9 +2815,9 @@ export const surgeries: Surgery[] = [
     complications: ["Persistent trophoblast (5–10%)", "Recurrence in same tube", "Need for MTX post-op"],
     postOp: ["Weekly hCG until <5 IU/L", "Single-dose MTX if plateau/rise"],
     pearls: ["Same future pregnancy rate as salpingectomy (ESEP trial) but higher persistent trophoblast", "Bleeding at incision often stops with 5 min pressure", "Do not attempt if heavy bleeding"],
-    videoId: "n8fL8XpRyfs",
-    videoTitle: "Laparoscopic Salpingotomy",
-    videoChannel: "ESHRE",
+    videoId: "JqHp3yVLbz4",
+    videoTitle: "Can I get pregnant after I had my tubes removed??",
+    videoChannel: "Shannon M. Clark, MD, MMS, FACOG",
     references: [{ label: "RCOG GTG 21 — Ectopic", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -2849,9 +2849,9 @@ export const surgeries: Surgery[] = [
     complications: ["Reduced ovarian reserve", "Recurrence (20–50% in 5 years)", "Inadvertent oophorectomy"],
     postOp: ["Hormonal suppression if fertility not desired", "AMH rechecked 3 months"],
     pearls: ["Bipolar reduces reserve more than suturing — minimize", "Pre-IVF cystectomy controversial — case-by-case", "Complete stripping reduces recurrence but increases reserve loss"],
-    videoId: "w0nL6G6Z8yQ",
-    videoTitle: "Endometrioma Cystectomy",
-    videoChannel: "ESHRE",
+    videoId: "eCe1d4H9gn0",
+    videoTitle: "The dilemma of surgery for ovarian cysts #endometriosis #ovariancysts #ovariancancer",
+    videoChannel: "Mathew Leonardi MD PhD",
     references: [{ label: "ESHRE Endometriosis", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -2882,9 +2882,9 @@ export const surgeries: Surgery[] = [
     complications: ["Reduced ovarian reserve (vessel damage)", "Incomplete removal", "Bleeding"],
     postOp: ["Proceed with IVF stimulation after next cycle"],
     pearls: ["Salpingectomy > proximal tubal occlusion for IVF outcome", "Dissect close to tube to preserve ovarian blood supply", "Bilateral if both tubes involved"],
-    videoId: "X0Lq7GXhA98",
-    videoTitle: "Salpingectomy for Hydrosalpinx",
-    videoChannel: "ESHRE",
+    videoId: "JqHp3yVLbz4",
+    videoTitle: "Can I get pregnant after I had my tubes removed??",
+    videoChannel: "Shannon M. Clark, MD, MMS, FACOG",
     references: [{ label: "Cochrane Salpingectomy Pre-IVF", url: "https://www.cochranelibrary.com/" }],
     mcqs: [
       {
@@ -2915,9 +2915,9 @@ export const surgeries: Surgery[] = [
     complications: ["Reduced ovarian reserve", "Adhesions", "Premature ovarian insufficiency"],
     postOp: ["Monitor ovulation within 6 weeks", "Add ovulation induction if no response"],
     pearls: ["Equivalent to gonadotropins with less multiple pregnancy and OHSS", "Limit to 4 punctures to minimize reserve loss", "Effect wanes after 1–2 years"],
-    videoId: "K9DwSHC1qkE",
-    videoTitle: "Ovarian Drilling",
-    videoChannel: "ESHRE",
+    videoId: "qL3sdZRHYqw",
+    videoTitle: "Laparoscopic Ovarian Drilling for PCOS - What is it? Can Ovarian Drilling cure PCOS?",
+    videoChannel: "ERemedium",
     references: [{ label: "ESHRE PCOS", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -2948,9 +2948,9 @@ export const surgeries: Surgery[] = [
     complications: ["Ectopic pregnancy (4–10%)", "Tubal stricture", "Failure to conceive"],
     postOp: ["Early pregnancy US to exclude ectopic", "Serial hCG"],
     pearls: ["Success highest with clips (ligation reversal) and residual length >4 cm", "Age strongest predictor — IVF better over 40", "Robotic facilitates microsurgery"],
-    videoId: "yaC7jT2T5ng",
-    videoTitle: "Tubal Reanastomosis",
-    videoChannel: "ASRM",
+    videoId: "ceQ87X9-zwA",
+    videoTitle: "𝗖𝗼𝗻𝘀𝗶𝗱𝗲𝗿𝗶𝗻𝗴 𝗧𝘂𝗯𝗮𝗹 𝗥𝗲𝘃𝗲𝗿𝘀𝗮𝗹? 𝗛𝗲𝗿𝗲’𝘀 𝗪𝗵𝗮𝘁 𝗬𝗼𝘂 𝗡𝗲𝗲𝗱 𝘁𝗼 𝗞𝗻𝗼𝘄!",
+    videoChannel: "Vitalab Fertility Clinic - Sandton and Umhlanga",
     references: [{ label: "ASRM Sterilization Reversal", url: "https://www.asrm.org/" }],
     mcqs: [
       {
@@ -2980,9 +2980,9 @@ export const surgeries: Surgery[] = [
     complications: ["Graft failure", "Stenosis", "Neovaginal prolapse", "Need for ongoing dilation"],
     postOp: ["Dilators for life to maintain patency", "Counsel on sexual function"],
     pearls: ["Frank's dilation first-line (success ~80%)", "Surgery reserved for failed dilation", "Lifelong dilation required"],
-    videoId: "8VqwEKnJ6gY",
-    videoTitle: "Davydov Vaginoplasty",
-    videoChannel: "ESGE",
+    videoId: "PgRF2B-q0Dg",
+    videoTitle: "Say Goodbye to Discomfort: Labiaplasty for Better Hygiene and Comfort | Labiaplasty surgery |#shorts",
+    videoChannel: "Aestiva Clinic by Dr. Mrinalini",
     references: [{ label: "ESHRE MRKH", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -3014,9 +3014,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bleeding", "Infection", "Scar"],
     postOp: ["Oral analgesia", "Keep dry 48 h"],
     pearls: ["Always biopsy suspicious lesion — don't 'treat blindly'", "Multiple biopsies for multifocal VIN", "Include edge AND centre of ulcer"],
-    videoId: "7LKN6p2j4Rg",
-    videoTitle: "Vulvar Punch Biopsy",
-    videoChannel: "ACOG",
+    videoId: "-7vuq0wth3A",
+    videoTitle: "Gynecologic Procedures Vulvar Biopsy on Banana Model",
+    videoChannel: "Teaching Videos",
     references: [{ label: "ACOG Vulvar Disease", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -3048,9 +3048,9 @@ export const surgeries: Surgery[] = [
     complications: ["Uterine perforation", "Fluid overload", "Recurrence of adhesions (up to 60%)", "Infertility"],
     postOp: ["Second-look hysteroscopy 4–6 weeks", "Future pregnancy classified high-risk (accreta)"],
     pearls: ["Cold scissors minimize thermal damage", "Multiple procedures often needed in severe cases", "Document before/after photos"],
-    videoId: "R6zR1Q5p6m8",
-    videoTitle: "Hysteroscopic Adhesiolysis",
-    videoChannel: "AAGL",
+    videoId: "UlsEw6r-Rok",
+    videoTitle: "Asherman Syndrome: Scar Tissue After Hysteroscopy Explained",
+    videoChannel: "Doctor Nefertiti duPont",
     references: [{ label: "AAGL Intrauterine Adhesions", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -3082,9 +3082,9 @@ export const surgeries: Surgery[] = [
     complications: ["Perforation", "Fluid overload", "Future placenta accreta (rare)"],
     postOp: ["Second-look hysteroscopy optional at 4 weeks", "Try to conceive after 1–2 cycles"],
     pearls: ["Hunter-Seldin distinguishes from bicornuate — external fundal contour", "Stop at fundus to avoid perforation", "Improves live birth in recurrent miscarriage"],
-    videoId: "D3d8sBSHg4E",
-    videoTitle: "Hysteroscopic Septoplasty",
-    videoChannel: "ESGE",
+    videoId: "USBZMXvYsDY",
+    videoTitle: "Uterine Septum: What is it? Should You get it removed?",
+    videoChannel: "Natalie Crawford, MD",
     references: [{ label: "ESHRE Mullerian Anomalies", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -3115,9 +3115,9 @@ export const surgeries: Surgery[] = [
     complications: ["Ovarian torsion", "Reduced function despite transposition", "Migration back into pelvis"],
     postOp: ["Monitor FSH/E2", "Consider oocyte cryopreservation concurrently"],
     pearls: ["Success in preserving function 50–80% depending on RT dose/field", "Clip marker essential for RT planning", "Offer oocyte/embryo cryopreservation also"],
-    videoId: "xL3Y8h9oH7c",
-    videoTitle: "Ovarian Transposition",
-    videoChannel: "ESHRE",
+    videoId: "UiW7_k1zYX0",
+    videoTitle: "🎗 Ovarian Cancer: The Silent Threat 🎗 #medicalanimation #anatomy",
+    videoChannel: "SciePro",
     references: [{ label: "ESHRE Fertility Preservation", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -3149,9 +3149,9 @@ export const surgeries: Surgery[] = [
     complications: ["Haemorrhage", "Cervical incompetence/stenosis", "Preterm birth in future pregnancy"],
     postOp: ["Pelvic rest 4 weeks", "Follow-up smear 6 months, HPV 12 months"],
     pearls: ["Preferred over LEEP for AIS (avoids thermal artefact at margin)", "Counsel re preterm birth risk in future pregnancy", "Margin status guides follow-up"],
-    videoId: "qH4gJtU9h4M",
-    videoTitle: "Cold Knife Conization",
-    videoChannel: "ESGO",
+    videoId: "lnOSViYus4U",
+    videoTitle: "Cold Knife Conization Procedure Explained",
+    videoChannel: "Doctor Nefertiti duPont",
     references: [{ label: "ASCCP Management 2019", url: "https://www.asccp.org/" }],
     mcqs: [
       {
@@ -3182,9 +3182,9 @@ export const surgeries: Surgery[] = [
     complications: ["Uterine perforation", "Fluid overload", "False-negative sampling"],
     postOp: ["Oral analgesia", "Plan definitive surgery based on pathology"],
     pearls: ["Superior to blind pipelle for focal lesions", "Saline preferred distension for bipolar", "Document with photos"],
-    videoId: "fG5m9HSkGlU",
-    videoTitle: "Hysteroscopic Biopsy",
-    videoChannel: "ESGE",
+    videoId: "LEUn04ZOlx8",
+    videoTitle: "how do we get a uterine endometrial biopsy?",
+    videoChannel: "StevenPalterMD",
     references: [{ label: "ESGE Hysteroscopy", url: "https://www.esge.com/" }],
     mcqs: [
       {
@@ -3218,9 +3218,9 @@ export const surgeries: Surgery[] = [
     complications: ["Uterine perforation", "Cervical laceration", "Hemorrhage", "Retained products", "Asherman's syndrome"],
     postOp: ["Anti-D if Rh-negative", "Contraception counselling", "Histology", "Bereavement support if indicated"],
     pearls: ["Safer than medical induction at 13–15 weeks", "US guidance reduces perforation", "Experienced operator essential >18 weeks"],
-    videoId: "s5x_8V9uKzY",
-    videoTitle: "D&E Technique",
-    videoChannel: "ACOG",
+    videoId: "IdcQ8c3exJs",
+    videoTitle: "Dilation and Evacuation (D&amp;E) Procedure | Indications, Steps &amp; Instruments #gynaecology #surgery",
+    videoChannel: "Hamza’s MedScope",
     references: [{ label: "RCOG Termination Guidelines", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -3251,9 +3251,9 @@ export const surgeries: Surgery[] = [
     complications: ["Extension to 3rd/4th degree tear", "Haematoma", "Infection", "Dyspareunia", "Wound breakdown"],
     postOp: ["Ice packs", "Oral analgesia", "Pelvic floor exercises from day 1"],
     pearls: ["Restrictive > routine episiotomy (NICE/WHO)", "Mediolateral protects anal sphincter better than midline", "Repair within 1 hour of delivery"],
-    videoId: "XpQJ0Yv3k7g",
-    videoTitle: "Episiotomy Repair",
-    videoChannel: "RCOG",
+    videoId: "86YBAjim_Rw",
+    videoTitle: "How To - Perineal Repair #suturing #ubcmedicine",
+    videoChannel: "UBC Medicine - Educational Media",
     references: [{ label: "NICE Intrapartum Care", url: "https://www.nice.org.uk/" }],
     mcqs: [
       {
@@ -3285,9 +3285,9 @@ export const surgeries: Surgery[] = [
     complications: ["Anal incontinence (flatus/faeces)", "Wound infection/breakdown", "Fistula", "Dyspareunia"],
     postOp: ["Broad-spectrum antibiotics (cefuroxime + metronidazole)", "Stool softeners 10 days", "Pelvic floor physio at 6–12 weeks", "Follow-up at 6 weeks with symptom inquiry"],
     pearls: ["Overlap = end-to-end for EAS at 12 months (Fernando RCT)", "Every woman needs post-delivery perineal inspection", "Document Sultan grade clearly"],
-    videoId: "oCp0n0r9wBY",
-    videoTitle: "OASI Repair",
-    videoChannel: "RCOG",
+    videoId: "pyGTqUa52kQ",
+    videoTitle: "Perineal Tears Repair (Third and Fourth Degree) | TOACS / OSCE Station",
+    videoChannel: "AAUN Obs and Gynae",
     references: [{ label: "RCOG GTG 29", url: "https://www.rcog.org.uk/guidance/" }],
     mcqs: [
       {
@@ -3319,9 +3319,9 @@ export const surgeries: Surgery[] = [
     complications: ["Uterine vessel injury", "Bladder injury", "Infection", "CS mandatory for all future deliveries"],
     postOp: ["Pelvic rest", "Elective CS at 37–38 weeks", "Tape left permanently"],
     pearls: ["Success rate >90%", "Pre-pregnancy laparoscopic placement ideal", "Tape is permanent — all future deliveries by CS"],
-    videoId: "b9JhA8KJXOE",
-    videoTitle: "Abdominal Cerclage",
-    videoChannel: "AAGL",
+    videoId: "ul_p48kDe50",
+    videoTitle: "Info on transabdominal cerclage!",
+    videoChannel: "Shannon M. Clark, MD, MMS, FACOG",
     references: [{ label: "ACOG PB 142 Cerclage", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -3352,9 +3352,9 @@ export const surgeries: Surgery[] = [
     complications: ["Splenic capsule injury", "Gastric injury", "Bleeding from gastroepiploic vessels"],
     postOp: ["Diet as tolerated", "Pathology for micro-metastases"],
     pearls: ["Infracolic omentectomy insufficient for staging", "Microscopic metastases in up to 30% of normal-looking omentum", "Dissect in avascular plane for bloodless surgery"],
-    videoId: "rX8j0HqzW1k",
-    videoTitle: "Total Omentectomy",
-    videoChannel: "ESGO",
+    videoId: "bzUaKzHaehk",
+    videoTitle: "How Is An Omentectomy Performed? - The Operating Table",
+    videoChannel: "The Operating Table",
     references: [{ label: "FIGO Ovarian Cancer", url: "https://www.figo.org/" }],
     mcqs: [
       {
@@ -3386,9 +3386,9 @@ export const surgeries: Surgery[] = [
     complications: ["Major vessel injury", "Chylous ascites", "Ureteric injury", "Sympathetic nerve injury (ejaculatory dysfunction in males)"],
     postOp: ["Low-fat diet if chyle concern", "Serial imaging"],
     pearls: ["Left renal vein is the superior boundary", "IMA is landmark for inframesenteric vs supramesenteric", "Clip ALL lymphatics to prevent chylous ascites"],
-    videoId: "QJR8dN2jM5Y",
-    videoTitle: "Para-Aortic Lymphadenectomy",
-    videoChannel: "ESGO",
+    videoId: "vFTPjDVXzE4",
+    videoTitle: "Lymphadenectomy and Survival in Ovarian Cancer",
+    videoChannel: "NEJM Group",
     references: [{ label: "ESGO Endometrial Cancer", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -3420,9 +3420,9 @@ export const surgeries: Surgery[] = [
     complications: ["Cervical stenosis/amenorrhoea", "Infertility", "Preterm delivery", "Recurrence"],
     postOp: ["Fertility planning after 6–12 months", "All pregnancies high-risk (cerclage in situ)", "CS delivery mandatory"],
     pearls: ["Pregnancy rate ~50–70% after vaginal trachelectomy", "Preterm delivery risk ~30%", "Abdominal approach less common but larger specimens"],
-    videoId: "LRhZ3VGYM2c",
-    videoTitle: "Radical Trachelectomy",
-    videoChannel: "ESGO",
+    videoId: "Xc5w0nv73aQ",
+    videoTitle: "Uterine Artery-Sparing Trachelectomy: Preserving Fertility for Women with Cervical Cancer",
+    videoChannel: "Breakthroughs for Physicians",
     references: [{ label: "ESGO Cervical Cancer", url: "https://www.esgo.org/" }],
     mcqs: [
       {
@@ -3454,9 +3454,9 @@ export const surgeries: Surgery[] = [
     complications: ["Haematoma", "Intravascular injection", "Nerve injury (rare)", "Infection"],
     postOp: ["Effect lasts 30–60 min"],
     pearls: ["Landmark: ischial spine + sacrospinous ligament", "Always aspirate before injecting", "Bilateral for perineal surgery"],
-    videoId: "XP3hT9Y3KZg",
-    videoTitle: "Pudendal Nerve Block",
-    videoChannel: "ACOG",
+    videoId: "U62rWmh-r0A",
+    videoTitle: "Pudendal Nerve Block FAQs with Dr. Nicole Ferro | Institute for Advanced Reconstruction",
+    videoChannel: "The Institute for Advanced Reconstruction",
     references: [{ label: "ACOG Obstetric Analgesia", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -3488,9 +3488,9 @@ export const surgeries: Surgery[] = [
     complications: ["Incomplete removal", "Perforation", "Infection", "Missed pathology"],
     postOp: ["Oral analgesia", "Histology follow-up"],
     pearls: ["Hysteroscopic polypectomy is gold standard — use if available", "Blind removal acceptable in resource-limited settings", "Always histology to exclude malignancy"],
-    videoId: "kQ7v3LpFqMc",
-    videoTitle: "Endometrial Polyp Removal",
-    videoChannel: "ACOG",
+    videoId: "LEUn04ZOlx8",
+    videoTitle: "how do we get a uterine endometrial biopsy?",
+    videoChannel: "StevenPalterMD",
     references: [{ label: "ACOG AUB", url: "https://www.acog.org/" }],
     mcqs: [
       {
@@ -3523,9 +3523,9 @@ export const surgeries: Surgery[] = [
     complications: ["Fluid overload/hyponatraemia (glycine)", "Perforation", "Incomplete resection (type 2)", "Intrauterine adhesions"],
     postOp: ["Second-look hysteroscopy if type 2 not fully resected", "Oestrogen cycle", "Try conception after 2 cycles"],
     pearls: ["Type 0 = complete resection in one go", "Type 2 may need 2 stages", "Monitor fluid balance meticulously"],
-    videoId: "dF5nC7k4y1c",
-    videoTitle: "Hysteroscopic Myomectomy",
-    videoChannel: "ESGE",
+    videoId: "Qd4sgoH5Hvs",
+    videoTitle: "Vaginal Fibroid Removal Myomectomy Surgery • PreOp Patient Education",
+    videoChannel: "PreOp.com Patient Engagement - Patient Education",
     references: [{ label: "ESGE Myoma Classification", url: "https://www.esge.com/" }],
     mcqs: [
       {
@@ -3557,9 +3557,9 @@ export const surgeries: Surgery[] = [
     complications: ["Post-embolization syndrome (pain, fever, nausea — 48 h)", "Amenorrhoea / premature menopause (2–7%)", "Infection/endometritis", "Fibroid expulsion", "Non-target embolization"],
     postOp: ["NSAIDs + opioids for 24–48 h", "MRI at 6 months to assess shrinkage", "Symptomatic relief expected at 3 months"],
     pearls: ["80–90% report symptom improvement", "EMMY trial: UAE effective alternative to hysterectomy", "Counsel on reduced fertility if planning pregnancy"],
-    videoId: "4Q5G4xFh6qY",
-    videoTitle: "Uterine Fibroid Embolization",
-    videoChannel: "SIR",
+    videoId: "SwkCXyTV8b0",
+    videoTitle: "Uterine Artery Embolization: A Modern Alternative to Surgery for Fibroid Treatment | 3D Animation",
+    videoChannel: "VOKA 3D Anatomy & Pathology",
     references: [{ label: "NICE Guideline UFE", url: "https://www.nice.org.uk/" }],
     mcqs: [
       {
@@ -3592,9 +3592,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bowel leak/fistula", "Ureteric injury", "Bladder fistula", "Recurrence (10–20% at 5 years)"],
     postOp: ["Low-residue diet 2 weeks if bowel involvement", "Hormonal therapy post-op", "Fertility planning if desired"],
     pearls: ["Centre of excellence = better outcomes", "Excision > ablation for DIE (ESHRE)", "Multidisciplinary mandatory"],
-    videoId: "g3qJ0nT5F1Y",
-    videoTitle: "Deep Endometriosis Excision",
-    videoChannel: "AAGL",
+    videoId: "zjbvoqoaS-Y",
+    videoTitle: "Ask an Endo Surgeon: What Happens Directly After Endometriosis Excision Surgery? Dr. Haverland",
+    videoChannel: "Pelvic Rehabilitation Medicine™",
     references: [{ label: "ESHRE Endometriosis Guideline 2022", url: "https://www.eshre.eu/" }],
     mcqs: [
       {
@@ -3626,9 +3626,9 @@ export const surgeries: Surgery[] = [
     complications: ["Bag perforation/leakage", "Unsuspected sarcoma dissemination if uncontained", "Port-site hernia"],
     postOp: ["Standard laparoscopic post-op", "Histology"],
     pearls: ["FDA black-box warning on uncontained power morcellation", "Contained morcellation is acceptable (AAGL 2023)", "Always get endometrial sampling before hysterectomy"],
-    videoId: "7v6VhHJqBZQ",
-    videoTitle: "Contained Morcellation",
-    videoChannel: "AAGL",
+    videoId: "c6VewyhCIqQ",
+    videoTitle: "Intro: Contained Morcellation Using GelPOINT® Advance Access Platforms and 3M Steri-Drape™ Endobag",
+    videoChannel: "Fertility & Sterility",
     references: [{ label: "AAGL Morcellation Position 2023", url: "https://www.aagl.org/" }],
     mcqs: [
       {
@@ -3660,9 +3660,9 @@ export const surgeries: Surgery[] = [
     complications: ["Dyspareunia (over-tight)", "Wound breakdown", "Haematoma", "Infection"],
     postOp: ["Pelvic rest 6 weeks", "Stool softeners", "Physiotherapy"],
     pearls: ["Don't over-tighten — causes dyspareunia", "Combine with posterior repair if rectocele", "Pelvic floor exercises complement surgery"],
-    videoId: "uN7k8GfWqAk",
-    videoTitle: "Perineoplasty Technique",
-    videoChannel: "IUGA",
+    videoId: "4s56VdZskv4",
+    videoTitle: "How is Perineoplasty performed? | Los Angeles | Michael Tahery, M.D.",
+    videoChannel: "Michael Tahery (M.D.)",
     references: [{ label: "IUGA Terminology", url: "https://www.iuga.org/" }],
     mcqs: [
       {
