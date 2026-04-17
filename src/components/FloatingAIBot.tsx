@@ -243,13 +243,69 @@ export function FloatingAIBot() {
             background: "radial-gradient(circle, hsl(195 100% 75% / 0.55) 0%, transparent 65%)",
           }}
         />
-        {/* Icon */}
+        {/* 3D Robot character */}
         <motion.span
-          className="relative z-10 text-white drop-shadow-[0_1px_2px_hsl(220_80%_15%/0.8)]"
-          animate={open ? { rotate: 90 } : { rotate: 0 }}
+          className="relative z-10"
+          animate={open ? { rotate: 90, scale: 0.9 } : { rotate: 0, scale: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 18 }}
         >
-          {open ? <X className="w-4 h-4" strokeWidth={2.6} /> : <Bot className="w-4 h-4" strokeWidth={2.4} />}
+          {open ? (
+            <X className="w-4 h-4 text-white drop-shadow-[0_1px_2px_hsl(220_80%_15%/0.8)]" strokeWidth={2.6} />
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 32 32" fill="none" className="drop-shadow-[0_1px_2px_hsl(220_80%_15%/0.9)]">
+              <defs>
+                <linearGradient id="bot-body" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(0 0% 100%)" />
+                  <stop offset="45%" stopColor="hsl(210 30% 92%)" />
+                  <stop offset="100%" stopColor="hsl(215 25% 70%)" />
+                </linearGradient>
+                <linearGradient id="bot-face" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(220 60% 18%)" />
+                  <stop offset="100%" stopColor="hsl(225 70% 8%)" />
+                </linearGradient>
+                <radialGradient id="bot-eye" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="hsl(180 100% 90%)" />
+                  <stop offset="60%" stopColor="hsl(195 100% 60%)" />
+                  <stop offset="100%" stopColor="hsl(210 100% 45%)" />
+                </radialGradient>
+              </defs>
+              {/* Antenna */}
+              <line x1="16" y1="2.5" x2="16" y2="6" stroke="hsl(215 25% 75%)" strokeWidth="1.2" strokeLinecap="round" />
+              <circle cx="16" cy="2.2" r="1.3" fill="hsl(0 90% 60%)">
+                <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite" />
+              </circle>
+              {/* Head shell */}
+              <rect x="6" y="5.5" width="20" height="16" rx="5.5" fill="url(#bot-body)" stroke="hsl(215 30% 55%)" strokeWidth="0.5" />
+              {/* Top highlight strip */}
+              <rect x="8" y="6.5" width="16" height="2" rx="1" fill="hsl(0 0% 100% / 0.55)" />
+              {/* Face screen */}
+              <rect x="9" y="9.5" width="14" height="9" rx="3" fill="url(#bot-face)" stroke="hsl(220 50% 25%)" strokeWidth="0.4" />
+              {/* Eyes */}
+              <circle cx="13" cy="14" r="1.7" fill="url(#bot-eye)">
+                <animate attributeName="r" values="1.7;0.4;1.7" dur="3.5s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="19" cy="14" r="1.7" fill="url(#bot-eye)">
+                <animate attributeName="r" values="1.7;0.4;1.7" dur="3.5s" repeatCount="indefinite" />
+              </circle>
+              {/* Eye glow */}
+              <circle cx="13" cy="14" r="0.5" fill="hsl(0 0% 100%)" />
+              <circle cx="19" cy="14" r="0.5" fill="hsl(0 0% 100%)" />
+              {/* Mouth indicator */}
+              <rect x="13.5" y="16.5" width="5" height="0.8" rx="0.4" fill="hsl(195 100% 65%)" opacity="0.7" />
+              {/* Side ear pods */}
+              <rect x="4.5" y="11" width="2" height="5" rx="1" fill="hsl(215 25% 70%)" />
+              <rect x="25.5" y="11" width="2" height="5" rx="1" fill="hsl(215 25% 70%)" />
+              <circle cx="5.5" cy="13.5" r="0.6" fill="hsl(195 100% 60%)" />
+              <circle cx="26.5" cy="13.5" r="0.6" fill="hsl(195 100% 60%)" />
+              {/* Neck/collar */}
+              <rect x="11" y="22" width="10" height="2" rx="1" fill="hsl(215 25% 60%)" />
+              <rect x="12" y="24.5" width="8" height="3.5" rx="1.5" fill="url(#bot-body)" stroke="hsl(215 30% 55%)" strokeWidth="0.4" />
+              {/* Chest panel light */}
+              <circle cx="16" cy="26.2" r="0.7" fill="hsl(140 90% 55%)">
+                <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </svg>
+          )}
         </motion.span>
         {/* Status dot */}
         {!open && (
