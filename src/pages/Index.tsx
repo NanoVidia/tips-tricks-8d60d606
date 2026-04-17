@@ -175,7 +175,8 @@ export default function Index() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+  // Recent searches (last 5, persisted in localStorage)
+  const recent = useRecentSearches();
 
   const toggleDark = () => {
     setDark((d) => {
