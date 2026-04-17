@@ -351,19 +351,6 @@ export default function Index() {
                 }`}>
                   Tips <span className="italic font-medium text-gold">&</span> Tricks
                 </h1>
-                <AnimatePresence initial={false}>
-                  {!scrolled && (
-                    <motion.p
-                      key="subtitle"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="text-[10px] text-muted-foreground leading-snug font-medium mt-1 truncate overflow-hidden"
-                    >
-                      <span className="eyebrow text-gold mr-1">By</span>{i.appSubtitle}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
               </div>
             </div>
             <button
@@ -764,6 +751,20 @@ export default function Index() {
           </>
         )}
       </main>
+
+      {/* Editorial footer — credits relocated from the masthead */}
+      <footer className="relative px-4 pt-5 pb-8 mt-2 border-t border-border/50 bg-card/40">
+        <div className="divider-editorial mb-4" aria-hidden="true" />
+        <div className="text-center space-y-1.5">
+          <p className="eyebrow text-gold">Under the supervision of</p>
+          <p className="font-editorial text-[15px] font-bold text-foreground leading-tight">
+            {i.appSubtitle}
+          </p>
+          <p className="text-[10px] text-muted-foreground leading-relaxed pt-1">
+            © {new Date().getFullYear()} Tips &amp; Tricks · Clinical Edition
+          </p>
+        </div>
+      </footer>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
       <Suspense fallback={null}><FloatingAIBot /></Suspense>
