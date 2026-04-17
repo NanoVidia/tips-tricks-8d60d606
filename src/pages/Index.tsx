@@ -266,6 +266,8 @@ export default function Index() {
         const all = (data as Scenario[]) || [];
         setTotalCount(all.length);
         setScenarios(all.slice(from, to + 1));
+        // Persist successful, non-trivial search
+        if (all.length > 0) recent.add(debouncedSearch.trim());
       } else {
         const { count, error: cErr } = await supabase
           .from("medical_scenarios")
