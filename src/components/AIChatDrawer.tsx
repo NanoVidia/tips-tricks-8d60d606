@@ -139,7 +139,7 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
           {messages.length === 0 && (
             <div className="text-center text-xs text-muted-foreground py-8 space-y-2">
               <p>👋 Welcome!</p>
-              <p>Your medical AI assistant by Dr. Sahar Elkhodiry</p>
+              <p>Your medical AI assistant</p>
               <p className="mt-3">Ask anything about this clinical scenario...</p>
             </div>
           )}
