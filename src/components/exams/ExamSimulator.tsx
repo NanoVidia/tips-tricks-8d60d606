@@ -432,7 +432,7 @@ export function ExamSimulator({ exam, onExit }: Props) {
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Questions</span>
               <span className="font-mono font-semibold text-foreground">
-                {Math.min(MOCK_TARGET_COUNT, ALL_MCQS.length)}
+                {Math.min(MOCK_TARGET_COUNT, bankMcqs.length)}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -447,9 +447,9 @@ export function ExamSimulator({ exam, onExit }: Props) {
               <span className="text-muted-foreground">Feedback</span>
               <span className="text-foreground">Hidden until exam ends</span>
             </div>
-            {ALL_MCQS.length < MOCK_TARGET_COUNT && (
+            {bankMcqs.length < MOCK_TARGET_COUNT && (
               <p className="text-xs text-warning pt-2">
-                ⚠ Bank has {ALL_MCQS.length} questions. Mock will use the full bank.
+                ⚠ Bank has {bankMcqs.length} questions. Mock will use the full bank.
               </p>
             )}
           </div>
