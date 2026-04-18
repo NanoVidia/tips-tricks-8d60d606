@@ -339,6 +339,10 @@ export function ExamSimulator({ exam, onExit }: Props) {
                 <p className="text-xs text-muted-foreground mt-0.5">
                   150 questions · 3 hours · no feedback until end · real exam conditions
                 </p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Bank: <span className="font-mono">{bankMcqs.length}</span> Qs ·
+                  source: <span className="font-mono">{bankLoading ? "loading…" : bankSource}</span>
+                </p>
               </div>
               <Switch
                 checked={mockOn}
