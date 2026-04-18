@@ -369,12 +369,14 @@ export default function Index() {
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               <h1
-                className={`font-editorial italic font-black tracking-tight leading-[0.95] transition-all bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_45%,hsl(var(--foreground))_100%)] ${
+                className={`font-editorial italic font-black tracking-tight leading-[0.95] text-foreground transition-all ${
                   scrolled ? "text-[22px]" : "text-[30px]"
                 }`}
               >
                 <span className="relative inline-block">
-                  {logoText}
+                  <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_50%,hsl(var(--foreground))_100%)]">
+                    {logoText}
+                  </span>
                   <span
                     aria-hidden="true"
                     className={`absolute left-0 -bottom-1.5 h-[2px] w-full origin-left bg-gradient-to-r from-primary via-primary/50 to-transparent transition-all ${
