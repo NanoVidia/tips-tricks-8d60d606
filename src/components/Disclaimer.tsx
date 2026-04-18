@@ -1,28 +1,34 @@
 import { AlertTriangle, Info } from "lucide-react";
+import { useAppSettings, defaultSettings } from "@/hooks/useAppSettings";
 
 /**
  * Compact one-line disclaimer to place beside AI replies, tool outputs,
- * and inside chat bubbles. Keeps the user reminded that nothing here
- * substitutes for clinical judgment.
+ * and inside chat bubbles. Text driven by app_settings.disclaimer_short.
  */
 export function InlineDisclaimer({ className = "" }: { className?: string }) {
+  const { get } = useAppSettings();
+  const text = get("disclaimer_short") ?? defaultSettings.disclaimer_short;
   return (
     <p
       className={`flex items-start gap-1.5 text-[10px] leading-snug text-muted-foreground italic ${className}`}
     >
       <Info className="w-3 h-3 mt-0.5 shrink-0 opacity-70" />
-      <span>
-        Educational reference only — not a substitute for clinical judgment or
-        individualized care.
-      </span>
+      <span>{text}</span>
     </p>
   );
 }
 
 /**
  * Full disclaimer banner for page tops / tool sections.
+ * Text driven by app_settings.disclaimer_long.
  */
 export function DisclaimerBanner({ className = "" }: { className?: string }) {
+  const { get } = useAppSettings();
+  const text = get("disclaimer_long") ?? defaultSettings.disclaimer_long;
+  // نُبرز أول جزء قبل النقطة كعنوان bold لو وُجد.
+  const dotIdx = text.indexOf(".");
+  const head = dotIdx > 0 ? text.slice(0, dotIdx + 1) : "";
+  const rest = dotIdx > 0 ? text.slice(dotIdx + 1) : text;
   return (
     <div
       className={`flex items-start gap-2 rounded-lg border border-amber-300/40 bg-amber-50/60 dark:bg-amber-950/20 px-3 py-2 text-[11px] leading-snug text-amber-900 dark:text-amber-200 ${className}`}
@@ -30,10 +36,8 @@ export function DisclaimerBanner({ className = "" }: { className?: string }) {
     >
       <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
       <span>
-        <strong className="font-semibold">Educational use only.</strong> All
-        content (AI responses, calculators, drug info, surgery library, MCQs)
-        is for healthcare-professional reference. Verify against current
-        guidelines and apply clinical judgment for every patient.
+        {head && <strong className="font-semibold">{head}</strong>}
+        {rest}
       </span>
     </div>
   );

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index.tsx";
 import Tools from "./pages/Tools.tsx";
 import Admin from "./pages/Admin.tsx";
@@ -20,13 +21,30 @@ function NotificationsBootstrap() {
 }
 
 const queryClient = new QueryClient();
-
-// Global freeze — stays ON for visitors. Developer bypasses via ?dev=1 (persists).
-// To re-lock yourself: visit ?dev=0
-const APP_FROZEN = true;
 const DEV_KEY = "dev_unlock";
 
-const App = () => {
+// قراءة حالة التجميد من app_settings.app_frozen مع fallback إلى true (سلوك قديم آمن).
+function useFrozenFlag(): boolean {
+  const q = useQuery({
+    queryKey: ["app_settings", "app_frozen"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "app_frozen")
+        .maybeSingle();
+      // value مخزّن كـ jsonb (true/false). نحوّله إلى boolean.
+      return Boolean(data?.value);
+    },
+    staleTime: 60_000,
+    retry: 0,
+  });
+  // أثناء التحميل وعند الخطأ → نعتبر التطبيق مُجمَّداً (آمن للزائر).
+  return q.data ?? true;
+}
+
+function FrozenGate() {
+  const frozen = useFrozenFlag();
   const [devUnlocked, setDevUnlocked] = useState(false);
 
   useEffect(() => {
@@ -36,8 +54,6 @@ const App = () => {
     setDevUnlocked(localStorage.getItem(DEV_KEY) === "1");
   }, []);
 
-  // Auto-unlock on Lovable preview/sandbox domains (developer view).
-  // Only the published custom domain (tips-tricks.lovable.app) stays frozen for visitors.
   const hostname = typeof window !== "undefined" ? window.location.hostname : "";
   const isLovablePreview =
     hostname.includes("id-preview--") ||
@@ -48,8 +64,12 @@ const App = () => {
 
   const path = typeof window !== "undefined" ? window.location.pathname : "";
   const onAdminPanel = path.startsWith("/admin") || path.startsWith("/control");
-  const showFreeze = APP_FROZEN && !devUnlocked && !onAdminPanel && !isLovablePreview;
+  const showFreeze = frozen && !devUnlocked && !onAdminPanel && !isLovablePreview;
 
+  return showFreeze ? <FreezeOverlay /> : null;
+}
+
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -68,7 +88,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-        {showFreeze && <FreezeOverlay />}
+        <FrozenGate />
       </TooltipProvider>
     </QueryClientProvider>
   );
