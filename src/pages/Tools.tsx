@@ -19,7 +19,7 @@ import {
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { SurgeryLibrary } from "@/components/tools/SurgeryLibrary";
 import { useBookmarks } from "@/hooks/useBookmarks";
-import { emergencyProtocols, pregnancyDrugs, guidelines, ddxLibrary } from "@/data/toolsData";
+import { useToolsData } from "@/hooks/useToolsData";
 import { toast } from "@/hooks/use-toast";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 
