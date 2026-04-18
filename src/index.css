@@ -150,6 +150,12 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
     font-feature-settings: 'cv11', 'ss01', 'ss03';
+    /* Force Latin (ASCII) digits everywhere, regardless of OS/browser locale */
+    font-variant-numeric: lining-nums tabular-nums;
+    -moz-font-feature-settings: "lnum";
+    -webkit-font-feature-settings: "lnum";
+    font-feature-settings: "lnum", 'cv11', 'ss01', 'ss03';
+    unicode-bidi: plaintext;
   }
   .font-editorial {
     font-family: 'Playfair Display', Georgia, serif;
