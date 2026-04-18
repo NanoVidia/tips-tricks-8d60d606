@@ -101,7 +101,7 @@ export function SurgeryLibrary() {
       );
     }
     return list;
-  }, [search, category, difficulty]);
+  }, [search, category, difficulty, surgeries]);
 
   return (
     <div className="space-y-3">
