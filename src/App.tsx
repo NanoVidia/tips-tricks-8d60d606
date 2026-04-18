@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Tools from "./pages/Tools.tsx";
 import Admin from "./pages/Admin.tsx";
+import Control from "./pages/Control.tsx";
 import Exams from "./pages/Exams.tsx";
 import ExamsCompare from "./pages/ExamsCompare.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -45,8 +46,9 @@ const App = () => {
     hostname === "localhost" ||
     hostname === "127.0.0.1";
 
-  const onAdmin = typeof window !== "undefined" && window.location.pathname.startsWith("/admin");
-  const showFreeze = APP_FROZEN && !devUnlocked && !onAdmin && !isLovablePreview;
+  const path = typeof window !== "undefined" ? window.location.pathname : "";
+  const onAdminPanel = path.startsWith("/admin") || path.startsWith("/control");
+  const showFreeze = APP_FROZEN && !devUnlocked && !onAdminPanel && !isLovablePreview;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -61,6 +63,7 @@ const App = () => {
             <Route path="/exams" element={<Exams />} />
             <Route path="/exams/compare" element={<ExamsCompare />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/control" element={<Control />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
