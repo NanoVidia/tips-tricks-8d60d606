@@ -15,6 +15,7 @@ import { StatsStrip } from "@/components/StatsStrip";
 import { CaseOfTheDay } from "@/components/CaseOfTheDay";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { useTranslations } from "@/hooks/useTranslations";
+import { useAppSettings } from "@/hooks/useAppSettings";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2 } from "lucide-react";
@@ -168,6 +169,8 @@ function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: 
 
 export default function Index() {
   const { t } = useTranslations();
+  const { get: getSetting } = useAppSettings();
+  const logoText = String(getSetting("logo_text") ?? "Tips & Tricks");
   const tabLabel = (c: ScenarioCategory) => t(TAB_LABEL_KEYS[c] as never);
   const [activeTab, setActiveTab] = useState<ScenarioCategory | null>(null);
   const [search, setSearch] = useState("");
@@ -371,7 +374,7 @@ export default function Index() {
                 <h1 className={`font-editorial font-bold tracking-tight text-foreground leading-none transition-all ${
                   scrolled ? "text-[18px]" : "text-[24px]"
                 }`}>
-                  Tips <span className="italic font-medium text-gold">&</span> Tricks
+                  {logoText}
                 </h1>
               </div>
             </div>
