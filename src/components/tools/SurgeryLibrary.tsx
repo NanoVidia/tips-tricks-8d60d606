@@ -11,6 +11,7 @@ import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { surgeryCategories, type Surgery, type SurgeryCategory } from "@/data/surgeriesData";
 import { SurgeryVideo } from "@/components/tools/SurgeryVideo";
 import { useAllSurgeries } from "@/hooks/useSurgeries";
+import { InlineDisclaimer } from "@/components/Disclaimer";
 
 const DIFF_LABELS = ["", "Basic", "Intermediate", "Advanced", "Expert", "Master"] as const;
 const DIFF_COLORS = ["", "text-emerald-400", "text-blue-400", "text-amber-400", "text-orange-400", "text-red-400"] as const;
@@ -282,6 +283,7 @@ export function SurgeryLibrary() {
                   <DialogTitle className="text-lg">{selected.name}</DialogTitle>
                   <DialogDescription className="text-xs leading-relaxed">{selected.summary}</DialogDescription>
                 </DialogHeader>
+                <InlineDisclaimer />
 
                 {/* Approach pills */}
                 <div className="flex flex-wrap gap-1">
@@ -348,6 +350,7 @@ export function SurgeryLibrary() {
                   <div className="space-y-2">
                     <h4 className="text-sm font-bold">🧠 Test Yourself</h4>
                     <MCQBlock mcqs={selected.mcqs} />
+                    <InlineDisclaimer />
                   </div>
                 )}
               </div>
