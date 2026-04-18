@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 // ملاحظة: app_frozen يُتحكَّم به من src/App.tsx مباشرة (Lovable فقط)، وليس من DB.
 export const defaultSettings = {
   whatsapp_number: "96899815505",
-  whatsapp_label: "تواصل عبر واتساب",
+  whatsapp_label: "Contact on WhatsApp",
   logo_text: "OB/GYN Reference",
   logo_emoji: "🩺",
   disclaimer_short:
