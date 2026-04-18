@@ -14,6 +14,297 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: {
+          category: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          category?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          category?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      app_translations: {
+        Row: {
+          ar: string
+          category: string
+          context: string | null
+          en: string
+          id: string
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          ar: string
+          category?: string
+          context?: string | null
+          en: string
+          id?: string
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          ar?: string
+          category?: string
+          context?: string | null
+          en?: string
+          id?: string
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      case_of_the_day: {
+        Row: {
+          active: boolean
+          answer: string
+          body: string
+          case_date: string
+          created_at: string
+          id: string
+          references_list: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          answer: string
+          body: string
+          case_date: string
+          created_at?: string
+          id?: string
+          references_list?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          answer?: string
+          body?: string
+          case_date?: string
+          created_at?: string
+          id?: string
+          references_list?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      exams_meta: {
+        Row: {
+          active: boolean
+          authority: string
+          country: string
+          country_code: string
+          created_at: string
+          display_order: number
+          duration: string
+          exam_id: string
+          exam_name: string
+          fee_usd: string
+          flag: string
+          format: string
+          id: string
+          level: string
+          notes: string | null
+          official_url: string
+          pass_mark: string
+          platform: string
+          questions: number
+          refs: string[]
+          register_url: string
+          syllabus: string[]
+          updated_at: string
+          validity_years: string
+        }
+        Insert: {
+          active?: boolean
+          authority: string
+          country: string
+          country_code: string
+          created_at?: string
+          display_order?: number
+          duration: string
+          exam_id: string
+          exam_name: string
+          fee_usd: string
+          flag: string
+          format: string
+          id?: string
+          level: string
+          notes?: string | null
+          official_url: string
+          pass_mark: string
+          platform: string
+          questions: number
+          refs?: string[]
+          register_url: string
+          syllabus?: string[]
+          updated_at?: string
+          validity_years: string
+        }
+        Update: {
+          active?: boolean
+          authority?: string
+          country?: string
+          country_code?: string
+          created_at?: string
+          display_order?: number
+          duration?: string
+          exam_id?: string
+          exam_name?: string
+          fee_usd?: string
+          flag?: string
+          format?: string
+          id?: string
+          level?: string
+          notes?: string | null
+          official_url?: string
+          pass_mark?: string
+          platform?: string
+          questions?: number
+          refs?: string[]
+          register_url?: string
+          syllabus?: string[]
+          updated_at?: string
+          validity_years?: string
+        }
+        Relationships: []
+      }
+      home_sections: {
+        Row: {
+          active: boolean
+          color: string | null
+          created_at: string
+          display_order: number
+          icon: string | null
+          id: string
+          link: string | null
+          slot: string
+          subtitle_ar: string | null
+          subtitle_en: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          color?: string | null
+          created_at?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          link?: string | null
+          slot: string
+          subtitle_ar?: string | null
+          subtitle_en?: string | null
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          color?: string | null
+          created_at?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          link?: string | null
+          slot?: string
+          subtitle_ar?: string | null
+          subtitle_en?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mcq_questions: {
+        Row: {
+          active: boolean
+          answer_index: number
+          created_at: string
+          difficulty: string
+          exams: string[]
+          explanation: string
+          external_id: string | null
+          id: string
+          options: string[]
+          reference: string | null
+          stem: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          answer_index: number
+          created_at?: string
+          difficulty?: string
+          exams?: string[]
+          explanation: string
+          external_id?: string | null
+          id?: string
+          options: string[]
+          reference?: string | null
+          stem: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          answer_index?: number
+          created_at?: string
+          difficulty?: string
+          exams?: string[]
+          explanation?: string
+          external_id?: string | null
+          id?: string
+          options?: string[]
+          reference?: string | null
+          stem?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       medical_scenarios: {
         Row: {
           action_ar: string
@@ -95,11 +386,216 @@ export type Database = {
         }
         Relationships: []
       }
+      surgeries: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          description: string | null
+          difficulty: number
+          display_order: number
+          external_id: string | null
+          id: string
+          mcqs: Json
+          name_ar: string | null
+          name_en: string
+          pearls: string[]
+          references_list: string[]
+          steps: Json
+          updated_at: string
+          video_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          description?: string | null
+          difficulty?: number
+          display_order?: number
+          external_id?: string | null
+          id?: string
+          mcqs?: Json
+          name_ar?: string | null
+          name_en: string
+          pearls?: string[]
+          references_list?: string[]
+          steps?: Json
+          updated_at?: string
+          video_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string | null
+          difficulty?: number
+          display_order?: number
+          external_id?: string | null
+          id?: string
+          mcqs?: Json
+          name_ar?: string | null
+          name_en?: string
+          pearls?: string[]
+          references_list?: string[]
+          steps?: Json
+          updated_at?: string
+          video_id?: string | null
+        }
+        Relationships: []
+      }
+      tools_ddx: {
+        Row: {
+          active: boolean
+          created_at: string
+          differentials: string[]
+          display_order: number
+          id: string
+          presentation: string
+          red_flags: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          differentials?: string[]
+          display_order?: number
+          id?: string
+          presentation: string
+          red_flags?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          differentials?: string[]
+          display_order?: number
+          id?: string
+          presentation?: string
+          red_flags?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tools_drugs: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          id: string
+          lactation: string
+          name: string
+          notes: string | null
+          trimester: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          id?: string
+          lactation: string
+          name: string
+          notes?: string | null
+          trimester: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          id?: string
+          lactation?: string
+          name?: string
+          notes?: string | null
+          trimester?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tools_guidelines: {
+        Row: {
+          active: boolean
+          color: string
+          created_at: string
+          display_order: number
+          id: string
+          items: string[]
+          region: string
+          society: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          color?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          items?: string[]
+          region: string
+          society: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          color?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          items?: string[]
+          region?: string
+          society?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tools_protocols: {
+        Row: {
+          active: boolean
+          color: string
+          created_at: string
+          display_order: number
+          external_id: string | null
+          id: string
+          steps: string[]
+          targets: string | null
+          title: string
+          title_ar: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          color?: string
+          created_at?: string
+          display_order?: number
+          external_id?: string | null
+          id?: string
+          steps?: string[]
+          targets?: string | null
+          title: string
+          title_ar?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          color?: string
+          created_at?: string
+          display_order?: number
+          external_id?: string | null
+          id?: string
+          steps?: string[]
+          targets?: string | null
+          title?: string
+          title_ar?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_admin_sessions: { Args: never; Returns: undefined }
       search_scenarios: {
         Args: {
           category_filter?: Database["public"]["Enums"]["scenario_category"]
