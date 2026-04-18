@@ -2,8 +2,8 @@
 // أي تعديل في /control → app_translations يطغى على هذه القيم في الإنتاج.
 export const defaultTranslations = {
   appTitle: "OB/GYN Reference",
-  appSubtitle: "Under the supervision of Dr. Sahar Elkhodiry",
-  appCredential: "Consultant in Obstetrics & Gynecology — Sultanate of Oman",
+  appSubtitle: "Clinical bedside companion",
+  appCredential: "Obstetrics & Gynecology",
   searchPlaceholder: "Smart Search — handles typos & synonyms...",
   noResults: "No results found.",
   situation: "Situation",
