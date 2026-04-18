@@ -1,0 +1,1 @@
+UPDATE public.app_settings SET value='"Tips & Tricks"'::jsonb WHERE key='logo_text';
