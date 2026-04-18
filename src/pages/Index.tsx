@@ -333,8 +333,8 @@ export default function Index() {
       <div className="h-[3px] gradient-gold relative z-20" />
 
       <header
-        className={`sticky top-0 z-20 px-4 transition-all duration-300 border-b bg-card/80 backdrop-blur-md ${
-          scrolled ? "pt-2 pb-2 border-border/70 shadow-editorial" : "pt-4 pb-3 border-border/50"
+        className={`sticky top-0 z-20 px-5 transition-all duration-300 border-b bg-card/85 backdrop-blur-md ${
+          scrolled ? "pt-2.5 pb-2.5 border-border/70 shadow-editorial" : "pt-5 pb-4 border-border/50"
         }`}
       >
         <div className="relative">
@@ -349,43 +349,43 @@ export default function Index() {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
-                  <span className="flex items-center gap-1.5">
+                <div className="flex items-center justify-between mb-4 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
+                  <span className="flex items-center gap-1.5 min-w-0 truncate">
                     <span className="inline-block w-1 h-1 rounded-full bg-gold" />
-                    <span>{issueDate()}</span>
+                    <span className="truncate">{issueDate()}</span>
                   </span>
-                  <span className="text-gold/90">Vol. I · Clinical Edition</span>
+                  <span className="text-gold/90 shrink-0 ml-2">Vol. I</span>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* Masthead — collapses to small in compact mode */}
-          <div className={`flex items-start justify-between gap-3 transition-all ${scrolled ? "mb-2" : "mb-3"}`}>
+          <div className={`flex items-center justify-between gap-3 transition-all ${scrolled ? "mb-3" : "mb-4"}`}>
             <motion.div
-              className="min-w-0 flex flex-col gap-2"
+              className="min-w-0 flex flex-col gap-1.5"
               initial={{ y: 6, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               <h1
-                className={`font-editorial italic font-black tracking-tight leading-[0.95] transition-all bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_45%,hsl(var(--foreground))_100%)] [text-shadow:0_1px_0_hsl(var(--background))] ${
-                  scrolled ? "text-[24px]" : "text-[36px]"
+                className={`font-editorial italic font-black tracking-tight leading-[0.95] transition-all bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_45%,hsl(var(--foreground))_100%)] ${
+                  scrolled ? "text-[22px]" : "text-[30px]"
                 }`}
               >
                 <span className="relative inline-block">
                   {logoText}
                   <span
                     aria-hidden="true"
-                    className={`absolute left-0 -bottom-1 h-[2px] w-full origin-left bg-gradient-to-r from-primary via-primary/60 to-transparent transition-all ${
+                    className={`absolute left-0 -bottom-1.5 h-[2px] w-full origin-left bg-gradient-to-r from-primary via-primary/50 to-transparent transition-all ${
                       scrolled ? "scale-x-75" : "scale-x-100"
                     }`}
                   />
                 </span>
               </h1>
               <span
-                className={`self-start inline-flex items-center rounded-md border border-primary/25 bg-primary/5 text-primary font-semibold uppercase tracking-[0.18em] transition-all ${
-                  scrolled ? "px-2 py-1 text-[8px]" : "px-2.5 py-1 text-[9px]"
+                className={`self-start inline-flex items-center rounded-md border border-primary/25 bg-primary/5 text-primary font-semibold uppercase tracking-[0.2em] transition-all ${
+                  scrolled ? "px-1.5 py-0.5 text-[8px]" : "px-2 py-0.5 text-[9px]"
                 }`}
               >
                 OB/GYN Reference
@@ -393,7 +393,7 @@ export default function Index() {
             </motion.div>
             <button
               onClick={toggleDark}
-              className="p-2.5 rounded-xl bg-card border border-border/60 hover:border-gold/50 hover:bg-muted transition-all shrink-0"
+              className="p-2 rounded-xl bg-card border border-border/60 hover:border-gold/50 hover:bg-muted transition-all shrink-0 self-start"
               aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             >
               {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
@@ -401,7 +401,7 @@ export default function Index() {
           </div>
 
           {/* Hairline divider — hidden in compact */}
-          {!scrolled && <div className="divider-editorial mb-3" aria-hidden="true" />}
+          {!scrolled && <div className="divider-editorial mb-4" aria-hidden="true" />}
 
           {/* Search bar with auto-suggest */}
           <motion.div
