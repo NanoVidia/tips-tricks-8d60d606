@@ -93,6 +93,8 @@ const TAB_LABEL_KEYS: Record<ScenarioCategory, string> = {
   behavior: "tab.behavior",
   qa: "tab.qa",
 };
+const formatNumber = (value: number) => new Intl.NumberFormat("en-US-u-nu-latn").format(value);
+const normalizeDigits = (value: string) => value.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
 
 function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: TFn }) {
   return (
@@ -103,8 +105,8 @@ function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: 
       <AccordionTrigger className="py-4 px-4 text-[15px] font-semibold hover:no-underline group">
         <div className="flex items-start gap-3 text-left flex-1">
           <div className="w-1 self-stretch rounded-full bg-gradient-to-b from-primary to-primary/40 shrink-0" aria-hidden="true" />
-          <span className="group-hover:text-primary transition-colors font-semibold text-foreground leading-6 text-[15px]">
-            {item.title_en}
+          <span className="group-hover:text-primary transition-colors font-semibold text-foreground leading-6 text-[15px] tabular-nums">
+            {normalizeDigits(item.title_en)}
           </span>
         </div>
       </AccordionTrigger>
@@ -117,7 +119,7 @@ function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: 
           ].map((section) => (
             <div key={section.label} className="rounded-2xl bg-card/80 backdrop-blur-sm p-3.5 border border-primary/10">
               <div className="text-[11px] font-bold text-primary uppercase tracking-[0.16em] mb-1.5">{section.label}</div>
-              <p className="text-[14px] leading-7 text-foreground tabular-nums">{section.text}</p>
+              <p className="text-[14px] leading-7 text-foreground tabular-nums">{normalizeDigits(section.text)}</p>
             </div>
           ))}
           <Button
@@ -640,7 +642,7 @@ export default function Index() {
                       : "bg-muted/70 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                   }`}
                 >
-                  {categoryCounts[id]}
+                  {formatNumber(categoryCounts[id])}
                 </span>
               </motion.button>
             );
@@ -660,8 +662,8 @@ export default function Index() {
                 Clinical wisdom,<br />
                 <span className="italic text-gold">one search away.</span>
               </h2>
-              <p className="text-xs text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
-                {totalScenarios}+ OB/GYN scenarios, scripts & protocols — curated for clinicians.
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-[280px] mx-auto tabular-nums">
+                {formatNumber(totalScenarios)}+ OB/GYN scenarios, scripts & protocols — curated for clinicians.
               </p>
             </header>
 
@@ -771,7 +773,7 @@ export default function Index() {
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-bold text-foreground truncate leading-tight">{tabLabel(id)}</p>
                         <p className="text-[9px] text-muted-foreground tabular-nums mt-0.5">
-                          {categoryCounts[id]} entries
+                          {formatNumber(categoryCounts[id])} entries
                         </p>
                       </div>
                     </button>
@@ -826,8 +828,8 @@ export default function Index() {
           <p className="text-center text-sm text-muted-foreground py-8">{t("noResults")}</p>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-2.5 px-1">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between mb-3 px-1 gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 {(() => {
                   const Icon = categoryConfig[activeTab].icon;
                   return (
@@ -836,10 +838,10 @@ export default function Index() {
                     </div>
                   );
                 })()}
-                <h2 className="text-sm font-bold text-foreground">{tabLabel(activeTab)}</h2>
+                <h2 className="text-[15px] font-bold text-foreground leading-tight truncate">{tabLabel(activeTab)}</h2>
               </div>
-              <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full font-bold">
-                {totalCount} items
+              <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-1 rounded-full font-bold tabular-nums shrink-0">
+                {formatNumber(totalCount)} items
               </span>
             </div>
 
@@ -867,8 +869,8 @@ export default function Index() {
           <p className="font-editorial text-[15px] font-bold text-foreground leading-tight">
             {t("appSubtitle")}
           </p>
-          <p className="text-[10px] text-muted-foreground leading-relaxed pt-1">
-            © {new Date().getFullYear()} Tips &amp; Tricks · Clinical Edition
+          <p className="text-[10px] text-muted-foreground leading-relaxed pt-1 tabular-nums">
+            © {formatNumber(new Date().getFullYear())} Tips &amp; Tricks · Clinical Edition
           </p>
         </div>
       </footer>
