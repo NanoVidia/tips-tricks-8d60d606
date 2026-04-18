@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+const numberFormatter = new Intl.NumberFormat("en-US-u-nu-latn");
+
 /** Lightweight count-up that respects prefers-reduced-motion and starts when scrolled into view. */
 export function CountUp({
   to,
@@ -49,7 +51,7 @@ export function CountUp({
 
   return (
     <span ref={ref} className={`tabular-nums ${className}`} aria-label={`${prefix}${to}${suffix}`}>
-      {prefix}{value.toLocaleString()}{suffix}
+      {prefix}{numberFormatter.format(value)}{suffix}
     </span>
   );
 }
