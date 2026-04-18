@@ -14,7 +14,7 @@ import { Pagination } from "@/components/Pagination";
 import { StatsStrip } from "@/components/StatsStrip";
 import { CaseOfTheDay } from "@/components/CaseOfTheDay";
 import { OnboardingTour } from "@/components/OnboardingTour";
-import { t } from "@/lib/i18n";
+import { useTranslations } from "@/hooks/useTranslations";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2 } from "lucide-react";
@@ -117,9 +117,15 @@ const issueDate = () => {
 };
 
 
-const i = t();
+type TFn = (k: string) => string;
+const TAB_LABEL_KEYS: Record<ScenarioCategory, string> = {
+  clinic: "tab.clinic",
+  or_labor: "tab.or_labor",
+  behavior: "tab.behavior",
+  qa: "tab.qa",
+};
 
-function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
+function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: TFn }) {
   return (
     <AccordionItem
       value={item.id}
@@ -136,9 +142,9 @@ function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
       <AccordionContent className="px-3.5 pb-4">
         <div className="space-y-2.5">
           {[
-            { label: i.situation, text: item.situation_en },
-            { label: i.clinicalAction, text: item.action_en },
-            { label: i.patientScript, text: item.script_en },
+            { label: t("situation"), text: item.situation_en },
+            { label: t("clinicalAction"), text: item.action_en },
+            { label: t("patientScript"), text: item.script_en },
           ].map((section) => (
             <div key={section.label} className="rounded-xl bg-card/70 backdrop-blur-sm p-3 border border-primary/10">
               <div className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1.5">{section.label}</div>
@@ -152,7 +158,7 @@ function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
             style={{ color: "hsl(40 30% 96%)" }}
           >
             <MessageCircle className="w-4 h-4 text-gold" />
-            {i.discussAI}
+            {t("discussAI")}
           </Button>
         </div>
       </AccordionContent>
