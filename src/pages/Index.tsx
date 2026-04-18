@@ -168,7 +168,7 @@ function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: 
 
 export default function Index() {
   const { t } = useTranslations();
-  const tabLabel = (c: ScenarioCategory) => t(TAB_LABEL_KEYS[c]);
+  const tabLabel = (c: ScenarioCategory) => t(TAB_LABEL_KEYS[c] as never);
   const [activeTab, setActiveTab] = useState<ScenarioCategory | null>(null);
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
@@ -860,7 +860,7 @@ export default function Index() {
             <div className="space-y-0">
               <Accordion type="single" collapsible className="w-full">
                 {scenarios.map((item) => (
-                  <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} />
+                  <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} t={t} />)
                 ))}
               </Accordion>
             </div>
