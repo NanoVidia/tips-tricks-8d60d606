@@ -370,12 +370,17 @@ export default function Index() {
               >
                 <Logo />
               </motion.div>
-              <div className="min-w-0">
-                <h1 className={`font-editorial font-bold tracking-tight text-foreground leading-none transition-all ${
-                  scrolled ? "text-[18px]" : "text-[24px]"
+              <div className="min-w-0 flex flex-col gap-1">
+                <h1 className={`font-editorial font-extrabold tracking-tight bg-gradient-to-r from-gold via-foreground to-gold bg-clip-text text-transparent leading-none transition-all drop-shadow-sm ${
+                  scrolled ? "text-[22px]" : "text-[32px]"
                 }`}>
                   {logoText}
                 </h1>
+                {!scrolled && (
+                  <span className="self-start inline-flex items-center px-2 py-0.5 rounded-md border border-gold/40 bg-gold/5 text-[9px] font-semibold uppercase tracking-[0.15em] text-gold">
+                    OB/GYN Reference
+                  </span>
+                )}
               </div>
             </div>
             <button
