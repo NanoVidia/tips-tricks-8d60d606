@@ -20,6 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { InlineDisclaimer } from "@/components/Disclaimer";
 import {
   CheckCircle2,
   XCircle,
@@ -589,6 +590,7 @@ export function ExamSimulator({ exam, onExit }: Props) {
                   </div>
                   <p className="text-sm text-foreground/90 leading-relaxed">{q.explanation}</p>
                   <p className="text-xs text-muted-foreground italic">Reference: {q.reference}</p>
+                  <InlineDisclaimer />
                 </motion.div>
               )}
             </Card>

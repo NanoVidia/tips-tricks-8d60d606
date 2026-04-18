@@ -21,7 +21,7 @@ import { SurgeryLibrary } from "@/components/tools/SurgeryLibrary";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useToolsData } from "@/hooks/useToolsData";
 import { toast } from "@/hooks/use-toast";
-import { DisclaimerBanner } from "@/components/Disclaimer";
+import { DisclaimerBanner, InlineDisclaimer } from "@/components/Disclaimer";
 
 const sections = [
   { id: "favorites", label: "Favorites", icon: Star, color: "from-amber-400 to-orange-500" },
@@ -665,6 +665,7 @@ export default function Tools() {
                     <div><span className="text-muted-foreground">Lactation:</span> <span className="font-semibold">{d.lactation}</span></div>
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-snug">{d.notes}</p>
+                  <InlineDisclaimer className="mt-1.5" />
                 </Card>
               ))}
               {filteredDrugs.length === 0 && (
