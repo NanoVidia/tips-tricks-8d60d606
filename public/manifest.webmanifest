@@ -1,7 +1,7 @@
 {
   "name": "Tips & Tricks — OB/GYN Reference",
   "short_name": "Tips & Tricks",
-  "description": "Bedside OB/GYN scenarios, scripts, calculators and AI assistant by Dr. Sahar Elkhodiry.",
+  "description": "Bedside OB/GYN scenarios, scripts, calculators and AI assistant for clinicians.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
