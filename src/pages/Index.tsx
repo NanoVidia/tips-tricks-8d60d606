@@ -431,7 +431,7 @@ export default function Index() {
                   setSuggestOpen(false);
                 }
               }}
-              placeholder={i.searchPlaceholder}
+              placeholder={t("searchPlaceholder")}
               role="combobox"
               aria-expanded={suggestOpen && suggestions.length > 0}
               aria-controls="search-suggestions"
@@ -551,7 +551,7 @@ export default function Index() {
                                   {s.title_en}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
-                                  {i.tabs[s.category]}
+                                  {tabLabel(s.category)}
                                 </p>
                               </div>
                               <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
@@ -646,7 +646,7 @@ export default function Index() {
                 >
                   <Icon className="w-3.5 h-3.5" strokeWidth={2.5} />
                 </motion.span>
-                <span className="relative flex-1 min-w-0 text-left leading-tight break-words">{i.tabs[id]}</span>
+                <span className="relative flex-1 min-w-0 text-left leading-tight break-words">{tabLabel(id)}</span>
                 <span
                   className={`relative shrink-0 text-[9px] tabular-nums font-black px-1.5 py-0.5 rounded-full transition-colors ${
                     active
@@ -783,7 +783,7 @@ export default function Index() {
                         <Icon className="w-3.5 h-3.5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold text-foreground truncate leading-tight">{i.tabs[id]}</p>
+                        <p className="text-[11px] font-bold text-foreground truncate leading-tight">{tabLabel(id)}</p>
                         <p className="text-[9px] text-muted-foreground tabular-nums mt-0.5">
                           {categoryCounts[id]} entries
                         </p>
@@ -837,7 +837,7 @@ export default function Index() {
             <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
         ) : scenarios.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground py-8">{i.noResults}</p>
+          <p className="text-center text-sm text-muted-foreground py-8">{t("noResults")}</p>
         ) : (
           <>
             <div className="flex items-center justify-between mb-2.5 px-1">
@@ -850,7 +850,7 @@ export default function Index() {
                     </div>
                   );
                 })()}
-                <h2 className="text-sm font-bold text-foreground">{i.tabs[activeTab]}</h2>
+                <h2 className="text-sm font-bold text-foreground">{tabLabel(activeTab)}</h2>
               </div>
               <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full font-bold">
                 {totalCount} items
@@ -879,7 +879,7 @@ export default function Index() {
         <div className="text-center space-y-1.5">
           <p className="eyebrow text-gold">Under the supervision of</p>
           <p className="font-editorial text-[15px] font-bold text-foreground leading-tight">
-            {i.appSubtitle}
+            {t("appSubtitle")}
           </p>
           <p className="text-[10px] text-muted-foreground leading-relaxed pt-1">
             © {new Date().getFullYear()} Tips &amp; Tricks · Clinical Edition
