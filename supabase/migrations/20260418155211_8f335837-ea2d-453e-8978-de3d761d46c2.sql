@@ -1,0 +1,1 @@
+UPDATE public.app_translations SET en='Tips & Tricks', ar='Tips & Tricks' WHERE key='appTitle';

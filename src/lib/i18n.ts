@@ -1,7 +1,7 @@
 // النصوص الافتراضية المُضمَّنة بالكود — تُستخدم كـ fallback عندما يفشل تحميل DB.
 // أي تعديل في /control → app_translations يطغى على هذه القيم في الإنتاج.
 export const defaultTranslations = {
-  appTitle: "OB/GYN Reference",
+  appTitle: "Tips & Tricks",
   appSubtitle: "Clinical bedside companion",
   appCredential: "Obstetrics & Gynecology",
   searchPlaceholder: "Smart Search — handles typos & synonyms...",
