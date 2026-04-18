@@ -19,7 +19,7 @@ import {
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { SurgeryLibrary } from "@/components/tools/SurgeryLibrary";
 import { useBookmarks } from "@/hooks/useBookmarks";
-import { emergencyProtocols, pregnancyDrugs, guidelines, ddxLibrary } from "@/data/toolsData";
+import { useToolsData } from "@/hooks/useToolsData";
 import { toast } from "@/hooks/use-toast";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 
@@ -264,6 +264,7 @@ export default function Tools() {
   const [mcqOrder, setMcqOrder] = useState<number[]>(() => mcqs.map((_, i) => i));
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
   const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
+  const { protocols: emergencyProtocols, drugs: pregnancyDrugs, guidelines, ddx: ddxLibrary, source: toolsSource } = useToolsData();
 
   // Group bookmarks by type for the Favorites view
   const favorites = useMemo(() => {
