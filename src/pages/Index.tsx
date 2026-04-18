@@ -14,7 +14,7 @@ import { Pagination } from "@/components/Pagination";
 import { StatsStrip } from "@/components/StatsStrip";
 import { CaseOfTheDay } from "@/components/CaseOfTheDay";
 import { OnboardingTour } from "@/components/OnboardingTour";
-import { t } from "@/lib/i18n";
+import { useTranslations } from "@/hooks/useTranslations";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2 } from "lucide-react";
@@ -117,9 +117,15 @@ const issueDate = () => {
 };
 
 
-const i = t();
+type TFn = (k: string) => string;
+const TAB_LABEL_KEYS: Record<ScenarioCategory, string> = {
+  clinic: "tab.clinic",
+  or_labor: "tab.or_labor",
+  behavior: "tab.behavior",
+  qa: "tab.qa",
+};
 
-function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
+function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: TFn }) {
   return (
     <AccordionItem
       value={item.id}
@@ -136,9 +142,9 @@ function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
       <AccordionContent className="px-3.5 pb-4">
         <div className="space-y-2.5">
           {[
-            { label: i.situation, text: item.situation_en },
-            { label: i.clinicalAction, text: item.action_en },
-            { label: i.patientScript, text: item.script_en },
+            { label: t("situation"), text: item.situation_en },
+            { label: t("clinicalAction"), text: item.action_en },
+            { label: t("patientScript"), text: item.script_en },
           ].map((section) => (
             <div key={section.label} className="rounded-xl bg-card/70 backdrop-blur-sm p-3 border border-primary/10">
               <div className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1.5">{section.label}</div>
@@ -152,7 +158,7 @@ function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
             style={{ color: "hsl(40 30% 96%)" }}
           >
             <MessageCircle className="w-4 h-4 text-gold" />
-            {i.discussAI}
+            {t("discussAI")}
           </Button>
         </div>
       </AccordionContent>
@@ -161,6 +167,8 @@ function ClinicalCard({ item, onAI }: { item: Scenario; onAI: () => void }) {
 }
 
 export default function Index() {
+  const { t } = useTranslations();
+  const tabLabel = (c: ScenarioCategory) => t(TAB_LABEL_KEYS[c] as never);
   const [activeTab, setActiveTab] = useState<ScenarioCategory | null>(null);
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
@@ -423,7 +431,7 @@ export default function Index() {
                   setSuggestOpen(false);
                 }
               }}
-              placeholder={i.searchPlaceholder}
+              placeholder={t("searchPlaceholder")}
               role="combobox"
               aria-expanded={suggestOpen && suggestions.length > 0}
               aria-controls="search-suggestions"
@@ -543,7 +551,7 @@ export default function Index() {
                                   {s.title_en}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
-                                  {i.tabs[s.category]}
+                                  {tabLabel(s.category)}
                                 </p>
                               </div>
                               <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
@@ -638,7 +646,7 @@ export default function Index() {
                 >
                   <Icon className="w-3.5 h-3.5" strokeWidth={2.5} />
                 </motion.span>
-                <span className="relative flex-1 min-w-0 text-left leading-tight break-words">{i.tabs[id]}</span>
+                <span className="relative flex-1 min-w-0 text-left leading-tight break-words">{tabLabel(id)}</span>
                 <span
                   className={`relative shrink-0 text-[9px] tabular-nums font-black px-1.5 py-0.5 rounded-full transition-colors ${
                     active
@@ -775,7 +783,7 @@ export default function Index() {
                         <Icon className="w-3.5 h-3.5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold text-foreground truncate leading-tight">{i.tabs[id]}</p>
+                        <p className="text-[11px] font-bold text-foreground truncate leading-tight">{tabLabel(id)}</p>
                         <p className="text-[9px] text-muted-foreground tabular-nums mt-0.5">
                           {categoryCounts[id]} entries
                         </p>
@@ -829,7 +837,7 @@ export default function Index() {
             <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
         ) : scenarios.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground py-8">{i.noResults}</p>
+          <p className="text-center text-sm text-muted-foreground py-8">{t("noResults")}</p>
         ) : (
           <>
             <div className="flex items-center justify-between mb-2.5 px-1">
@@ -842,7 +850,7 @@ export default function Index() {
                     </div>
                   );
                 })()}
-                <h2 className="text-sm font-bold text-foreground">{i.tabs[activeTab]}</h2>
+                <h2 className="text-sm font-bold text-foreground">{tabLabel(activeTab)}</h2>
               </div>
               <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full font-bold">
                 {totalCount} items
@@ -852,7 +860,7 @@ export default function Index() {
             <div className="space-y-0">
               <Accordion type="single" collapsible className="w-full">
                 {scenarios.map((item) => (
-                  <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} />
+                  <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} t={t} />
                 ))}
               </Accordion>
             </div>
@@ -871,7 +879,7 @@ export default function Index() {
         <div className="text-center space-y-1.5">
           <p className="eyebrow text-gold">Under the supervision of</p>
           <p className="font-editorial text-[15px] font-bold text-foreground leading-tight">
-            {i.appSubtitle}
+            {t("appSubtitle")}
           </p>
           <p className="text-[10px] text-muted-foreground leading-relaxed pt-1">
             © {new Date().getFullYear()} Tips &amp; Tricks · Clinical Edition
