@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 // قيم defaults — تطابق السلوك الحالي قبل ربط DB.
+// ملاحظة: app_frozen يُتحكَّم به من src/App.tsx مباشرة (Lovable فقط)، وليس من DB.
 export const defaultSettings = {
-  app_frozen: false,
   whatsapp_number: "96899815505",
   whatsapp_label: "تواصل عبر واتساب",
   logo_text: "OB/GYN Reference",
