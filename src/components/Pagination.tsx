@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface PaginationProps {
   currentPage: number;
@@ -8,8 +8,8 @@ interface PaginationProps {
 }
 
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+  const { t } = useTranslations();
   if (totalPages <= 1) return null;
-  const i = t();
 
   const maxVisible = 5;
   let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
@@ -66,7 +66,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
       </button>
 
       <span className="text-[10px] text-muted-foreground ml-2">
-        {i.page} {currentPage} {i.of} {totalPages}
+        {t("page")} {currentPage} {t("of")} {totalPages}
       </span>
     </div>
   );
