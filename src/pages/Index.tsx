@@ -78,38 +78,6 @@ const categoryConfig = {
 const tabIds: ScenarioCategory[] = ["qa", "clinic", "or_labor", "behavior"];
 
 /* Calm clinical mark — abstract stethoscope arc forming a "T". */
-const Logo = () => (
-  <div className="relative w-11 h-11 shrink-0">
-    <div
-      className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-card to-muted/60 border border-primary/15 flex items-center justify-center shadow-editorial overflow-hidden"
-      aria-label="Tips & Tricks logo"
-    >
-      {/* corner accent */}
-      <span className="absolute top-1 right-1 w-1 h-1 rounded-full bg-primary/70" aria-hidden="true" />
-      <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none" aria-hidden="true">
-        {/* stethoscope arc */}
-        <path
-          d="M9 6 V14 a7 7 0 0 0 14 0 V6"
-          stroke="hsl(var(--primary))"
-          strokeWidth="2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* vertical stem (T) */}
-        <path
-          d="M16 21 V25"
-          stroke="hsl(var(--primary))"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        {/* chest piece */}
-        <circle cx="16" cy="26.5" r="2.2" fill="hsl(var(--primary))" />
-        <circle cx="16" cy="26.5" r="0.9" fill="hsl(var(--card))" />
-      </svg>
-    </div>
-  </div>
-);
-
 /** Today's date — formatted as a magazine issue line. */
 const issueDate = () => {
   try {
@@ -130,26 +98,26 @@ function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: 
   return (
     <AccordionItem
       value={item.id}
-      className="border-0 mb-2 last:mb-0 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/[0.06] via-primary/[0.03] to-transparent border border-primary/15 hover:border-primary/30 hover:from-primary/[0.10] hover:via-primary/[0.05] transition-all data-[state=open]:from-primary/[0.10] data-[state=open]:via-primary/[0.06] data-[state=open]:border-primary/30 data-[state=open]:shadow-editorial"
+      className="border-0 mb-2.5 last:mb-0 rounded-[1.35rem] overflow-hidden bg-gradient-to-br from-primary/[0.06] via-primary/[0.03] to-transparent border border-primary/15 hover:border-primary/30 hover:from-primary/[0.10] hover:via-primary/[0.05] transition-all data-[state=open]:from-primary/[0.10] data-[state=open]:via-primary/[0.06] data-[state=open]:border-primary/30 data-[state=open]:shadow-editorial"
     >
-      <AccordionTrigger className="py-3.5 px-3.5 text-sm font-medium hover:no-underline group">
-        <div className="flex items-center gap-2.5 text-left flex-1">
+      <AccordionTrigger className="py-4 px-4 text-[15px] font-semibold hover:no-underline group">
+        <div className="flex items-start gap-3 text-left flex-1">
           <div className="w-1 self-stretch rounded-full bg-gradient-to-b from-primary to-primary/40 shrink-0" aria-hidden="true" />
-          <span className="group-hover:text-primary transition-colors font-semibold text-foreground">
+          <span className="group-hover:text-primary transition-colors font-semibold text-foreground leading-6 text-[15px]">
             {item.title_en}
           </span>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="px-3.5 pb-4">
-        <div className="space-y-2.5">
+      <AccordionContent className="px-4 pb-4.5">
+        <div className="space-y-3">
           {[
             { label: t("situation"), text: item.situation_en },
             { label: t("clinicalAction"), text: item.action_en },
             { label: t("patientScript"), text: item.script_en },
           ].map((section) => (
-            <div key={section.label} className="rounded-xl bg-card/70 backdrop-blur-sm p-3 border border-primary/10">
-              <div className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1.5">{section.label}</div>
-              <p className="text-sm leading-relaxed text-foreground">{section.text}</p>
+            <div key={section.label} className="rounded-2xl bg-card/80 backdrop-blur-sm p-3.5 border border-primary/10">
+              <div className="text-[11px] font-bold text-primary uppercase tracking-[0.16em] mb-1.5">{section.label}</div>
+              <p className="text-[14px] leading-7 text-foreground tabular-nums">{section.text}</p>
             </div>
           ))}
           <Button
@@ -170,7 +138,7 @@ function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: 
 export default function Index() {
   const { t } = useTranslations();
   const { get: getSetting } = useAppSettings();
-  const logoText = String(getSetting("logo_text") ?? "Tips & Tricks");
+  const logoText = String(getSetting("logo_text") ?? "OB/GYN Reference");
   const tabLabel = (c: ScenarioCategory) => t(TAB_LABEL_KEYS[c] as never);
   const [activeTab, setActiveTab] = useState<ScenarioCategory | null>(null);
   const [search, setSearch] = useState("");
@@ -324,7 +292,7 @@ export default function Index() {
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative">
+    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative tabular-nums">
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
         style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
@@ -333,8 +301,8 @@ export default function Index() {
       <div className="h-[3px] gradient-gold relative z-20" />
 
       <header
-        className={`sticky top-0 z-20 px-5 transition-all duration-300 border-b bg-card/85 backdrop-blur-md ${
-          scrolled ? "pt-2.5 pb-2.5 border-border/70 shadow-editorial" : "pt-5 pb-4 border-border/50"
+        className={`sticky top-0 z-20 px-4 sm:px-5 transition-all duration-300 border-b bg-card/85 backdrop-blur-md ${
+          scrolled ? "pt-2.5 pb-2.5 border-border/70 shadow-editorial" : "pt-4.5 pb-4 border-border/50"
         }`}
       >
         <div className="relative">
@@ -361,21 +329,21 @@ export default function Index() {
           </AnimatePresence>
 
           {/* Masthead — collapses to small in compact mode */}
-          <div className={`flex items-center justify-between gap-3 transition-all ${scrolled ? "mb-3" : "mb-4"}`}>
+          <div className={`flex items-start justify-between gap-3 transition-all ${scrolled ? "mb-3" : "mb-4"}`}>
             <motion.div
-              className="min-w-0 flex flex-col gap-1.5"
+              className="min-w-0 flex-1 flex flex-col gap-1.5 pr-1"
               initial={{ y: 6, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               <h1
                 className={`font-editorial italic font-black tracking-tight leading-[0.95] text-foreground transition-all ${
-                  scrolled ? "text-[22px]" : "text-[30px]"
+                  scrolled ? "text-[21px] leading-tight" : "text-[28px] leading-[1.02]"
                 }`}
               >
-                <span className="relative inline-block">
+                <span className="relative inline-block max-w-full">
                   <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_50%,hsl(var(--foreground))_100%)]">
-                    {logoText}
+                    {logoText.trim() || "OB/GYN Reference"}
                   </span>
                   <span
                     aria-hidden="true"
@@ -386,7 +354,7 @@ export default function Index() {
                 </span>
               </h1>
               <span
-                className={`self-start inline-flex items-center rounded-md border border-primary/25 bg-primary/5 text-primary font-semibold uppercase tracking-[0.2em] transition-all ${
+                className={`self-start inline-flex max-w-full items-center rounded-md border border-primary/25 bg-primary/5 text-primary font-semibold uppercase tracking-[0.18em] transition-all ${
                   scrolled ? "px-1.5 py-0.5 text-[8px]" : "px-2 py-0.5 text-[9px]"
                 }`}
               >
@@ -455,7 +423,7 @@ export default function Index() {
               aria-controls="search-suggestions"
               aria-autocomplete="list"
               aria-activedescendant={highlightIdx >= 0 ? `suggest-${highlightIdx}` : undefined}
-              className="relative h-12 bg-card border-border/60 rounded-2xl text-sm pl-12 pr-10 shadow-editorial focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/50 transition-all"
+              className="relative h-12 bg-card border-border/60 rounded-2xl text-[14px] pl-12 pr-10 shadow-editorial focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/50 transition-all tabular-nums"
             />
             {search && (
               <button
