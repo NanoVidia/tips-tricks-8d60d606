@@ -167,6 +167,8 @@ function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: 
 }
 
 export default function Index() {
+  const { t } = useTranslations();
+  const tabLabel = (c: ScenarioCategory) => t(TAB_LABEL_KEYS[c]);
   const [activeTab, setActiveTab] = useState<ScenarioCategory | null>(null);
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
