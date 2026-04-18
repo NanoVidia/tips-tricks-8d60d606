@@ -78,6 +78,7 @@ function MCQBlock({ mcqs }: { mcqs: Surgery["mcqs"] }) {
 }
 
 export function SurgeryLibrary() {
+  const { surgeries, source, isLoading } = useAllSurgeries();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<SurgeryCategory | "All" | null>(null); // null = index view
   const [difficulty, setDifficulty] = useState<number>(0); // 0 = all
