@@ -264,6 +264,7 @@ export default function Tools() {
   const [mcqOrder, setMcqOrder] = useState<number[]>(() => mcqs.map((_, i) => i));
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
   const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
+  const { protocols: emergencyProtocols, drugs: pregnancyDrugs, guidelines, ddx: ddxLibrary, source: toolsSource } = useToolsData();
 
   // Group bookmarks by type for the Favorites view
   const favorites = useMemo(() => {
