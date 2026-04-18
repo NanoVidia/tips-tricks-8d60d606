@@ -361,7 +361,7 @@ export default function Index() {
           </AnimatePresence>
 
           {/* Masthead — collapses to small in compact mode */}
-          <div className={`flex items-center justify-between transition-all ${scrolled ? "mb-2" : "mb-3"}`}>
+          <div className={`flex items-start justify-between gap-3 transition-all ${scrolled ? "mb-2" : "mb-3"}`}>
             <div className="flex items-center gap-3 min-w-0">
               <motion.div
                 initial={{ scale: 0.85, opacity: 0 }}
@@ -370,17 +370,19 @@ export default function Index() {
               >
                 <Logo />
               </motion.div>
-              <div className="min-w-0 flex flex-col gap-1">
-                <h1 className={`font-editorial font-extrabold tracking-tight bg-gradient-to-r from-gold via-foreground to-gold bg-clip-text text-transparent leading-none transition-all drop-shadow-sm ${
+              <div className="min-w-0 flex flex-col gap-1.5">
+                <h1 className={`font-editorial font-black tracking-tight text-foreground leading-none transition-all ${
                   scrolled ? "text-[22px]" : "text-[32px]"
                 }`}>
                   {logoText}
                 </h1>
-                {!scrolled && (
-                  <span className="self-start inline-flex items-center px-2 py-0.5 rounded-md border border-gold/40 bg-gold/5 text-[9px] font-semibold uppercase tracking-[0.15em] text-gold">
-                    OB/GYN Reference
-                  </span>
-                )}
+                <span
+                  className={`self-start inline-flex items-center rounded-md border border-primary/25 bg-primary/5 text-primary font-semibold uppercase tracking-[0.15em] transition-all ${
+                    scrolled ? "px-2 py-1 text-[8px]" : "px-2.5 py-1 text-[9px]"
+                  }`}
+                >
+                  OB/GYN Reference
+                </span>
               </div>
             </div>
             <button
