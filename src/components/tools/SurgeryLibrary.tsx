@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
-import { surgeries, surgeryCategories, type Surgery, type SurgeryCategory } from "@/data/surgeriesData";
+import { surgeryCategories, type Surgery, type SurgeryCategory } from "@/data/surgeriesData";
 import { SurgeryVideo } from "@/components/tools/SurgeryVideo";
+import { useAllSurgeries } from "@/hooks/useSurgeries";
 
 const DIFF_LABELS = ["", "Basic", "Intermediate", "Advanced", "Expert", "Master"] as const;
 const DIFF_COLORS = ["", "text-emerald-400", "text-blue-400", "text-amber-400", "text-orange-400", "text-red-400"] as const;
@@ -77,6 +78,7 @@ function MCQBlock({ mcqs }: { mcqs: Surgery["mcqs"] }) {
 }
 
 export function SurgeryLibrary() {
+  const { surgeries, source, isLoading } = useAllSurgeries();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<SurgeryCategory | "All" | null>(null); // null = index view
   const [difficulty, setDifficulty] = useState<number>(0); // 0 = all
@@ -99,14 +101,17 @@ export function SurgeryLibrary() {
       );
     }
     return list;
-  }, [search, category, difficulty]);
+  }, [search, category, difficulty, surgeries]);
 
   return (
     <div className="space-y-3">
       {/* Header */}
       <div className="text-center space-y-1">
         <h2 className="text-lg font-bold">Surgery Encyclopedia</h2>
-        <p className="text-xs text-muted-foreground">{surgeries.length} procedures • Video • Steps • MCQs</p>
+        <p className="text-xs text-muted-foreground">
+          {isLoading ? "Loading…" : `${surgeries.length} procedures`} • Video • Steps • MCQs
+          <span className="ml-1 text-[9px] opacity-60">[{source}]</span>
+        </p>
       </div>
 
       {/* Search */}
