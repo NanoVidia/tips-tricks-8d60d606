@@ -41,7 +41,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ReferenceLine } from "recha
 import { supabase } from "@/integrations/supabase/client";
 import type { ExamMeta, Topic, Difficulty } from "@/data/examsData";
 import { TOPICS } from "@/data/examsData";
-import { filterMCQs, ALL_MCQS, type MCQ } from "@/data/mcqBank";
+import { type MCQ } from "@/data/mcqBank";
+import { useAllMcqs, filterMcqList } from "@/hooks/useMcqs";
 
 type Mode = "setup" | "running" | "review";
 type ExamMode = "practice" | "mock";
@@ -56,6 +57,7 @@ const MOCK_TOTAL_SECONDS = 3 * 60 * 60; // 3 hours
 const MOCK_TARGET_COUNT = 150;
 
 export function ExamSimulator({ exam, onExit }: Props) {
+  const { mcqs: bankMcqs, source: bankSource, isLoading: bankLoading } = useAllMcqs();
   const [mode, setMode] = useState<Mode>("setup");
   const [examMode, setExamMode] = useState<ExamMode>("practice");
   const [topic, setTopic] = useState<Topic | "All">("All");
@@ -116,8 +118,8 @@ export function ExamSimulator({ exam, onExit }: Props) {
 
     // In mock mode: full bank, no filters, no AI
     let pool: MCQ[] = mockMode
-      ? [...ALL_MCQS]
-      : filterMCQs({ examId: exam.id, topic, difficulty });
+      ? [...bankMcqs]
+      : filterMcqList(bankMcqs, { examId: exam.id, topic, difficulty });
 
     if (!mockMode && useAI) {
       setLoadingAI(true);
