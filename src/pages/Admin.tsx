@@ -329,6 +329,17 @@ export default function Admin() {
             ))}
           </CardContent>
         </Card>
+
+        {/* Footer: رابط مباشر للوحة التحكم الكاملة */}
+        <footer className="pt-2 pb-4 text-center">
+          <a
+            href="/control"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Lock className="h-3 w-3" />
+            الانتقال إلى لوحة التحكم الكاملة (/control)
+          </a>
+        </footer>
       </div>
     </div>
   );
