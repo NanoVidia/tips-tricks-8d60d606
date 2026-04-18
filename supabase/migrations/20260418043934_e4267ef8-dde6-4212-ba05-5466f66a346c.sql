@@ -1,0 +1,2 @@
+UPDATE public.app_translations SET en='Clinical bedside companion', ar='مرجع سريري للممارسة اليومية' WHERE key='appSubtitle';
+UPDATE public.app_translations SET en='Obstetrics & Gynecology', ar='النساء والولادة' WHERE key='appCredential';
