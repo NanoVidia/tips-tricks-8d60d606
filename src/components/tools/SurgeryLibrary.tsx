@@ -108,7 +108,10 @@ export function SurgeryLibrary() {
       {/* Header */}
       <div className="text-center space-y-1">
         <h2 className="text-lg font-bold">Surgery Encyclopedia</h2>
-        <p className="text-xs text-muted-foreground">{surgeries.length} procedures • Video • Steps • MCQs</p>
+        <p className="text-xs text-muted-foreground">
+          {isLoading ? "Loading…" : `${surgeries.length} procedures`} • Video • Steps • MCQs
+          <span className="ml-1 text-[9px] opacity-60">[{source}]</span>
+        </p>
       </div>
 
       {/* Search */}
