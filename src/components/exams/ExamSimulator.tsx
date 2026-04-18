@@ -20,6 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { InlineDisclaimer } from "@/components/Disclaimer";
 import {
   CheckCircle2,
   XCircle,
