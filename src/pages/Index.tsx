@@ -678,7 +678,7 @@ export default function Index() {
                 <span className="italic text-gold">one search away.</span>
               </h2>
               <p className="text-xs text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
-                {totalScenarios}+ OB/GYN scenarios, scripts & protocols — curated by Dr. Sahar Elkhodiry.
+                {totalScenarios}+ OB/GYN scenarios, scripts & protocols — curated for clinicians.
               </p>
             </header>
 
