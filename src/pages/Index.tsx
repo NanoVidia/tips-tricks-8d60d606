@@ -19,6 +19,7 @@ import { useAppSettings } from "@/hooks/useAppSettings";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2 } from "lucide-react";
+import { PhIcon } from "@/components/ui/PhIcon";
 
 // Code-split the floating bot — it's not needed for first paint and ships React Markdown.
 const FloatingAIBot = lazy(() =>
