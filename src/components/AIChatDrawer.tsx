@@ -95,9 +95,9 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const send = async () => {
-    if (!input.trim() || !scenario || loading) return;
-    const userMsg: Msg = { role: "user", content: input.trim() };
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || !scenario || loading) return;
+    const userMsg: Msg = { role: "user", content: text.trim() };
     setMessages((p) => [...p, userMsg]);
     setInput("");
     setLoading(true);
@@ -124,6 +124,21 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
         setLoading(false);
       },
     });
+  };
+
+  const send = () => sendMessage(input);
+
+  const askHardQuestion = () => {
+    sendMessage(
+      `🎯 **Challenge me!** Based on the current scenario (${scenario?.title_en}), ask me ONE advanced OSCE-style question to test my clinical reasoning.
+
+Rules:
+- Make it a realistic high-stakes vignette (numbers, vitals, exam findings, lab values).
+- Focus on a tricky decision point: next best step, anticipating a complication, recognizing a subtle sign, choosing the right maneuver, or avoiding a pitfall.
+- Give me 4 plausible options (A/B/C/D) — make the distractors tempting, not obvious.
+- DO NOT reveal the answer yet. End with: "💭 Take your time. Reply with A/B/C/D and your reasoning, and I'll grade you like an examiner."
+- After I answer, give me an examiner-style feedback: ✅ correct/❌ wrong, why each option is right or wrong, the underlying mechanism, the pearl, and the guideline reference.`
+    );
   };
 
   return (
