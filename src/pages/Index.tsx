@@ -763,10 +763,26 @@ export default function Index() {
             <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
         ) : scenarios.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground py-8">{t("noResults")}</p>
+          <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-muted/60 flex items-center justify-center">
+              <Search className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground max-w-[260px]">{t("noResults")}</p>
+            {search && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSearch("")}
+                className="rounded-full text-[11px] h-8 px-3.5"
+              >
+                <X className="w-3 h-3 mr-1" />
+                Clear search
+              </Button>
+            )}
+          </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-3 px-1 gap-2">
+            <div className="flex items-center justify-between mb-3 mt-4 px-1 gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 {(() => {
                   const cfg = categoryConfig[activeTab];
@@ -783,12 +799,19 @@ export default function Index() {
               </span>
             </div>
 
-            <div className="space-y-0">
-              <Accordion type="single" collapsible className="w-full">
-                {scenarios.map((item) => (
-                  <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} t={t} />
-                ))}
-              </Accordion>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {scenarios.map((item, idx) => (
+                <ScenarioCard
+                  key={item.id}
+                  id={item.id}
+                  title={item.title_en}
+                  situation={item.situation_en}
+                  category={item.category}
+                  index={idx}
+                  onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                  categoryConfig={categoryConfig}
+                />
+              ))}
             </div>
             <Pagination
               currentPage={currentPage}
