@@ -770,7 +770,7 @@ export default function Index() {
                       className="group flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:shadow-editorial transition-all text-left"
                     >
                       <div className={`p-2 rounded-lg ${cfg.iconBg} shrink-0`}>
-                        <Icon className="w-3.5 h-3.5 text-white" />
+                        <PhIcon name={cfg.phName} size={16} tone="white" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-bold text-foreground truncate leading-tight">{tabLabel(id)}</p>
@@ -797,7 +797,7 @@ export default function Index() {
               style={{ color: "hsl(40 30% 96%)" }}
             >
               <div className="p-2 rounded-xl bg-gold/20 ring-1 ring-gold/40 shrink-0">
-                <Wrench className="w-4 h-4 text-gold" />
+                <PhIcon name="Wrench" size={18} tone="gold" />
               </div>
               <div className="flex-1 text-left min-w-0">
                 <p className="text-[13px] font-bold leading-tight" style={{ color: "hsl(40 30% 96%)" }}>Clinical Tools Suite</p>
@@ -812,7 +812,7 @@ export default function Index() {
               className="group flex items-center gap-3 w-full p-4 rounded-2xl bg-gradient-to-br from-primary to-accent border border-primary/40 hover:shadow-[var(--shadow-gold)] transition-all"
             >
               <div className="p-2 rounded-xl bg-white/20 ring-1 ring-white/30 shrink-0">
-                <Trophy className="w-4 h-4 text-white" />
+                <PhIcon name="Trophy" size={18} tone="white" />
               </div>
               <div className="flex-1 text-left min-w-0">
                 <p className="text-[13px] font-bold leading-tight text-white">Gulf Licensing Exams · OB/GYN</p>
