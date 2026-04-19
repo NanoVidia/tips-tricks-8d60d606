@@ -617,149 +617,23 @@ export default function Index() {
           })}
         </motion.div>
         {!activeTab ? (
-          <motion.div
-            className="pt-4 pb-6 space-y-6"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            {/* 1️⃣ Welcome — sets context immediately */}
-            <header className="text-center px-2">
-              <span className="eyebrow text-gold">Editor's note</span>
-              <h2 className="font-editorial text-[22px] font-bold text-foreground tracking-tight mt-2 mb-2 leading-tight">
-                Clinical wisdom,<br />
-                <span className="italic text-gold">one search away.</span>
-              </h2>
-              <p className="text-xs text-muted-foreground leading-relaxed max-w-[280px] mx-auto tabular-nums">
-                {formatNumber(totalScenarios)}+ OB/GYN scenarios, scripts & protocols — curated for clinicians.
-              </p>
-            </header>
-
-            {/* 2️⃣ Quick start — most likely first action */}
-            <section aria-labelledby="quick-start">
-              <div className="flex items-center justify-between mb-2 px-1">
-                <h3 id="quick-start" className="eyebrow text-foreground/80 flex items-center gap-1.5">
-                  <Search className="w-3 h-3 text-gold" />
-                  Quick start
-                </h3>
-                <span className="text-[9px] text-muted-foreground">Tap to search</span>
-              </div>
-              <div className="space-y-1.5">
-                {[
-                  { icon: ShieldCheck, label: "Preeclampsia management", tag: "Emergency" },
-                  { icon: Activity, label: "PPH protocol", tag: "Emergency" },
-                  { icon: Baby, label: "Shoulder dystocia", tag: "Labor" },
-                ].map((s) => (
-                  <button
-                    key={s.label}
-                    onClick={() => { setActiveTab("qa"); setSearch(s.label); }}
-                    className="w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:bg-muted/40 transition-all text-left group"
-                  >
-                    <div className="p-1.5 rounded-lg bg-muted/60 group-hover:bg-gold-soft transition-colors shrink-0">
-                      <s.icon className="w-3.5 h-3.5 text-foreground" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[12px] text-foreground font-semibold block truncate">{s.label}</span>
-                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">{s.tag}</span>
-                    </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 group-hover:text-gold group-hover:translate-x-0.5 transition" />
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {/* 3️⃣ Today's teaching case — daily engagement */}
-            <section aria-labelledby="today-case">
-              <h3 id="today-case" className="eyebrow text-foreground/80 mb-2 px-1 flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-gold" />
-                Today's teaching case
-              </h3>
-              <CaseOfTheDay onOpen={(c) => openAI(c as unknown as Scenario)} />
-            </section>
-
-            {/* 3.5 Recent searches — only when user has history */}
-            {recent.items.length > 0 && (
-              <section aria-labelledby="recent">
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h3 id="recent" className="eyebrow text-foreground/80 flex items-center gap-1.5">
-                    <Clock className="w-3 h-3 text-gold" />
-                    Recent searches
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={recent.clear}
-                    className="flex items-center gap-1 text-[9px] uppercase tracking-wider font-bold text-muted-foreground hover:text-destructive transition px-1.5 py-1 rounded-md hover:bg-destructive/10"
-                    aria-label="Clear recent searches"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    Clear
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {recent.items.map((q) => (
-                    <div
-                      key={q}
-                      className="group inline-flex items-center gap-1 rounded-full bg-card border border-border/50 hover:border-gold/40 transition-all overflow-hidden"
-                    >
-                      <button
-                        type="button"
-                        onClick={() => { setActiveTab("qa"); setSearch(q); }}
-                        className="flex items-center gap-1.5 pl-3 pr-1 py-1.5 text-[11px] font-semibold text-foreground"
-                      >
-                        <Clock className="w-2.5 h-2.5 text-muted-foreground" />
-                        {q}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => recent.remove(q)}
-                        aria-label={`Remove ${q}`}
-                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
-                      >
-                        <X className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* 5️⃣ Library stats — trust signal */}
-            <section aria-labelledby="stats">
-              <h3 id="stats" className="eyebrow text-foreground/80 mb-1 px-1">By the numbers</h3>
-              <StatsStrip total={totalScenarios} byCategory={categoryCounts} />
-            </section>
-
-            {/* 6️⃣ Tools CTA — final action point */}
-            <Link
-              to="/tools"
-              className="group flex items-center gap-3 w-full p-4 rounded-2xl gradient-ink border border-gold/30 hover:border-gold/60 transition-all shadow-editorial"
-              style={{ color: "hsl(40 30% 96%)" }}
-            >
-              <div className="p-2 rounded-xl bg-gold/20 ring-1 ring-gold/40 shrink-0">
-                <PhIcon name="Wrench" size={18} tone="gold" />
-              </div>
-              <div className="flex-1 text-left min-w-0">
-                <p className="text-[13px] font-bold leading-tight" style={{ color: "hsl(40 30% 96%)" }}>Clinical Tools Suite</p>
-                <p className="text-[10px] leading-tight mt-0.5 opacity-70 truncate">Calculators · Emergency · Drugs · DDx · MCQ</p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-gold group-hover:translate-x-1 transition shrink-0" />
-            </Link>
-
-            {/* 7️⃣ Exams Hub CTA — Gulf licensing exam simulator */}
-            <Link
-              to="/exams"
-              className="group flex items-center gap-3 w-full p-4 rounded-2xl bg-gradient-to-br from-primary to-accent border border-primary/40 hover:shadow-[var(--shadow-gold)] transition-all"
-            >
-              <div className="p-2 rounded-xl bg-white/20 ring-1 ring-white/30 shrink-0">
-                <PhIcon name="Trophy" size={18} tone="white" />
-              </div>
-              <div className="flex-1 text-left min-w-0">
-                <p className="text-[13px] font-bold leading-tight text-white">Gulf Licensing Exams · OB/GYN</p>
-                <p className="text-[10px] leading-tight mt-0.5 text-white/80 truncate">Simulate SCFHS · DHA · DOH · MRCOG · QCHP · KMLE · NHRA · OMSB</p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition shrink-0" />
-            </Link>
-          </motion.div>
+          <HomeHero
+            totalScenarios={totalScenarios}
+            categoryCounts={categoryCounts}
+            onSelectCategory={(id) => { setActiveTab(id); }}
+            onOpenAI={() => {
+              // Open the floating AI bot if available; otherwise the AI drawer with no scenario
+              const btn = document.querySelector<HTMLButtonElement>('[data-floating-ai-bot="true"]');
+              if (btn) btn.click();
+              else setAiOpen(true);
+            }}
+            tabLabels={{
+              qa: tabLabel("qa"),
+              clinic: tabLabel("clinic"),
+              or_labor: tabLabel("or_labor"),
+              behavior: tabLabel("behavior"),
+            }}
+          />
         ) : loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
