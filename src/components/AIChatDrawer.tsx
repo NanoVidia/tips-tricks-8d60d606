@@ -168,8 +168,6 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
               </div>
             </div>
           )}
-          {/* WhatsApp contact — driven by app_settings */}
-          <WhatsAppContact />
           <div ref={bottomRef} />
         </div>
 
