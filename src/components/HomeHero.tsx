@@ -60,7 +60,7 @@ export function HomeHero({
 }: HomeHeroProps) {
   const { get } = useAppSettings();
   const waNumber = String(get("whatsapp_number") ?? "").replace(/[^0-9]/g, "") || "966500000000";
-  const drName = String(get("doctor_name") ?? "Dr. Sahar");
+  const drName = String(get("whatsapp_label") ?? "Dr. Sahar");
 
   const categories: CategoryDef[] = [
     {
