@@ -833,10 +833,10 @@ export default function Index() {
             <div className="flex items-center justify-between mb-3 px-1 gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 {(() => {
-                  const Icon = categoryConfig[activeTab].icon;
+                  const cfg = categoryConfig[activeTab];
                   return (
-                    <div className={`p-1 rounded-lg ${categoryConfig[activeTab].iconBg}`}>
-                      <Icon className="w-3.5 h-3.5 text-white" />
+                    <div className={`p-1 rounded-lg ${cfg.iconBg}`}>
+                      <PhIcon name={cfg.phName} size={16} tone="white" />
                     </div>
                   );
                 })()}
