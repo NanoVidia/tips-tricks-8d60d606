@@ -152,10 +152,19 @@ Rules:
 
         <div className="flex-1 overflow-y-auto py-3 space-y-3 min-h-0">
           {messages.length === 0 && (
-            <div className="text-center text-xs text-muted-foreground py-8 space-y-2">
+            <div className="text-center text-xs text-muted-foreground py-8 space-y-3">
               <p>👋 Welcome!</p>
               <p>Your medical AI assistant</p>
               <p className="mt-3">Ask anything about this clinical scenario...</p>
+              <Button
+                onClick={askHardQuestion}
+                disabled={loading}
+                size="sm"
+                className="mt-4 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90"
+              >
+                <Target className="w-4 h-4" />
+                اسألني سؤال صعب
+              </Button>
             </div>
           )}
           {messages.map((m, i) => (
