@@ -102,46 +102,8 @@ const TAB_LABEL_KEYS: Record<ScenarioCategory, string> = {
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US-u-nu-latn").format(value);
 const normalizeDigits = (value: string) => value.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
 
-function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: TFn }) {
-  return (
-    <AccordionItem
-      value={item.id}
-      className="border-0 mb-2.5 last:mb-0 rounded-[1.35rem] overflow-hidden bg-gradient-to-br from-primary/[0.06] via-primary/[0.03] to-transparent border border-primary/15 hover:border-primary/30 hover:from-primary/[0.10] hover:via-primary/[0.05] transition-all data-[state=open]:from-primary/[0.10] data-[state=open]:via-primary/[0.06] data-[state=open]:border-primary/30 data-[state=open]:shadow-editorial"
-    >
-      <AccordionTrigger className="py-4 px-4 text-[15px] font-semibold hover:no-underline group">
-        <div className="flex items-start gap-3 text-left flex-1">
-          <div className="w-1 self-stretch rounded-full bg-gradient-to-b from-primary to-primary/40 shrink-0" aria-hidden="true" />
-          <span className="group-hover:text-primary transition-colors font-semibold text-foreground leading-6 text-[15px] tabular-nums">
-            {normalizeDigits(item.title_en)}
-          </span>
-        </div>
-      </AccordionTrigger>
-      <AccordionContent className="px-4 pb-4.5">
-        <div className="space-y-3">
-          {[
-            { label: t("situation"), text: item.situation_en },
-            { label: t("clinicalAction"), text: item.action_en },
-            { label: t("patientScript"), text: item.script_en },
-          ].map((section) => (
-            <div key={section.label} className="rounded-2xl bg-card/80 backdrop-blur-sm p-3.5 border border-primary/10">
-              <div className="text-[11px] font-bold text-primary uppercase tracking-[0.16em] mb-1.5">{section.label}</div>
-              <p className="text-[14px] leading-7 text-foreground tabular-nums">{normalizeDigits(section.text)}</p>
-            </div>
-          ))}
-          <Button
-            size="sm"
-            onClick={onAI}
-            className="w-full rounded-xl gradient-ink text-paper font-medium gap-2 shadow-editorial hover:shadow-gold h-10 border border-gold/20"
-            style={{ color: "hsl(40 30% 96%)" }}
-          >
-            <MessageCircle className="w-4 h-4 text-gold" />
-            {t("discussAI")}
-          </Button>
-        </div>
-      </AccordionContent>
-    </AccordionItem>
-  );
-}
+// (Inline ClinicalCard removed — replaced by ScenarioCard + ScenarioSheet)
+
 
 export default function Index() {
   const { t } = useTranslations();
