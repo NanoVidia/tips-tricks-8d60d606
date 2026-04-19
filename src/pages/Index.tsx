@@ -537,7 +537,7 @@ export default function Index() {
                               }`}
                             >
                               <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
-                                <Icon className="w-3 h-3 text-white" />
+                                <PhIcon name={cfg.phName} size={14} tone="white" />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="text-[12px] font-semibold text-foreground truncate leading-tight">
