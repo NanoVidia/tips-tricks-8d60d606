@@ -111,7 +111,7 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
       answer: assistant.content,
     });
     setSavedKeys((prev) => new Set(prev).add(assistantIdx));
-    toast.success("تم حفظ المحادثة في المفضلة ⭐");
+    toast.success("Saved to bookmarks ⭐");
   };
 
   const sendMessage = async (text: string) => {
@@ -179,15 +179,16 @@ Rules:
                 onClick={askHardQuestion}
                 disabled={loading}
                 size="sm"
-                className="mt-4 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90"
+                className="mt-4 rounded-full bg-gradient-to-r from-primary via-primary to-primary/70 hover:opacity-90 shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all hover:-translate-y-0.5 px-5 h-9 font-semibold tracking-wide"
               >
-                <Target className="w-4 h-4" />
-                اسألني سؤال صعب
+                <Target className="w-4 h-4 mr-1.5" />
+                Challenge Me
+                <span className="ml-1.5 opacity-80">✦</span>
               </Button>
 
               <div className="pt-4 space-y-2">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                  💡 اقتراحات سريعة
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70 font-semibold">
+                  ✦ Quick Prompts ✦
                 </p>
                 <div className="flex flex-wrap gap-1.5 justify-center px-2">
                   {[
@@ -200,11 +201,11 @@ Rules:
                     { emoji: "⚠️", label: "Pitfalls", prompt: `What are the top 3 pitfalls or "never do this" warnings in "${scenario?.title_en}"?` },
                     { emoji: "🗣️", label: "Counsel patient", prompt: `Script how I should counsel the patient in "${scenario?.title_en}" — empathetic, clear, in plain language.` },
                   ].map((chip) => (
-                    <button
+                      <button
                       key={chip.label}
                       onClick={() => sendMessage(chip.prompt)}
                       disabled={loading}
-                      className="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary border border-border/50 transition-colors disabled:opacity-50"
+                      className="text-xs px-3 py-1.5 rounded-full bg-gradient-to-br from-muted to-muted/50 hover:from-primary/15 hover:to-primary/5 hover:text-primary border border-border/50 hover:border-primary/40 transition-all hover:-translate-y-0.5 hover:shadow-sm disabled:opacity-50 font-medium"
                     >
                       <span className="mr-1">{chip.emoji}</span>
                       {chip.label}
@@ -242,10 +243,10 @@ Rules:
                             ? "bg-warning-soft border-warning/40 text-warning"
                             : "border-border/50 text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/30"
                         }`}
-                        title={isSaved ? "محفوظة" : "حفظ المحادثة"}
+                        title={isSaved ? "Saved" : "Save chat"}
                       >
                         {isSaved ? <BookmarkCheck className="w-3 h-3" /> : <Bookmark className="w-3 h-3" />}
-                        {isSaved ? "محفوظة" : "حفظ"}
+                        {isSaved ? "Saved" : "Save"}
                       </button>
                     </div>
                   )}
@@ -270,10 +271,10 @@ Rules:
               disabled={loading}
               size="sm"
               variant="outline"
-              className="rounded-full text-xs h-8 shrink-0 border-primary/30 text-primary hover:bg-primary/10"
+              className="rounded-full text-xs h-8 shrink-0 border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/60 font-semibold tracking-wide shadow-sm"
             >
-              <Target className="w-3.5 h-3.5" />
-              سؤال صعب
+              <Target className="w-3.5 h-3.5 mr-1" />
+              Challenge Me ✦
             </Button>
           </div>
         )}
