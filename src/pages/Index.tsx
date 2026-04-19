@@ -634,7 +634,7 @@ export default function Index() {
                       : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  <PhIcon name={config.phName} size={16} tone={active ? "white" : "current"} />
                 </motion.span>
                 <span className="relative flex-1 min-w-0 text-left leading-tight break-words">{tabLabel(id)}</span>
                 <span
