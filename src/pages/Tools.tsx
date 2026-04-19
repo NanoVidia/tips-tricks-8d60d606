@@ -363,23 +363,47 @@ export default function Tools() {
   const mcqAnswered = Object.keys(mcqAnswers).length;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
-      <div className="h-1 bg-gradient-to-r from-rose-500 via-blue-500 to-emerald-500" />
+    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative tabular-nums">
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
+        style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
+        aria-hidden="true"
+      />
+      <div className="h-[3px] gradient-gold relative z-20" />
 
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border/40 px-4 py-3">
-        <div className="flex items-center gap-2 mb-3">
-          <Link to="/" aria-label="Back to home" className="p-1.5 -ml-1.5 rounded-lg hover:bg-muted transition">
-            <ArrowLeft className="w-4 h-4 text-foreground" />
+      <header className="sticky top-0 z-20 px-4 sm:px-5 pt-4 pb-3 border-b border-border/50 bg-card/85 backdrop-blur-md">
+        {/* Eyebrow line — matches Index masthead */}
+        <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
+          <Link to="/" aria-label="Back to home" className="flex items-center gap-1.5 hover:text-foreground transition">
+            <ArrowLeft className="w-3 h-3" />
+            <span>Home</span>
           </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-base font-black text-foreground tracking-tight">Clinical Tools</h1>
-            <p className="text-[10px] text-muted-foreground">Calculators • Protocols • References</p>
-          </div>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-1 h-1 rounded-full bg-gold" />
+            <span className="text-gold/90">Clinical Tools</span>
+          </span>
         </div>
+
+        {/* Masthead title */}
+        <div className="mb-4">
+          <h1 className="font-editorial italic font-black tracking-tight leading-[1.02] text-[26px] text-foreground">
+            <span className="relative inline-block">
+              <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_50%,hsl(var(--foreground))_100%)]">
+                Clinical Tools
+              </span>
+              <span aria-hidden="true" className="absolute left-0 -bottom-1.5 h-[2px] w-full origin-left bg-gradient-to-r from-primary via-primary/50 to-transparent" />
+            </span>
+          </h1>
+          <p className="mt-3 text-[11px] text-muted-foreground tracking-wide">
+            Calculators · Protocols · Drugs · DDx · Surgery · MCQ
+          </p>
+        </div>
+
+        <div className="divider-editorial mb-3" aria-hidden="true" />
 
         <nav
           aria-label="Tools sections"
-          className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-1 px-1 pb-1"
+          className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-1 px-1 pb-0.5"
         >
           {sections.map((s) => {
             const Icon = s.icon;
@@ -392,8 +416,8 @@ export default function Tools() {
                 aria-current={isActive ? "page" : undefined}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition ${
                   isActive
-                    ? `bg-gradient-to-r ${s.color} text-white border-transparent shadow-sm`
-                    : "bg-card border-border/50 text-muted-foreground hover:bg-muted/50"
+                    ? `bg-gradient-to-r ${s.color} text-white border-transparent shadow-gold`
+                    : "bg-card border-border/60 text-muted-foreground hover:bg-muted/50 hover:border-primary/30"
                 }`}
               >
                 <Icon className={`w-3 h-3 ${s.id === "favorites" && favorites.total > 0 && !isActive ? "fill-warning text-warning" : ""}`} />
@@ -409,8 +433,7 @@ export default function Tools() {
         </nav>
       </header>
 
-      <main className="flex-1 px-4 py-4">
-        <DisclaimerBanner className="mb-3" />
+      <main className="flex-1 px-4 sm:px-5 pt-5 pb-6">
         <Tabs value={active} onValueChange={setActive} className="w-full">
           <TabsList className="hidden">
             {sections.map((s) => <TabsTrigger key={s.id} value={s.id}>{s.label}</TabsTrigger>)}
@@ -817,6 +840,18 @@ export default function Tools() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Disclaimer — placed just above the footer for legal prominence */}
+      <div className="px-4 sm:px-5 pt-2 pb-5">
+        <DisclaimerBanner />
+      </div>
+
+      <footer className="relative px-5 pt-5 pb-8 border-t border-border/50 bg-card/40">
+        <div className="divider-editorial mb-3" aria-hidden="true" />
+        <p className="text-center text-[10px] text-muted-foreground tabular-nums">
+          © {new Intl.NumberFormat("en-US-u-nu-latn").format(new Date().getFullYear())} Tips &amp; Tricks · Clinical Tools
+        </p>
+      </footer>
     </div>
   );
 }
