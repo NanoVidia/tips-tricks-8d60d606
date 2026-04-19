@@ -842,15 +842,25 @@ export default function Index() {
       </div>
 
       {/* Editorial footer — credits relocated from the masthead */}
-      <footer className="relative px-5 pt-6 pb-9 border-t border-border/50 bg-card/40">
-        <div className="divider-editorial mb-4" aria-hidden="true" />
-        <div className="text-center space-y-2">
-          <p className="eyebrow text-gold text-[10px] tracking-[0.22em]">Under the supervision of</p>
-          <p className="font-editorial text-[16px] font-bold text-foreground leading-snug">
+      <footer className="relative px-5 pt-7 pb-10 border-t border-border/50 bg-gradient-to-b from-card/40 via-card/60 to-card/80 overflow-hidden">
+        {/* Decorative gold orb */}
+        <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-gradient-to-br from-gold/10 to-transparent blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="divider-editorial mb-4 relative" aria-hidden="true" />
+        <div className="text-center space-y-2 relative">
+          <p className="eyebrow text-gold text-[10px] tracking-[0.22em]">✦ Under the supervision of ✦</p>
+          <p className="font-editorial text-[17px] font-bold bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent leading-snug">
             {t("appSubtitle")}
           </p>
-          <p className="text-[10px] text-muted-foreground leading-relaxed pt-1.5 tabular-nums">
-            © {formatNumber(new Date().getFullYear())} Tips &amp; Tricks · Clinical Edition
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <span className="h-px w-8 bg-gradient-to-r from-transparent to-gold/40" aria-hidden="true" />
+            <span className="text-[10px] text-gold/80 font-semibold tracking-[0.2em] uppercase">Est. {formatNumber(2026)}</span>
+            <span className="h-px w-8 bg-gradient-to-l from-transparent to-gold/40" aria-hidden="true" />
+          </div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed pt-1 tabular-nums">
+            © {formatNumber(2026)} <span className="font-semibold text-foreground/80">Tips &amp; Tricks</span> · Clinical Edition
+          </p>
+          <p className="text-[9px] text-muted-foreground/70 tracking-wider pt-0.5">
+            Crafted with precision for OB/GYN excellence
           </p>
         </div>
       </footer>

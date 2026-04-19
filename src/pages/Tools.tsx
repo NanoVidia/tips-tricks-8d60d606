@@ -852,10 +852,16 @@ export default function Tools() {
         <DisclaimerBanner />
       </div>
 
-      <footer className="relative px-5 pt-5 pb-8 border-t border-border/50 bg-card/40">
-        <div className="divider-editorial mb-3" aria-hidden="true" />
-        <p className="text-center text-[10px] text-muted-foreground tabular-nums">
-          © {new Intl.NumberFormat("en-US-u-nu-latn").format(new Date().getFullYear())} Tips &amp; Tricks · Clinical Tools
+      <footer className="relative px-5 pt-6 pb-9 border-t border-border/50 bg-gradient-to-b from-card/40 to-card/70 overflow-hidden">
+        <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-br from-gold/10 to-transparent blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="divider-editorial mb-3 relative" aria-hidden="true" />
+        <div className="flex items-center justify-center gap-2 mb-2 relative">
+          <span className="h-px w-6 bg-gradient-to-r from-transparent to-gold/40" aria-hidden="true" />
+          <span className="text-[9px] text-gold/80 font-semibold tracking-[0.2em] uppercase">Clinical Tools</span>
+          <span className="h-px w-6 bg-gradient-to-l from-transparent to-gold/40" aria-hidden="true" />
+        </div>
+        <p className="text-center text-[10px] text-muted-foreground tabular-nums relative">
+          © {new Intl.NumberFormat("en-US-u-nu-latn").format(2026)} <span className="font-semibold text-foreground/80">Tips &amp; Tricks</span> · Crafted for OB/GYN excellence
         </p>
       </footer>
     </div>
