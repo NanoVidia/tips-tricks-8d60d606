@@ -152,7 +152,7 @@ Rules:
 
         <div className="flex-1 overflow-y-auto py-3 space-y-3 min-h-0">
           {messages.length === 0 && (
-            <div className="text-center text-xs text-muted-foreground py-8 space-y-3">
+            <div className="text-center text-xs text-muted-foreground py-6 space-y-3">
               <p>👋 Welcome!</p>
               <p>Your medical AI assistant</p>
               <p className="mt-3">Ask anything about this clinical scenario...</p>
@@ -165,6 +165,34 @@ Rules:
                 <Target className="w-4 h-4" />
                 اسألني سؤال صعب
               </Button>
+
+              <div className="pt-4 space-y-2">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+                  💡 اقتراحات سريعة
+                </p>
+                <div className="flex flex-wrap gap-1.5 justify-center px-2">
+                  {[
+                    { emoji: "🚩", label: "Red flags", prompt: `What are the key red flags & danger signs I must NOT miss in "${scenario?.title_en}"? Give me the "don't be that doctor" list.` },
+                    { emoji: "🎯", label: "Next best step", prompt: `In "${scenario?.title_en}", what is the single next best step right now? Justify in 3 lines max.` },
+                    { emoji: "🧠", label: "Mnemonic", prompt: `Give me a memorable mnemonic or rule of thumb for managing "${scenario?.title_en}" — the kind seniors actually use.` },
+                    { emoji: "🔪", label: "Surgical pearls", prompt: `Share 3 surgical/procedural pearls or tricks specific to "${scenario?.title_en}" — anatomic landmarks, hand positions, or "if A fails, do B" ladders.` },
+                    { emoji: "💊", label: "Drug doses", prompt: `List the exact drug doses, routes, and contraindications relevant to "${scenario?.title_en}". Be precise.` },
+                    { emoji: "📚", label: "Latest guideline", prompt: `What does the most recent ACOG/RCOG/FIGO guideline say about "${scenario?.title_en}"? Cite year and bulletin number.` },
+                    { emoji: "⚠️", label: "Pitfalls", prompt: `What are the top 3 pitfalls or "never do this" warnings in "${scenario?.title_en}"?` },
+                    { emoji: "🗣️", label: "Counsel patient", prompt: `Script how I should counsel the patient in "${scenario?.title_en}" — empathetic, clear, in plain language.` },
+                  ].map((chip) => (
+                    <button
+                      key={chip.label}
+                      onClick={() => sendMessage(chip.prompt)}
+                      disabled={loading}
+                      className="text-[11px] px-2.5 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary border border-border/50 transition-colors disabled:opacity-50"
+                    >
+                      <span className="mr-1">{chip.emoji}</span>
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
           {messages.map((m, i) => (
