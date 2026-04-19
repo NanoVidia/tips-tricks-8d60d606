@@ -861,7 +861,7 @@ export default function Tools() {
           <span className="h-px w-6 bg-gradient-to-l from-transparent to-gold/40" aria-hidden="true" />
         </div>
         <p className="text-center text-[10px] text-muted-foreground tabular-nums relative">
-          © {new Intl.NumberFormat("en-US-u-nu-latn").format(2026)} <span className="font-semibold text-foreground/80">Tips &amp; Tricks</span> · Crafted for OB/GYN excellence
+          © 2026 <span className="font-semibold text-foreground/80">Tips &amp; Tricks</span> · Crafted for OB/GYN excellence
         </p>
       </footer>
     </div>
