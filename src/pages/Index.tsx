@@ -853,11 +853,11 @@ export default function Index() {
           </p>
           <div className="flex items-center justify-center gap-2 pt-2">
             <span className="h-px w-8 bg-gradient-to-r from-transparent to-gold/40" aria-hidden="true" />
-            <span className="text-[10px] text-gold/80 font-semibold tracking-[0.2em] uppercase">Est. {formatNumber(2026)}</span>
+            <span className="text-[10px] text-gold/80 font-semibold tracking-[0.2em] uppercase">Est. 2026</span>
             <span className="h-px w-8 bg-gradient-to-l from-transparent to-gold/40" aria-hidden="true" />
           </div>
           <p className="text-[10px] text-muted-foreground leading-relaxed pt-1 tabular-nums">
-            © {formatNumber(2026)} <span className="font-semibold text-foreground/80">Tips &amp; Tricks</span> · Clinical Edition
+            © 2026 <span className="font-semibold text-foreground/80">Tips &amp; Tricks</span> · Clinical Edition
           </p>
           <p className="text-[9px] text-muted-foreground/70 tracking-wider pt-0.5">
             Crafted with precision for OB/GYN excellence
