@@ -1,7 +1,7 @@
 // Unified Phosphor Icon wrapper with brand-tinted duotone styling.
-// Usage: <PhIcon name="Stethoscope" size={18} tone="primary" />
-// All Phosphor icons are exposed by name; we apply duotone weight + a
-// secondary color tint that follows the design system tokens.
+// Phosphor's duotone weight renders two layers using the same `color` value;
+// the secondary layer is automatically rendered at ~20% opacity.
+// We expose tone presets that map to design tokens via inline color values.
 import * as Ph from "@phosphor-icons/react";
 import type { IconProps } from "@phosphor-icons/react";
 
@@ -9,43 +9,34 @@ type PhName = keyof typeof Ph;
 
 export type PhIconProps = Omit<IconProps, "weight" | "color"> & {
   name: PhName;
-  /** Tone for the duotone secondary fill — maps to design tokens. */
-  tone?: "primary" | "gold" | "danger" | "success" | "muted" | "white";
-  /** Override the primary stroke color (defaults to currentColor). */
+  /** Tone preset — sets stroke color. Defaults to currentColor. */
+  tone?: "primary" | "gold" | "danger" | "success" | "muted" | "foreground" | "white" | "current";
+  /** Direct color override (wins over tone). */
   color?: string;
+  /** Phosphor weight; defaults to duotone for the editorial brand look. */
+  weight?: IconProps["weight"];
 };
 
-const TONE_FILL: Record<NonNullable<PhIconProps["tone"]>, string> = {
+const TONE_COLOR: Record<Exclude<NonNullable<PhIconProps["tone"]>, "current">, string> = {
   primary: "hsl(var(--primary))",
   gold: "hsl(var(--gold, 38 70% 52%))",
   danger: "hsl(var(--destructive))",
   success: "hsl(142 70% 45%)",
   muted: "hsl(var(--muted-foreground))",
+  foreground: "hsl(var(--foreground))",
   white: "hsl(0 0% 100%)",
 };
 
 export function PhIcon({
   name,
-  tone = "primary",
+  tone = "current",
   color,
   size = 20,
-  style,
+  weight = "duotone",
   ...rest
 }: PhIconProps) {
-  const Comp = Ph[name] as React.ComponentType<IconProps>;
+  const Comp = Ph[name] as React.ComponentType<IconProps> | undefined;
   if (!Comp) return null;
-  return (
-    <Comp
-      weight="duotone"
-      size={size}
-      color={color ?? "currentColor"}
-      style={{
-        // Duotone secondary layer color via CSS variable Phosphor reads
-        ["--ph-duotone-secondary-color" as never]: TONE_FILL[tone],
-        ["--ph-duotone-secondary-opacity" as never]: 0.28,
-        ...style,
-      }}
-      {...rest}
-    />
-  );
+  const resolved = color ?? (tone === "current" ? "currentColor" : TONE_COLOR[tone]);
+  return <Comp weight={weight} size={size} color={resolved} {...rest} />;
 }
