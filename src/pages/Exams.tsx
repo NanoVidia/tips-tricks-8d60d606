@@ -210,39 +210,60 @@ export default function Exams() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur sticky top-0 z-20">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-            Home
-          </Link>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate("/exams/compare")}>
-              <GitCompare className="h-4 w-4 mr-2" />
+    <div className="min-h-screen gradient-paper text-foreground relative tabular-nums">
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
+        style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
+        aria-hidden="true"
+      />
+      <div className="h-[3px] gradient-gold relative z-20" />
+
+      {/* Editorial Header */}
+      <header className="sticky top-0 z-20 border-b border-border/50 bg-card/85 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-5 pt-4 pb-3">
+          {/* Eyebrow line */}
+          <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
+            <Link to="/" className="flex items-center gap-1.5 hover:text-foreground transition">
+              <ArrowLeft className="w-3 h-3" />
+              <span>Home</span>
+            </Link>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-1 h-1 rounded-full bg-gold" />
+              <span className="text-gold/90">Licensing Hub</span>
+            </span>
+            <Button variant="outline" size="sm" onClick={() => navigate("/exams/compare")} className="h-7 text-[10px] uppercase tracking-wider font-bold">
+              <GitCompare className="h-3 w-3 mr-1.5" />
               Compare
             </Button>
           </div>
+
+          {/* Masthead title */}
+          <div className="mb-3">
+            <h1 className="font-editorial italic font-black tracking-tight leading-[1.02] text-[28px] sm:text-[34px] text-foreground">
+              <span className="relative inline-block">
+                <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_50%,hsl(var(--foreground))_100%)]">
+                  Practice. Simulate. Pass.
+                </span>
+                <span aria-hidden="true" className="absolute left-0 -bottom-1.5 h-[2px] w-full origin-left bg-gradient-to-r from-primary via-primary/50 to-transparent" />
+              </span>
+            </h1>
+            <p className="mt-3 text-[11px] sm:text-[12px] text-muted-foreground tracking-wide">
+              Gulf Licensing Exams · OB/GYN
+            </p>
+          </div>
+          <div className="divider-editorial" aria-hidden="true" />
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        <DisclaimerBanner />
-        {/* Hero */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-5 py-6 space-y-7">
+        {/* Intro paragraph */}
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-3"
+          className="max-w-2xl"
         >
-          <Badge variant="secondary" className="uppercase tracking-wider text-xs">
-            Gulf Licensing Exams · OB/GYN
-          </Badge>
-          <h1 className="font-serif text-4xl sm:text-5xl text-foreground">
-            Practice. Simulate. Pass.
-          </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Every Pearson VUE & Prometric OB/GYN licensing exam in the Gulf — with real-time exam simulation,
+          <p className="text-[13px] sm:text-sm text-muted-foreground leading-relaxed">
+            Every Pearson VUE &amp; Prometric OB/GYN licensing exam in the Gulf — with real-time exam simulation,
             AI-generated questions and curated MCQs from RCOG, ACOG and Williams Obstetrics.
           </p>
         </motion.section>
