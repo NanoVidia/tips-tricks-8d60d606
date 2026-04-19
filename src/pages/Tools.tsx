@@ -840,6 +840,18 @@ export default function Tools() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Disclaimer — placed just above the footer for legal prominence */}
+      <div className="px-4 sm:px-5 pt-2 pb-5">
+        <DisclaimerBanner />
+      </div>
+
+      <footer className="relative px-5 pt-5 pb-8 border-t border-border/50 bg-card/40">
+        <div className="divider-editorial mb-3" aria-hidden="true" />
+        <p className="text-center text-[10px] text-muted-foreground tabular-nums">
+          © {new Intl.NumberFormat("en-US-u-nu-latn").format(new Date().getFullYear())} Tips &amp; Tricks · Clinical Tools
+        </p>
+      </footer>
     </div>
   );
 }
