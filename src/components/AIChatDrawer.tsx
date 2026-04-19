@@ -86,15 +86,33 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [savedKeys, setSavedKeys] = useState<Set<number>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { save: saveChat } = useSavedChats();
 
   useEffect(() => {
-    if (!open) { setMessages([]); setInput(""); }
+    if (!open) { setMessages([]); setInput(""); setSavedKeys(new Set()); }
   }, [open]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleSaveExchange = (assistantIdx: number) => {
+    const assistant = messages[assistantIdx];
+    if (!assistant || assistant.role !== "assistant" || !assistant.content.trim()) return;
+    let question = "";
+    for (let i = assistantIdx - 1; i >= 0; i--) {
+      if (messages[i].role === "user") { question = messages[i].content; break; }
+    }
+    saveChat({
+      scenarioTitle: scenario?.title_en || "Scenario",
+      question,
+      answer: assistant.content,
+    });
+    setSavedKeys((prev) => new Set(prev).add(assistantIdx));
+    toast.success("تم حفظ المحادثة في المفضلة ⭐");
+  };
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || !scenario || loading) return;
