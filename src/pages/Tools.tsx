@@ -22,6 +22,7 @@ import { useBookmarks } from "@/hooks/useBookmarks";
 import { useToolsData } from "@/hooks/useToolsData";
 import { toast } from "@/hooks/use-toast";
 import { DisclaimerBanner, InlineDisclaimer } from "@/components/Disclaimer";
+import { PhIcon } from "@/components/ui/PhIcon";
 
 const sections = [
   { id: "favorites", label: "Favorites", icon: Star, ph: "Star" as const, color: "from-amber-400 to-orange-500" },
