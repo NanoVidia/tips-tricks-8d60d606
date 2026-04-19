@@ -195,6 +195,21 @@ Rules:
           <div ref={bottomRef} />
         </div>
 
+        {messages.length > 0 && (
+          <div className="flex gap-2 pt-2 overflow-x-auto scrollbar-none">
+            <Button
+              onClick={askHardQuestion}
+              disabled={loading}
+              size="sm"
+              variant="outline"
+              className="rounded-full text-xs h-8 shrink-0 border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <Target className="w-3.5 h-3.5" />
+              سؤال صعب
+            </Button>
+          </div>
+        )}
+
         <div className="flex gap-2 pt-2 border-t border-border/50">
           <Input
             value={input}
