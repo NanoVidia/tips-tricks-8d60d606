@@ -215,7 +215,7 @@
       hsl(var(--foreground) / 0.06) 60%,
       transparent 100%
     );
-    z-index: 30;
+    z-index: 1;
   }
   .dark .header-fade::after {
     background: linear-gradient(
