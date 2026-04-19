@@ -308,8 +308,8 @@ export default function Index() {
       <div className="h-[3px] gradient-gold relative z-20" />
 
       <header
-        className={`header-fade sticky top-0 z-20 px-4 sm:px-5 pt-4 pb-3.5 border-b bg-card/85 backdrop-blur-md transition-shadow duration-300 ${
-          scrolled ? "border-border/70" : "border-border/50"
+        className={`header-fade sticky top-0 z-20 px-4 sm:px-5 border-b bg-card/85 backdrop-blur-md transition-all duration-300 ${
+          scrolled ? "pt-2 pb-2 border-border/70" : "pt-4 pb-3.5 border-border/50"
         }`}
       >
         <div className="relative">
@@ -430,7 +430,7 @@ export default function Index() {
               aria-controls="search-suggestions"
               aria-autocomplete="list"
               aria-activedescendant={highlightIdx >= 0 ? `suggest-${highlightIdx}` : undefined}
-              className="relative h-12 bg-card border-border/60 rounded-2xl text-[14px] pl-12 pr-10 shadow-editorial focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/50 transition-all tabular-nums"
+              className={`relative bg-card border-border/60 rounded-2xl text-[14px] pl-12 pr-10 shadow-editorial focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/50 transition-all duration-300 tabular-nums ${scrolled ? "h-9" : "h-12"}`}
             />
             {search && (
               <button
