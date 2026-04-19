@@ -119,6 +119,8 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [aiScenario, setAiScenario] = useState<Scenario | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
+  const [sheetScenario, setSheetScenario] = useState<Scenario | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   // Auto-suggest state
@@ -852,6 +854,14 @@ export default function Index() {
       </footer>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
+      <ScenarioSheet
+        scenario={sheetScenario}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onAI={(s) => { setSheetOpen(false); openAI(s); }}
+        categoryConfig={categoryConfig}
+        t={t}
+      />
       <Suspense fallback={null}><FloatingAIBot /></Suspense>
       <OnboardingTour />
     </div>
