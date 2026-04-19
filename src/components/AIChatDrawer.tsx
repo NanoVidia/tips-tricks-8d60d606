@@ -284,10 +284,10 @@ Rules:
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
             placeholder="Ask about this scenario..."
-            className="flex-1 h-10 rounded-xl"
+            className="flex-1 h-11 rounded-xl text-[15px]"
             disabled={loading}
           />
-          <Button size="icon" onClick={send} disabled={loading || !input.trim()} className="rounded-xl">
+          <Button size="icon" onClick={send} disabled={loading || !input.trim()} className="rounded-xl h-11 w-11">
             <Send className="w-4 h-4" />
           </Button>
         </div>
