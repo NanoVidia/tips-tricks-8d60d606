@@ -24,7 +24,7 @@ const queryClient = new QueryClient();
 // 🔒 حالة التجميد — يتحكم بها Lovable فقط من هنا (غير مرتبطة بـ DB).
 // لتجميد التطبيق للزوار: اجعل القيمة true. لإلغاء التجميد: false.
 // المطوّر يتجاوز عبر ?dev=1 (يُحفظ في localStorage) ويُعيد القفل عبر ?dev=0.
-const APP_FROZEN = true;
+const APP_FROZEN = false;
 const DEV_KEY = "dev_unlock";
 
 const App = () => {
