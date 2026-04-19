@@ -308,7 +308,7 @@ export default function Index() {
       <div className="h-[3px] gradient-gold relative z-20" />
 
       <header
-        className={`sticky top-0 z-20 px-4 sm:px-5 transition-all duration-300 border-b bg-card/85 backdrop-blur-md ${
+        className={`header-fade sticky top-0 z-20 px-4 sm:px-5 transition-all duration-300 border-b bg-card/85 backdrop-blur-md ${
           scrolled ? "pt-2.5 pb-2.5 border-border/70 shadow-editorial" : "pt-4.5 pb-4 border-border/50"
         }`}
       >

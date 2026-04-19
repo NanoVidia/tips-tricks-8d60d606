@@ -372,7 +372,7 @@ export default function Tools() {
       />
       <div className="h-[3px] gradient-gold relative z-20" />
 
-      <header className="sticky top-0 z-20 px-4 sm:px-5 pt-4 pb-3 border-b border-border/50 bg-card/85 backdrop-blur-md">
+      <header className="header-fade sticky top-0 z-20 px-4 sm:px-5 pt-4 pb-3 border-b border-border/50 bg-card/85 backdrop-blur-md">
         {/* Eyebrow line — matches Index masthead */}
         <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
           <Link to="/" aria-label="Back to home" className="flex items-center gap-1.5 hover:text-foreground transition">

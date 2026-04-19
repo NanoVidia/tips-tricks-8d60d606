@@ -219,7 +219,7 @@ export default function Exams() {
       <div className="h-[3px] gradient-gold relative z-20" />
 
       {/* Editorial Header */}
-      <header className="sticky top-0 z-20 border-b border-border/50 bg-card/85 backdrop-blur-md">
+      <header className="header-fade sticky top-0 z-20 border-b border-border/50 bg-card/85 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-5 pt-4 pb-3">
           {/* Eyebrow line */}
           <div className="flex items-center justify-between mb-3 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
