@@ -7,9 +7,10 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { AIChatDrawer } from "@/components/AIChatDrawer";
+import { ScenarioCard } from "@/components/ScenarioCard";
+import { ScenarioSheet } from "@/components/ScenarioSheet";
 import { Pagination } from "@/components/Pagination";
 import { StatsStrip } from "@/components/StatsStrip";
 import { CaseOfTheDay } from "@/components/CaseOfTheDay";
@@ -101,46 +102,8 @@ const TAB_LABEL_KEYS: Record<ScenarioCategory, string> = {
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US-u-nu-latn").format(value);
 const normalizeDigits = (value: string) => value.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
 
-function ClinicalCard({ item, onAI, t }: { item: Scenario; onAI: () => void; t: TFn }) {
-  return (
-    <AccordionItem
-      value={item.id}
-      className="border-0 mb-2.5 last:mb-0 rounded-[1.35rem] overflow-hidden bg-gradient-to-br from-primary/[0.06] via-primary/[0.03] to-transparent border border-primary/15 hover:border-primary/30 hover:from-primary/[0.10] hover:via-primary/[0.05] transition-all data-[state=open]:from-primary/[0.10] data-[state=open]:via-primary/[0.06] data-[state=open]:border-primary/30 data-[state=open]:shadow-editorial"
-    >
-      <AccordionTrigger className="py-4 px-4 text-[15px] font-semibold hover:no-underline group">
-        <div className="flex items-start gap-3 text-left flex-1">
-          <div className="w-1 self-stretch rounded-full bg-gradient-to-b from-primary to-primary/40 shrink-0" aria-hidden="true" />
-          <span className="group-hover:text-primary transition-colors font-semibold text-foreground leading-6 text-[15px] tabular-nums">
-            {normalizeDigits(item.title_en)}
-          </span>
-        </div>
-      </AccordionTrigger>
-      <AccordionContent className="px-4 pb-4.5">
-        <div className="space-y-3">
-          {[
-            { label: t("situation"), text: item.situation_en },
-            { label: t("clinicalAction"), text: item.action_en },
-            { label: t("patientScript"), text: item.script_en },
-          ].map((section) => (
-            <div key={section.label} className="rounded-2xl bg-card/80 backdrop-blur-sm p-3.5 border border-primary/10">
-              <div className="text-[11px] font-bold text-primary uppercase tracking-[0.16em] mb-1.5">{section.label}</div>
-              <p className="text-[14px] leading-7 text-foreground tabular-nums">{normalizeDigits(section.text)}</p>
-            </div>
-          ))}
-          <Button
-            size="sm"
-            onClick={onAI}
-            className="w-full rounded-xl gradient-ink text-paper font-medium gap-2 shadow-editorial hover:shadow-gold h-10 border border-gold/20"
-            style={{ color: "hsl(40 30% 96%)" }}
-          >
-            <MessageCircle className="w-4 h-4 text-gold" />
-            {t("discussAI")}
-          </Button>
-        </div>
-      </AccordionContent>
-    </AccordionItem>
-  );
-}
+// (Inline ClinicalCard removed — replaced by ScenarioCard + ScenarioSheet)
+
 
 export default function Index() {
   const { t } = useTranslations();
@@ -156,6 +119,8 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [aiScenario, setAiScenario] = useState<Scenario | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
+  const [sheetScenario, setSheetScenario] = useState<Scenario | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   // Auto-suggest state
@@ -800,10 +765,26 @@ export default function Index() {
             <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
         ) : scenarios.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground py-8">{t("noResults")}</p>
+          <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-muted/60 flex items-center justify-center">
+              <Search className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground max-w-[260px]">{t("noResults")}</p>
+            {search && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSearch("")}
+                className="rounded-full text-[11px] h-8 px-3.5"
+              >
+                <X className="w-3 h-3 mr-1" />
+                Clear search
+              </Button>
+            )}
+          </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-3 px-1 gap-2">
+            <div className="flex items-center justify-between mb-3 mt-4 px-1 gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 {(() => {
                   const cfg = categoryConfig[activeTab];
@@ -820,12 +801,19 @@ export default function Index() {
               </span>
             </div>
 
-            <div className="space-y-0">
-              <Accordion type="single" collapsible className="w-full">
-                {scenarios.map((item) => (
-                  <ClinicalCard key={item.id} item={item} onAI={() => openAI(item)} t={t} />
-                ))}
-              </Accordion>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {scenarios.map((item, idx) => (
+                <ScenarioCard
+                  key={item.id}
+                  id={item.id}
+                  title={item.title_en}
+                  situation={item.situation_en}
+                  category={item.category}
+                  index={idx}
+                  onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                  categoryConfig={categoryConfig}
+                />
+              ))}
             </div>
             <Pagination
               currentPage={currentPage}
@@ -866,6 +854,14 @@ export default function Index() {
       </footer>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
+      <ScenarioSheet
+        scenario={sheetScenario}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onAI={(s) => { setSheetOpen(false); openAI(s as Scenario); }}
+        categoryConfig={categoryConfig}
+        t={t}
+      />
       <Suspense fallback={null}><FloatingAIBot /></Suspense>
       <OnboardingTour />
     </div>
