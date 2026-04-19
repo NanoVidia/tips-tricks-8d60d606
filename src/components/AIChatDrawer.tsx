@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { InlineDisclaimer } from "@/components/Disclaimer";
-import { WhatsAppContact } from "@/components/WhatsAppContact";
+
 
 interface Scenario {
   title_en: string;
