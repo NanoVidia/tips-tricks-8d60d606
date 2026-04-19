@@ -15,6 +15,7 @@ interface Scenario {
   situation_en: string;
   action_en: string;
   script_en: string;
+  synonyms?: string[] | null;
 }
 
 interface ScenarioSheetProps {
