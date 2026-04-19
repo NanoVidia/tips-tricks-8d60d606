@@ -430,7 +430,7 @@ export default function Index() {
               aria-controls="search-suggestions"
               aria-autocomplete="list"
               aria-activedescendant={highlightIdx >= 0 ? `suggest-${highlightIdx}` : undefined}
-              className="relative h-12 bg-card border-border/60 rounded-2xl text-[14px] pl-12 pr-10 shadow-editorial focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/50 transition-all tabular-nums"
+              className={`relative bg-card border-border/60 rounded-2xl text-[14px] pl-12 pr-10 shadow-editorial focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/50 transition-all duration-300 tabular-nums ${scrolled ? "h-9" : "h-12"}`}
             />
             {search && (
               <button
