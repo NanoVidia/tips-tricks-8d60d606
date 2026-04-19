@@ -158,7 +158,7 @@ Anchor your answers to THIS scenario when relevant — don't drift into generic 
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
