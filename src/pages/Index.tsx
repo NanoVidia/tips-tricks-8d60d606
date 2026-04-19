@@ -630,11 +630,11 @@ export default function Index() {
                   transition={{ duration: 0.5 }}
                   className={`relative flex items-center justify-center w-5 h-5 rounded-md shrink-0 transition-all ${
                     active
-                      ? "bg-white/20 text-primary-foreground backdrop-blur-sm"
-                      : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                      ? "bg-white/25 backdrop-blur-sm ring-1 ring-white/30"
+                      : "bg-gradient-to-br from-gold/15 to-primary/10 ring-1 ring-gold/30 group-hover:from-gold/25 group-hover:to-primary/20 group-hover:ring-gold/50"
                   }`}
                 >
-                  <PhIcon name={config.phName} size={13} tone={active ? "white" : "current"} />
+                  <PhIcon name={config.phName} size={13} tone={active ? "white" : "gold"} weight={active ? "fill" : "duotone"} />
                 </motion.span>
                 <span className="relative flex-1 min-w-0 text-left leading-[1.15] text-[10.5px] truncate">{tabLabel(id)}</span>
                 <span
