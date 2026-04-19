@@ -858,15 +858,20 @@ export default function Index() {
         )}
       </main>
 
+      {/* Disclaimer — placed just above the footer for legal prominence */}
+      <div className="px-4 sm:px-5 pt-2 pb-5">
+        <DisclaimerBanner />
+      </div>
+
       {/* Editorial footer — credits relocated from the masthead */}
-      <footer className="relative px-4 pt-5 pb-8 mt-2 border-t border-border/50 bg-card/40">
+      <footer className="relative px-5 pt-6 pb-9 border-t border-border/50 bg-card/40">
         <div className="divider-editorial mb-4" aria-hidden="true" />
-        <div className="text-center space-y-1.5">
-          <p className="eyebrow text-gold">Under the supervision of</p>
-          <p className="font-editorial text-[15px] font-bold text-foreground leading-tight">
+        <div className="text-center space-y-2">
+          <p className="eyebrow text-gold text-[10px] tracking-[0.22em]">Under the supervision of</p>
+          <p className="font-editorial text-[16px] font-bold text-foreground leading-snug">
             {t("appSubtitle")}
           </p>
-          <p className="text-[10px] text-muted-foreground leading-relaxed pt-1 tabular-nums">
+          <p className="text-[10px] text-muted-foreground leading-relaxed pt-1.5 tabular-nums">
             © {formatNumber(new Date().getFullYear())} Tips &amp; Tricks · Clinical Edition
           </p>
         </div>
