@@ -3,9 +3,10 @@ import ReactMarkdown from "react-markdown";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Target } from "lucide-react";
+import { Send, Loader2, Target, Bookmark, BookmarkCheck } from "lucide-react";
 import { toast } from "sonner";
 import { InlineDisclaimer } from "@/components/Disclaimer";
+import { useSavedChats } from "@/hooks/useSavedChats";
 
 
 interface Scenario {
@@ -85,15 +86,33 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [savedKeys, setSavedKeys] = useState<Set<number>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { save: saveChat } = useSavedChats();
 
   useEffect(() => {
-    if (!open) { setMessages([]); setInput(""); }
+    if (!open) { setMessages([]); setInput(""); setSavedKeys(new Set()); }
   }, [open]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleSaveExchange = (assistantIdx: number) => {
+    const assistant = messages[assistantIdx];
+    if (!assistant || assistant.role !== "assistant" || !assistant.content.trim()) return;
+    let question = "";
+    for (let i = assistantIdx - 1; i >= 0; i--) {
+      if (messages[i].role === "user") { question = messages[i].content; break; }
+    }
+    saveChat({
+      scenarioTitle: scenario?.title_en || "Scenario",
+      question,
+      answer: assistant.content,
+    });
+    setSavedKeys((prev) => new Set(prev).add(assistantIdx));
+    toast.success("تم حفظ المحادثة في المفضلة ⭐");
+  };
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || !scenario || loading) return;
@@ -145,15 +164,15 @@ Rules:
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[85vh] flex flex-col rounded-t-2xl">
         <SheetHeader className="pb-2 border-b border-border/50">
-          <SheetTitle className="text-sm truncate">
+          <SheetTitle className="text-base md:text-lg font-semibold truncate">
             ✨ AI — {scenario?.title_en || ""}
           </SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto py-3 space-y-3 min-h-0">
+        <div className="flex-1 overflow-y-auto py-3 space-y-4 min-h-0">
           {messages.length === 0 && (
-            <div className="text-center text-xs text-muted-foreground py-6 space-y-3">
-              <p>👋 Welcome!</p>
+            <div className="text-center text-sm text-muted-foreground py-6 space-y-3">
+              <p className="text-base">👋 Welcome!</p>
               <p>Your medical AI assistant</p>
               <p className="mt-3">Ask anything about this clinical scenario...</p>
               <Button
@@ -185,7 +204,7 @@ Rules:
                       key={chip.label}
                       onClick={() => sendMessage(chip.prompt)}
                       disabled={loading}
-                      className="text-[11px] px-2.5 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary border border-border/50 transition-colors disabled:opacity-50"
+                      className="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary border border-border/50 transition-colors disabled:opacity-50"
                     >
                       <span className="mr-1">{chip.emoji}</span>
                       {chip.label}
@@ -195,27 +214,48 @@ Rules:
               </div>
             </div>
           )}
-          {messages.map((m, i) => (
-            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[85%] space-y-1 ${m.role === "user" ? "items-end" : "items-start"}`}>
-                <div className={`rounded-xl px-3 py-2 text-sm ${
-                  m.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
-                }`}>
-                  {m.role === "assistant" ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <ReactMarkdown>{m.content}</ReactMarkdown>
+          {messages.map((m, i) => {
+            const isAssistant = m.role === "assistant";
+            const isSaved = savedKeys.has(i);
+            return (
+              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[88%] space-y-1.5 ${m.role === "user" ? "items-end" : "items-start"}`}>
+                  <div className={`rounded-2xl px-4 py-3 text-[15px] leading-relaxed ${
+                    m.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  }`}>
+                    {isAssistant ? (
+                      <div className="prose prose-base dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-2 prose-h1:text-lg prose-h2:text-base prose-h3:text-base prose-p:my-2 prose-li:my-0.5 prose-strong:text-foreground prose-code:text-[13px]">
+                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                      </div>
+                    ) : m.content}
+                  </div>
+                  {isAssistant && m.content && (
+                    <div className="flex items-center gap-2">
+                      <InlineDisclaimer />
+                      <button
+                        onClick={() => !isSaved && handleSaveExchange(i)}
+                        disabled={isSaved || loading}
+                        className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border transition ${
+                          isSaved
+                            ? "bg-warning-soft border-warning/40 text-warning"
+                            : "border-border/50 text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/30"
+                        }`}
+                        title={isSaved ? "محفوظة" : "حفظ المحادثة"}
+                      >
+                        {isSaved ? <BookmarkCheck className="w-3 h-3" /> : <Bookmark className="w-3 h-3" />}
+                        {isSaved ? "محفوظة" : "حفظ"}
+                      </button>
                     </div>
-                  ) : m.content}
+                  )}
                 </div>
-                {m.role === "assistant" && m.content && <InlineDisclaimer />}
               </div>
-            </div>
-          ))}
+            );
+          })}
           {loading && messages[messages.length - 1]?.role !== "assistant" && (
             <div className="flex justify-start">
-              <div className="bg-muted rounded-xl px-3 py-2">
+              <div className="bg-muted rounded-2xl px-4 py-3">
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
               </div>
             </div>
@@ -244,10 +284,10 @@ Rules:
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
             placeholder="Ask about this scenario..."
-            className="flex-1 h-10 rounded-xl"
+            className="flex-1 h-11 rounded-xl text-[15px]"
             disabled={loading}
           />
-          <Button size="icon" onClick={send} disabled={loading || !input.trim()} className="rounded-xl">
+          <Button size="icon" onClick={send} disabled={loading || !input.trim()} className="rounded-xl h-11 w-11">
             <Send className="w-4 h-4" />
           </Button>
         </div>
