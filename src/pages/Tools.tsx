@@ -407,8 +407,8 @@ export default function Tools() {
           className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-1 px-1 pb-0.5"
         >
           {sections.map((s) => {
-            const Icon = s.icon;
             const isActive = active === s.id;
+            const isFavBadge = s.id === "favorites" && favorites.total > 0 && !isActive;
             return (
               <button
                 key={s.id}
@@ -421,7 +421,12 @@ export default function Tools() {
                     : "bg-card border-border/60 text-muted-foreground hover:bg-muted/50 hover:border-primary/30"
                 }`}
               >
-                <Icon className={`w-3 h-3 ${s.id === "favorites" && favorites.total > 0 && !isActive ? "fill-warning text-warning" : ""}`} />
+                <PhIcon
+                  name={s.ph}
+                  size={14}
+                  weight={isActive || isFavBadge ? "fill" : "duotone"}
+                  tone={isActive ? "white" : isFavBadge ? "gold" : "current"}
+                />
                 {s.label}
                 {s.id === "favorites" && favorites.total > 0 && (
                   <span className={`text-[9px] tabular-nums px-1.5 rounded-full ${isActive ? "bg-white/25" : "bg-warning/20 text-warning"}`}>
