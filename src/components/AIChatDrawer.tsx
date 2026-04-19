@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { InlineDisclaimer } from "@/components/Disclaimer";
-import { WhatsAppContact } from "@/components/WhatsAppContact";
+
 
 interface Scenario {
   title_en: string;
@@ -168,8 +168,6 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
               </div>
             </div>
           )}
-          {/* WhatsApp contact — driven by app_settings */}
-          <WhatsAppContact />
           <div ref={bottomRef} />
         </div>
 
