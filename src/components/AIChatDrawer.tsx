@@ -3,9 +3,10 @@ import ReactMarkdown from "react-markdown";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Target } from "lucide-react";
+import { Send, Loader2, Target, Bookmark, BookmarkCheck } from "lucide-react";
 import { toast } from "sonner";
 import { InlineDisclaimer } from "@/components/Disclaimer";
+import { useSavedChats } from "@/hooks/useSavedChats";
 
 
 interface Scenario {
