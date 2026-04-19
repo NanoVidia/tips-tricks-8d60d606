@@ -571,15 +571,12 @@ export default function Index() {
       </header>
 
       {/* Content */}
-      <main className="flex-1 px-4 pb-6">
-        <div className="pt-3">
-          <DisclaimerBanner />
-        </div>
+      <main className="flex-1 px-4 sm:px-5 pb-8">
         {/* Category tabs — scrolls with the page (not sticky) */}
         <motion.div
           role="tablist"
           aria-label="Scenario categories"
-          className="relative grid grid-cols-2 gap-2 pt-4"
+          className="relative grid grid-cols-2 gap-2.5 pt-5"
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.35 }}
