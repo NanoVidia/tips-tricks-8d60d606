@@ -400,6 +400,20 @@ export default function Exams() {
           Fees and dates are indicative. Always verify with the official authority before registering.
         </p>
       </main>
+
+      {/* Disclaimer above footer */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-5 pt-2 pb-5">
+        <DisclaimerBanner />
+      </div>
+
+      <footer className="border-t border-border/50 bg-card/40">
+        <div className="max-w-6xl mx-auto px-5 pt-5 pb-8">
+          <div className="divider-editorial mb-3" aria-hidden="true" />
+          <p className="text-center text-[10px] text-muted-foreground tabular-nums">
+            © {new Intl.NumberFormat("en-US-u-nu-latn").format(new Date().getFullYear())} Tips &amp; Tricks · Licensing Hub
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
