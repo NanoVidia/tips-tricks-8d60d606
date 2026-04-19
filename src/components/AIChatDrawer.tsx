@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Target } from "lucide-react";
 import { toast } from "sonner";
 import { InlineDisclaimer } from "@/components/Disclaimer";
 
@@ -95,9 +95,9 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const send = async () => {
-    if (!input.trim() || !scenario || loading) return;
-    const userMsg: Msg = { role: "user", content: input.trim() };
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || !scenario || loading) return;
+    const userMsg: Msg = { role: "user", content: text.trim() };
     setMessages((p) => [...p, userMsg]);
     setInput("");
     setLoading(true);
@@ -126,6 +126,21 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
     });
   };
 
+  const send = () => sendMessage(input);
+
+  const askHardQuestion = () => {
+    sendMessage(
+      `🎯 **Challenge me!** Based on the current scenario (${scenario?.title_en}), ask me ONE advanced OSCE-style question to test my clinical reasoning.
+
+Rules:
+- Make it a realistic high-stakes vignette (numbers, vitals, exam findings, lab values).
+- Focus on a tricky decision point: next best step, anticipating a complication, recognizing a subtle sign, choosing the right maneuver, or avoiding a pitfall.
+- Give me 4 plausible options (A/B/C/D) — make the distractors tempting, not obvious.
+- DO NOT reveal the answer yet. End with: "💭 Take your time. Reply with A/B/C/D and your reasoning, and I'll grade you like an examiner."
+- After I answer, give me an examiner-style feedback: ✅ correct/❌ wrong, why each option is right or wrong, the underlying mechanism, the pearl, and the guideline reference.`
+    );
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[85vh] flex flex-col rounded-t-2xl">
@@ -137,10 +152,19 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
 
         <div className="flex-1 overflow-y-auto py-3 space-y-3 min-h-0">
           {messages.length === 0 && (
-            <div className="text-center text-xs text-muted-foreground py-8 space-y-2">
+            <div className="text-center text-xs text-muted-foreground py-8 space-y-3">
               <p>👋 Welcome!</p>
               <p>Your medical AI assistant</p>
               <p className="mt-3">Ask anything about this clinical scenario...</p>
+              <Button
+                onClick={askHardQuestion}
+                disabled={loading}
+                size="sm"
+                className="mt-4 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90"
+              >
+                <Target className="w-4 h-4" />
+                اسألني سؤال صعب
+              </Button>
             </div>
           )}
           {messages.map((m, i) => (
@@ -170,6 +194,21 @@ export function AIChatDrawer({ open, onOpenChange, scenario }: AIChatDrawerProps
           )}
           <div ref={bottomRef} />
         </div>
+
+        {messages.length > 0 && (
+          <div className="flex gap-2 pt-2 overflow-x-auto scrollbar-none">
+            <Button
+              onClick={askHardQuestion}
+              disabled={loading}
+              size="sm"
+              variant="outline"
+              className="rounded-full text-xs h-8 shrink-0 border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <Target className="w-3.5 h-3.5" />
+              سؤال صعب
+            </Button>
+          </div>
+        )}
 
         <div className="flex gap-2 pt-2 border-t border-border/50">
           <Input
