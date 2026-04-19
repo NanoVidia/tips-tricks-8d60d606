@@ -22,17 +22,18 @@ import { useBookmarks } from "@/hooks/useBookmarks";
 import { useToolsData } from "@/hooks/useToolsData";
 import { toast } from "@/hooks/use-toast";
 import { DisclaimerBanner, InlineDisclaimer } from "@/components/Disclaimer";
+import { PhIcon } from "@/components/ui/PhIcon";
 
 const sections = [
-  { id: "favorites", label: "Favorites", icon: Star, color: "from-amber-400 to-orange-500" },
-  { id: "calc", label: "Calculators", icon: Calculator, color: "from-blue-500 to-indigo-600" },
-  { id: "emergency", label: "Emergency", icon: Siren, color: "from-red-500 to-rose-600" },
-  { id: "drugs", label: "Drugs", icon: Pill, color: "from-emerald-500 to-teal-600" },
-  { id: "guidelines", label: "Guidelines", icon: BookMarked, color: "from-purple-500 to-pink-600" },
-  { id: "ddx", label: "DDx", icon: Brain, color: "from-amber-500 to-orange-600" },
-  { id: "mcq", label: "MCQ", icon: GraduationCap, color: "from-cyan-500 to-blue-600" },
-  { id: "surgeries", label: "Surgeries", icon: Scissors, color: "from-rose-500 to-pink-600" },
-  { id: "offline", label: "Offline", icon: WifiOff, color: "from-slate-500 to-slate-700" },
+  { id: "favorites", label: "Favorites", icon: Star, ph: "Star" as const, color: "from-amber-400 to-orange-500" },
+  { id: "calc", label: "Calculators", icon: Calculator, ph: "Calculator" as const, color: "from-blue-500 to-indigo-600" },
+  { id: "emergency", label: "Emergency", icon: Siren, ph: "Siren" as const, color: "from-red-500 to-rose-600" },
+  { id: "drugs", label: "Drugs", icon: Pill, ph: "Pill" as const, color: "from-emerald-500 to-teal-600" },
+  { id: "guidelines", label: "Guidelines", icon: BookMarked, ph: "BookmarkSimple" as const, color: "from-purple-500 to-pink-600" },
+  { id: "ddx", label: "DDx", icon: Brain, ph: "Brain" as const, color: "from-amber-500 to-orange-600" },
+  { id: "mcq", label: "MCQ", icon: GraduationCap, ph: "GraduationCap" as const, color: "from-cyan-500 to-blue-600" },
+  { id: "surgeries", label: "Surgeries", icon: Scissors, ph: "Scissors" as const, color: "from-rose-500 to-pink-600" },
+  { id: "offline", label: "Offline", icon: WifiOff, ph: "WifiSlash" as const, color: "from-slate-500 to-slate-700" },
 ] as const;
 
 // Registry of calculator IDs → metadata, for the Favorites view
@@ -406,8 +407,8 @@ export default function Tools() {
           className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-1 px-1 pb-0.5"
         >
           {sections.map((s) => {
-            const Icon = s.icon;
             const isActive = active === s.id;
+            const isFavBadge = s.id === "favorites" && favorites.total > 0 && !isActive;
             return (
               <button
                 key={s.id}
@@ -420,7 +421,12 @@ export default function Tools() {
                     : "bg-card border-border/60 text-muted-foreground hover:bg-muted/50 hover:border-primary/30"
                 }`}
               >
-                <Icon className={`w-3 h-3 ${s.id === "favorites" && favorites.total > 0 && !isActive ? "fill-warning text-warning" : ""}`} />
+                <PhIcon
+                  name={s.ph}
+                  size={14}
+                  weight={isActive || isFavBadge ? "fill" : "duotone"}
+                  tone={isActive ? "white" : isFavBadge ? "gold" : "current"}
+                />
                 {s.label}
                 {s.id === "favorites" && favorites.total > 0 && (
                   <span className={`text-[9px] tabular-nums px-1.5 rounded-full ${isActive ? "bg-white/25" : "bg-warning/20 text-warning"}`}>

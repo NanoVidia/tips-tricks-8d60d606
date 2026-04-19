@@ -19,6 +19,7 @@ import { useAppSettings } from "@/hooks/useAppSettings";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2 } from "lucide-react";
+import { PhIcon } from "@/components/ui/PhIcon";
 
 // Code-split the floating bot — it's not needed for first paint and ships React Markdown.
 const FloatingAIBot = lazy(() =>
@@ -42,6 +43,7 @@ const ITEMS_PER_PAGE = 30;
 
 const categoryConfig = {
   clinic: {
+    phName: "Stethoscope" as const,
     icon: Stethoscope,
     gradient: "from-sky-400 to-blue-600",
     bgLight: "bg-sky-50 dark:bg-sky-950/30",
@@ -50,6 +52,7 @@ const categoryConfig = {
     iconBg: "bg-gradient-to-br from-sky-400 to-blue-600",
   },
   or_labor: {
+    phName: "Scissors" as const,
     icon: Scissors,
     gradient: "from-rose-400 to-pink-600",
     bgLight: "bg-rose-50 dark:bg-rose-950/30",
@@ -58,6 +61,7 @@ const categoryConfig = {
     iconBg: "bg-gradient-to-br from-rose-400 to-pink-600",
   },
   behavior: {
+    phName: "ChatCircleDots" as const,
     icon: MessageCircle,
     gradient: "from-amber-400 to-orange-500",
     bgLight: "bg-amber-50 dark:bg-amber-950/30",
@@ -66,6 +70,7 @@ const categoryConfig = {
     iconBg: "bg-gradient-to-br from-amber-400 to-orange-500",
   },
   qa: {
+    phName: "Question" as const,
     icon: HelpCircle,
     gradient: "from-emerald-400 to-teal-600",
     bgLight: "bg-emerald-50 dark:bg-emerald-950/30",
@@ -532,7 +537,7 @@ export default function Index() {
                               }`}
                             >
                               <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
-                                <Icon className="w-3 h-3 text-white" />
+                                <PhIcon name={cfg.phName} size={14} tone="white" />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="text-[12px] font-semibold text-foreground truncate leading-tight">
@@ -629,7 +634,7 @@ export default function Index() {
                       : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  <PhIcon name={config.phName} size={16} tone={active ? "white" : "current"} />
                 </motion.span>
                 <span className="relative flex-1 min-w-0 text-left leading-tight break-words">{tabLabel(id)}</span>
                 <span
@@ -765,7 +770,7 @@ export default function Index() {
                       className="group flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:shadow-editorial transition-all text-left"
                     >
                       <div className={`p-2 rounded-lg ${cfg.iconBg} shrink-0`}>
-                        <Icon className="w-3.5 h-3.5 text-white" />
+                        <PhIcon name={cfg.phName} size={16} tone="white" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-bold text-foreground truncate leading-tight">{tabLabel(id)}</p>
@@ -792,7 +797,7 @@ export default function Index() {
               style={{ color: "hsl(40 30% 96%)" }}
             >
               <div className="p-2 rounded-xl bg-gold/20 ring-1 ring-gold/40 shrink-0">
-                <Wrench className="w-4 h-4 text-gold" />
+                <PhIcon name="Wrench" size={18} tone="gold" />
               </div>
               <div className="flex-1 text-left min-w-0">
                 <p className="text-[13px] font-bold leading-tight" style={{ color: "hsl(40 30% 96%)" }}>Clinical Tools Suite</p>
@@ -807,7 +812,7 @@ export default function Index() {
               className="group flex items-center gap-3 w-full p-4 rounded-2xl bg-gradient-to-br from-primary to-accent border border-primary/40 hover:shadow-[var(--shadow-gold)] transition-all"
             >
               <div className="p-2 rounded-xl bg-white/20 ring-1 ring-white/30 shrink-0">
-                <Trophy className="w-4 h-4 text-white" />
+                <PhIcon name="Trophy" size={18} tone="white" />
               </div>
               <div className="flex-1 text-left min-w-0">
                 <p className="text-[13px] font-bold leading-tight text-white">Gulf Licensing Exams · OB/GYN</p>
@@ -828,10 +833,10 @@ export default function Index() {
             <div className="flex items-center justify-between mb-3 px-1 gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 {(() => {
-                  const Icon = categoryConfig[activeTab].icon;
+                  const cfg = categoryConfig[activeTab];
                   return (
-                    <div className={`p-1 rounded-lg ${categoryConfig[activeTab].iconBg}`}>
-                      <Icon className="w-3.5 h-3.5 text-white" />
+                    <div className={`p-1 rounded-lg ${cfg.iconBg}`}>
+                      <PhIcon name={cfg.phName} size={16} tone="white" />
                     </div>
                   );
                 })()}
