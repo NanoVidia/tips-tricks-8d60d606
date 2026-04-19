@@ -757,33 +757,6 @@ export default function Index() {
               </section>
             )}
 
-            <section aria-labelledby="browse-cat">
-              <h3 id="browse-cat" className="eyebrow text-foreground/80 mb-2 px-1">Browse the library</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {tabIds.map((id) => {
-                  const cfg = categoryConfig[id];
-                  const Icon = cfg.icon;
-                  return (
-                    <button
-                      key={id}
-                      onClick={() => setActiveTab(id)}
-                      className="group flex items-center gap-2.5 p-3 rounded-xl bg-card border border-border/50 hover:border-gold/40 hover:shadow-editorial transition-all text-left"
-                    >
-                      <div className={`p-2 rounded-lg ${cfg.iconBg} shrink-0`}>
-                        <PhIcon name={cfg.phName} size={16} tone="white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold text-foreground truncate leading-tight">{tabLabel(id)}</p>
-                        <p className="text-[9px] text-muted-foreground tabular-nums mt-0.5">
-                          {formatNumber(categoryCounts[id])} entries
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
             {/* 5️⃣ Library stats — trust signal */}
             <section aria-labelledby="stats">
               <h3 id="stats" className="eyebrow text-foreground/80 mb-1 px-1">By the numbers</h3>
