@@ -858,7 +858,7 @@ export default function Index() {
         scenario={sheetScenario}
         open={sheetOpen}
         onOpenChange={setSheetOpen}
-        onAI={(s) => { setSheetOpen(false); openAI(s); }}
+        onAI={(s) => { setSheetOpen(false); openAI(s as Scenario); }}
         categoryConfig={categoryConfig}
         t={t}
       />
