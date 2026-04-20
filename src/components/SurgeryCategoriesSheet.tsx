@@ -55,7 +55,7 @@ export function SurgeryCategoriesSheet({ open, onOpenChange }: Props) {
           </SheetTitle>
         </SheetHeader>
 
-        <div className="grid grid-cols-3 gap-2 pt-4 pb-2">
+        <div className="grid grid-cols-2 gap-2 pt-4 pb-2">
           {surgeryCategories.map((c, idx) => {
             const isAll = c.id === "All";
             const count = isAll ? surgeries.length : (counts[c.id] ?? 0);
