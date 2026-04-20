@@ -247,16 +247,48 @@ export default function Index() {
     try {
       if (debouncedSearch.trim()) {
         // Global search across ALL categories — don't filter by activeTab.
+        const q = debouncedSearch.trim();
         const { data, error } = await supabase.rpc("search_scenarios", {
-          search_query: debouncedSearch.trim(),
+          search_query: q,
         });
         if (error) throw error;
-        const all = (data as Scenario[]) || [];
-        setAllSearchResults(all);
-        setTotalCount(all.length);
-        setScenarios(all);
+        const raw = (data as Scenario[]) || [];
+
+        // Relevance ranking: keep only results that actually match the query,
+        // then sort by weighted score (title >> synonyms > situation > action).
+        const tokens = q
+          .toLowerCase()
+          .split(/\s+/)
+          .filter((t) => t.length >= 2);
+        const scoreOf = (s: Scenario) => {
+          const title = (s.title_en || "").toLowerCase();
+          const sit = (s.situation_en || "").toLowerCase();
+          const act = (s.action_en || "").toLowerCase();
+          const syn = (s.synonyms || []).join(" ").toLowerCase();
+          let score = 0;
+          for (const tok of tokens) {
+            if (title.includes(tok)) score += 5;
+            if (syn.includes(tok)) score += 3;
+            if (sit.includes(tok)) score += 2;
+            if (act.includes(tok)) score += 1;
+            // Strong bonus for exact phrase in title
+            if (title === tok) score += 8;
+          }
+          // Strong bonus for full-phrase match in title
+          if (tokens.length > 1 && title.includes(q.toLowerCase())) score += 10;
+          return score;
+        };
+        const ranked = raw
+          .map((s) => ({ s, score: scoreOf(s) }))
+          .filter((x) => x.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((x) => x.s);
+
+        setAllSearchResults(ranked);
+        setTotalCount(ranked.length);
+        setScenarios(ranked);
         // Persist successful, non-trivial search
-        if (all.length > 0) recent.add(debouncedSearch.trim());
+        if (ranked.length > 0) recent.add(q);
       } else {
         setAllSearchResults([]);
         const { count, error: cErr } = await supabase
