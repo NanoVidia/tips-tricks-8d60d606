@@ -440,9 +440,19 @@ export default function Index() {
                   transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute left-0 right-0 top-full mt-2 bg-card border border-border/60 rounded-2xl shadow-xl shadow-black/10 overflow-hidden z-30 p-3"
                 >
-                  <div className="flex items-center gap-1.5 mb-2 px-0.5">
-                    <Sparkles className="w-3 h-3 text-primary" />
-                    <span className="eyebrow text-muted-foreground">Popular searches</span>
+                  <div className="flex items-center justify-between gap-1.5 mb-2 px-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3 text-primary" />
+                      <span className="eyebrow text-muted-foreground">Popular searches</span>
+                    </div>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => { e.preventDefault(); setSearchFocused(false); setSuggestOpen(false); }}
+                      aria-label="Close suggestions"
+                      className="p-1 rounded-md hover:bg-muted transition text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {[
