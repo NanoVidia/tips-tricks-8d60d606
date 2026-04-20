@@ -279,7 +279,7 @@ export function HomeHero({
             </>
           );
 
-          const cn = `relative overflow-hidden rounded-3xl p-5 min-h-[170px] flex flex-col justify-between text-left bg-gradient-to-br ${c.gradient} shadow-lg ${c.shadow} active:shadow-md transition-shadow`;
+          const cn = `soft-tint relative overflow-hidden rounded-3xl p-5 min-h-[170px] flex flex-col justify-between text-left bg-gradient-to-br ${c.gradient} shadow-lg ${c.shadow} active:shadow-md transition-shadow`;
           const mp = {
             initial: { y: 30, opacity: 0 },
             animate: { y: 0, opacity: 1 },

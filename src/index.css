@@ -174,9 +174,38 @@
   .bg-gold-soft { background-color: hsl(var(--gold-soft)); }
   .border-gold { border-color: hsl(var(--gold)); }
 
-  .gradient-paper { background-image: var(--gradient-paper); }
+  .gradient-paper {
+    background-image:
+      linear-gradient(180deg, hsl(210 60% 96% / 0.55) 0%, hsl(215 45% 94% / 0.35) 50%, hsl(210 55% 96% / 0.55) 100%),
+      var(--gradient-paper);
+  }
+  .dark .gradient-paper {
+    background-image:
+      linear-gradient(180deg, hsl(215 55% 14% / 0.45) 0%, hsl(220 50% 10% / 0.35) 50%, hsl(215 55% 14% / 0.45) 100%),
+      var(--gradient-paper);
+  }
   .gradient-gold { background-image: var(--gradient-gold); }
   .gradient-ink { background-image: var(--gradient-ink); }
+
+  /* Soft blue calming tint overlay — applied on top of saturated gradient
+     cards (Clinic / Surgery / Exams / Hero). Reduces eye strain without
+     losing visual identity. */
+  .soft-tint {
+    position: relative;
+  }
+  .soft-tint::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, hsl(215 70% 55% / 0.22), hsl(220 60% 40% / 0.14));
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  .dark .soft-tint::after {
+    background: linear-gradient(160deg, hsl(215 70% 35% / 0.28), hsl(220 50% 20% / 0.18));
+    mix-blend-mode: overlay;
+  }
 
   .shadow-editorial { box-shadow: var(--shadow-editorial); }
   .shadow-gold { box-shadow: var(--shadow-gold); }
