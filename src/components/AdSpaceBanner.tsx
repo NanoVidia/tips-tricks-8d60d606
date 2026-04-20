@@ -77,20 +77,21 @@ export function AdSpaceBanner() {
           Premium Placement
         </motion.div>
 
-        {/* Rotating multilingual content */}
-        <div className="relative w-full min-h-[88px] flex items-center justify-center">
+        {/* Rotating multilingual content — uses grid stacking to avoid overlap with siblings */}
+        <div className="relative w-full grid">
           <AnimatePresence mode="wait">
             <motion.div
               key={current.lang}
               dir={current.dir}
-              initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+              initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-2"
+              exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              style={{ gridArea: "1 / 1" }}
+              className="w-full flex flex-col items-center justify-center gap-2 px-2"
             >
               <h3
-                className="font-editorial text-[22px] sm:text-3xl font-bold tracking-tight leading-tight"
+                className="font-editorial text-[19px] sm:text-3xl font-bold tracking-tight leading-tight break-words"
                 style={{
                   backgroundImage:
                     "linear-gradient(90deg, hsl(var(--foreground)), hsl(var(--primary)), hsl(var(--foreground)))",
@@ -102,7 +103,7 @@ export function AdSpaceBanner() {
               >
                 {current.headline}
               </h3>
-              <p className="text-[12px] sm:text-sm text-muted-foreground max-w-md leading-relaxed">
+              <p className="text-[12px] sm:text-sm text-muted-foreground max-w-md leading-relaxed break-words">
                 {current.sub}
               </p>
             </motion.div>
