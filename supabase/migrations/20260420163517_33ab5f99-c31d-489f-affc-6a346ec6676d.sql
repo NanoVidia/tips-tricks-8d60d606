@@ -1,0 +1,7 @@
+-- Seed editable legal/info content into app_settings
+INSERT INTO public.app_settings (key, category, value, description) VALUES
+  ('about_content', 'legal', '{"title":"About this app","body":"Tips & Tricks — OB/GYN is a curated clinical reference for obstetrics & gynecology practitioners, covering scenarios, surgeries, licensing exams, calculators, emergency protocols, drugs, and international guidelines. Content is educational and does not replace clinical judgement or local protocols."}'::jsonb, 'About dialog content'),
+  ('privacy_content', 'legal', '{"title":"Privacy Policy","body":"We respect your privacy. Preferences (theme, language, bookmarks) are stored locally on your device. No personal medical data is collected. Anonymous analytics may be used to improve features. AI chat queries are processed by Lovable AI Gateway and are not persisted."}'::jsonb, 'Privacy dialog content'),
+  ('terms_content', 'legal', '{"title":"Terms of Use","body":"By using this app you agree that: (1) content is educational and not a substitute for professional clinical judgement; (2) you are responsible for verifying drug doses, protocols, and guidelines against local authorities; (3) the publisher disclaims liability for any outcome resulting from use of this material."}'::jsonb, 'Terms dialog content'),
+  ('support_email', 'contact', '"support@tips-tricks.app"'::jsonb, 'Support contact email')
+ON CONFLICT (key) DO NOTHING;
