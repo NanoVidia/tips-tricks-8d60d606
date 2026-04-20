@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { AIRobot } from "@/components/AIRobot";
 
