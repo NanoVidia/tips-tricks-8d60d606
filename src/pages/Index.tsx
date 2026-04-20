@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,17 +16,13 @@ import { StatsStrip } from "@/components/StatsStrip";
 import { CaseOfTheDay } from "@/components/CaseOfTheDay";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { HomeHero } from "@/components/HomeHero";
+import { FloatingAIBot } from "@/components/FloatingAIBot";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2 } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
-
-// Code-split the floating bot — it's not needed for first paint and ships React Markdown.
-const FloatingAIBot = lazy(() =>
-  import("@/components/FloatingAIBot").then((m) => ({ default: m.FloatingAIBot })),
-);
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
@@ -739,7 +735,7 @@ export default function Index() {
         categoryConfig={categoryConfig}
         t={t}
       />
-      <Suspense fallback={null}><FloatingAIBot /></Suspense>
+      <FloatingAIBot />
       <OnboardingTour />
     </div>
   );
