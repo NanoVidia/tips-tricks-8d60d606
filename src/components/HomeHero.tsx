@@ -51,6 +51,15 @@ function AnimatedNumber({ value, className = "" }: { value: number; className?: 
 
 const SPRING = { type: "spring" as const, stiffness: 150, damping: 14 };
 
+/** Light haptic tap — safe no-op if unsupported. */
+const hapticTap = (ms: number = 10) => {
+  try {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(ms);
+    }
+  } catch { /* ignore */ }
+};
+
 export function HomeHero({
   totalScenarios,
   categoryCounts,
