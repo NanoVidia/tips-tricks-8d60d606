@@ -600,8 +600,10 @@ export default function Index() {
                         <button
                           type="button"
                           onClick={() => {
-                            if (!activeTab) setActiveTab("qa");
+                            // Global results — no tab needed.
+                            setActiveTab(null);
                             setSuggestOpen(false);
+                            setSearchFocused(false);
                           }}
                           className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-primary hover:bg-muted/40 transition uppercase tracking-wider"
                         >
