@@ -93,13 +93,13 @@ export function ScenarioCard({
           <PhIcon name={cfg.phName as never} size={16} tone="white" weight="duotone" />
         </div>
         <h3 className="flex-1 text-[14px] font-bold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-          {title}
+          <HighlightedText text={title} query={highlight} />
         </h3>
       </div>
 
       {/* Middle: situation preview */}
       <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2 pl-[46px] -mt-1">
-        {situation}
+        <HighlightedText text={situation} query={highlight} />
       </p>
 
       {/* Bottom row: bookmark + open */}
