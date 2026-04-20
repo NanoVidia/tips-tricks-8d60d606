@@ -22,6 +22,10 @@ interface HomeHeroProps {
   onSelectCategory: (id: ScenarioCategory) => void;
   /** Tap the hero banner — opens the AI bot/drawer */
   onOpenAI: () => void;
+  /** Open the Surgery categories sheet */
+  onOpenSurgery: () => void;
+  /** Open the Prometric/Exams flags sheet */
+  onOpenExams: () => void;
   tabLabels: Record<ScenarioCategory, string>;
 }
 
@@ -84,6 +88,8 @@ export function HomeHero({
   categoryCounts,
   onSelectCategory,
   onOpenAI,
+  onOpenSurgery,
+  onOpenExams,
   tabLabels,
 }: HomeHeroProps) {
   type CardItem =
@@ -99,9 +105,9 @@ export function HomeHero({
         countLabel: string;
       }
     | {
-        kind: "link";
+        kind: "action";
         id: string;
-        to: string;
+        onAction: () => void;
         title: string;
         subtitle: string;
         phName: "FirstAidKit" | "GraduationCap";
@@ -135,28 +141,28 @@ export function HomeHero({
       countLabel: "items",
     },
     {
-      kind: "link",
+      kind: "action",
       id: "surgery",
-      to: "/tools?tab=surgery",
+      onAction: onOpenSurgery,
       title: "Surgery Library",
-      subtitle: "Procedures, steps & videos",
+      subtitle: "Browse by category",
       phName: "FirstAidKit",
       gradient: "from-rose-500 to-pink-700",
       shadow: "shadow-rose-500/30",
       badge: "Atlas",
-      countLabel: "open",
+      countLabel: "categories",
     },
     {
-      kind: "link",
+      kind: "action",
       id: "exams",
-      to: "/exams",
+      onAction: onOpenExams,
       title: "Prometric Exams",
-      subtitle: "SCFHS · DHA · MOH · MRCOG",
+      subtitle: "Choose a country",
       phName: "GraduationCap",
       gradient: "from-violet-500 to-indigo-700",
       shadow: "shadow-violet-500/30",
       badge: "Prep",
-      countLabel: "open",
+      countLabel: "exams",
     },
   ];
 
@@ -292,11 +298,16 @@ export function HomeHero({
             );
           }
           return (
-            <motion.div key={c.id} {...mp} onClick={() => hapticTap(10)}>
-              <Link to={c.to} className={`${cn} block`} aria-label={`Open ${c.title}`}>
-                {inner}
-              </Link>
-            </motion.div>
+            <motion.button
+              key={c.id}
+              type="button"
+              onClick={() => { hapticTap(10); c.onAction(); }}
+              {...mp}
+              className={cn}
+              aria-label={`Open ${c.title}`}
+            >
+              {inner}
+            </motion.button>
           );
         })}
       </div>

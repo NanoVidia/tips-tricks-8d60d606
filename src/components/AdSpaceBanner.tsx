@@ -1,12 +1,37 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
 
 /**
- * Professional "Advertising Space Available" banner.
- * Uses semantic design tokens, animated shimmer, and gentle motion
- * to feel premium without being intrusive.
+ * Professional multilingual "Available for Advertising / Sponsorship / Partnership" banner.
+ * Rotates through 10 languages with a smooth crossfade + subtle slide.
  */
+
+type Phrase = { headline: string; sub: string; dir: "ltr" | "rtl"; lang: string };
+
+const PHRASES: Phrase[] = [
+  { lang: "en", dir: "ltr", headline: "Advertising · Sponsorship · Partnership", sub: "Available space — reach thousands of OB/GYN clinicians." },
+  { lang: "ar", dir: "rtl", headline: "إعلان · رعاية · شراكة", sub: "مساحة متاحة — تواصل مع آلاف أطباء النساء والولادة." },
+  { lang: "fr", dir: "ltr", headline: "Publicité · Parrainage · Partenariat", sub: "Espace disponible — touchez des milliers de gynécologues." },
+  { lang: "es", dir: "ltr", headline: "Publicidad · Patrocinio · Colaboración", sub: "Espacio disponible — llega a miles de ginecólogos." },
+  { lang: "de", dir: "ltr", headline: "Werbung · Sponsoring · Partnerschaft", sub: "Platz verfügbar — erreichen Sie Tausende Gynäkologen." },
+  { lang: "it", dir: "ltr", headline: "Pubblicità · Sponsorizzazione · Partnership", sub: "Spazio disponibile — raggiungi migliaia di ginecologi." },
+  { lang: "tr", dir: "ltr", headline: "Reklam · Sponsorluk · Ortaklık", sub: "Alan müsait — binlerce kadın doğum uzmanına ulaşın." },
+  { lang: "pt", dir: "ltr", headline: "Publicidade · Patrocínio · Parceria", sub: "Espaço disponível — alcance milhares de ginecologistas." },
+  { lang: "hi", dir: "ltr", headline: "विज्ञापन · प्रायोजन · साझेदारी", sub: "स्थान उपलब्ध — हजारों स्त्री रोग विशेषज्ञों तक पहुँचें।" },
+  { lang: "zh", dir: "ltr", headline: "广告 · 赞助 · 合作", sub: "广告位可用 — 触达数千名妇产科医生。" },
+];
+
 export function AdSpaceBanner() {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % PHRASES.length), 3200);
+    return () => clearInterval(t);
+  }, []);
+
+  const current = PHRASES[idx];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -16,7 +41,7 @@ export function AdSpaceBanner() {
       whileHover={{ scale: 1.01 }}
       className="relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-card via-card/80 to-muted/50 shadow-lg"
       role="complementary"
-      aria-label="Advertising space available"
+      aria-label="Available for advertising, sponsorship, or partnership"
     >
       {/* Animated conic sheen */}
       <motion.div
@@ -24,7 +49,7 @@ export function AdSpaceBanner() {
         className="absolute inset-0 opacity-40 pointer-events-none"
         style={{
           background:
-            "conic-gradient(from 0deg at 50% 50%, hsl(var(--primary)/0.15), transparent 30%, hsl(var(--gold,38 70% 52%)/0.12) 60%, transparent 90%, hsl(var(--primary)/0.15))",
+            "conic-gradient(from 0deg at 50% 50%, hsl(var(--primary)/0.18), transparent 30%, hsl(var(--accent)/0.15) 60%, transparent 90%, hsl(var(--primary)/0.18))",
         }}
         animate={{ rotate: 360 }}
         transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
@@ -42,7 +67,6 @@ export function AdSpaceBanner() {
         transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.2 }}
       />
 
-      {/* Dashed inner frame for "placeholder ad" feel */}
       <div className="relative m-2 rounded-2xl border border-dashed border-border/60 px-5 py-7 sm:py-8 flex flex-col items-center text-center gap-3 backdrop-blur-sm">
         <motion.div
           className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground px-2.5 py-1 rounded-full bg-background/60 ring-1 ring-border/60"
@@ -53,33 +77,54 @@ export function AdSpaceBanner() {
           Premium Placement
         </motion.div>
 
-        <motion.h3
-          className="font-editorial text-2xl sm:text-3xl font-bold text-foreground tracking-tight"
-          animate={{
-            backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-          }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            backgroundImage:
-              "linear-gradient(90deg, hsl(var(--foreground)), hsl(var(--primary)), hsl(var(--foreground)))",
-            backgroundSize: "200% 100%",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          Your Advertising Space
-        </motion.h3>
+        {/* Rotating multilingual content */}
+        <div className="relative w-full min-h-[88px] flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.lang}
+              dir={current.dir}
+              initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-2"
+            >
+              <h3
+                className="font-editorial text-[22px] sm:text-3xl font-bold tracking-tight leading-tight"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(90deg, hsl(var(--foreground)), hsl(var(--primary)), hsl(var(--foreground)))",
+                  backgroundSize: "200% 100%",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                {current.headline}
+              </h3>
+              <p className="text-[12px] sm:text-sm text-muted-foreground max-w-md leading-relaxed">
+                {current.sub}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-        <motion.p
-          className="text-sm text-muted-foreground max-w-md leading-relaxed"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          Reach thousands of OB/GYN professionals. Showcase your brand, product, or service right here.
-        </motion.p>
+        {/* Language progress dots */}
+        <div className="flex items-center gap-1 mt-1" aria-hidden="true">
+          {PHRASES.map((p, i) => (
+            <motion.span
+              key={p.lang}
+              className="rounded-full bg-muted-foreground/30"
+              animate={{
+                width: i === idx ? 14 : 4,
+                opacity: i === idx ? 1 : 0.4,
+                backgroundColor: i === idx ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.3)",
+              }}
+              style={{ height: 4 }}
+              transition={{ duration: 0.4 }}
+            />
+          ))}
+        </div>
 
         <motion.a
           href="mailto:ads@example.com"
@@ -88,7 +133,7 @@ export function AdSpaceBanner() {
           className="inline-flex items-center gap-2 mt-1 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md shadow-primary/20 ring-1 ring-primary/30"
         >
           <Mail className="w-3.5 h-3.5" />
-          Contact for Advertising
+          Contact us — Advertising · Sponsorship · Partnership
         </motion.a>
       </div>
     </motion.div>
