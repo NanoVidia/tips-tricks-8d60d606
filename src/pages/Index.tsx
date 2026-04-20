@@ -785,6 +785,8 @@ export default function Index() {
       </footer>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
+      <SurgeryCategoriesSheet open={surgerySheetOpen} onOpenChange={setSurgerySheetOpen} />
+      <ExamsFlagsSheet open={examsSheetOpen} onOpenChange={setExamsSheetOpen} />
       <ScenarioSheet
         scenario={sheetScenario}
         open={sheetOpen}
