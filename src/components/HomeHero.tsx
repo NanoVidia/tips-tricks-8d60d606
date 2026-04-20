@@ -189,7 +189,7 @@ export function HomeHero({
           <motion.button
             key={c.id}
             type="button"
-            onClick={() => onSelectCategory(c.id)}
+            onClick={() => { hapticTap(10); onSelectCategory(c.id); }}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ ...SPRING, delay: 0.1 + idx * 0.08 }}
