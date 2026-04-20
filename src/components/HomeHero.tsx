@@ -171,7 +171,7 @@ export function HomeHero({
               href={`https://wa.me/${waNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); hapticTap(8); }}
               className="shrink-0 inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 active:scale-95 transition-all text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-md shadow-green-500/30"
             >
               <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="currentColor" aria-hidden="true">
