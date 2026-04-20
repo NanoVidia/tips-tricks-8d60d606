@@ -232,17 +232,20 @@ export default function Index() {
     };
   }, [suggestOpen, searchFocused]);
 
+  const isSearching = debouncedSearch.trim().length > 0;
+
   const fetchScenarios = useCallback(async () => {
-    if (!activeTab) return;
+    // When searching, run a global cross-category search even without an active tab.
+    if (!activeTab && !isSearching) return;
     setLoading(true);
     const from = (currentPage - 1) * ITEMS_PER_PAGE;
     const to = from + ITEMS_PER_PAGE - 1;
 
     try {
       if (debouncedSearch.trim()) {
+        // Global search across ALL categories — don't filter by activeTab.
         const { data, error } = await supabase.rpc("search_scenarios", {
           search_query: debouncedSearch.trim(),
-          category_filter: activeTab,
         });
         if (error) throw error;
         const all = (data as Scenario[]) || [];
@@ -597,8 +600,10 @@ export default function Index() {
                         <button
                           type="button"
                           onClick={() => {
-                            if (!activeTab) setActiveTab("qa");
+                            // Global results — no tab needed.
+                            setActiveTab(null);
                             setSuggestOpen(false);
+                            setSearchFocused(false);
                           }}
                           className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-primary hover:bg-muted/40 transition uppercase tracking-wider"
                         >
@@ -618,8 +623,8 @@ export default function Index() {
 
       {/* Content */}
       <main className="flex-1 px-4 sm:px-5 pb-8">
-        {/* Category tabs — only when a tab is active (HomeHero shows them on home) */}
-        {activeTab && (
+        {/* Category tabs — hidden during search to keep results focused */}
+        {activeTab && !isSearching && (
         <motion.div
           role="tablist"
           aria-label="Scenario categories"
@@ -693,13 +698,12 @@ export default function Index() {
           })}
         </motion.div>
         )}
-        {!activeTab ? (
+        {!activeTab && !isSearching ? (
           <HomeHero
             totalScenarios={totalScenarios}
             categoryCounts={categoryCounts}
             onSelectCategory={(id) => { setActiveTab(id); }}
             onOpenAI={() => {
-              // Open the floating AI bot if available; otherwise the AI drawer with no scenario
               const btn = document.querySelector<HTMLButtonElement>('[data-floating-ai-bot="true"]');
               if (btn) btn.click();
               else setAiOpen(true);
@@ -725,6 +729,27 @@ export default function Index() {
               <Search className="w-5 h-5 text-muted-foreground" />
             </div>
             <p className="text-sm text-muted-foreground max-w-[260px]">{t("noResults")}</p>
+            {isSearching && (
+              <Button
+                size="sm"
+                onClick={() => {
+                  const q = debouncedSearch.trim();
+                  openAI({
+                    id: "search-query",
+                    category: "qa",
+                    title_en: q,
+                    situation_en: q,
+                    action_en: "",
+                    script_en: "",
+                    synonyms: null,
+                  });
+                }}
+                className="rounded-full text-[11px] h-9 px-4 gap-1.5 bg-gradient-to-r from-primary to-primary/80"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Ask AI about "{debouncedSearch.trim()}"
+              </Button>
+            )}
             {search && (
               <Button
                 size="sm"
@@ -739,20 +764,72 @@ export default function Index() {
           </div>
         ) : (
           <>
+            {/* AI shortcut banner — appears at the top of every search result list */}
+            {isSearching && (
+              <motion.button
+                type="button"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={() => {
+                  const q = debouncedSearch.trim();
+                  openAI({
+                    id: "search-query",
+                    category: "qa",
+                    title_en: q,
+                    situation_en: q,
+                    action_en: "",
+                    script_en: "",
+                    synonyms: null,
+                  });
+                }}
+                className="group relative overflow-hidden w-full mt-4 rounded-2xl p-3 bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground shadow-md shadow-primary/20 flex items-center gap-3 text-left"
+              >
+                <span
+                  className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none"
+                  aria-hidden
+                />
+                <span className="relative w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/30 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5" />
+                </span>
+                <span className="relative flex-1 min-w-0">
+                  <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/80">
+                    Ask AI Mentor
+                  </span>
+                  <span className="block text-[13px] font-bold leading-tight truncate mt-0.5">
+                    "{debouncedSearch.trim()}"
+                  </span>
+                </span>
+                <ChevronRight className="relative w-4 h-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+              </motion.button>
+            )}
+
             <div className="flex items-center justify-between mb-3 mt-4 px-1 gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                {(() => {
-                  const cfg = categoryConfig[activeTab];
-                  return (
-                    <div className={`p-1 rounded-lg ${cfg.iconBg}`}>
-                      <PhIcon name={cfg.phName} size={16} tone="white" />
+                {isSearching ? (
+                  <>
+                    <div className="p-1 rounded-lg bg-gradient-to-br from-primary to-primary/70">
+                      <Search className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
                     </div>
-                  );
-                })()}
-                <h2 className="text-[15px] font-bold text-foreground leading-tight truncate">{tabLabel(activeTab)}</h2>
+                    <h2 className="text-[15px] font-bold text-foreground leading-tight truncate">
+                      Search results
+                    </h2>
+                  </>
+                ) : (
+                  <>
+                    {(() => {
+                      const cfg = categoryConfig[activeTab!];
+                      return (
+                        <div className={`p-1 rounded-lg ${cfg.iconBg}`}>
+                          <PhIcon name={cfg.phName} size={16} tone="white" />
+                        </div>
+                      );
+                    })()}
+                    <h2 className="text-[15px] font-bold text-foreground leading-tight truncate">{tabLabel(activeTab!)}</h2>
+                  </>
+                )}
               </div>
               <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-1 rounded-full font-bold tabular-nums shrink-0">
-                {formatNumber(totalCount)} items
+                {formatNumber(totalCount)} {isSearching ? "matches" : "items"}
               </span>
             </div>
 
