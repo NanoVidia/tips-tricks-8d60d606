@@ -543,7 +543,8 @@ export default function Index() {
 
       {/* Content */}
       <main className="flex-1 px-4 sm:px-5 pb-8">
-        {/* Category tabs — scrolls with the page (not sticky) */}
+        {/* Category tabs — only when a tab is active (HomeHero shows them on home) */}
+        {activeTab && (
         <motion.div
           role="tablist"
           aria-label="Scenario categories"
