@@ -252,11 +252,13 @@ export default function Index() {
         });
         if (error) throw error;
         const all = (data as Scenario[]) || [];
+        setAllSearchResults(all);
         setTotalCount(all.length);
-        setScenarios(all.slice(from, to + 1));
+        setScenarios(all);
         // Persist successful, non-trivial search
         if (all.length > 0) recent.add(debouncedSearch.trim());
       } else {
+        setAllSearchResults([]);
         const { count, error: cErr } = await supabase
           .from("medical_scenarios")
           .select("*", { count: "exact", head: true })
@@ -278,9 +280,45 @@ export default function Index() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, activeTab, currentPage, recent.add]);
+  }, [debouncedSearch, activeTab, currentPage, recent.add, isSearching]);
 
   useEffect(() => { fetchScenarios(); }, [fetchScenarios]);
+
+  // Reset category filter & expand all groups when search query changes
+  useEffect(() => {
+    setSearchCatFilter(null);
+    setCollapsedGroups(new Set());
+  }, [debouncedSearch]);
+
+  // Per-category counts within current search results
+  const searchCounts = (() => {
+    const c: Record<ScenarioCategory, number> = { clinic: 0, or_labor: 0, behavior: 0, qa: 0 };
+    for (const s of allSearchResults) c[s.category]++;
+    return c;
+  })();
+
+  // Filtered results based on chip selection
+  const filteredSearchResults = searchCatFilter
+    ? allSearchResults.filter((s) => s.category === searchCatFilter)
+    : allSearchResults;
+
+  // Group filtered results by category, preserving rank order
+  const groupedResults = (() => {
+    const groups: Record<ScenarioCategory, Scenario[]> = { clinic: [], or_labor: [], behavior: [], qa: [] };
+    for (const s of filteredSearchResults) groups[s.category].push(s);
+    return tabIds
+      .map((cat) => ({ cat, items: groups[cat] }))
+      .filter((g) => g.items.length > 0);
+  })();
+
+  const toggleGroup = (cat: ScenarioCategory) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  };
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
