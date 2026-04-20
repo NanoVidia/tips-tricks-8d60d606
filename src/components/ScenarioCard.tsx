@@ -16,6 +16,40 @@ interface ScenarioCardProps {
     ScenarioCategory,
     { phName: string; iconBg: string; gradient: string }
   >;
+  highlight?: string;
+}
+
+/** Render text with case-insensitive highlighted matches of `query`. */
+function HighlightedText({ text, query }: { text: string; query?: string }) {
+  if (!query || !query.trim()) return <>{text}</>;
+  const tokens = Array.from(
+    new Set(
+      query
+        .trim()
+        .split(/\s+/)
+        .filter((t) => t.length >= 2)
+        .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    )
+  );
+  if (tokens.length === 0) return <>{text}</>;
+  const re = new RegExp(`(${tokens.join("|")})`, "gi");
+  const parts = text.split(re);
+  return (
+    <>
+      {parts.map((part, i) =>
+        re.test(part) ? (
+          <mark
+            key={i}
+            className="bg-yellow-200 dark:bg-yellow-400/40 text-foreground rounded-[3px] px-[2px] py-0"
+          >
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
 }
 
 export function ScenarioCard({
@@ -26,6 +60,7 @@ export function ScenarioCard({
   index,
   onOpen,
   categoryConfig,
+  highlight,
 }: ScenarioCardProps) {
   const cfg = categoryConfig[category];
 
@@ -58,13 +93,13 @@ export function ScenarioCard({
           <PhIcon name={cfg.phName as never} size={16} tone="white" weight="duotone" />
         </div>
         <h3 className="flex-1 text-[14px] font-bold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-          {title}
+          <HighlightedText text={title} query={highlight} />
         </h3>
       </div>
 
       {/* Middle: situation preview */}
       <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2 pl-[46px] -mt-1">
-        {situation}
+        <HighlightedText text={situation} query={highlight} />
       </p>
 
       {/* Bottom row: bookmark + open */}

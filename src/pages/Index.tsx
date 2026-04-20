@@ -116,6 +116,9 @@ export default function Index() {
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [allSearchResults, setAllSearchResults] = useState<Scenario[]>([]);
+  const [searchCatFilter, setSearchCatFilter] = useState<ScenarioCategory | null>(null);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<ScenarioCategory>>(new Set());
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -249,11 +252,13 @@ export default function Index() {
         });
         if (error) throw error;
         const all = (data as Scenario[]) || [];
+        setAllSearchResults(all);
         setTotalCount(all.length);
-        setScenarios(all.slice(from, to + 1));
+        setScenarios(all);
         // Persist successful, non-trivial search
         if (all.length > 0) recent.add(debouncedSearch.trim());
       } else {
+        setAllSearchResults([]);
         const { count, error: cErr } = await supabase
           .from("medical_scenarios")
           .select("*", { count: "exact", head: true })
@@ -275,9 +280,45 @@ export default function Index() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, activeTab, currentPage, recent.add]);
+  }, [debouncedSearch, activeTab, currentPage, recent.add, isSearching]);
 
   useEffect(() => { fetchScenarios(); }, [fetchScenarios]);
+
+  // Reset category filter & expand all groups when search query changes
+  useEffect(() => {
+    setSearchCatFilter(null);
+    setCollapsedGroups(new Set());
+  }, [debouncedSearch]);
+
+  // Per-category counts within current search results
+  const searchCounts = (() => {
+    const c: Record<ScenarioCategory, number> = { clinic: 0, or_labor: 0, behavior: 0, qa: 0 };
+    for (const s of allSearchResults) c[s.category]++;
+    return c;
+  })();
+
+  // Filtered results based on chip selection
+  const filteredSearchResults = searchCatFilter
+    ? allSearchResults.filter((s) => s.category === searchCatFilter)
+    : allSearchResults;
+
+  // Group filtered results by category, preserving rank order
+  const groupedResults = (() => {
+    const groups: Record<ScenarioCategory, Scenario[]> = { clinic: [], or_labor: [], behavior: [], qa: [] };
+    for (const s of filteredSearchResults) groups[s.category].push(s);
+    return tabIds
+      .map((cat) => ({ cat, items: groups[cat] }))
+      .filter((g) => g.items.length > 0);
+  })();
+
+  const toggleGroup = (cat: ScenarioCategory) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  };
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
@@ -723,7 +764,7 @@ export default function Index() {
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
-        ) : scenarios.length === 0 ? (
+        ) : (isSearching ? filteredSearchResults.length === 0 : scenarios.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
             <div className="w-12 h-12 rounded-2xl bg-muted/60 flex items-center justify-center">
               <Search className="w-5 h-5 text-muted-foreground" />
@@ -754,11 +795,14 @@ export default function Index() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setSearch("")}
+                onClick={() => {
+                  if (searchCatFilter) setSearchCatFilter(null);
+                  else setSearch("");
+                }}
                 className="rounded-full text-[11px] h-8 px-3.5"
               >
                 <X className="w-3 h-3 mr-1" />
-                Clear search
+                {searchCatFilter ? "Show all categories" : "Clear search"}
               </Button>
             )}
           </div>
@@ -829,29 +873,143 @@ export default function Index() {
                 )}
               </div>
               <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-1 rounded-full font-bold tabular-nums shrink-0">
-                {formatNumber(totalCount)} {isSearching ? "matches" : "items"}
+                {formatNumber(isSearching ? filteredSearchResults.length : totalCount)} {isSearching ? "matches" : "items"}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {scenarios.map((item, idx) => (
-                <ScenarioCard
-                  key={item.id}
-                  id={item.id}
-                  title={item.title_en}
-                  situation={item.situation_en}
-                  category={item.category}
-                  index={idx}
-                  onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
-                  categoryConfig={categoryConfig}
+            {/* Category filter chips — only shown during search */}
+            {isSearching && allSearchResults.length > 0 && (
+              <div
+                className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1 mb-3"
+                role="tablist"
+                aria-label="Filter search results by category"
+              >
+                {([null, ...tabIds] as (ScenarioCategory | null)[]).map((cat) => {
+                  const isAll = cat === null;
+                  const count = isAll ? allSearchResults.length : searchCounts[cat as ScenarioCategory];
+                  const active = searchCatFilter === cat;
+                  const cfg = isAll ? null : categoryConfig[cat as ScenarioCategory];
+                  const label = isAll ? "All" : tabLabel(cat as ScenarioCategory);
+                  return (
+                    <button
+                      key={isAll ? "all" : cat as string}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setSearchCatFilter(cat)}
+                      disabled={count === 0}
+                      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
+                        active
+                          ? `text-primary-foreground border-transparent shadow-sm ${
+                              isAll ? "bg-primary" : `bg-gradient-to-br ${cfg!.gradient}`
+                            }`
+                          : "bg-card text-foreground border-border/60 hover:border-primary/40"
+                      } ${count === 0 ? "opacity-40 cursor-not-allowed" : ""}`}
+                    >
+                      {!isAll && (
+                        <PhIcon
+                          name={cfg!.phName as never}
+                          size={11}
+                          tone={active ? "white" : "gold"}
+                          weight={active ? "fill" : "duotone"}
+                        />
+                      )}
+                      <span>{label}</span>
+                      <span
+                        className={`tabular-nums text-[9px] px-1.5 py-0.5 rounded-full ${
+                          active ? "bg-white/25" : "bg-muted/70 text-muted-foreground"
+                        }`}
+                      >
+                        {formatNumber(count)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {isSearching ? (
+              <div className="space-y-4">
+                {groupedResults.map(({ cat, items }) => {
+                  const cfg = categoryConfig[cat];
+                  const collapsed = collapsedGroups.has(cat);
+                  return (
+                    <section key={cat} className="rounded-2xl border border-border/60 bg-card/40 overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(cat)}
+                        aria-expanded={!collapsed}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-muted/40 transition"
+                      >
+                        <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
+                          <PhIcon name={cfg.phName as never} size={13} tone="white" weight="duotone" />
+                        </div>
+                        <h3 className="flex-1 text-left text-[13px] font-bold text-foreground truncate">
+                          {tabLabel(cat)}
+                        </h3>
+                        <span className="text-[10px] tabular-nums font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                          {formatNumber(items.length)}
+                        </span>
+                        <ChevronRight
+                          className={`w-4 h-4 text-muted-foreground transition-transform ${
+                            collapsed ? "" : "rotate-90"
+                          }`}
+                        />
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {!collapsed && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 pt-1">
+                              {items.map((item, idx) => (
+                                <ScenarioCard
+                                  key={item.id}
+                                  id={item.id}
+                                  title={item.title_en}
+                                  situation={item.situation_en}
+                                  category={item.category}
+                                  index={idx}
+                                  onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                                  categoryConfig={categoryConfig}
+                                  highlight={debouncedSearch}
+                                />
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </section>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {scenarios.map((item, idx) => (
+                    <ScenarioCard
+                      key={item.id}
+                      id={item.id}
+                      title={item.title_en}
+                      situation={item.situation_en}
+                      category={item.category}
+                      index={idx}
+                      onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                      categoryConfig={categoryConfig}
+                    />
+                  ))}
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
                 />
-              ))}
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+              </>
+            )}
           </>
         )}
       </main>
