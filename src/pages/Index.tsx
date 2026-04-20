@@ -790,6 +790,13 @@ export default function Index() {
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
       <SurgeryCategoriesSheet open={surgerySheetOpen} onOpenChange={setSurgerySheetOpen} />
       <ExamsFlagsSheet open={examsSheetOpen} onOpenChange={setExamsSheetOpen} />
+      <ClinicTopicsSheet
+        open={clinicSheetOpen}
+        onOpenChange={setClinicSheetOpen}
+        total={categoryCounts.clinic ?? 0}
+        onBrowseAll={() => { setActiveTab("clinic"); setSearch(""); }}
+        onPickTopic={(q) => { setActiveTab("clinic"); setSearch(q); }}
+      />
       <ScenarioSheet
         scenario={sheetScenario}
         open={sheetOpen}
