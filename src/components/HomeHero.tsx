@@ -235,6 +235,7 @@ export function HomeHero({
           animate={{ y: 0, opacity: 1 }}
           transition={{ ...SPRING, delay: 0.42 }}
           whileTap={{ scale: 0.96 }}
+          onClick={() => hapticTap(8)}
           className="relative overflow-hidden rounded-2xl p-4 min-h-[90px] flex flex-col justify-between bg-gradient-to-br from-green-500 to-emerald-700 shadow-lg shadow-green-500/30"
           aria-label="WhatsApp direct consult"
         >
