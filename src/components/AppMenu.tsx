@@ -34,9 +34,15 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState<DialogId>(null);
   const navigate = useNavigate();
-  const { get } = useAppSettings();
+  const { get, all } = useAppSettings();
   const whatsapp = String(get("whatsapp_number") || "").replace(/\D/g, "");
-  const supportEmail = "support@tips-tricks.app";
+  const settingsMap = (all as Record<string, any>) || {};
+  const supportEmail = typeof settingsMap.support_email === "string"
+    ? settingsMap.support_email
+    : "support@tips-tricks.app";
+  const aboutContent = settingsMap.about_content || null;
+  const privacyContent = settingsMap.privacy_content || null;
+  const termsContent = settingsMap.terms_content || null;
 
   const close = () => { setDialog(null); setOpen(false); };
 
