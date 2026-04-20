@@ -116,6 +116,9 @@ export default function Index() {
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [allSearchResults, setAllSearchResults] = useState<Scenario[]>([]);
+  const [searchCatFilter, setSearchCatFilter] = useState<ScenarioCategory | null>(null);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<ScenarioCategory>>(new Set());
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
