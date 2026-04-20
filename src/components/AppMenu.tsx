@@ -34,9 +34,9 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState<DialogId>(null);
   const navigate = useNavigate();
-  const { getSetting } = useAppSettings();
-  const whatsapp = String(getSetting("whatsapp_number", "") || "").replace(/\D/g, "");
-  const supportEmail = String(getSetting("support_email", "support@tips-tricks.app") || "support@tips-tricks.app");
+  const { get } = useAppSettings();
+  const whatsapp = String(get("whatsapp_number") || "").replace(/\D/g, "");
+  const supportEmail = "support@tips-tricks.app";
 
   const close = () => { setDialog(null); setOpen(false); };
 
