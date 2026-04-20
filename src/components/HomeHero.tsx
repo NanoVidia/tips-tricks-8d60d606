@@ -104,7 +104,7 @@ export function HomeHero({
         to: string;
         title: string;
         subtitle: string;
-        phName: "Knife" | "GraduationCap";
+        phName: "FirstAidKit" | "GraduationCap";
         gradient: string;
         shadow: string;
         badge: string;
