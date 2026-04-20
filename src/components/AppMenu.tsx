@@ -34,9 +34,15 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState<DialogId>(null);
   const navigate = useNavigate();
-  const { get } = useAppSettings();
+  const { get, all } = useAppSettings();
   const whatsapp = String(get("whatsapp_number") || "").replace(/\D/g, "");
-  const supportEmail = "support@tips-tricks.app";
+  const settingsMap = (all as Record<string, any>) || {};
+  const supportEmail = typeof settingsMap.support_email === "string"
+    ? settingsMap.support_email
+    : "support@tips-tricks.app";
+  const aboutContent = settingsMap.about_content || null;
+  const privacyContent = settingsMap.privacy_content || null;
+  const termsContent = settingsMap.terms_content || null;
 
   const close = () => { setDialog(null); setOpen(false); };
 
@@ -117,7 +123,12 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
       <Dialog open={dialog !== null} onOpenChange={(o) => !o && close()}>
         <DialogContent className="max-w-md max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="font-editorial text-xl">{titleFor(dialog)}</DialogTitle>
+            <DialogTitle className="font-editorial text-xl">
+              {(dialog === "about" && aboutContent?.title)
+                || (dialog === "privacy" && privacyContent?.title)
+                || (dialog === "terms" && termsContent?.title)
+                || titleFor(dialog)}
+            </DialogTitle>
             <DialogDescription className="text-xs">{subtitleFor(dialog)}</DialogDescription>
           </DialogHeader>
           <ScrollArea className="flex-1 -mx-6 px-6">
@@ -128,6 +139,9 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
                 supportEmail={supportEmail}
                 dark={dark}
                 onToggleTheme={onToggleTheme}
+                aboutContent={aboutContent}
+                privacyContent={privacyContent}
+                termsContent={termsContent}
               />
             </div>
           </ScrollArea>
@@ -176,36 +190,42 @@ function subtitleFor(id: DialogId): string {
 
 function DialogBody({
   id, whatsapp, supportEmail, dark, onToggleTheme,
+  aboutContent, privacyContent, termsContent,
 }: {
   id: DialogId; whatsapp: string; supportEmail: string; dark: boolean; onToggleTheme: () => void;
+  aboutContent?: { title?: string; body?: string } | null;
+  privacyContent?: { title?: string; body?: string } | null;
+  termsContent?: { title?: string; body?: string } | null;
 }) {
   if (id === "about") return (
     <>
-      <p><strong>{APP_NAME}</strong> is a curated clinical reference for OB/GYN practitioners — covering scenarios, surgeries, exams, calculators, protocols, drugs, and guidelines.</p>
-      <p className="text-muted-foreground">⚠️ For educational purposes only. Always follow local protocols and clinical judgment.</p>
+      {aboutContent?.body ? (
+        <p className="whitespace-pre-line">{aboutContent.body}</p>
+      ) : (
+        <p><strong>{APP_NAME}</strong> is a curated clinical reference for OB/GYN practitioners.</p>
+      )}
+      <p className="text-muted-foreground text-xs">⚠️ For educational purposes only. Always follow local protocols and clinical judgment.</p>
       <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} — All rights reserved.</p>
     </>
   );
 
   if (id === "privacy") return (
     <>
-      <p>We respect your privacy. This app stores preferences (theme, language, bookmarks) locally on your device.</p>
-      <ul className="list-disc pr-5 space-y-1 text-muted-foreground">
-        <li>No personal medical data is collected.</li>
-        <li>Anonymous analytics may be used to improve features.</li>
-        <li>AI chat queries are processed by Lovable AI Gateway and are not stored.</li>
-      </ul>
+      {privacyContent?.body ? (
+        <p className="whitespace-pre-line">{privacyContent.body}</p>
+      ) : (
+        <p>We respect your privacy. Preferences are stored locally on your device.</p>
+      )}
     </>
   );
 
   if (id === "terms") return (
     <>
-      <p>By using this app you agree that:</p>
-      <ul className="list-disc pr-5 space-y-1 text-muted-foreground">
-        <li>Content is educational and not a substitute for professional clinical judgement.</li>
-        <li>You are responsible for verifying drug doses, protocols, and guidelines against local authorities.</li>
-        <li>The publisher disclaims liability for any outcome resulting from use of this material.</li>
-      </ul>
+      {termsContent?.body ? (
+        <p className="whitespace-pre-line">{termsContent.body}</p>
+      ) : (
+        <p>Content is educational and not a substitute for professional clinical judgement.</p>
+      )}
     </>
   );
 

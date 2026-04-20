@@ -35,6 +35,10 @@ const App = () => {
     if (params.get("dev") === "1") localStorage.setItem(DEV_KEY, "1");
     if (params.get("dev") === "0") localStorage.removeItem(DEV_KEY);
     setDevUnlocked(localStorage.getItem(DEV_KEY) === "1");
+
+    // Restore accessibility preferences
+    if (localStorage.getItem("a11y_reduce") === "1") document.documentElement.classList.add("reduce-motion");
+    if (localStorage.getItem("a11y_large") === "1") document.documentElement.classList.add("large-text");
   }, []);
 
   // Auto-unlock على preview/sandbox الخاصة بـ Lovable (عرض المطوّر).
