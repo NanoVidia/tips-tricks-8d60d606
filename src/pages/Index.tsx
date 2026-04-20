@@ -232,17 +232,20 @@ export default function Index() {
     };
   }, [suggestOpen, searchFocused]);
 
+  const isSearching = debouncedSearch.trim().length > 0;
+
   const fetchScenarios = useCallback(async () => {
-    if (!activeTab) return;
+    // When searching, run a global cross-category search even without an active tab.
+    if (!activeTab && !isSearching) return;
     setLoading(true);
     const from = (currentPage - 1) * ITEMS_PER_PAGE;
     const to = from + ITEMS_PER_PAGE - 1;
 
     try {
       if (debouncedSearch.trim()) {
+        // Global search across ALL categories — don't filter by activeTab.
         const { data, error } = await supabase.rpc("search_scenarios", {
           search_query: debouncedSearch.trim(),
-          category_filter: activeTab,
         });
         if (error) throw error;
         const all = (data as Scenario[]) || [];
