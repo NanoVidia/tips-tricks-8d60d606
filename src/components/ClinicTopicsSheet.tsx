@@ -68,7 +68,7 @@ export function ClinicTopicsSheet({ open, onOpenChange, onPickTopic, onBrowseAll
           </SheetTitle>
         </SheetHeader>
 
-        <div className="grid grid-cols-3 gap-2 pt-4 pb-2">
+        <div className="grid grid-cols-2 gap-2 pt-4 pb-2">
           {TOPICS.map((t, idx) => (
             <motion.button
               key={t.id}
