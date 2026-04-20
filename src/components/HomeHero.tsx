@@ -26,6 +26,8 @@ interface HomeHeroProps {
   onOpenSurgery: () => void;
   /** Open the Prometric/Exams flags sheet */
   onOpenExams: () => void;
+  /** Open the Clinic topics sheet */
+  onOpenClinic: () => void;
   tabLabels: Record<ScenarioCategory, string>;
 }
 
