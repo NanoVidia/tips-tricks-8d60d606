@@ -266,7 +266,7 @@ Rules:
         </div>
 
         {messages.length > 0 && (
-          <div className="flex gap-2 pt-2 overflow-x-auto scrollbar-none">
+          <div className="flex gap-2 pt-2 overflow-x-auto scrollbar-none border-t border-border/50">
             <Button
               onClick={askHardQuestion}
               disabled={loading}
@@ -277,6 +277,26 @@ Rules:
               <Target className="w-3.5 h-3.5 mr-1" />
               Challenge Me
             </Button>
+            {[
+              { emoji: "🚩", label: "Red flags", prompt: `What are the key red flags & danger signs I must NOT miss in "${scenario?.title_en}"? Give me the "don't be that doctor" list.` },
+              { emoji: "🎯", label: "Next step", prompt: `In "${scenario?.title_en}", what is the single next best step right now? Justify in 3 lines max.` },
+              { emoji: "🔪", label: "Pearls", prompt: `Share 3 surgical/procedural pearls or tricks specific to "${scenario?.title_en}" — anatomic landmarks, hand positions, or "if A fails, do B" ladders.` },
+              { emoji: "💊", label: "Doses", prompt: `List the exact drug doses, routes, and contraindications relevant to "${scenario?.title_en}". Be precise.` },
+              { emoji: "📚", label: "Guideline", prompt: `What does the most recent ACOG/RCOG/FIGO guideline say about "${scenario?.title_en}"? Cite year and bulletin number.` },
+              { emoji: "🗣️", label: "Counsel", prompt: `Script how I should counsel the patient in "${scenario?.title_en}" — empathetic, clear, in plain language.` },
+            ].map((c) => (
+              <Button
+                key={c.label}
+                onClick={() => sendMessage(c.prompt)}
+                disabled={loading}
+                size="sm"
+                variant="outline"
+                className="rounded-full text-xs h-8 shrink-0 border-border/60 hover:bg-muted hover:border-primary/40 font-medium"
+              >
+                <span className="mr-1">{c.emoji}</span>
+                {c.label}
+              </Button>
+            ))}
           </div>
         )}
 
