@@ -104,7 +104,7 @@ export function HomeHero({
         to: string;
         title: string;
         subtitle: string;
-        phName: "Knife" | "GraduationCap";
+        phName: "FirstAidKit" | "GraduationCap";
         gradient: string;
         shadow: string;
         badge: string;
@@ -140,7 +140,7 @@ export function HomeHero({
       to: "/tools?tab=surgery",
       title: "Surgery Library",
       subtitle: "Procedures, steps & videos",
-      phName: "Knife",
+      phName: "FirstAidKit",
       gradient: "from-rose-500 to-pink-700",
       shadow: "shadow-rose-500/30",
       badge: "Atlas",
@@ -235,9 +235,13 @@ export function HomeHero({
               </div>
 
               <div className="relative flex items-start justify-between gap-2">
-                <div className="w-9 h-9 rounded-2xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shadow-sm">
+                <motion.div
+                  className="w-9 h-9 rounded-2xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shadow-sm"
+                  animate={{ y: [0, -3, 0], rotate: [0, -4, 4, 0] }}
+                  transition={{ duration: 4 + idx * 0.3, repeat: Infinity, ease: "easeInOut", delay: idx * 0.2 }}
+                >
                   <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
-                </div>
+                </motion.div>
                 <div className="text-right leading-none">
                   {c.kind === "scenario" ? (
                     <AnimatedNumber
