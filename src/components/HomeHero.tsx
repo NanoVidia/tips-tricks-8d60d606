@@ -86,38 +86,77 @@ export function HomeHero({
   onOpenAI,
   tabLabels,
 }: HomeHeroProps) {
-  const categories: CategoryDef[] = [
+  type CardItem =
+    | {
+        kind: "scenario";
+        id: ScenarioCategory;
+        title: string;
+        subtitle: string;
+        phName: CategoryDef["phName"];
+        gradient: string;
+        shadow: string;
+        count: number;
+        countLabel: string;
+      }
+    | {
+        kind: "link";
+        id: string;
+        to: string;
+        title: string;
+        subtitle: string;
+        phName: "Knife" | "GraduationCap";
+        gradient: string;
+        shadow: string;
+        badge: string;
+        countLabel: string;
+      };
+
+  const cards: CardItem[] = [
     {
+      kind: "scenario",
       id: "qa",
       title: tabLabels.qa,
       subtitle: "Questions & Skills Bank",
       phName: "Question",
       gradient: "from-emerald-500 to-teal-700",
       shadow: "shadow-emerald-500/30",
+      count: categoryCounts.qa ?? 0,
+      countLabel: "items",
     },
     {
+      kind: "scenario",
       id: "clinic",
       title: tabLabels.clinic,
       subtitle: "Clinical Scenarios",
       phName: "Stethoscope",
       gradient: "from-sky-500 to-blue-700",
       shadow: "shadow-sky-500/30",
+      count: categoryCounts.clinic ?? 0,
+      countLabel: "items",
     },
     {
-      id: "or_labor",
-      title: tabLabels.or_labor,
-      subtitle: "OR & Labor Protocols",
-      phName: "Scissors",
+      kind: "link",
+      id: "surgery",
+      to: "/tools?tab=surgery",
+      title: "Surgery Library",
+      subtitle: "Procedures, steps & videos",
+      phName: "Knife",
       gradient: "from-rose-500 to-pink-700",
       shadow: "shadow-rose-500/30",
+      badge: "Atlas",
+      countLabel: "open",
     },
     {
-      id: "behavior",
-      title: tabLabels.behavior,
-      subtitle: "Communication Scripts",
-      phName: "ChatCircleDots",
-      gradient: "from-amber-400 to-orange-600",
-      shadow: "shadow-amber-500/30",
+      kind: "link",
+      id: "exams",
+      to: "/exams",
+      title: "Prometric Exams",
+      subtitle: "SCFHS · DHA · MOH · MRCOG",
+      phName: "GraduationCap",
+      gradient: "from-violet-500 to-indigo-700",
+      shadow: "shadow-violet-500/30",
+      badge: "Prep",
+      countLabel: "open",
     },
   ];
 
@@ -188,49 +227,76 @@ export function HomeHero({
         </div>
       </motion.button>
 
-      {/* ② 2×2 Category Cards — larger counts */}
+      {/* ② 2×2 Cards — scenarios + Surgery + Exams */}
       <div className="grid grid-cols-2 gap-3">
-        {categories.map((c, idx) => (
-          <motion.button
-            key={c.id}
-            type="button"
-            onClick={() => { hapticTap(10); onSelectCategory(c.id); }}
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ ...SPRING, delay: 0.1 + idx * 0.08 }}
-            whileTap={{ scale: 0.96 }}
-            className={`relative overflow-hidden rounded-3xl p-5 min-h-[170px] flex flex-col justify-between text-left bg-gradient-to-br ${c.gradient} shadow-lg ${c.shadow} active:shadow-md transition-shadow`}
-            aria-label={`Open ${c.title}`}
-          >
-            {/* Decorative corner icon */}
-            <div className="absolute -bottom-3 -right-3 w-24 h-24 opacity-15 pointer-events-none" aria-hidden="true">
-              <PhIcon name={c.phName} size={96} tone="white" weight="fill" />
-            </div>
+        {cards.map((c, idx) => {
+          const inner = (
+            <>
+              <div className="absolute -bottom-3 -right-3 w-24 h-24 opacity-15 pointer-events-none" aria-hidden="true">
+                <PhIcon name={c.phName} size={96} tone="white" weight="fill" />
+              </div>
 
-            {/* Top: icon + LARGE count */}
-            <div className="relative flex items-start justify-between gap-2">
-              <div className="w-9 h-9 rounded-2xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shadow-sm">
-                <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
+              <div className="relative flex items-start justify-between gap-2">
+                <div className="w-9 h-9 rounded-2xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shadow-sm">
+                  <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
+                </div>
+                <div className="text-right leading-none">
+                  {c.kind === "scenario" ? (
+                    <AnimatedNumber
+                      value={c.count}
+                      className="block text-white font-black text-[28px] tabular-nums tracking-tight drop-shadow-sm"
+                    />
+                  ) : (
+                    <span className="block text-white font-black text-[18px] tracking-tight drop-shadow-sm">
+                      {c.badge}
+                    </span>
+                  )}
+                  <span className="text-white/70 text-[9px] font-bold uppercase tracking-wider">
+                    {c.countLabel}
+                  </span>
+                </div>
               </div>
-              <div className="text-right leading-none">
-                <AnimatedNumber
-                  value={categoryCounts[c.id] ?? 0}
-                  className="block text-white font-black text-[28px] tabular-nums tracking-tight drop-shadow-sm"
-                />
-                <span className="text-white/70 text-[9px] font-bold uppercase tracking-wider">items</span>
-              </div>
-            </div>
 
-            {/* Bottom: title + subtitle + arrow */}
-            <div className="relative">
-              <p className="text-white font-bold text-[15px] leading-tight">{c.title}</p>
-              <div className="flex items-center justify-between gap-2 mt-1">
-                <p className="text-white/75 text-[11px] leading-snug truncate">{c.subtitle}</p>
-                <ArrowRight className="w-4 h-4 text-white/90 shrink-0" />
+              <div className="relative">
+                <p className="text-white font-bold text-[15px] leading-tight">{c.title}</p>
+                <div className="flex items-center justify-between gap-2 mt-1">
+                  <p className="text-white/75 text-[11px] leading-snug truncate">{c.subtitle}</p>
+                  <ArrowRight className="w-4 h-4 text-white/90 shrink-0" />
+                </div>
               </div>
-            </div>
-          </motion.button>
-        ))}
+            </>
+          );
+
+          const cn = `relative overflow-hidden rounded-3xl p-5 min-h-[170px] flex flex-col justify-between text-left bg-gradient-to-br ${c.gradient} shadow-lg ${c.shadow} active:shadow-md transition-shadow`;
+          const mp = {
+            initial: { y: 30, opacity: 0 },
+            animate: { y: 0, opacity: 1 },
+            transition: { ...SPRING, delay: 0.1 + idx * 0.08 },
+            whileTap: { scale: 0.96 },
+          };
+
+          if (c.kind === "scenario") {
+            return (
+              <motion.button
+                key={c.id}
+                type="button"
+                onClick={() => { hapticTap(10); onSelectCategory(c.id); }}
+                {...mp}
+                className={cn}
+                aria-label={`Open ${c.title}`}
+              >
+                {inner}
+              </motion.button>
+            );
+          }
+          return (
+            <motion.div key={c.id} {...mp} onClick={() => hapticTap(10)}>
+              <Link to={c.to} className={`${cn} block`} aria-label={`Open ${c.title}`}>
+                {inner}
+              </Link>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* ③ Total scenarios — single compact stat strip */}
