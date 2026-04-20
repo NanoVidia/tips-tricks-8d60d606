@@ -617,6 +617,7 @@ export default function Index() {
             );
           })}
         </motion.div>
+        )}
         {!activeTab ? (
           <HomeHero
             totalScenarios={totalScenarios}
