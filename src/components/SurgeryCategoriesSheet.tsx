@@ -12,12 +12,12 @@ interface Props {
 }
 
 /** Icon mapping per surgical category — phosphor set, medically appropriate. */
-const CATEGORY_ICON: Record<SurgeryCategory, "Baby" | "Heartbeat" | "Flask" | "Drop" | "DNA" | "Siren" | "Cube" | "GenderFemale" | "MagnifyingGlass"> = {
+const CATEGORY_ICON: Record<SurgeryCategory, "Baby" | "Heartbeat" | "Flask" | "Drop" | "Dna" | "Siren" | "Cube" | "GenderFemale" | "MagnifyingGlass"> = {
   "Obstetric": "Baby",
   "Benign Gyn": "Heartbeat",
   "Oncology": "Flask",
   "Urogyn": "Drop",
-  "Reproductive": "DNA",
+  "Reproductive": "Dna",
   "Emergency": "Siren",
   "Minimally Invasive": "Cube",
   "Vaginal": "GenderFemale",
