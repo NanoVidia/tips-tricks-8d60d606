@@ -140,7 +140,7 @@ export function HomeHero({
       to: "/tools?tab=surgery",
       title: "Surgery Library",
       subtitle: "Procedures, steps & videos",
-      phName: "Knife",
+      phName: "FirstAidKit",
       gradient: "from-rose-500 to-pink-700",
       shadow: "shadow-rose-500/30",
       badge: "Atlas",
