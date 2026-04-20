@@ -16,7 +16,7 @@ import { StatsStrip } from "@/components/StatsStrip";
 import { CaseOfTheDay } from "@/components/CaseOfTheDay";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { HomeHero } from "@/components/HomeHero";
-import { FloatingAIBot } from "@/components/FloatingAIBot";
+
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { DisclaimerBanner } from "@/components/Disclaimer";
@@ -735,7 +735,7 @@ export default function Index() {
         categoryConfig={categoryConfig}
         t={t}
       />
-      <FloatingAIBot />
+      
       <OnboardingTour />
     </div>
   );
