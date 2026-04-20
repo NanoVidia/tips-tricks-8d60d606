@@ -79,7 +79,7 @@ export function ClinicTopicsSheet({ open, onOpenChange, onPickTopic, onBrowseAll
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.94 }}
               onClick={() => pick(t)}
-              className={`group relative overflow-hidden rounded-2xl p-3 bg-gradient-to-br ${t.gradient} shadow-md shadow-black/10 text-left`}
+              className={`group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br ${t.gradient} shadow-md shadow-black/10 text-left`}
               aria-label={`Filter clinic by ${t.label}`}
             >
               {/* Shimmer */}
@@ -88,21 +88,21 @@ export function ClinicTopicsSheet({ open, onOpenChange, onPickTopic, onBrowseAll
                 aria-hidden
               />
               {/* Background icon */}
-              <div className="absolute -bottom-2 -right-2 opacity-15 pointer-events-none" aria-hidden>
-                <PhIcon name={t.phName} size={48} tone="white" weight="fill" />
+              <div className="absolute -bottom-3 -right-3 opacity-15 pointer-events-none" aria-hidden>
+                <PhIcon name={t.phName} size={72} tone="white" weight="fill" />
               </div>
 
-              <div className="relative flex flex-col gap-1.5 min-h-[72px]">
+              <div className="relative flex flex-col gap-2.5 min-h-[108px]">
                 <motion.div
-                  className="w-7 h-7 rounded-xl bg-white/25 backdrop-blur-sm ring-1 ring-white/30 flex items-center justify-center"
+                  className="w-11 h-11 rounded-2xl bg-white/25 backdrop-blur-sm ring-1 ring-white/30 flex items-center justify-center shadow-inner"
                   animate={{ y: [0, -2, 0], rotate: [0, -3, 3, 0] }}
                   transition={{ duration: 3.5 + idx * 0.2, repeat: Infinity, ease: "easeInOut", delay: idx * 0.1 }}
                 >
-                  <PhIcon name={t.phName} size={14} tone="white" weight="duotone" />
+                  <PhIcon name={t.phName} size={22} tone="white" weight="duotone" />
                 </motion.div>
-                <div>
-                  <p className="text-white font-bold text-[11px] leading-tight truncate">{t.label}</p>
-                  <p className="text-white/70 text-[9px] font-bold uppercase tracking-wider mt-0.5">
+                <div className="mt-auto">
+                  <p className="text-white font-bold text-[13px] leading-tight line-clamp-2">{t.label}</p>
+                  <p className="text-white/80 text-[9px] font-bold uppercase tracking-[0.18em] mt-1">
                     Topic
                   </p>
                 </div>
