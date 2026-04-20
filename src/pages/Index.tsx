@@ -19,6 +19,7 @@ import { HomeHero } from "@/components/HomeHero";
 import { AdSpaceBanner } from "@/components/AdSpaceBanner";
 import { SurgeryCategoriesSheet } from "@/components/SurgeryCategoriesSheet";
 import { ExamsFlagsSheet } from "@/components/ExamsFlagsSheet";
+import { ClinicTopicsSheet } from "@/components/ClinicTopicsSheet";
 
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAppSettings } from "@/hooks/useAppSettings";
@@ -123,6 +124,7 @@ export default function Index() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [surgerySheetOpen, setSurgerySheetOpen] = useState(false);
   const [examsSheetOpen, setExamsSheetOpen] = useState(false);
+  const [clinicSheetOpen, setClinicSheetOpen] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   // Auto-suggest state
@@ -678,6 +680,7 @@ export default function Index() {
             }}
             onOpenSurgery={() => setSurgerySheetOpen(true)}
             onOpenExams={() => setExamsSheetOpen(true)}
+            onOpenClinic={() => setClinicSheetOpen(true)}
             tabLabels={{
               qa: tabLabel("qa"),
               clinic: tabLabel("clinic"),
@@ -787,6 +790,13 @@ export default function Index() {
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
       <SurgeryCategoriesSheet open={surgerySheetOpen} onOpenChange={setSurgerySheetOpen} />
       <ExamsFlagsSheet open={examsSheetOpen} onOpenChange={setExamsSheetOpen} />
+      <ClinicTopicsSheet
+        open={clinicSheetOpen}
+        onOpenChange={setClinicSheetOpen}
+        total={categoryCounts.clinic ?? 0}
+        onBrowseAll={() => { setActiveTab("clinic"); setSearch(""); }}
+        onPickTopic={(q) => { setActiveTab("clinic"); setSearch(q); }}
+      />
       <ScenarioSheet
         scenario={sheetScenario}
         open={sheetOpen}

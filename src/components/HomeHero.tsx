@@ -26,6 +26,8 @@ interface HomeHeroProps {
   onOpenSurgery: () => void;
   /** Open the Prometric/Exams flags sheet */
   onOpenExams: () => void;
+  /** Open the Clinic topics sheet */
+  onOpenClinic: () => void;
   tabLabels: Record<ScenarioCategory, string>;
 }
 
@@ -90,6 +92,7 @@ export function HomeHero({
   onOpenAI,
   onOpenSurgery,
   onOpenExams,
+  onOpenClinic,
   tabLabels,
 }: HomeHeroProps) {
   type CardItem =
@@ -110,7 +113,7 @@ export function HomeHero({
         onAction: () => void;
         title: string;
         subtitle: string;
-        phName: "FirstAidKit" | "GraduationCap";
+        phName: "FirstAidKit" | "GraduationCap" | "Stethoscope";
         gradient: string;
         shadow: string;
         badge: string;
@@ -130,15 +133,16 @@ export function HomeHero({
       countLabel: "items",
     },
     {
-      kind: "scenario",
-      id: "clinic",
+      kind: "action",
+      id: "clinic-topics",
+      onAction: onOpenClinic,
       title: tabLabels.clinic,
-      subtitle: "Clinical Scenarios",
+      subtitle: "Browse by topic",
       phName: "Stethoscope",
       gradient: "from-sky-500 to-blue-700",
       shadow: "shadow-sky-500/30",
-      count: categoryCounts.clinic ?? 0,
-      countLabel: "items",
+      badge: "Topics",
+      countLabel: `${categoryCounts.clinic ?? 0} items`,
     },
     {
       kind: "action",
