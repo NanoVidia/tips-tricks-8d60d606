@@ -20,6 +20,7 @@ import { AdSpaceBanner } from "@/components/AdSpaceBanner";
 import { SurgeryCategoriesSheet } from "@/components/SurgeryCategoriesSheet";
 import { ExamsFlagsSheet } from "@/components/ExamsFlagsSheet";
 import { ClinicTopicsSheet } from "@/components/ClinicTopicsSheet";
+import { AppMenu } from "@/components/AppMenu";
 
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAppSettings } from "@/hooks/useAppSettings";
@@ -349,13 +350,16 @@ export default function Index() {
                 OB/GYN Reference
               </span>
             </motion.div>
-            <button
-              onClick={toggleDark}
-              className="p-2 rounded-xl bg-card border border-border/60 hover:border-gold/50 hover:bg-muted transition-all shrink-0 self-start"
-              aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0 self-start">
+              <button
+                onClick={toggleDark}
+                className="p-2 rounded-xl bg-card border border-border/60 hover:border-gold/50 hover:bg-muted transition-all"
+                aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
+              </button>
+              <AppMenu dark={dark} onToggleTheme={toggleDark} />
+            </div>
           </div>
 
           {/* Hairline divider — hidden in compact */}
