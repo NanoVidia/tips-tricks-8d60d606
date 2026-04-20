@@ -123,7 +123,12 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
       <Dialog open={dialog !== null} onOpenChange={(o) => !o && close()}>
         <DialogContent className="max-w-md max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="font-editorial text-xl">{titleFor(dialog)}</DialogTitle>
+            <DialogTitle className="font-editorial text-xl">
+              {(dialog === "about" && aboutContent?.title)
+                || (dialog === "privacy" && privacyContent?.title)
+                || (dialog === "terms" && termsContent?.title)
+                || titleFor(dialog)}
+            </DialogTitle>
             <DialogDescription className="text-xs">{subtitleFor(dialog)}</DialogDescription>
           </DialogHeader>
           <ScrollArea className="flex-1 -mx-6 px-6">
