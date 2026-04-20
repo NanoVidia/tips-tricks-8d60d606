@@ -113,7 +113,7 @@ export function HomeHero({
         onAction: () => void;
         title: string;
         subtitle: string;
-        phName: "FirstAidKit" | "GraduationCap";
+        phName: "FirstAidKit" | "GraduationCap" | "Stethoscope";
         gradient: string;
         shadow: string;
         badge: string;
