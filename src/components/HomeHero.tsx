@@ -111,7 +111,7 @@ export function HomeHero({
       {/* ① Hero AI Banner — full-width immersive card */}
       <motion.button
         type="button"
-        onClick={onOpenAI}
+        onClick={() => { hapticTap(12); onOpenAI(); }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={SPRING}
