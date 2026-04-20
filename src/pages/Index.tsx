@@ -207,17 +207,29 @@ export default function Index() {
   // Reset highlight when suggestions change
   useEffect(() => { setHighlightIdx(-1); }, [suggestions]);
 
-  // Click outside to close
+  // Click outside to close (suggestions + focus panel)
   useEffect(() => {
-    if (!suggestOpen) return;
+    if (!suggestOpen && !searchFocused) return;
     const onClick = (e: MouseEvent) => {
       if (searchBoxRef.current && !searchBoxRef.current.contains(e.target as Node)) {
         setSuggestOpen(false);
+        setSearchFocused(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSuggestOpen(false);
+        setSearchFocused(false);
+        (document.activeElement as HTMLElement | null)?.blur?.();
       }
     };
     document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [suggestOpen]);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [suggestOpen, searchFocused]);
 
   const fetchScenarios = useCallback(async () => {
     if (!activeTab) return;
