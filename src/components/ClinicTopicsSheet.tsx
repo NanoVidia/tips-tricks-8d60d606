@@ -79,7 +79,7 @@ export function ClinicTopicsSheet({ open, onOpenChange, onPickTopic, onBrowseAll
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.94 }}
               onClick={() => pick(t)}
-              className={`group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br ${t.gradient} shadow-md shadow-black/10 text-left`}
+              className={`group soft-tint relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br ${t.gradient} shadow-md shadow-black/10 text-left`}
               aria-label={`Filter clinic by ${t.label}`}
             >
               {/* Shimmer */}

@@ -71,7 +71,7 @@ export function SurgeryCategoriesSheet({ open, onOpenChange }: Props) {
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.94 }}
                 onClick={() => go(c.id)}
-                className={`group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br ${c.color} shadow-md shadow-black/10 text-left`}
+                className={`group soft-tint relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br ${c.color} shadow-md shadow-black/10 text-left`}
                 aria-label={`Open ${c.label} surgeries`}
               >
                 {/* Shimmer */}

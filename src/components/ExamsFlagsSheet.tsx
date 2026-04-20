@@ -62,7 +62,7 @@ export function ExamsFlagsSheet({ open, onOpenChange }: Props) {
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => go(exam.id)}
-                className={`group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br ${color} shadow-md shadow-black/10 text-left`}
+                className={`group soft-tint relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br ${color} shadow-md shadow-black/10 text-left`}
                 aria-label={`Open ${exam.authority} exam`}
               >
                 {/* Shimmer */}
