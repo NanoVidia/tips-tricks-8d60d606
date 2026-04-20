@@ -16,6 +16,40 @@ interface ScenarioCardProps {
     ScenarioCategory,
     { phName: string; iconBg: string; gradient: string }
   >;
+  highlight?: string;
+}
+
+/** Render text with case-insensitive highlighted matches of `query`. */
+function HighlightedText({ text, query }: { text: string; query?: string }) {
+  if (!query || !query.trim()) return <>{text}</>;
+  const tokens = Array.from(
+    new Set(
+      query
+        .trim()
+        .split(/\s+/)
+        .filter((t) => t.length >= 2)
+        .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    )
+  );
+  if (tokens.length === 0) return <>{text}</>;
+  const re = new RegExp(`(${tokens.join("|")})`, "gi");
+  const parts = text.split(re);
+  return (
+    <>
+      {parts.map((part, i) =>
+        re.test(part) ? (
+          <mark
+            key={i}
+            className="bg-yellow-200 dark:bg-yellow-400/40 text-foreground rounded-[3px] px-[2px] py-0"
+          >
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
 }
 
 export function ScenarioCard({
@@ -26,6 +60,7 @@ export function ScenarioCard({
   index,
   onOpen,
   categoryConfig,
+  highlight,
 }: ScenarioCardProps) {
   const cfg = categoryConfig[category];
 
