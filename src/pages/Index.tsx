@@ -764,7 +764,7 @@ export default function Index() {
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
-        ) : scenarios.length === 0 ? (
+        ) : (isSearching ? filteredSearchResults.length === 0 : scenarios.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
             <div className="w-12 h-12 rounded-2xl bg-muted/60 flex items-center justify-center">
               <Search className="w-5 h-5 text-muted-foreground" />
@@ -795,11 +795,14 @@ export default function Index() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setSearch("")}
+                onClick={() => {
+                  if (searchCatFilter) setSearchCatFilter(null);
+                  else setSearch("");
+                }}
                 className="rounded-full text-[11px] h-8 px-3.5"
               >
                 <X className="w-3 h-3 mr-1" />
-                Clear search
+                {searchCatFilter ? "Show all categories" : "Clear search"}
               </Button>
             )}
           </div>
@@ -870,29 +873,143 @@ export default function Index() {
                 )}
               </div>
               <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-1 rounded-full font-bold tabular-nums shrink-0">
-                {formatNumber(totalCount)} {isSearching ? "matches" : "items"}
+                {formatNumber(isSearching ? filteredSearchResults.length : totalCount)} {isSearching ? "matches" : "items"}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {scenarios.map((item, idx) => (
-                <ScenarioCard
-                  key={item.id}
-                  id={item.id}
-                  title={item.title_en}
-                  situation={item.situation_en}
-                  category={item.category}
-                  index={idx}
-                  onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
-                  categoryConfig={categoryConfig}
+            {/* Category filter chips — only shown during search */}
+            {isSearching && allSearchResults.length > 0 && (
+              <div
+                className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1 mb-3"
+                role="tablist"
+                aria-label="Filter search results by category"
+              >
+                {([null, ...tabIds] as (ScenarioCategory | null)[]).map((cat) => {
+                  const isAll = cat === null;
+                  const count = isAll ? allSearchResults.length : searchCounts[cat as ScenarioCategory];
+                  const active = searchCatFilter === cat;
+                  const cfg = isAll ? null : categoryConfig[cat as ScenarioCategory];
+                  const label = isAll ? "All" : tabLabel(cat as ScenarioCategory);
+                  return (
+                    <button
+                      key={isAll ? "all" : cat as string}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setSearchCatFilter(cat)}
+                      disabled={count === 0}
+                      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
+                        active
+                          ? `text-primary-foreground border-transparent shadow-sm ${
+                              isAll ? "bg-primary" : `bg-gradient-to-br ${cfg!.gradient}`
+                            }`
+                          : "bg-card text-foreground border-border/60 hover:border-primary/40"
+                      } ${count === 0 ? "opacity-40 cursor-not-allowed" : ""}`}
+                    >
+                      {!isAll && (
+                        <PhIcon
+                          name={cfg!.phName as never}
+                          size={11}
+                          tone={active ? "white" : "gold"}
+                          weight={active ? "fill" : "duotone"}
+                        />
+                      )}
+                      <span>{label}</span>
+                      <span
+                        className={`tabular-nums text-[9px] px-1.5 py-0.5 rounded-full ${
+                          active ? "bg-white/25" : "bg-muted/70 text-muted-foreground"
+                        }`}
+                      >
+                        {formatNumber(count)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {isSearching ? (
+              <div className="space-y-4">
+                {groupedResults.map(({ cat, items }) => {
+                  const cfg = categoryConfig[cat];
+                  const collapsed = collapsedGroups.has(cat);
+                  return (
+                    <section key={cat} className="rounded-2xl border border-border/60 bg-card/40 overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(cat)}
+                        aria-expanded={!collapsed}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-muted/40 transition"
+                      >
+                        <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
+                          <PhIcon name={cfg.phName as never} size={13} tone="white" weight="duotone" />
+                        </div>
+                        <h3 className="flex-1 text-left text-[13px] font-bold text-foreground truncate">
+                          {tabLabel(cat)}
+                        </h3>
+                        <span className="text-[10px] tabular-nums font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                          {formatNumber(items.length)}
+                        </span>
+                        <ChevronRight
+                          className={`w-4 h-4 text-muted-foreground transition-transform ${
+                            collapsed ? "" : "rotate-90"
+                          }`}
+                        />
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {!collapsed && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 pt-1">
+                              {items.map((item, idx) => (
+                                <ScenarioCard
+                                  key={item.id}
+                                  id={item.id}
+                                  title={item.title_en}
+                                  situation={item.situation_en}
+                                  category={item.category}
+                                  index={idx}
+                                  onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                                  categoryConfig={categoryConfig}
+                                  highlight={debouncedSearch}
+                                />
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </section>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {scenarios.map((item, idx) => (
+                    <ScenarioCard
+                      key={item.id}
+                      id={item.id}
+                      title={item.title_en}
+                      situation={item.situation_en}
+                      category={item.category}
+                      index={idx}
+                      onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                      categoryConfig={categoryConfig}
+                    />
+                  ))}
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
                 />
-              ))}
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+              </>
+            )}
           </>
         )}
       </main>
