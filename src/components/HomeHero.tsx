@@ -51,6 +51,15 @@ function AnimatedNumber({ value, className = "" }: { value: number; className?: 
 
 const SPRING = { type: "spring" as const, stiffness: 150, damping: 14 };
 
+/** Light haptic tap — safe no-op if unsupported. */
+const hapticTap = (ms: number = 10) => {
+  try {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(ms);
+    }
+  } catch { /* ignore */ }
+};
+
 export function HomeHero({
   totalScenarios,
   categoryCounts,
@@ -102,7 +111,7 @@ export function HomeHero({
       {/* ① Hero AI Banner — full-width immersive card */}
       <motion.button
         type="button"
-        onClick={onOpenAI}
+        onClick={() => { hapticTap(12); onOpenAI(); }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={SPRING}
@@ -162,7 +171,7 @@ export function HomeHero({
               href={`https://wa.me/${waNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); hapticTap(8); }}
               className="shrink-0 inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 active:scale-95 transition-all text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-md shadow-green-500/30"
             >
               <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="currentColor" aria-hidden="true">
@@ -180,7 +189,7 @@ export function HomeHero({
           <motion.button
             key={c.id}
             type="button"
-            onClick={() => onSelectCategory(c.id)}
+            onClick={() => { hapticTap(10); onSelectCategory(c.id); }}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ ...SPRING, delay: 0.1 + idx * 0.08 }}
@@ -226,6 +235,7 @@ export function HomeHero({
           animate={{ y: 0, opacity: 1 }}
           transition={{ ...SPRING, delay: 0.42 }}
           whileTap={{ scale: 0.96 }}
+          onClick={() => hapticTap(8)}
           className="relative overflow-hidden rounded-2xl p-4 min-h-[90px] flex flex-col justify-between bg-gradient-to-br from-green-500 to-emerald-700 shadow-lg shadow-green-500/30"
           aria-label="WhatsApp direct consult"
         >
