@@ -697,8 +697,13 @@ export default function Index() {
         )}
       </main>
 
+      {/* Advertising space — premium placement before the legal disclaimer */}
+      <div className="px-4 sm:px-5 pt-2 pb-3">
+        <AdSpaceBanner />
+      </div>
+
       {/* Disclaimer — placed just above the footer for legal prominence */}
-      <div className="px-4 sm:px-5 pt-2 pb-5">
+      <div className="px-4 sm:px-5 pt-1 pb-5">
         <DisclaimerBanner />
       </div>
 
