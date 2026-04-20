@@ -62,7 +62,7 @@ export function ExamsFlagsSheet({ open, onOpenChange }: Props) {
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => go(exam.id)}
-                className={`group relative overflow-hidden rounded-2xl p-3 bg-gradient-to-br ${color} shadow-md shadow-black/10 text-left min-h-[100px]`}
+                className={`group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br ${color} shadow-md shadow-black/10 text-left`}
                 aria-label={`Open ${exam.authority} exam`}
               >
                 {/* Shimmer */}
@@ -72,30 +72,30 @@ export function ExamsFlagsSheet({ open, onOpenChange }: Props) {
                 />
                 {/* Huge flag watermark */}
                 <div
-                  className="absolute -bottom-4 -right-2 text-[68px] leading-none opacity-25 pointer-events-none select-none"
+                  className="absolute -bottom-5 -right-3 text-[88px] leading-none opacity-20 pointer-events-none select-none"
                   aria-hidden
                 >
                   {exam.flag}
                 </div>
 
-                <div className="relative flex flex-col justify-between h-full gap-1.5">
-                  <div className="flex items-center gap-1.5">
+                <div className="relative flex flex-col gap-2.5 min-h-[108px]">
+                  <div className="flex items-center gap-2">
                     <motion.span
-                      className="text-xl leading-none"
+                      className="w-11 h-11 rounded-2xl bg-white/25 backdrop-blur-sm ring-1 ring-white/30 flex items-center justify-center text-[22px] leading-none shadow-inner"
                       animate={{ y: [0, -2, 0], rotate: [0, -5, 5, 0] }}
                       transition={{ duration: 3.5 + idx * 0.15, repeat: Infinity, ease: "easeInOut", delay: idx * 0.1 }}
                     >
                       {exam.flag}
                     </motion.span>
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-white/20 ring-1 ring-white/30 text-white text-[8px] font-bold uppercase tracking-wider backdrop-blur-sm">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/20 ring-1 ring-white/30 text-white text-[9px] font-bold uppercase tracking-[0.15em] backdrop-blur-sm">
                       {exam.id}
                     </span>
                   </div>
-                  <div>
-                    <p className="text-white font-bold text-[12px] leading-tight line-clamp-2">
+                  <div className="mt-auto">
+                    <p className="text-white font-bold text-[13px] leading-tight line-clamp-2">
                       {exam.country}
                     </p>
-                    <p className="text-white/80 text-[9px] font-semibold uppercase tracking-wider mt-0.5 line-clamp-1">
+                    <p className="text-white/80 text-[9px] font-bold uppercase tracking-[0.18em] mt-1 line-clamp-1">
                       {exam.platform} · {exam.level}
                     </p>
                   </div>
