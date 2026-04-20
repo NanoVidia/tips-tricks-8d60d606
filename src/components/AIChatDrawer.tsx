@@ -169,49 +169,50 @@ Rules:
           </SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto py-3 space-y-4 min-h-0">
+        <div className="flex-1 overflow-y-auto py-2 space-y-3 min-h-0">
           {messages.length === 0 && (
-            <div className="text-center text-sm text-muted-foreground py-6 space-y-3">
-              <p className="text-base">👋 Welcome!</p>
-              <p>Your medical AI assistant</p>
-              <p className="mt-3">Ask anything about this clinical scenario...</p>
+            <div className="px-1 pb-2">
+              {/* Compact greeting */}
+              <div className="text-center mb-3">
+                <p className="text-[13px] font-semibold text-foreground">👋 Ask anything about this scenario</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Pick a quick action or type your question</p>
+              </div>
+
+              {/* Challenge Me — hero CTA */}
               <Button
                 onClick={askHardQuestion}
                 disabled={loading}
-                size="sm"
-                className="mt-4 rounded-full bg-gradient-to-r from-primary via-primary to-primary/70 hover:opacity-90 shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all hover:-translate-y-0.5 px-5 h-9 font-semibold tracking-wide"
+                className="w-full rounded-2xl bg-gradient-to-r from-primary via-primary to-primary/80 hover:opacity-95 shadow-md shadow-primary/25 h-11 font-bold tracking-wide mb-3"
               >
-                <Target className="w-4 h-4 mr-1.5" />
-                Challenge Me
-                <span className="ml-1.5 opacity-80">✦</span>
+                <Target className="w-4 h-4 mr-2" />
+                Challenge Me — OSCE-style MCQ
               </Button>
 
-              <div className="pt-4 space-y-2">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70 font-semibold">
-                  ✦ Quick Prompts ✦
-                </p>
-                <div className="flex flex-wrap gap-1.5 justify-center px-2">
-                  {[
-                    { emoji: "🚩", label: "Red flags", prompt: `What are the key red flags & danger signs I must NOT miss in "${scenario?.title_en}"? Give me the "don't be that doctor" list.` },
-                    { emoji: "🎯", label: "Next best step", prompt: `In "${scenario?.title_en}", what is the single next best step right now? Justify in 3 lines max.` },
-                    { emoji: "🧠", label: "Mnemonic", prompt: `Give me a memorable mnemonic or rule of thumb for managing "${scenario?.title_en}" — the kind seniors actually use.` },
-                    { emoji: "🔪", label: "Surgical pearls", prompt: `Share 3 surgical/procedural pearls or tricks specific to "${scenario?.title_en}" — anatomic landmarks, hand positions, or "if A fails, do B" ladders.` },
-                    { emoji: "💊", label: "Drug doses", prompt: `List the exact drug doses, routes, and contraindications relevant to "${scenario?.title_en}". Be precise.` },
-                    { emoji: "📚", label: "Latest guideline", prompt: `What does the most recent ACOG/RCOG/FIGO guideline say about "${scenario?.title_en}"? Cite year and bulletin number.` },
-                    { emoji: "⚠️", label: "Pitfalls", prompt: `What are the top 3 pitfalls or "never do this" warnings in "${scenario?.title_en}"?` },
-                    { emoji: "🗣️", label: "Counsel patient", prompt: `Script how I should counsel the patient in "${scenario?.title_en}" — empathetic, clear, in plain language.` },
-                  ].map((chip) => (
-                      <button
-                      key={chip.label}
-                      onClick={() => sendMessage(chip.prompt)}
-                      disabled={loading}
-                      className="text-xs px-3 py-1.5 rounded-full bg-gradient-to-br from-muted to-muted/50 hover:from-primary/15 hover:to-primary/5 hover:text-primary border border-border/50 hover:border-primary/40 transition-all hover:-translate-y-0.5 hover:shadow-sm disabled:opacity-50 font-medium"
-                    >
-                      <span className="mr-1">{chip.emoji}</span>
-                      {chip.label}
-                    </button>
-                  ))}
-                </div>
+              {/* 2×3 Quick-prompt grid — professional, scannable */}
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { emoji: "🚩", label: "Red flags", hint: "Don't-miss signs", gradient: "from-rose-500/10 to-red-500/5", border: "border-rose-500/25", prompt: `What are the key red flags & danger signs I must NOT miss in "${scenario?.title_en}"? Give me the "don't be that doctor" list.` },
+                  { emoji: "🎯", label: "Next best step", hint: "Decision now", gradient: "from-sky-500/10 to-blue-500/5", border: "border-sky-500/25", prompt: `In "${scenario?.title_en}", what is the single next best step right now? Justify in 3 lines max.` },
+                  { emoji: "🔪", label: "Surgical pearls", hint: "Tricks & ladders", gradient: "from-amber-500/10 to-orange-500/5", border: "border-amber-500/25", prompt: `Share 3 surgical/procedural pearls or tricks specific to "${scenario?.title_en}" — anatomic landmarks, hand positions, or "if A fails, do B" ladders.` },
+                  { emoji: "💊", label: "Drug doses", hint: "Exact & safe", gradient: "from-emerald-500/10 to-teal-500/5", border: "border-emerald-500/25", prompt: `List the exact drug doses, routes, and contraindications relevant to "${scenario?.title_en}". Be precise.` },
+                  { emoji: "📚", label: "Guideline", hint: "ACOG · RCOG", gradient: "from-violet-500/10 to-indigo-500/5", border: "border-violet-500/25", prompt: `What does the most recent ACOG/RCOG/FIGO guideline say about "${scenario?.title_en}"? Cite year and bulletin number.` },
+                  { emoji: "🗣️", label: "Counsel patient", hint: "Empathic script", gradient: "from-pink-500/10 to-rose-500/5", border: "border-pink-500/25", prompt: `Script how I should counsel the patient in "${scenario?.title_en}" — empathetic, clear, in plain language.` },
+                ].map((chip) => (
+                  <button
+                    key={chip.label}
+                    onClick={() => sendMessage(chip.prompt)}
+                    disabled={loading}
+                    className={`group relative overflow-hidden text-left p-2.5 rounded-xl bg-gradient-to-br ${chip.gradient} border ${chip.border} hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50`}
+                  >
+                    <div className="flex items-start gap-2">
+                      <span className="text-lg leading-none mt-0.5">{chip.emoji}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[12px] font-bold text-foreground leading-tight">{chip.label}</p>
+                        <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 truncate">{chip.hint}</p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -274,7 +275,7 @@ Rules:
               className="rounded-full text-xs h-8 shrink-0 border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/60 font-semibold tracking-wide shadow-sm"
             >
               <Target className="w-3.5 h-3.5 mr-1" />
-              Challenge Me ✦
+              Challenge Me
             </Button>
           </div>
         )}

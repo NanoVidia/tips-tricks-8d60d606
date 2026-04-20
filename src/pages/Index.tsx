@@ -451,6 +451,52 @@ export default function Index() {
                         </button>
                       ))}
                     </div>
+
+                    {/* 🔥 Hot topics — hardest procedures, skills, tricks */}
+                    <div className="flex items-center gap-1.5 mt-4 mb-2 px-0.5">
+                      <span className="text-[11px]">🔥</span>
+                      <span className="eyebrow text-muted-foreground">Hot topics for clinicians</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { emoji: "⚡", label: "Shoulder dystocia", hint: "HELPERR drill", cat: "or_labor" as const, gradient: "from-rose-500/12 to-red-500/5", border: "border-rose-500/25" },
+                        { emoji: "🩸", label: "Massive PPH", hint: "4 T's protocol", cat: "qa" as const, gradient: "from-red-500/12 to-pink-500/5", border: "border-red-500/25" },
+                        { emoji: "🫀", label: "Eclampsia", hint: "MgSO₄ dosing", cat: "qa" as const, gradient: "from-violet-500/12 to-fuchsia-500/5", border: "border-violet-500/25" },
+                        { emoji: "🔪", label: "C-section tricks", hint: "Difficult delivery", cat: "or_labor" as const, gradient: "from-amber-500/12 to-orange-500/5", border: "border-amber-500/25" },
+                        { emoji: "👶", label: "Breech delivery", hint: "Maneuvers", cat: "or_labor" as const, gradient: "from-sky-500/12 to-blue-500/5", border: "border-sky-500/25" },
+                        { emoji: "🧠", label: "Consent pitfalls", hint: "Ethics & law", cat: "behavior" as const, gradient: "from-emerald-500/12 to-teal-500/5", border: "border-emerald-500/25" },
+                      ].map((item, idx) => (
+                        <motion.button
+                          key={item.label}
+                          type="button"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.05 + idx * 0.04, type: "spring", stiffness: 260, damping: 22 }}
+                          whileHover={{ y: -2 }}
+                          whileTap={{ scale: 0.96 }}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setActiveTab(item.cat);
+                            setSearch(item.label);
+                            setSuggestOpen(true);
+                            setSearchFocused(false);
+                          }}
+                          className={`group relative overflow-hidden text-left p-2 rounded-xl bg-gradient-to-br ${item.gradient} border ${item.border} hover:shadow-md transition-all`}
+                        >
+                          <span
+                            className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none"
+                            aria-hidden
+                          />
+                          <div className="relative flex items-start gap-1.5">
+                            <span className="text-base leading-none mt-0.5">{item.emoji}</span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[11px] font-bold text-foreground leading-tight truncate">{item.label}</p>
+                              <p className="text-[9px] text-muted-foreground leading-tight mt-0.5 truncate">{item.hint}</p>
+                            </div>
+                          </div>
+                        </motion.button>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
               )}
