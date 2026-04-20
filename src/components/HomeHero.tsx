@@ -196,17 +196,17 @@ export function HomeHero({
           aria-hidden="true"
         />
 
-        <div className="relative p-4 flex items-center gap-4 min-h-[170px]">
+        <div className="relative p-4 flex items-center gap-3 min-h-[150px]">
           {/* Animated robot, contained within banner */}
           <div className="relative shrink-0 self-center">
             <div className="absolute inset-0 rounded-full bg-sky-400/25 blur-2xl animate-pulse" aria-hidden="true" />
-            <AIRobot size={104} className="relative" />
+            <AIRobot size={78} className="relative" />
           </div>
 
           {/* Text block */}
-          <div className="flex-1 min-w-0 space-y-2">
+          <div className="flex-1 min-w-0 space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-white font-bold text-[17px] leading-tight">AI Medical Assistant</h2>
+              <h2 className="text-white font-bold text-[16px] leading-tight">AI Medical Assistant</h2>
               <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-green-400/20 text-green-300 border border-green-400/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                 Live
@@ -214,12 +214,10 @@ export function HomeHero({
             </div>
 
             <p className="text-white/75 text-[11px] leading-snug">
-              Tap to chat with your clinical AI — calculators (EDD, Bishop, BMI),
-              drug & pregnancy safety checks, evidence-based guidance, and instant
-              answers to OB/GYN questions, 24/7.
+              Calculators, drug safety & instant OB/GYN answers — 24/7.
             </p>
 
-            <div className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-bold text-white bg-white/10 hover:bg-white/15 transition-colors px-2.5 py-1 rounded-full ring-1 ring-white/20">
+            <div className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-bold text-white bg-white/10 px-2.5 py-1 rounded-full ring-1 ring-white/20">
               Open chat
               <ArrowRight className="w-3 h-3" />
             </div>
