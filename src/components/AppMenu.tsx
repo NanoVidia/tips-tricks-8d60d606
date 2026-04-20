@@ -1,0 +1,428 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  MoreVertical, Info, Shield, FileText, Mail, HelpCircle, LifeBuoy,
+  MessageSquare, Star, Share2, Tag, History, Award, Scale, Languages,
+  Palette, Bell, Accessibility, Bug, LogOut, ExternalLink, Check, Heart,
+} from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useAppSettings } from "@/hooks/useAppSettings";
+
+const APP_VERSION = "1.4.0";
+const APP_NAME = "Tips & Tricks — OB/GYN";
+
+type DialogId =
+  | "about" | "privacy" | "terms" | "contact" | "faq" | "help"
+  | "feedback" | "version" | "changelog" | "credits" | "licenses"
+  | "language" | "theme" | "notifications" | "accessibility" | "bug" | null;
+
+interface Props {
+  dark: boolean;
+  onToggleTheme: () => void;
+}
+
+export function AppMenu({ dark, onToggleTheme }: Props) {
+  const [open, setOpen] = useState(false);
+  const [dialog, setDialog] = useState<DialogId>(null);
+  const navigate = useNavigate();
+  const { getSetting } = useAppSettings();
+  const whatsapp = String(getSetting("whatsapp_number", "") || "").replace(/\D/g, "");
+  const supportEmail = String(getSetting("support_email", "support@tips-tricks.app") || "support@tips-tricks.app");
+
+  const close = () => { setDialog(null); setOpen(false); };
+
+  const handleShare = async () => {
+    const data = { title: APP_NAME, text: "OB/GYN clinical reference", url: window.location.origin };
+    try {
+      if (navigator.share) await navigator.share(data);
+      else { await navigator.clipboard.writeText(data.url); toast.success("Link copied"); }
+    } catch { /* user cancelled */ }
+    setOpen(false);
+  };
+
+  const handleRate = () => {
+    window.open("https://lovable.app", "_blank", "noopener,noreferrer");
+    setOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    toast.success("Local data cleared");
+    setTimeout(() => window.location.reload(), 600);
+  };
+
+  const items: Array<{ icon: any; label: string; action: () => void; danger?: boolean; sep?: boolean }> = [
+    { icon: Info, label: "About", action: () => setDialog("about") },
+    { icon: HelpCircle, label: "FAQ", action: () => setDialog("faq") },
+    { icon: LifeBuoy, label: "Help & Support", action: () => setDialog("help") },
+    { icon: MessageSquare, label: "Feedback", action: () => setDialog("feedback"), sep: true },
+    { icon: Mail, label: "Contact", action: () => setDialog("contact") },
+    { icon: Share2, label: "Share App", action: handleShare },
+    { icon: Star, label: "Rate Us", action: handleRate },
+    { icon: Heart, label: "Donate / Support", action: () => window.open("https://lovable.app", "_blank"), sep: true },
+    { icon: Languages, label: "Language", action: () => setDialog("language") },
+    { icon: Palette, label: "Theme", action: () => setDialog("theme") },
+    { icon: Bell, label: "Notifications", action: () => setDialog("notifications") },
+    { icon: Accessibility, label: "Accessibility", action: () => setDialog("accessibility"), sep: true },
+    { icon: Shield, label: "Privacy Policy", action: () => setDialog("privacy") },
+    { icon: FileText, label: "Terms of Use", action: () => setDialog("terms") },
+    { icon: Scale, label: "Licenses", action: () => setDialog("licenses") },
+    { icon: Award, label: "Credits", action: () => setDialog("credits") },
+    { icon: History, label: "Changelog", action: () => setDialog("changelog") },
+    { icon: Bug, label: "Report a Bug", action: () => setDialog("bug") },
+    { icon: Tag, label: `Version ${APP_VERSION}`, action: () => setDialog("version"), sep: true },
+    { icon: LogOut, label: "Reset Local Data", action: handleLogout, danger: true },
+  ];
+
+  return (
+    <>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="p-2 rounded-xl bg-card border border-border/60 hover:border-primary/50 hover:bg-muted transition-all shrink-0 self-start"
+            aria-label="App menu"
+          >
+            <MoreVertical className="w-4 h-4 text-foreground" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-64 max-h-[80vh] overflow-y-auto">
+          <DropdownMenuLabel className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+            {APP_NAME}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {items.map((it, i) => (
+            <div key={i}>
+              <DropdownMenuItem
+                onClick={(e) => { e.preventDefault(); it.action(); }}
+                className={`gap-2.5 cursor-pointer ${it.danger ? "text-destructive focus:text-destructive" : ""}`}
+              >
+                <it.icon className="w-4 h-4 shrink-0" />
+                <span className="flex-1">{it.label}</span>
+              </DropdownMenuItem>
+              {it.sep && <DropdownMenuSeparator />}
+            </div>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={dialog !== null} onOpenChange={(o) => !o && close()}>
+        <DialogContent className="max-w-md max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="font-editorial text-xl">{titleFor(dialog)}</DialogTitle>
+            <DialogDescription className="text-xs">{subtitleFor(dialog)}</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="flex-1 -mx-6 px-6">
+            <div className="text-sm leading-relaxed space-y-3 pb-2">
+              <DialogBody
+                id={dialog}
+                whatsapp={whatsapp}
+                supportEmail={supportEmail}
+                dark={dark}
+                onToggleTheme={onToggleTheme}
+              />
+            </div>
+          </ScrollArea>
+          <div className="pt-3 border-t flex justify-end">
+            <Button variant="outline" size="sm" onClick={close}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function titleFor(id: DialogId): string {
+  const map: Record<string, string> = {
+    about: "About this app", privacy: "Privacy Policy", terms: "Terms of Use",
+    contact: "Contact us", faq: "Frequently Asked Questions", help: "Help & Support",
+    feedback: "Send Feedback", version: "Version Information", changelog: "What's New",
+    credits: "Credits & Acknowledgements", licenses: "Open-source Licenses",
+    language: "Language", theme: "Theme", notifications: "Notifications",
+    accessibility: "Accessibility", bug: "Report a Bug",
+  };
+  return map[id || ""] || "";
+}
+
+function subtitleFor(id: DialogId): string {
+  const map: Record<string, string> = {
+    about: "Educational OB/GYN clinical reference",
+    privacy: "How we handle your data",
+    terms: "Conditions of use",
+    contact: "Reach the team",
+    faq: "Common questions",
+    help: "Get assistance",
+    feedback: "Help us improve",
+    version: `Build ${APP_VERSION}`,
+    changelog: "Recent updates",
+    credits: "People & sources",
+    licenses: "Third-party software",
+    language: "Display language",
+    theme: "Light or dark",
+    notifications: "Manage alerts",
+    accessibility: "Visual & motion preferences",
+    bug: "Tell us what went wrong",
+  };
+  return map[id || ""] || "";
+}
+
+function DialogBody({
+  id, whatsapp, supportEmail, dark, onToggleTheme,
+}: {
+  id: DialogId; whatsapp: string; supportEmail: string; dark: boolean; onToggleTheme: () => void;
+}) {
+  if (id === "about") return (
+    <>
+      <p><strong>{APP_NAME}</strong> is a curated clinical reference for OB/GYN practitioners — covering scenarios, surgeries, exams, calculators, protocols, drugs, and guidelines.</p>
+      <p className="text-muted-foreground">⚠️ For educational purposes only. Always follow local protocols and clinical judgment.</p>
+      <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} — All rights reserved.</p>
+    </>
+  );
+
+  if (id === "privacy") return (
+    <>
+      <p>We respect your privacy. This app stores preferences (theme, language, bookmarks) locally on your device.</p>
+      <ul className="list-disc pr-5 space-y-1 text-muted-foreground">
+        <li>No personal medical data is collected.</li>
+        <li>Anonymous analytics may be used to improve features.</li>
+        <li>AI chat queries are processed by Lovable AI Gateway and are not stored.</li>
+      </ul>
+    </>
+  );
+
+  if (id === "terms") return (
+    <>
+      <p>By using this app you agree that:</p>
+      <ul className="list-disc pr-5 space-y-1 text-muted-foreground">
+        <li>Content is educational and not a substitute for professional clinical judgement.</li>
+        <li>You are responsible for verifying drug doses, protocols, and guidelines against local authorities.</li>
+        <li>The publisher disclaims liability for any outcome resulting from use of this material.</li>
+      </ul>
+    </>
+  );
+
+  if (id === "contact") return (
+    <div className="space-y-3">
+      <a href={`mailto:${supportEmail}`} className="flex items-center gap-2 p-3 rounded-lg border hover:bg-muted">
+        <Mail className="w-4 h-4 text-primary" /> {supportEmail}
+      </a>
+      {whatsapp && (
+        <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-3 rounded-lg border hover:bg-muted">
+          <MessageSquare className="w-4 h-4 text-primary" /> WhatsApp: +{whatsapp}
+        </a>
+      )}
+    </div>
+  );
+
+  if (id === "faq") return (
+    <ul className="space-y-3">
+      {[
+        ["Is the content peer-reviewed?", "Each entry references major guidelines (ACOG, NICE, RCOG, WHO) where applicable."],
+        ["Does it work offline?", "Core scenarios are cached. Some features (AI chat, video) need internet."],
+        ["Can I bookmark items?", "Yes — use the bookmark icon on tools and surgeries."],
+        ["Is patient data sent anywhere?", "No. Calculators run locally on your device."],
+      ].map(([q, a]) => (
+        <li key={q}><p className="font-semibold">{q}</p><p className="text-muted-foreground">{a}</p></li>
+      ))}
+    </ul>
+  );
+
+  if (id === "help") return (
+    <>
+      <p>Need help using the app?</p>
+      <ul className="list-disc pr-5 space-y-1">
+        <li>Tap any scenario card to open detailed action steps.</li>
+        <li>Use the search bar to find topics across all categories.</li>
+        <li>The AI assistant (chat icon) answers free-text clinical questions.</li>
+      </ul>
+      <a href={`mailto:${supportEmail}`} className="inline-flex items-center gap-2 text-primary hover:underline">
+        <Mail className="w-4 h-4" /> Email support
+      </a>
+    </>
+  );
+
+  if (id === "feedback") return <FeedbackForm supportEmail={supportEmail} />;
+  if (id === "bug") return <BugForm supportEmail={supportEmail} />;
+
+  if (id === "version") return (
+    <div className="space-y-2">
+      <Row label="Version" value={APP_VERSION} />
+      <Row label="Build" value={import.meta.env.MODE} />
+      <Row label="Platform" value={navigator.platform || "Web"} />
+      <Row label="User agent" value={navigator.userAgent.slice(0, 40) + "…"} mono />
+    </div>
+  );
+
+  if (id === "changelog") return (
+    <ul className="space-y-3">
+      {[
+        ["1.4.0", "Added pro app menu (19 items), improved search dismissal, fixed ad banner overlap."],
+        ["1.3.0", "AI assistant, exams comparison, surgery library."],
+        ["1.2.0", "Clinical scenarios database with search."],
+        ["1.0.0", "Initial release."],
+      ].map(([v, n]) => (
+        <li key={v} className="border-l-2 border-primary/40 pr-3 pl-3">
+          <p className="font-semibold text-primary">v{v}</p>
+          <p className="text-muted-foreground text-xs">{n}</p>
+        </li>
+      ))}
+    </ul>
+  );
+
+  if (id === "credits") return (
+    <ul className="space-y-2">
+      <li>Clinical content curated by OB/GYN consultants.</li>
+      <li>Icons by <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Lucide</a> & <a href="https://phosphoricons.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Phosphor</a>.</li>
+      <li>Built with React, Vite, Tailwind CSS, Supabase.</li>
+      <li>Guidelines from ACOG, RCOG, NICE, WHO, ESC.</li>
+    </ul>
+  );
+
+  if (id === "licenses") return (
+    <ul className="space-y-1 text-xs font-mono text-muted-foreground">
+      {["React (MIT)", "Vite (MIT)", "Tailwind CSS (MIT)", "Radix UI (MIT)", "Framer Motion (MIT)", "Lucide (ISC)", "Supabase JS (MIT)", "TanStack Query (MIT)"].map(l => (
+        <li key={l}>• {l}</li>
+      ))}
+    </ul>
+  );
+
+  if (id === "language") return (
+    <div className="space-y-2">
+      <p className="text-muted-foreground text-xs">App content is currently in English. Arabic UI is partially supported.</p>
+      {["English", "العربية (Beta)"].map((l, i) => (
+        <button key={l} className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted">
+          <span>{l}</span>
+          {i === 0 && <Check className="w-4 h-4 text-primary" />}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (id === "theme") return (
+    <div className="space-y-2">
+      {[{ k: "light", l: "Light" }, { k: "dark", l: "Dark" }].map(t => {
+        const active = (t.k === "dark") === dark;
+        return (
+          <button
+            key={t.k}
+            onClick={() => { if (!active) onToggleTheme(); }}
+            className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted"
+          >
+            <span>{t.l}</span>
+            {active && <Check className="w-4 h-4 text-primary" />}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  if (id === "notifications") return (
+    <NotificationsPanel />
+  );
+
+  if (id === "accessibility") return (
+    <AccessibilityPanel />
+  );
+
+  return null;
+}
+
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex justify-between gap-3 py-1.5 border-b border-border/40">
+      <span className="text-muted-foreground text-xs">{label}</span>
+      <span className={`text-xs ${mono ? "font-mono" : ""} text-right break-all`}>{value}</span>
+    </div>
+  );
+}
+
+function FeedbackForm({ supportEmail }: { supportEmail: string }) {
+  const [msg, setMsg] = useState("");
+  return (
+    <>
+      <textarea
+        value={msg}
+        onChange={(e) => setMsg(e.target.value)}
+        placeholder="Tell us what you love, what's missing, or what could be better…"
+        className="w-full min-h-[120px] p-3 rounded-lg border bg-background text-sm"
+      />
+      <a
+        href={`mailto:${supportEmail}?subject=App Feedback&body=${encodeURIComponent(msg)}`}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90"
+      >
+        <Mail className="w-4 h-4" /> Send via Email
+      </a>
+    </>
+  );
+}
+
+function BugForm({ supportEmail }: { supportEmail: string }) {
+  const [msg, setMsg] = useState("");
+  const meta = `\n\n---\nVersion: ${APP_VERSION}\nURL: ${window.location.href}\nUA: ${navigator.userAgent}`;
+  return (
+    <>
+      <textarea
+        value={msg}
+        onChange={(e) => setMsg(e.target.value)}
+        placeholder="Steps to reproduce, expected vs actual behaviour…"
+        className="w-full min-h-[120px] p-3 rounded-lg border bg-background text-sm"
+      />
+      <a
+        href={`mailto:${supportEmail}?subject=Bug Report&body=${encodeURIComponent(msg + meta)}`}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm hover:opacity-90"
+      >
+        <Bug className="w-4 h-4" /> Send Bug Report
+      </a>
+    </>
+  );
+}
+
+function NotificationsPanel() {
+  const [granted, setGranted] = useState(typeof Notification !== "undefined" && Notification.permission === "granted");
+  const request = async () => {
+    if (typeof Notification === "undefined") { toast.error("Not supported"); return; }
+    const r = await Notification.requestPermission();
+    setGranted(r === "granted");
+    if (r === "granted") toast.success("Notifications enabled");
+  };
+  return (
+    <>
+      <p className="text-muted-foreground text-xs">Get reminders for new case-of-the-day and updates.</p>
+      <Button onClick={request} disabled={granted} className="w-full">
+        <Bell className="w-4 h-4 mr-2" />
+        {granted ? "Enabled" : "Enable Notifications"}
+      </Button>
+    </>
+  );
+}
+
+function AccessibilityPanel() {
+  const [reduce, setReduce] = useState(localStorage.getItem("a11y_reduce") === "1");
+  const [large, setLarge] = useState(localStorage.getItem("a11y_large") === "1");
+  const toggle = (key: string, cls: string, val: boolean, set: (b: boolean) => void) => {
+    const next = !val;
+    set(next);
+    localStorage.setItem(key, next ? "1" : "0");
+    document.documentElement.classList.toggle(cls, next);
+  };
+  return (
+    <div className="space-y-2">
+      <button onClick={() => toggle("a11y_reduce", "reduce-motion", reduce, setReduce)} className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted">
+        <span>Reduce motion</span>
+        {reduce && <Check className="w-4 h-4 text-primary" />}
+      </button>
+      <button onClick={() => toggle("a11y_large", "large-text", large, setLarge)} className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted">
+        <span>Larger text</span>
+        {large && <Check className="w-4 h-4 text-primary" />}
+      </button>
+    </div>
+  );
+}
