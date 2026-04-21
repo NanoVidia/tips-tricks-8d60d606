@@ -297,9 +297,10 @@ export default function Index() {
           return score;
         };
         const ranked = raw
-          .map((s) => ({ s, score: scoreOf(s) }))
+          .map((s) => ({ s, score: scoreOf(s), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
           .filter((x) => x.score > 0)
-          .sort((a, b) => b.score - a.score)
+          // Critical first, then urgent, then routine — within each group by relevance.
+          .sort((a, b) => (b.urg - a.urg) || (b.score - a.score))
           .map((x) => x.s);
 
         setAllSearchResults(ranked);
