@@ -1025,7 +1025,7 @@ export default function Index() {
                                   situation={item.situation_en}
                                   category={item.category}
                                   index={idx}
-                                  onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                                  onOpen={() => openScenarioSheet(item)}
                                   categoryConfig={categoryConfig}
                                   highlight={debouncedSearch}
                                 />
@@ -1049,7 +1049,7 @@ export default function Index() {
                       situation={item.situation_en}
                       category={item.category}
                       index={idx}
-                      onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                      onOpen={() => openScenarioSheet(item)}
                       categoryConfig={categoryConfig}
                     />
                   ))}
