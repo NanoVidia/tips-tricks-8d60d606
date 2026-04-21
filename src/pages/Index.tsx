@@ -1211,6 +1211,9 @@ export default function Index() {
                       index={idx}
                       onOpen={() => openScenarioSheet(item)}
                       categoryConfig={categoryConfig}
+                      action={item.action_en}
+                      script={item.script_en}
+                      synonyms={item.synonyms}
                     />
                   ))}
                 </div>
