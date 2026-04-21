@@ -124,6 +124,9 @@ export function HomeHero({
       {/* Soft animated ambient background */}
       <AmbientBackground />
 
+      {/* ⓪ Emergency Quick Access — top priority for time-critical use */}
+      <EmergencyStrip onPick={(q) => { hapticTap(15); onSearchChip?.(q); }} />
+
       {/* ① Hero AI Banner — tap to open AI assistant */}
       <motion.button
         type="button"
