@@ -82,6 +82,7 @@ export function HomeHero({
   onOpenExams,
   onOpenClinic,
   tabLabels,
+  onSearchChip,
 }: HomeHeroProps) {
   type CardItem =
     | {
