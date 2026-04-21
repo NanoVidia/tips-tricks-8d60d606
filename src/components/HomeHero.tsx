@@ -96,6 +96,7 @@ export function HomeHero({
   onOpenClinic,
   tabLabels,
   onSearchChip,
+  onOpenDailyCase,
 }: HomeHeroProps) {
   type ChipItem = {
     id: string;
