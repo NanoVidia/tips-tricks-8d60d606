@@ -3,8 +3,19 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Search } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { AIRobot } from "@/components/AIRobot";
+import { EmergencyStrip } from "@/components/home/EmergencyStrip";
+import { MiniCaseOfDay } from "@/components/home/MiniCaseOfDay";
+import { DailyMcqWidget } from "@/components/home/DailyMcqWidget";
+import { QuickToolsStrip } from "@/components/home/QuickToolsStrip";
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
+
+interface DailyCaseRef {
+  id: string;
+  title_en: string;
+  situation_en: string;
+  category: ScenarioCategory;
+}
 
 interface HomeHeroProps {
   totalScenarios: number;
@@ -16,6 +27,8 @@ interface HomeHeroProps {
   onOpenClinic: () => void;
   /** Trigger a search from a content-type chip (e.g. "Drugs", "Protocols"). */
   onSearchChip?: (query: string) => void;
+  /** Open today's case in the scenario sheet. */
+  onOpenDailyCase?: (c: DailyCaseRef) => void;
   tabLabels: Record<ScenarioCategory, string>;
 }
 
