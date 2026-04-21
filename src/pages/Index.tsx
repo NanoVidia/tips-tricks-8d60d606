@@ -734,7 +734,7 @@ export default function Index() {
                 key={id}
                 role="tab"
                 aria-selected={active}
-                onClick={() => setActiveTab(active ? null : id)}
+                onClick={() => { if (active) setActiveTab(null); else openHub(id); }}
                 initial={{ opacity: 0, y: 10, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: 0.25 + idx * 0.06, type: "spring", stiffness: 280, damping: 22 }}
@@ -794,7 +794,7 @@ export default function Index() {
           <HomeHero
             totalScenarios={totalScenarios}
             categoryCounts={categoryCounts}
-            onSelectCategory={(id) => { setActiveTab(id); }}
+            onSelectCategory={(id) => { openHub(id); }}
             onOpenAI={() => {
               const btn = document.querySelector<HTMLButtonElement>('[data-floating-ai-bot="true"]');
               if (btn) btn.click();
