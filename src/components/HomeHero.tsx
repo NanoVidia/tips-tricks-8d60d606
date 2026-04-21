@@ -237,7 +237,16 @@ export function HomeHero({
         </div>
       </motion.div>
 
-      {/* ③ Total scenarios — single compact stat strip */}
+      {/* ③ Case of the day — opens scenario sheet */}
+      {onOpenDailyCase && <MiniCaseOfDay onOpen={onOpenDailyCase} />}
+
+      {/* ④ Today's MCQ — interactive single-question widget */}
+      <DailyMcqWidget />
+
+      {/* ⑤ Quick clinical tools row */}
+      <QuickToolsStrip />
+
+      {/* ⑥ Total scenarios — single compact stat strip */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
