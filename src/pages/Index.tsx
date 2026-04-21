@@ -1115,25 +1115,30 @@ export default function Index() {
       </footer>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
-      <CategoryHubSheet
+      <SmartBottomSheet
         open={hubOpen}
         onOpenChange={setHubOpen}
-        category={hubCategory}
-        categoryLabel={hubCategory ? tabLabel(hubCategory) : ""}
-        totalCount={hubCategory ? categoryCounts[hubCategory] ?? 0 : 0}
-        config={hubCategory ? categoryConfig[hubCategory] : categoryConfig.qa}
-        onBrowseAll={() => {
-          if (hubCategory) { setActiveTab(hubCategory); setSearch(""); }
+        tab={hubCategory as TabId | null}
+        tabLabel={hubCategory ? tabLabel(hubCategory) : ""}
+        onBrowse={() => {
+          if (hubCategory) { setActiveTab(hubCategory); setLastTab(hubCategory as TabId); setSearch(""); }
         }}
-        onPickTopic={(q) => {
-          if (hubCategory) { setActiveTab(hubCategory); setSearch(q); }
-        }}
-        onOpenScenario={(s) => openScenarioSheet(s as Scenario)}
-        onOpenAI={() => {
+        onMCQs={() => { window.location.href = "/exams"; }}
+        onQuickReference={() => { window.location.href = "/tools"; }}
+        onAskAI={() => {
           const btn = document.querySelector<HTMLButtonElement>('[data-floating-ai-bot="true"]');
           if (btn) btn.click();
           else setAiOpen(true);
         }}
+        onPickTopic={(q) => {
+          if (hubCategory) { setActiveTab(hubCategory); setLastTab(hubCategory as TabId); setSearch(q); setLastSearch(q); }
+        }}
+        onOpenScenario={(id, title) => openScenarioById(id, title)}
+      />
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onSelect={(s) => { setActiveTab(s.category); openScenarioSheet(s as Scenario); }}
       />
       <SurgeryCategoriesSheet open={surgerySheetOpen} onOpenChange={setSurgerySheetOpen} />
       <ExamsFlagsSheet open={examsSheetOpen} onOpenChange={setExamsSheetOpen} />
