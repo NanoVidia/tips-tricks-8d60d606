@@ -1,33 +1,21 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowRight, Search } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { AIRobot } from "@/components/AIRobot";
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
-interface CategoryDef {
-  id: ScenarioCategory;
-  title: string;
-  subtitle: string;
-  phName: "Stethoscope" | "Scissors" | "ChatCircleDots" | "Question";
-  gradient: string;
-  shadow: string;
-}
-
 interface HomeHeroProps {
   totalScenarios: number;
   categoryCounts: Record<ScenarioCategory, number>;
   onSelectCategory: (id: ScenarioCategory) => void;
-  /** Tap the hero banner — opens the AI bot/drawer */
   onOpenAI: () => void;
-  /** Open the Surgery categories sheet */
   onOpenSurgery: () => void;
-  /** Open the Prometric/Exams flags sheet */
   onOpenExams: () => void;
-  /** Open the Clinic topics sheet */
   onOpenClinic: () => void;
+  /** Trigger a search from a content-type chip (e.g. "Drugs", "Protocols"). */
+  onSearchChip?: (query: string) => void;
   tabLabels: Record<ScenarioCategory, string>;
 }
 
