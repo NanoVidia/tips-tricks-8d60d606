@@ -189,6 +189,14 @@ export default function Index() {
 
   useEffect(() => { setCurrentPage(1); }, [activeTab, debouncedSearch]);
 
+  // Persist activity for the Adaptive Hub (lastSearch + lastTab)
+  useEffect(() => {
+    if (debouncedSearch.trim().length >= 2) setLastSearch(debouncedSearch.trim());
+  }, [debouncedSearch, setLastSearch]);
+  useEffect(() => {
+    if (activeTab) setLastTab(activeTab as TabId);
+  }, [activeTab, setLastTab]);
+
   // Auto-suggest: fetch top 5 across all categories as user types
   useEffect(() => {
     const q = search.trim();
