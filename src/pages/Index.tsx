@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Sun, Moon, Stethoscope, Scissors, MessageCircle, HelpCircle,
-  Sparkles, ChevronRight, Baby, ShieldCheck, Activity, Wrench, X, Loader2, Trophy,
+  Sparkles, ChevronRight, Baby, Activity, Wrench, X, Loader2, Trophy,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
