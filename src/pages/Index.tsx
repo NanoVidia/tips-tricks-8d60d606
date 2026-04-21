@@ -134,7 +134,8 @@ export default function Index() {
   const [clinicSheetOpen, setClinicSheetOpen] = useState(false);
   const [hubCategory, setHubCategory] = useState<ScenarioCategory | null>(null);
   const [hubOpen, setHubOpen] = useState(false);
-  const { track: trackUsage } = useScenarioUsage();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const { state: activity, setLastSearch, setLastTab, setLastScenario } = useActivityTracker();
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   // Auto-suggest state
