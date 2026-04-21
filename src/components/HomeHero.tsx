@@ -1,33 +1,21 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowRight, Search } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { AIRobot } from "@/components/AIRobot";
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
-interface CategoryDef {
-  id: ScenarioCategory;
-  title: string;
-  subtitle: string;
-  phName: "Stethoscope" | "Scissors" | "ChatCircleDots" | "Question";
-  gradient: string;
-  shadow: string;
-}
-
 interface HomeHeroProps {
   totalScenarios: number;
   categoryCounts: Record<ScenarioCategory, number>;
   onSelectCategory: (id: ScenarioCategory) => void;
-  /** Tap the hero banner — opens the AI bot/drawer */
   onOpenAI: () => void;
-  /** Open the Surgery categories sheet */
   onOpenSurgery: () => void;
-  /** Open the Prometric/Exams flags sheet */
   onOpenExams: () => void;
-  /** Open the Clinic topics sheet */
   onOpenClinic: () => void;
+  /** Trigger a search from a content-type chip (e.g. "Drugs", "Protocols"). */
+  onSearchChip?: (query: string) => void;
   tabLabels: Record<ScenarioCategory, string>;
 }
 
@@ -94,80 +82,25 @@ export function HomeHero({
   onOpenExams,
   onOpenClinic,
   tabLabels,
+  onSearchChip,
 }: HomeHeroProps) {
-  type CardItem =
-    | {
-        kind: "scenario";
-        id: ScenarioCategory;
-        title: string;
-        subtitle: string;
-        phName: CategoryDef["phName"];
-        gradient: string;
-        shadow: string;
-        count: number;
-        countLabel: string;
-      }
-    | {
-        kind: "action";
-        id: string;
-        onAction: () => void;
-        title: string;
-        subtitle: string;
-        phName: "FirstAidKit" | "GraduationCap" | "Stethoscope";
-        gradient: string;
-        shadow: string;
-        badge: string;
-        countLabel: string;
-      };
+  type ChipItem = {
+    id: string;
+    label: string;
+    query: string;
+    phName: "Pill" | "ClipboardText" | "Scissors" | "Question" | "Heartbeat" | "Baby";
+    gradient: string;
+    shadow: string;
+    hint: string;
+  };
 
-  const cards: CardItem[] = [
-    {
-      kind: "scenario",
-      id: "qa",
-      title: tabLabels.qa,
-      subtitle: "Questions & Skills Bank",
-      phName: "Question",
-      gradient: "from-emerald-500 to-teal-700",
-      shadow: "shadow-emerald-500/30",
-      count: categoryCounts.qa ?? 0,
-      countLabel: "items",
-    },
-    {
-      kind: "action",
-      id: "clinic-topics",
-      onAction: onOpenClinic,
-      title: tabLabels.clinic,
-      subtitle: "Browse by topic",
-      phName: "Stethoscope",
-      gradient: "from-sky-500 to-blue-700",
-      shadow: "shadow-sky-500/30",
-      badge: "Topics",
-      countLabel: `${categoryCounts.clinic ?? 0} items`,
-    },
-    {
-      kind: "action",
-      id: "surgery",
-      onAction: onOpenSurgery,
-      title: "Surgery Library",
-      subtitle: "Browse by category",
-      phName: "FirstAidKit",
-      gradient: "from-rose-500 to-pink-700",
-      shadow: "shadow-rose-500/30",
-      badge: "Atlas",
-      countLabel: "categories",
-    },
-    {
-      kind: "action",
-      id: "exams",
-      onAction: onOpenExams,
-      title: "Prometric Exams",
-      subtitle: "Choose a country",
-      phName: "GraduationCap",
-      gradient: "from-violet-500 to-indigo-700",
-      shadow: "shadow-violet-500/30",
-      badge: "Prep",
-      countLabel: "exams",
-    },
+  const chips: ChipItem[] = [
+    { id: "drugs", label: "Drugs & Dosing", query: "drug", phName: "Pill", gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30", hint: "MgSO₄ · Oxytocin · Heparin" },
+    { id: "protocols", label: "Protocols", query: "protocol", phName: "ClipboardText", gradient: "from-sky-500 to-blue-700", shadow: "shadow-sky-500/30", hint: "PPH · Eclampsia · Sepsis" },
+    { id: "procedures", label: "Procedures", query: "procedure", phName: "Scissors", gradient: "from-rose-500 to-pink-700", shadow: "shadow-rose-500/30", hint: "C-section · Forceps · D&C" },
+    { id: "emergencies", label: "Emergencies", query: "emergency", phName: "Heartbeat", gradient: "from-red-500 to-orange-600", shadow: "shadow-red-500/30", hint: "Shoulder dystocia · Cord prolapse" },
+    { id: "obstetrics", label: "Obstetrics", query: "labor", phName: "Baby", gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", hint: "Labor · Delivery · Antenatal" },
+    { id: "mcqs", label: "Q&A / MCQs", query: "MCQ", phName: "Question", gradient: "from-emerald-500 to-teal-700", shadow: "shadow-emerald-500/30", hint: "Self-assessment items" },
   ];
 
   return (
@@ -235,86 +168,55 @@ export function HomeHero({
         </div>
       </motion.button>
 
-      {/* ② 2×2 Cards — scenarios + Surgery + Exams */}
-      <div className="grid grid-cols-2 gap-3">
-        {cards.map((c, idx) => {
-          const inner = (
-            <>
-              <div className="absolute -bottom-3 -right-3 w-24 h-24 opacity-15 pointer-events-none" aria-hidden="true">
-                <PhIcon name={c.phName} size={96} tone="white" weight="fill" />
-              </div>
+      {/* ② Search-driven content type chips — replace previous category cards */}
+      <motion.div
+        initial={{ y: 12, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ ...SPRING, delay: 0.15 }}
+        className="space-y-2.5"
+      >
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-1.5">
+            <Search className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              Search by type
+            </span>
+          </div>
+          <span className="text-[9px] font-semibold text-muted-foreground/70">
+            Tap to filter
+          </span>
+        </div>
 
-              <div className="relative flex items-start justify-between gap-2">
-                <motion.div
-                  className="w-9 h-9 rounded-2xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shadow-sm"
-                  animate={{ y: [0, -3, 0], rotate: [0, -4, 4, 0] }}
-                  transition={{ duration: 4 + idx * 0.3, repeat: Infinity, ease: "easeInOut", delay: idx * 0.2 }}
-                >
-                  <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
-                </motion.div>
-                <div className="text-right leading-none">
-                  {c.kind === "scenario" ? (
-                    <AnimatedNumber
-                      value={c.count}
-                      className="block text-white font-black text-[28px] tabular-nums tracking-tight drop-shadow-sm"
-                    />
-                  ) : (
-                    <span className="block text-white font-black text-[18px] tracking-tight drop-shadow-sm">
-                      {c.badge}
-                    </span>
-                  )}
-                  <span className="text-white/70 text-[9px] font-bold uppercase tracking-wider">
-                    {c.countLabel}
-                  </span>
-                </div>
-              </div>
-
-              <div className="relative">
-                <p className="text-white font-bold text-[15px] leading-tight">{c.title}</p>
-                <div className="flex items-center justify-between gap-2 mt-1">
-                  <p className="text-white/75 text-[11px] leading-snug truncate">{c.subtitle}</p>
-                  <ArrowRight className="w-4 h-4 text-white/90 shrink-0" />
-                </div>
-              </div>
-            </>
-          );
-
-          const cn = `soft-tint relative overflow-hidden rounded-3xl p-5 min-h-[170px] flex flex-col justify-between text-left bg-gradient-to-br ${c.gradient} shadow-lg ${c.shadow} active:shadow-md transition-shadow`;
-          const mp = {
-            initial: { y: 30, opacity: 0 },
-            animate: { y: 0, opacity: 1 },
-            transition: { ...SPRING, delay: 0.1 + idx * 0.08 },
-            whileTap: { scale: 0.96 },
-          };
-
-          if (c.kind === "scenario") {
-            return (
-              <motion.button
-                key={c.id}
-                type="button"
-                onClick={() => { hapticTap(10); onSelectCategory(c.id); }}
-                {...mp}
-                className={cn}
-                aria-label={`Open ${c.title}`}
-              >
-                {inner}
-              </motion.button>
-            );
-          }
-          return (
+        <div className="grid grid-cols-2 gap-2.5">
+          {chips.map((c, idx) => (
             <motion.button
               key={c.id}
               type="button"
-              onClick={() => { hapticTap(10); c.onAction(); }}
-              {...mp}
-              className={cn}
-              aria-label={`Open ${c.title}`}
+              onClick={() => { hapticTap(8); onSearchChip?.(c.query); }}
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ ...SPRING, delay: 0.2 + idx * 0.05 }}
+              whileTap={{ scale: 0.96 }}
+              whileHover={{ y: -2 }}
+              className={`soft-tint relative overflow-hidden rounded-2xl p-3 text-left bg-gradient-to-br ${c.gradient} shadow-md ${c.shadow} active:shadow-sm transition-all`}
+              aria-label={`Search ${c.label}`}
             >
-              {inner}
+              <div className="absolute -bottom-2 -right-2 w-14 h-14 opacity-15 pointer-events-none" aria-hidden="true">
+                <PhIcon name={c.phName} size={56} tone="white" weight="fill" />
+              </div>
+              <div className="relative flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shrink-0">
+                  <PhIcon name={c.phName} size={16} tone="white" weight="duotone" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-white font-bold text-[12.5px] leading-tight truncate">{c.label}</p>
+                  <p className="text-white/70 text-[9.5px] leading-tight mt-0.5 truncate">{c.hint}</p>
+                </div>
+              </div>
             </motion.button>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </motion.div>
 
       {/* ③ Total scenarios — single compact stat strip */}
       <motion.div
