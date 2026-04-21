@@ -20,6 +20,8 @@ import { AdSpaceBanner } from "@/components/AdSpaceBanner";
 import { SurgeryCategoriesSheet } from "@/components/SurgeryCategoriesSheet";
 import { ExamsFlagsSheet } from "@/components/ExamsFlagsSheet";
 import { ClinicTopicsSheet } from "@/components/ClinicTopicsSheet";
+import { CategoryHubSheet } from "@/components/CategoryHubSheet";
+import { useScenarioUsage } from "@/hooks/useScenarioUsage";
 import { AppMenu } from "@/components/AppMenu";
 
 import { useTranslations } from "@/hooks/useTranslations";
@@ -129,6 +131,9 @@ export default function Index() {
   const [surgerySheetOpen, setSurgerySheetOpen] = useState(false);
   const [examsSheetOpen, setExamsSheetOpen] = useState(false);
   const [clinicSheetOpen, setClinicSheetOpen] = useState(false);
+  const [hubCategory, setHubCategory] = useState<ScenarioCategory | null>(null);
+  const [hubOpen, setHubOpen] = useState(false);
+  const { track: trackUsage } = useScenarioUsage();
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   // Auto-suggest state
