@@ -30,8 +30,9 @@ import { useTranslations } from "@/hooks/useTranslations";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
-import { Clock, Trash2 } from "lucide-react";
+import { Clock, Trash2, AlertTriangle, AlertCircle, ShieldCheck } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
+import { detectUrgency, URGENCY_WEIGHT, URGENCY_LABEL, type Urgency } from "@/lib/clinicalTags";
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
