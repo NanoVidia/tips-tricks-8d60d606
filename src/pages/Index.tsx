@@ -893,6 +893,11 @@ export default function Index() {
               or_labor: tabLabel("or_labor"),
               behavior: tabLabel("behavior"),
             }}
+            onSearchChip={(q) => {
+              setSearch(q);
+              setLastSearch(q);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
             />
           </>
         ) : loading ? (
