@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MessageCircle, Share2 } from "lucide-react";
+import { MessageCircle, Share2, ArrowLeft } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { PhIcon } from "@/components/ui/PhIcon";
@@ -82,7 +82,7 @@ export function ScenarioSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="p-0 max-h-[92vh] overflow-hidden rounded-t-3xl sm:rounded-2xl sm:right-4 sm:left-auto sm:top-4 sm:bottom-4 sm:inset-y-auto sm:max-w-md sm:h-auto sm:max-h-[calc(100vh-2rem)] flex flex-col gap-0 border-t-2 border-primary/20"
+        className="p-0 max-h-[94vh] overflow-hidden rounded-t-3xl sm:rounded-2xl sm:right-4 sm:left-auto sm:top-4 sm:bottom-4 sm:inset-y-auto sm:max-w-md sm:h-auto sm:max-h-[calc(100vh-2rem)] flex flex-col gap-0 border-t-2 border-primary/20 [&>button.absolute]:hidden"
       >
         <motion.div
           initial={{ y: 50, opacity: 0 }}
@@ -95,9 +95,35 @@ export function ScenarioSheet({
             <div className="w-10 h-1 rounded-full bg-border" />
           </div>
 
+          {/* Sticky top bar — large, professional Back button */}
+          <div className="sticky top-0 z-10 px-4 pt-2 pb-3 bg-card/95 backdrop-blur-md border-b border-border/40 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              aria-label="Back"
+              className="group inline-flex items-center gap-2 h-11 pl-2.5 pr-4 rounded-2xl bg-primary/10 text-primary border border-primary/25 font-bold text-[13px] hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-[0.97] transition-all shadow-sm"
+            >
+              <span className="w-7 h-7 rounded-xl bg-background/70 group-hover:bg-white/20 flex items-center justify-center transition-colors">
+                <ArrowLeft className="w-4 h-4" strokeWidth={2.6} />
+              </span>
+              <span className="tracking-wide">Back</span>
+            </button>
+            <span className="flex-1 text-center text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground truncate px-2">
+              Scenario
+            </span>
+            <button
+              type="button"
+              onClick={handleShare}
+              aria-label="Share"
+              className="w-11 h-11 inline-flex items-center justify-center rounded-2xl border border-border/60 bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 transition active:scale-[0.97]"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
+          </div>
+
           {/* Header */}
-          <div className="px-5 pt-3 pb-4 border-b border-border/40 bg-gradient-to-br from-card to-muted/30">
-            <div className="flex items-start gap-3 pr-8">
+          <div className="px-5 pt-4 pb-4 border-b border-border/40 bg-gradient-to-br from-card to-muted/30">
+            <div className="flex items-start gap-3">
               <div
                 className={`shrink-0 w-11 h-11 rounded-xl ${cfg.iconBg} flex items-center justify-center shadow-md ring-1 ring-white/20`}
               >
@@ -113,14 +139,6 @@ export function ScenarioSheet({
             {/* Action row */}
             <div className="flex items-center gap-1.5 mt-3 pl-[56px]">
               <BookmarkButton id={`scenario:${scenario.id}`} label={scenario.title_en} size="sm" />
-              <button
-                type="button"
-                onClick={handleShare}
-                aria-label="Share"
-                className="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-border/50 bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 transition"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-              </button>
             </div>
           </div>
 
@@ -147,11 +165,20 @@ export function ScenarioSheet({
             ))}
           </div>
 
-          {/* Footer CTA */}
-          <div className="px-5 py-4 border-t border-border/40 bg-card">
+          {/* Footer CTAs — Back + Discuss with AI side by side */}
+          <div className="px-4 py-3 border-t border-border/40 bg-card flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="h-12 rounded-2xl px-4 gap-1.5 font-bold text-[13px] border-border/70 hover:border-primary/40 hover:bg-muted/50 shrink-0"
+              aria-label="Back"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
             <Button
               onClick={() => onAI(scenario)}
-              className="w-full h-11 rounded-xl gradient-ink text-paper font-semibold gap-2 shadow-editorial hover:shadow-gold border border-gold/20"
+              className="flex-1 h-12 rounded-2xl gradient-ink text-paper font-semibold gap-2 shadow-editorial hover:shadow-gold border border-gold/20"
               style={{ color: "hsl(40 30% 96%)" }}
             >
               <MessageCircle className="w-4 h-4 text-gold" />
