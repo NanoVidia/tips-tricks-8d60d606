@@ -168,86 +168,55 @@ export function HomeHero({
         </div>
       </motion.button>
 
-      {/* ② 2×2 Cards — scenarios + Surgery + Exams */}
-      <div className="grid grid-cols-2 gap-3">
-        {cards.map((c, idx) => {
-          const inner = (
-            <>
-              <div className="absolute -bottom-3 -right-3 w-24 h-24 opacity-15 pointer-events-none" aria-hidden="true">
-                <PhIcon name={c.phName} size={96} tone="white" weight="fill" />
-              </div>
+      {/* ② Search-driven content type chips — replace previous category cards */}
+      <motion.div
+        initial={{ y: 12, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ ...SPRING, delay: 0.15 }}
+        className="space-y-2.5"
+      >
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-1.5">
+            <Search className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              Search by type
+            </span>
+          </div>
+          <span className="text-[9px] font-semibold text-muted-foreground/70">
+            Tap to filter
+          </span>
+        </div>
 
-              <div className="relative flex items-start justify-between gap-2">
-                <motion.div
-                  className="w-9 h-9 rounded-2xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shadow-sm"
-                  animate={{ y: [0, -3, 0], rotate: [0, -4, 4, 0] }}
-                  transition={{ duration: 4 + idx * 0.3, repeat: Infinity, ease: "easeInOut", delay: idx * 0.2 }}
-                >
-                  <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
-                </motion.div>
-                <div className="text-right leading-none">
-                  {c.kind === "scenario" ? (
-                    <AnimatedNumber
-                      value={c.count}
-                      className="block text-white font-black text-[28px] tabular-nums tracking-tight drop-shadow-sm"
-                    />
-                  ) : (
-                    <span className="block text-white font-black text-[18px] tracking-tight drop-shadow-sm">
-                      {c.badge}
-                    </span>
-                  )}
-                  <span className="text-white/70 text-[9px] font-bold uppercase tracking-wider">
-                    {c.countLabel}
-                  </span>
-                </div>
-              </div>
-
-              <div className="relative">
-                <p className="text-white font-bold text-[15px] leading-tight">{c.title}</p>
-                <div className="flex items-center justify-between gap-2 mt-1">
-                  <p className="text-white/75 text-[11px] leading-snug truncate">{c.subtitle}</p>
-                  <ArrowRight className="w-4 h-4 text-white/90 shrink-0" />
-                </div>
-              </div>
-            </>
-          );
-
-          const cn = `soft-tint relative overflow-hidden rounded-3xl p-5 min-h-[170px] flex flex-col justify-between text-left bg-gradient-to-br ${c.gradient} shadow-lg ${c.shadow} active:shadow-md transition-shadow`;
-          const mp = {
-            initial: { y: 30, opacity: 0 },
-            animate: { y: 0, opacity: 1 },
-            transition: { ...SPRING, delay: 0.1 + idx * 0.08 },
-            whileTap: { scale: 0.96 },
-          };
-
-          if (c.kind === "scenario") {
-            return (
-              <motion.button
-                key={c.id}
-                type="button"
-                onClick={() => { hapticTap(10); onSelectCategory(c.id); }}
-                {...mp}
-                className={cn}
-                aria-label={`Open ${c.title}`}
-              >
-                {inner}
-              </motion.button>
-            );
-          }
-          return (
+        <div className="grid grid-cols-2 gap-2.5">
+          {chips.map((c, idx) => (
             <motion.button
               key={c.id}
               type="button"
-              onClick={() => { hapticTap(10); c.onAction(); }}
-              {...mp}
-              className={cn}
-              aria-label={`Open ${c.title}`}
+              onClick={() => { hapticTap(8); onSearchChip?.(c.query); }}
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ ...SPRING, delay: 0.2 + idx * 0.05 }}
+              whileTap={{ scale: 0.96 }}
+              whileHover={{ y: -2 }}
+              className={`soft-tint relative overflow-hidden rounded-2xl p-3 text-left bg-gradient-to-br ${c.gradient} shadow-md ${c.shadow} active:shadow-sm transition-all`}
+              aria-label={`Search ${c.label}`}
             >
-              {inner}
+              <div className="absolute -bottom-2 -right-2 w-14 h-14 opacity-15 pointer-events-none" aria-hidden="true">
+                <PhIcon name={c.phName} size={56} tone="white" weight="fill" />
+              </div>
+              <div className="relative flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shrink-0">
+                  <PhIcon name={c.phName} size={16} tone="white" weight="duotone" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-white font-bold text-[12.5px] leading-tight truncate">{c.label}</p>
+                  <p className="text-white/70 text-[9.5px] leading-tight mt-0.5 truncate">{c.hint}</p>
+                </div>
+              </div>
             </motion.button>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </motion.div>
 
       {/* ③ Total scenarios — single compact stat strip */}
       <motion.div
