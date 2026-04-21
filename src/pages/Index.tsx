@@ -20,8 +20,9 @@ import { AdSpaceBanner } from "@/components/AdSpaceBanner";
 import { SurgeryCategoriesSheet } from "@/components/SurgeryCategoriesSheet";
 import { ExamsFlagsSheet } from "@/components/ExamsFlagsSheet";
 import { ClinicTopicsSheet } from "@/components/ClinicTopicsSheet";
-import { CategoryHubSheet } from "@/components/CategoryHubSheet";
-import { useScenarioUsage } from "@/hooks/useScenarioUsage";
+import { SmartBottomSheet } from "@/components/SmartBottomSheet";
+import { CommandPalette } from "@/components/CommandPalette";
+import { useActivityTracker, type TabId } from "@/hooks/useActivityTracker";
 import { AppMenu } from "@/components/AppMenu";
 
 import { useTranslations } from "@/hooks/useTranslations";
@@ -133,7 +134,8 @@ export default function Index() {
   const [clinicSheetOpen, setClinicSheetOpen] = useState(false);
   const [hubCategory, setHubCategory] = useState<ScenarioCategory | null>(null);
   const [hubOpen, setHubOpen] = useState(false);
-  const { track: trackUsage } = useScenarioUsage();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const { state: activity, setLastSearch, setLastTab, setLastScenario } = useActivityTracker();
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   // Auto-suggest state
@@ -186,6 +188,14 @@ export default function Index() {
   }, [search]);
 
   useEffect(() => { setCurrentPage(1); }, [activeTab, debouncedSearch]);
+
+  // Persist activity for the Adaptive Hub (lastSearch + lastTab)
+  useEffect(() => {
+    if (debouncedSearch.trim().length >= 2) setLastSearch(debouncedSearch.trim());
+  }, [debouncedSearch, setLastSearch]);
+  useEffect(() => {
+    if (activeTab) setLastTab(activeTab as TabId);
+  }, [activeTab, setLastTab]);
 
   // Auto-suggest: fetch top 5 across all categories as user types
   useEffect(() => {
@@ -365,12 +375,25 @@ export default function Index() {
     setHubOpen(true);
   };
 
-  /** Open a scenario sheet AND track usage for the Smart Hub. */
+  /** Open a scenario sheet AND track it as "last scenario" for resume + most-viewed. */
   const openScenarioSheet = (s: Scenario) => {
-    trackUsage(s.category, s.id, s.title_en);
+    setLastScenario({ id: s.id, title: s.title_en, category: s.category as TabId });
     setSheetScenario(s);
     setSheetOpen(true);
   };
+
+  /** Resolve a scenario by id (for "Most viewed" → open). Falls back to a single fetch. */
+  const openScenarioById = useCallback(async (id: string, title: string) => {
+    const known = scenarios.find((x) => x.id === id) || allSearchResults.find((x) => x.id === id);
+    if (known) { openScenarioSheet(known); return; }
+    try {
+      const { data } = await supabase.from("medical_scenarios").select("*").eq("id", id).maybeSingle();
+      if (data) openScenarioSheet(data as Scenario);
+      else console.warn("Scenario not found:", id, title);
+    } catch (e) { console.error(e); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenarios, allSearchResults]);
+
 
 
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
@@ -791,7 +814,71 @@ export default function Index() {
         </motion.div>
         )}
         {!activeTab && !isSearching ? (
-          <HomeHero
+          <>
+            {/* ⌘K hint — visible cue to open the Command Palette */}
+            <motion.button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, type: "spring", stiffness: 350, damping: 30, mass: 0.8 }}
+              className="mt-4 w-full flex items-center gap-2 px-3.5 h-11 rounded-2xl bg-card border border-border/60 hover:border-primary/50 transition-all duration-200 ease-out shadow-sm group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              aria-label="Open command palette"
+            >
+              <Search className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <span className="flex-1 text-left text-[12px] text-muted-foreground truncate">
+                Search scenarios, drugs, protocols…
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground border border-border/60">
+                  ⌘
+                </kbd>
+                <kbd className="px-1.5 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground border border-border/60">
+                  K
+                </kbd>
+              </span>
+            </motion.button>
+
+            {/* Continue Where You Left Off — only when lastScenario exists */}
+            <AnimatePresence>
+              {activity.lastScenario && (
+                <motion.div
+                  key="continue"
+                  initial={{ opacity: 0, y: 8, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30, mass: 0.8 }}
+                  className="mt-3 overflow-hidden"
+                >
+                  <div className="relative rounded-2xl p-3.5 bg-gradient-to-br from-primary/15 via-primary/8 to-transparent border border-primary/30 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/80">
+                        Continue where you left off
+                      </p>
+                      <p className="text-[13px] font-bold text-foreground leading-tight truncate mt-0.5">
+                        {activity.lastScenario.title}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const ref = activity.lastScenario;
+                        if (ref) openScenarioById(ref.id, ref.title);
+                      }}
+                      className="rounded-full text-[11px] h-8 px-3.5 gap-1 shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 ease-out"
+                    >
+                      Resume
+                      <ChevronRight className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <HomeHero
             totalScenarios={totalScenarios}
             categoryCounts={categoryCounts}
             onSelectCategory={(id) => { openHub(id); }}
@@ -809,7 +896,8 @@ export default function Index() {
               or_labor: tabLabel("or_labor"),
               behavior: tabLabel("behavior"),
             }}
-          />
+            />
+          </>
         ) : loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -1100,25 +1188,30 @@ export default function Index() {
       </footer>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
-      <CategoryHubSheet
+      <SmartBottomSheet
         open={hubOpen}
         onOpenChange={setHubOpen}
-        category={hubCategory}
-        categoryLabel={hubCategory ? tabLabel(hubCategory) : ""}
-        totalCount={hubCategory ? categoryCounts[hubCategory] ?? 0 : 0}
-        config={hubCategory ? categoryConfig[hubCategory] : categoryConfig.qa}
-        onBrowseAll={() => {
-          if (hubCategory) { setActiveTab(hubCategory); setSearch(""); }
+        tab={hubCategory as TabId | null}
+        tabLabel={hubCategory ? tabLabel(hubCategory) : ""}
+        onBrowse={() => {
+          if (hubCategory) { setActiveTab(hubCategory); setLastTab(hubCategory as TabId); setSearch(""); }
         }}
-        onPickTopic={(q) => {
-          if (hubCategory) { setActiveTab(hubCategory); setSearch(q); }
-        }}
-        onOpenScenario={(s) => openScenarioSheet(s as Scenario)}
-        onOpenAI={() => {
+        onMCQs={() => { window.location.href = "/exams"; }}
+        onQuickReference={() => { window.location.href = "/tools"; }}
+        onAskAI={() => {
           const btn = document.querySelector<HTMLButtonElement>('[data-floating-ai-bot="true"]');
           if (btn) btn.click();
           else setAiOpen(true);
         }}
+        onPickTopic={(q) => {
+          if (hubCategory) { setActiveTab(hubCategory); setLastTab(hubCategory as TabId); setSearch(q); setLastSearch(q); }
+        }}
+        onOpenScenario={(id, title) => openScenarioById(id, title)}
+      />
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onSelect={(s) => { setActiveTab(s.category); openScenarioSheet(s as Scenario); }}
       />
       <SurgeryCategoriesSheet open={surgerySheetOpen} onOpenChange={setSurgerySheetOpen} />
       <ExamsFlagsSheet open={examsSheetOpen} onOpenChange={setExamsSheetOpen} />
