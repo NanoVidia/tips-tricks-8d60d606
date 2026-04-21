@@ -1032,6 +1032,59 @@ export default function Index() {
               </span>
             </div>
 
+            {/* Urgency filter — clinical priority chips, only during search */}
+            {isSearching && allSearchResults.length > 0 && (
+              <div
+                className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1 mb-2"
+                role="tablist"
+                aria-label="Filter by clinical urgency"
+              >
+                {([
+                  { key: null as Urgency | null, label: "All priorities", Icon: Search,
+                    activeCls: "bg-foreground text-background border-transparent",
+                    idleCls: "bg-card text-foreground border-border/60 hover:border-foreground/40",
+                    count: allSearchResults.length },
+                  { key: "critical" as Urgency, label: URGENCY_LABEL.critical, Icon: AlertTriangle,
+                    activeCls: "bg-red-500 text-white border-transparent shadow-sm shadow-red-500/30",
+                    idleCls: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 hover:bg-red-500/15",
+                    count: urgencyCounts.critical },
+                  { key: "urgent" as Urgency, label: URGENCY_LABEL.urgent, Icon: AlertCircle,
+                    activeCls: "bg-amber-500 text-white border-transparent shadow-sm shadow-amber-500/30",
+                    idleCls: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/15",
+                    count: urgencyCounts.urgent },
+                  { key: "routine" as Urgency, label: URGENCY_LABEL.routine, Icon: ShieldCheck,
+                    activeCls: "bg-emerald-500 text-white border-transparent shadow-sm shadow-emerald-500/30",
+                    idleCls: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/15",
+                    count: urgencyCounts.routine },
+                ]).map(({ key, label, Icon, activeCls, idleCls, count }) => {
+                  const active = urgencyFilter === key;
+                  return (
+                    <button
+                      key={String(key)}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setUrgencyFilter(key)}
+                      disabled={count === 0}
+                      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
+                        active ? activeCls : idleCls
+                      } ${count === 0 ? "opacity-40 cursor-not-allowed" : ""}`}
+                    >
+                      <Icon className="w-3 h-3" strokeWidth={2.5} />
+                      <span>{label}</span>
+                      <span
+                        className={`tabular-nums text-[9px] px-1.5 py-0.5 rounded-full ${
+                          active ? "bg-white/25" : "bg-background/60"
+                        }`}
+                      >
+                        {formatNumber(count)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             {/* Category filter chips — only shown during search */}
             {isSearching && allSearchResults.length > 0 && (
               <div
