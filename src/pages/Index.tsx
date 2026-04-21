@@ -367,12 +367,25 @@ export default function Index() {
     setHubOpen(true);
   };
 
-  /** Open a scenario sheet AND track usage for the Smart Hub. */
+  /** Open a scenario sheet AND track it as "last scenario" for resume + most-viewed. */
   const openScenarioSheet = (s: Scenario) => {
-    trackUsage(s.category, s.id, s.title_en);
+    setLastScenario({ id: s.id, title: s.title_en, category: s.category as TabId });
     setSheetScenario(s);
     setSheetOpen(true);
   };
+
+  /** Resolve a scenario by id (for "Most viewed" → open). Falls back to a single fetch. */
+  const openScenarioById = useCallback(async (id: string, title: string) => {
+    const known = scenarios.find((x) => x.id === id) || allSearchResults.find((x) => x.id === id);
+    if (known) { openScenarioSheet(known); return; }
+    try {
+      const { data } = await supabase.from("medical_scenarios").select("*").eq("id", id).maybeSingle();
+      if (data) openScenarioSheet(data as Scenario);
+      else console.warn("Scenario not found:", id, title);
+    } catch (e) { console.error(e); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenarios, allSearchResults]);
+
 
 
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
