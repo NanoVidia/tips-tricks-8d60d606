@@ -335,9 +335,10 @@ export default function Index() {
 
   useEffect(() => { fetchScenarios(); }, [fetchScenarios]);
 
-  // Reset category filter & expand all groups when search query changes
+  // Reset category/urgency filters & expand all groups when search query changes
   useEffect(() => {
     setSearchCatFilter(null);
+    setUrgencyFilter(null);
     setCollapsedGroups(new Set());
   }, [debouncedSearch]);
 
@@ -348,10 +349,19 @@ export default function Index() {
     return c;
   })();
 
-  // Filtered results based on chip selection
-  const filteredSearchResults = searchCatFilter
-    ? allSearchResults.filter((s) => s.category === searchCatFilter)
-    : allSearchResults;
+  // Per-urgency counts within current search results
+  const urgencyCounts = (() => {
+    const c: Record<Urgency, number> = { critical: 0, urgent: 0, routine: 0 };
+    for (const s of allSearchResults) c[detectUrgency(s)]++;
+    return c;
+  })();
+
+  // Filtered results based on chip selection (category + urgency)
+  const filteredSearchResults = allSearchResults.filter((s) => {
+    if (searchCatFilter && s.category !== searchCatFilter) return false;
+    if (urgencyFilter && detectUrgency(s) !== urgencyFilter) return false;
+    return true;
+  });
 
   // Group filtered results by category, preserving rank order
   const groupedResults = (() => {
