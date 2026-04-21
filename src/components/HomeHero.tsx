@@ -84,79 +84,23 @@ export function HomeHero({
   tabLabels,
   onSearchChip,
 }: HomeHeroProps) {
-  type CardItem =
-    | {
-        kind: "scenario";
-        id: ScenarioCategory;
-        title: string;
-        subtitle: string;
-        phName: CategoryDef["phName"];
-        gradient: string;
-        shadow: string;
-        count: number;
-        countLabel: string;
-      }
-    | {
-        kind: "action";
-        id: string;
-        onAction: () => void;
-        title: string;
-        subtitle: string;
-        phName: "FirstAidKit" | "GraduationCap" | "Stethoscope";
-        gradient: string;
-        shadow: string;
-        badge: string;
-        countLabel: string;
-      };
+  type ChipItem = {
+    id: string;
+    label: string;
+    query: string;
+    phName: "Pill" | "ClipboardText" | "Scissors" | "Question" | "Heartbeat" | "Baby";
+    gradient: string;
+    shadow: string;
+    hint: string;
+  };
 
-  const cards: CardItem[] = [
-    {
-      kind: "scenario",
-      id: "qa",
-      title: tabLabels.qa,
-      subtitle: "Questions & Skills Bank",
-      phName: "Question",
-      gradient: "from-emerald-500 to-teal-700",
-      shadow: "shadow-emerald-500/30",
-      count: categoryCounts.qa ?? 0,
-      countLabel: "items",
-    },
-    {
-      kind: "action",
-      id: "clinic-topics",
-      onAction: onOpenClinic,
-      title: tabLabels.clinic,
-      subtitle: "Browse by topic",
-      phName: "Stethoscope",
-      gradient: "from-sky-500 to-blue-700",
-      shadow: "shadow-sky-500/30",
-      badge: "Topics",
-      countLabel: `${categoryCounts.clinic ?? 0} items`,
-    },
-    {
-      kind: "action",
-      id: "surgery",
-      onAction: onOpenSurgery,
-      title: "Surgery Library",
-      subtitle: "Browse by category",
-      phName: "FirstAidKit",
-      gradient: "from-rose-500 to-pink-700",
-      shadow: "shadow-rose-500/30",
-      badge: "Atlas",
-      countLabel: "categories",
-    },
-    {
-      kind: "action",
-      id: "exams",
-      onAction: onOpenExams,
-      title: "Prometric Exams",
-      subtitle: "Choose a country",
-      phName: "GraduationCap",
-      gradient: "from-violet-500 to-indigo-700",
-      shadow: "shadow-violet-500/30",
-      badge: "Prep",
-      countLabel: "exams",
-    },
+  const chips: ChipItem[] = [
+    { id: "drugs", label: "Drugs & Dosing", query: "drug", phName: "Pill", gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30", hint: "MgSO₄ · Oxytocin · Heparin" },
+    { id: "protocols", label: "Protocols", query: "protocol", phName: "ClipboardText", gradient: "from-sky-500 to-blue-700", shadow: "shadow-sky-500/30", hint: "PPH · Eclampsia · Sepsis" },
+    { id: "procedures", label: "Procedures", query: "procedure", phName: "Scissors", gradient: "from-rose-500 to-pink-700", shadow: "shadow-rose-500/30", hint: "C-section · Forceps · D&C" },
+    { id: "emergencies", label: "Emergencies", query: "emergency", phName: "Heartbeat", gradient: "from-red-500 to-orange-600", shadow: "shadow-red-500/30", hint: "Shoulder dystocia · Cord prolapse" },
+    { id: "obstetrics", label: "Obstetrics", query: "labor", phName: "Baby", gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", hint: "Labor · Delivery · Antenatal" },
+    { id: "mcqs", label: "Q&A / MCQs", query: "MCQ", phName: "Question", gradient: "from-emerald-500 to-teal-700", shadow: "shadow-emerald-500/30", hint: "Self-assessment items" },
   ];
 
   return (
