@@ -521,7 +521,7 @@ export default function Index() {
               >
                 OB/GYN Reference
               </span>
-            </motion.div>
+            </motion.button>
             <div className="flex items-center gap-1.5 shrink-0 self-start">
               <button
                 onClick={toggleDark}
