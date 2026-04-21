@@ -272,35 +272,64 @@ export default function Index() {
         if (error) throw error;
         const raw = (data as Scenario[]) || [];
 
-        // Relevance ranking: keep only results that actually match the query,
-        // then sort by weighted score (title >> synonyms > situation > action).
+        // Strict relevance ranking — drop noise, keep only on-topic matches.
+        // Tokens shorter than 3 chars are dropped (and common English stop-words),
+        // we require EVERY meaningful token to match somewhere in the doc (AND),
+        // and we require the match to land in a high-signal field (title /
+        // synonyms / situation) — a hit only in `action_en` is treated as noise.
+        const STOP = new Set([
+          "the","a","an","and","or","of","for","to","in","on","at","by","is","are",
+          "with","from","as","be","this","that","it","its","into","over","under",
+        ]);
         const tokens = q
           .toLowerCase()
           .split(/\s+/)
-          .filter((t) => t.length >= 2);
+          .map((t) => t.replace(/[^\p{L}\p{N}+/-]/gu, ""))
+          .filter((t) => t.length >= 3 && !STOP.has(t));
+        // Fall back to original behaviour if the cleaned token list is empty
+        // (e.g. user typed a single 2-char acronym like "EL").
+        const effectiveTokens =
+          tokens.length > 0
+            ? tokens
+            : q.toLowerCase().split(/\s+/).filter((t) => t.length >= 2);
+
         const scoreOf = (s: Scenario) => {
           const title = (s.title_en || "").toLowerCase();
           const sit = (s.situation_en || "").toLowerCase();
           const act = (s.action_en || "").toLowerCase();
           const syn = (s.synonyms || []).join(" ").toLowerCase();
           let score = 0;
-          for (const tok of tokens) {
-            if (title.includes(tok)) score += 5;
-            if (syn.includes(tok)) score += 3;
-            if (sit.includes(tok)) score += 2;
-            if (act.includes(tok)) score += 1;
-            // Strong bonus for exact phrase in title
-            if (title === tok) score += 8;
+          let signalHits = 0; // hits in title/synonyms/situation
+          let matchedTokens = 0;
+          for (const tok of effectiveTokens) {
+            const inTitle = title.includes(tok);
+            const inSyn = syn.includes(tok);
+            const inSit = sit.includes(tok);
+            const inAct = act.includes(tok);
+            if (inTitle) score += 8;
+            if (inSyn)   score += 5;
+            if (inSit)   score += 3;
+            if (inAct)   score += 1;
+            if (inTitle || inSyn || inSit) signalHits++;
+            if (inTitle || inSyn || inSit || inAct) matchedTokens++;
+            if (title === tok) score += 12;
           }
-          // Strong bonus for full-phrase match in title
-          if (tokens.length > 1 && title.includes(q.toLowerCase())) score += 10;
+          // Strict AND: every meaningful token must appear *somewhere*.
+          if (matchedTokens < effectiveTokens.length) return 0;
+          // At least one match must be in a high-signal field (no action-only noise).
+          if (signalHits === 0) return 0;
+          // Heavy bonus for full-phrase match in title
+          if (effectiveTokens.length > 1 && title.includes(q.toLowerCase())) score += 20;
+          // Bonus if the title *starts* with the query — best UX signal.
+          if (title.startsWith(q.toLowerCase())) score += 15;
           return score;
         };
         const ranked = raw
           .map((s) => ({ s, score: scoreOf(s), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
-          .filter((x) => x.score > 0)
-          // Critical first, then urgent, then routine — within each group by relevance.
-          .sort((a, b) => (b.urg - a.urg) || (b.score - a.score))
+          .filter((x) => x.score >= 5) // hard floor — no scrap matches
+          // Relevance first; urgency is a tie-breaker so on-topic results
+          // never get pushed down by an off-topic Critical row.
+          .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
           .map((x) => x.s);
 
         setAllSearchResults(ranked);
