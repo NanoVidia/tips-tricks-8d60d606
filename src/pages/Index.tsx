@@ -1100,6 +1100,26 @@ export default function Index() {
       </footer>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
+      <CategoryHubSheet
+        open={hubOpen}
+        onOpenChange={setHubOpen}
+        category={hubCategory}
+        categoryLabel={hubCategory ? tabLabel(hubCategory) : ""}
+        totalCount={hubCategory ? categoryCounts[hubCategory] ?? 0 : 0}
+        config={hubCategory ? categoryConfig[hubCategory] : categoryConfig.qa}
+        onBrowseAll={() => {
+          if (hubCategory) { setActiveTab(hubCategory); setSearch(""); }
+        }}
+        onPickTopic={(q) => {
+          if (hubCategory) { setActiveTab(hubCategory); setSearch(q); }
+        }}
+        onOpenScenario={(s) => openScenarioSheet(s as Scenario)}
+        onOpenAI={() => {
+          const btn = document.querySelector<HTMLButtonElement>('[data-floating-ai-bot="true"]');
+          if (btn) btn.click();
+          else setAiOpen(true);
+        }}
+      />
       <SurgeryCategoriesSheet open={surgerySheetOpen} onOpenChange={setSurgerySheetOpen} />
       <ExamsFlagsSheet open={examsSheetOpen} onOpenChange={setExamsSheetOpen} />
       <ClinicTopicsSheet
