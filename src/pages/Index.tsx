@@ -815,27 +815,23 @@ export default function Index() {
         )}
         {!activeTab && !isSearching ? (
           <>
-            {/* ⌘K hint — visible cue to open the Command Palette */}
+            {/* Desktop-only ⌘K hint — hidden on mobile to avoid duplicating the main search bar */}
             <motion.button
               type="button"
               onClick={() => setPaletteOpen(true)}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, type: "spring", stiffness: 350, damping: 30, mass: 0.8 }}
-              className="mt-4 w-full flex items-center gap-2 px-3.5 h-11 rounded-2xl bg-card border border-border/60 hover:border-primary/50 transition-all duration-200 ease-out shadow-sm group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              transition={springTransition}
+              className="hidden sm:flex mt-4 w-full items-center gap-2 px-3.5 h-12 rounded-2xl bg-card border border-border/60 hover:border-primary/50 shadow-editorial group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-all"
               aria-label="Open command palette"
             >
-              <Search className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-              <span className="flex-1 text-left text-[12px] text-muted-foreground truncate">
-                Search scenarios, drugs, protocols…
+              <Search className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              <span className="flex-1 text-left text-[13px] text-muted-foreground truncate">
+                {t("searchPlaceholder")}
               </span>
-              <span className="hidden sm:inline-flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground border border-border/60">
-                  ⌘
-                </kbd>
-                <kbd className="px-1.5 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground border border-border/60">
-                  K
-                </kbd>
+              <span className="inline-flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-bold text-muted-foreground border border-border/60">⌘</kbd>
+                <kbd className="px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-bold text-muted-foreground border border-border/60">K</kbd>
               </span>
             </motion.button>
 
