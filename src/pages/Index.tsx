@@ -480,8 +480,19 @@ export default function Index() {
 
           {/* Masthead — collapses to small in compact mode */}
           <div className={`flex items-start justify-between gap-3 transition-all ${scrolled ? "mb-3" : "mb-4"}`}>
-            <motion.div
-              className="min-w-0 flex-1 flex flex-col gap-1.5 pr-1"
+            <motion.button
+              type="button"
+              onClick={() => {
+                setActiveTab(null);
+                setSearch("");
+                setSearchCatFilter(null);
+                setUrgencyFilter(null);
+                setSuggestOpen(false);
+                setSearchFocused(false);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              aria-label="Go to home"
+              className="min-w-0 flex-1 flex flex-col gap-1.5 pr-1 text-start cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-80 transition-opacity"
               initial={{ y: 6, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -510,7 +521,7 @@ export default function Index() {
               >
                 OB/GYN Reference
               </span>
-            </motion.div>
+            </motion.button>
             <div className="flex items-center gap-1.5 shrink-0 self-start">
               <button
                 onClick={toggleDark}
