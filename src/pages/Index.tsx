@@ -898,6 +898,7 @@ export default function Index() {
               setLastSearch(q);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
+            onOpenDailyCase={(c) => openScenarioById(c.id, c.title_en)}
             />
           </>
         ) : loading ? (
