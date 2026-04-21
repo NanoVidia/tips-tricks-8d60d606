@@ -20,6 +20,8 @@ import { AdSpaceBanner } from "@/components/AdSpaceBanner";
 import { SurgeryCategoriesSheet } from "@/components/SurgeryCategoriesSheet";
 import { ExamsFlagsSheet } from "@/components/ExamsFlagsSheet";
 import { ClinicTopicsSheet } from "@/components/ClinicTopicsSheet";
+import { CategoryHubSheet } from "@/components/CategoryHubSheet";
+import { useScenarioUsage } from "@/hooks/useScenarioUsage";
 import { AppMenu } from "@/components/AppMenu";
 
 import { useTranslations } from "@/hooks/useTranslations";
@@ -129,6 +131,9 @@ export default function Index() {
   const [surgerySheetOpen, setSurgerySheetOpen] = useState(false);
   const [examsSheetOpen, setExamsSheetOpen] = useState(false);
   const [clinicSheetOpen, setClinicSheetOpen] = useState(false);
+  const [hubCategory, setHubCategory] = useState<ScenarioCategory | null>(null);
+  const [hubOpen, setHubOpen] = useState(false);
+  const { track: trackUsage } = useScenarioUsage();
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
 
   // Auto-suggest state
@@ -353,6 +358,20 @@ export default function Index() {
   };
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
+
+  /** Open the Adaptive Hub sheet for a category instead of jumping directly to the list. */
+  const openHub = (cat: ScenarioCategory) => {
+    setHubCategory(cat);
+    setHubOpen(true);
+  };
+
+  /** Open a scenario sheet AND track usage for the Smart Hub. */
+  const openScenarioSheet = (s: Scenario) => {
+    trackUsage(s.category, s.id, s.title_en);
+    setSheetScenario(s);
+    setSheetOpen(true);
+  };
+
 
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
@@ -715,7 +734,7 @@ export default function Index() {
                 key={id}
                 role="tab"
                 aria-selected={active}
-                onClick={() => setActiveTab(active ? null : id)}
+                onClick={() => { if (active) setActiveTab(null); else openHub(id); }}
                 initial={{ opacity: 0, y: 10, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: 0.25 + idx * 0.06, type: "spring", stiffness: 280, damping: 22 }}
@@ -775,7 +794,7 @@ export default function Index() {
           <HomeHero
             totalScenarios={totalScenarios}
             categoryCounts={categoryCounts}
-            onSelectCategory={(id) => { setActiveTab(id); }}
+            onSelectCategory={(id) => { openHub(id); }}
             onOpenAI={() => {
               const btn = document.querySelector<HTMLButtonElement>('[data-floating-ai-bot="true"]');
               if (btn) btn.click();
@@ -1006,7 +1025,7 @@ export default function Index() {
                                   situation={item.situation_en}
                                   category={item.category}
                                   index={idx}
-                                  onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                                  onOpen={() => openScenarioSheet(item)}
                                   categoryConfig={categoryConfig}
                                   highlight={debouncedSearch}
                                 />
@@ -1030,7 +1049,7 @@ export default function Index() {
                       situation={item.situation_en}
                       category={item.category}
                       index={idx}
-                      onOpen={() => { setSheetScenario(item); setSheetOpen(true); }}
+                      onOpen={() => openScenarioSheet(item)}
                       categoryConfig={categoryConfig}
                     />
                   ))}
@@ -1081,6 +1100,26 @@ export default function Index() {
       </footer>
 
       <AIChatDrawer open={aiOpen} onOpenChange={setAiOpen} scenario={aiScenario} />
+      <CategoryHubSheet
+        open={hubOpen}
+        onOpenChange={setHubOpen}
+        category={hubCategory}
+        categoryLabel={hubCategory ? tabLabel(hubCategory) : ""}
+        totalCount={hubCategory ? categoryCounts[hubCategory] ?? 0 : 0}
+        config={hubCategory ? categoryConfig[hubCategory] : categoryConfig.qa}
+        onBrowseAll={() => {
+          if (hubCategory) { setActiveTab(hubCategory); setSearch(""); }
+        }}
+        onPickTopic={(q) => {
+          if (hubCategory) { setActiveTab(hubCategory); setSearch(q); }
+        }}
+        onOpenScenario={(s) => openScenarioSheet(s as Scenario)}
+        onOpenAI={() => {
+          const btn = document.querySelector<HTMLButtonElement>('[data-floating-ai-bot="true"]');
+          if (btn) btn.click();
+          else setAiOpen(true);
+        }}
+      />
       <SurgeryCategoriesSheet open={surgerySheetOpen} onOpenChange={setSurgerySheetOpen} />
       <ExamsFlagsSheet open={examsSheetOpen} onOpenChange={setExamsSheetOpen} />
       <ClinicTopicsSheet
