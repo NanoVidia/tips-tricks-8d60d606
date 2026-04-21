@@ -359,6 +359,20 @@ export default function Index() {
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
+  /** Open the Adaptive Hub sheet for a category instead of jumping directly to the list. */
+  const openHub = (cat: ScenarioCategory) => {
+    setHubCategory(cat);
+    setHubOpen(true);
+  };
+
+  /** Open a scenario sheet AND track usage for the Smart Hub. */
+  const openScenarioSheet = (s: Scenario) => {
+    trackUsage(s.category, s.id, s.title_en);
+    setSheetScenario(s);
+    setSheetOpen(true);
+  };
+
+
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
