@@ -806,7 +806,71 @@ export default function Index() {
         </motion.div>
         )}
         {!activeTab && !isSearching ? (
-          <HomeHero
+          <>
+            {/* ⌘K hint — visible cue to open the Command Palette */}
+            <motion.button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, type: "spring", stiffness: 350, damping: 30, mass: 0.8 }}
+              className="mt-4 w-full flex items-center gap-2 px-3.5 h-11 rounded-2xl bg-card border border-border/60 hover:border-primary/50 transition-all duration-200 ease-out shadow-sm group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              aria-label="Open command palette"
+            >
+              <Search className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <span className="flex-1 text-left text-[12px] text-muted-foreground truncate">
+                Search scenarios, drugs, protocols…
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground border border-border/60">
+                  ⌘
+                </kbd>
+                <kbd className="px-1.5 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground border border-border/60">
+                  K
+                </kbd>
+              </span>
+            </motion.button>
+
+            {/* Continue Where You Left Off — only when lastScenario exists */}
+            <AnimatePresence>
+              {activity.lastScenario && (
+                <motion.div
+                  key="continue"
+                  initial={{ opacity: 0, y: 8, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30, mass: 0.8 }}
+                  className="mt-3 overflow-hidden"
+                >
+                  <div className="relative rounded-2xl p-3.5 bg-gradient-to-br from-primary/15 via-primary/8 to-transparent border border-primary/30 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/80">
+                        Continue where you left off
+                      </p>
+                      <p className="text-[13px] font-bold text-foreground leading-tight truncate mt-0.5">
+                        {activity.lastScenario.title}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const ref = activity.lastScenario;
+                        if (ref) openScenarioById(ref.id, ref.title);
+                      }}
+                      className="rounded-full text-[11px] h-8 px-3.5 gap-1 shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 ease-out"
+                    >
+                      Resume
+                      <ChevronRight className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <HomeHero
             totalScenarios={totalScenarios}
             categoryCounts={categoryCounts}
             onSelectCategory={(id) => { openHub(id); }}
