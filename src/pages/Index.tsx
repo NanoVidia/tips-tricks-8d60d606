@@ -20,8 +20,9 @@ import { AdSpaceBanner } from "@/components/AdSpaceBanner";
 import { SurgeryCategoriesSheet } from "@/components/SurgeryCategoriesSheet";
 import { ExamsFlagsSheet } from "@/components/ExamsFlagsSheet";
 import { ClinicTopicsSheet } from "@/components/ClinicTopicsSheet";
-import { CategoryHubSheet } from "@/components/CategoryHubSheet";
-import { useScenarioUsage } from "@/hooks/useScenarioUsage";
+import { SmartBottomSheet } from "@/components/SmartBottomSheet";
+import { CommandPalette } from "@/components/CommandPalette";
+import { useActivityTracker, type TabId } from "@/hooks/useActivityTracker";
 import { AppMenu } from "@/components/AppMenu";
 
 import { useTranslations } from "@/hooks/useTranslations";
