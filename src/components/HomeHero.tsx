@@ -255,7 +255,7 @@ export function HomeHero({
       >
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/60 leading-none mb-1.5">
+            <p className="text-[13px] font-black uppercase tracking-[0.2em] text-white/70 leading-none mb-2">
               Library Coverage
             </p>
             <div className="flex items-baseline gap-1.5">
