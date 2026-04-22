@@ -192,10 +192,10 @@ export function SmartBottomSheet({
                     <span className="w-9 h-9 rounded-xl bg-primary/10 group-hover:bg-primary/15 flex items-center justify-center text-primary">
                       <Icon className="w-4 h-4" />
                     </span>
-                    <span className="text-[12px] font-bold text-foreground leading-tight">
+                    <span className="text-[12px] font-bold text-foreground leading-tight break-words text-left w-full">
                       {a.label}
                     </span>
-                    <span className="text-[10px] text-muted-foreground leading-tight">
+                    <span className="text-[10px] text-muted-foreground leading-tight break-words text-left w-full">
                       {a.hint}
                     </span>
                   </motion.button>
