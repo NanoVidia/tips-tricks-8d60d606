@@ -54,10 +54,10 @@ export function EmergencyStrip({ onPick }: Props) {
             <Siren className="w-3.5 h-3.5 text-red-200" strokeWidth={2.5} />
           </motion.span>
           <div className="min-w-0">
-            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-red-100 leading-none">
+            <p className="text-[14px] font-black uppercase tracking-[0.18em] text-red-100 leading-none">
               Emergency Protocols
             </p>
-            <p className="text-[9.5px] font-semibold text-red-200/80 tracking-wide mt-0.5 leading-none">
+            <p className="text-[10.5px] font-semibold text-red-200/80 tracking-wide mt-1 leading-none">
               One-tap lifesaving access
             </p>
           </div>
