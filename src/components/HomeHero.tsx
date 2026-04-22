@@ -111,12 +111,12 @@ export function HomeHero({
   // Emergencies live in the dedicated EmergencyStrip above — keep this list as
   // the broader "browse by content type" filter row.
   const chips: ChipItem[] = [
-    { id: "drugs", label: "Drugs & Dosing", query: "drug", phName: "Pill", gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30", hint: "MgSO₄ · Oxytocin · Heparin" },
-    { id: "protocols", label: "Protocols", query: "protocol", phName: "ClipboardText", gradient: "from-sky-500 to-blue-700", shadow: "shadow-sky-500/30", hint: "PPH · Eclampsia · Sepsis" },
-    { id: "procedures", label: "Procedures", query: "procedure", phName: "Scissors", gradient: "from-rose-500 to-pink-700", shadow: "shadow-rose-500/30", hint: "C-section · Forceps · D&C" },
-    { id: "obstetrics", label: "Obstetrics", query: "labor", phName: "Baby", gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", hint: "Labor · Delivery · Antenatal" },
-    { id: "clinic", label: "Clinic", query: "clinic", phName: "Stethoscope", gradient: "from-teal-500 to-cyan-700", shadow: "shadow-teal-500/30", hint: "Outpatient · Antenatal" },
-    { id: "mcqs", label: "Q&A / MCQs", query: "MCQ", phName: "Question", gradient: "from-emerald-500 to-teal-700", shadow: "shadow-emerald-500/30", hint: "Self-assessment items" },
+    { id: "drugs",      label: "Drugs & Dosing",        query: "drug",      phName: "Pill",          gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30",  hint: "MgSO₄ · Oxytocin · Heparin" },
+    { id: "protocols",  label: "Clinical Protocols",    query: "protocol",  phName: "ClipboardText", gradient: "from-sky-500 to-blue-700",       shadow: "shadow-sky-500/30",     hint: "PPH · Eclampsia · Sepsis" },
+    { id: "procedures", label: "Procedures & Surgery",  query: "procedure", phName: "Scissors",      gradient: "from-rose-500 to-pink-700",      shadow: "shadow-rose-500/30",    hint: "C-section · Forceps · D&C" },
+    { id: "obstetrics", label: "Obstetrics & Labor",    query: "labor",     phName: "Baby",          gradient: "from-amber-500 to-orange-600",   shadow: "shadow-amber-500/30",   hint: "Labor · Delivery · Antenatal" },
+    { id: "clinic",     label: "Outpatient Clinic",     query: "clinic",    phName: "Stethoscope",   gradient: "from-teal-500 to-cyan-700",      shadow: "shadow-teal-500/30",    hint: "Antenatal · Gynae visits" },
+    { id: "mcqs",       label: "Q&A and MCQs",          query: "MCQ",       phName: "Question",      gradient: "from-emerald-500 to-teal-700",   shadow: "shadow-emerald-500/30", hint: "Board-style self-assessment" },
   ];
 
   return (
@@ -194,16 +194,16 @@ export function HomeHero({
         transition={{ ...SPRING, delay: 0.15 }}
         className="space-y-2.5"
       >
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-1.5">
-            <Search className="w-3 h-3 text-muted-foreground" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-              Search by type
-            </span>
+        <div className="flex items-end justify-between px-1 gap-2">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground leading-none flex items-center gap-1.5">
+              <Search className="w-3 h-3 text-primary" />
+              Browse by Content Type
+            </p>
+            <p className="text-[10px] text-muted-foreground mt-1 leading-none">
+              Tap any card to filter the library
+            </p>
           </div>
-          <span className="text-[9px] font-semibold text-muted-foreground/70">
-            Tap to filter
-          </span>
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
@@ -217,19 +217,19 @@ export function HomeHero({
               transition={{ ...SPRING, delay: 0.2 + idx * 0.05 }}
               whileTap={{ scale: 0.96 }}
               whileHover={{ y: -2 }}
-              className={`soft-tint relative overflow-hidden rounded-2xl p-3 text-left bg-gradient-to-br ${c.gradient} shadow-md ${c.shadow} active:shadow-sm transition-all`}
+              className={`soft-tint relative overflow-hidden rounded-2xl p-3 text-left bg-gradient-to-br ${c.gradient} shadow-md ${c.shadow} active:shadow-sm transition-all min-h-[82px]`}
               aria-label={`Search ${c.label}`}
             >
               <div className="absolute -bottom-2 -right-2 w-14 h-14 opacity-15 pointer-events-none" aria-hidden="true">
                 <PhIcon name={c.phName} size={56} tone="white" weight="fill" />
               </div>
-              <div className="relative flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shrink-0">
-                  <PhIcon name={c.phName} size={16} tone="white" weight="duotone" />
+              <div className="relative flex items-start gap-2.5 h-full">
+                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shrink-0">
+                  <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-white font-bold text-[12.5px] leading-tight truncate">{c.label}</p>
-                  <p className="text-white/70 text-[9.5px] leading-tight mt-0.5 truncate">{c.hint}</p>
+                  <p className="text-white font-bold text-[12px] leading-[1.15] break-words">{c.label}</p>
+                  <p className="text-white/70 text-[9.5px] leading-[1.2] mt-1 break-words">{c.hint}</p>
                 </div>
               </div>
             </motion.button>
@@ -251,21 +251,30 @@ export function HomeHero({
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ ...SPRING, delay: 0.5 }}
-        className="relative overflow-hidden rounded-2xl p-4 flex items-center justify-between bg-gradient-to-br from-slate-700 to-slate-900 shadow-lg shadow-slate-900/40"
+        className="relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br from-slate-700 to-slate-900 shadow-lg shadow-slate-900/40"
       >
-        <div className="flex items-baseline gap-2">
-          <AnimatedNumber
-            value={totalScenarios}
-            className="text-white font-black text-[34px] leading-none tabular-nums tracking-tight"
-          />
-          <span className="text-white/60 text-[14px] font-bold">+</span>
-          <span className="text-white/75 text-[11px] font-semibold ml-1">Clinical Scenarios</span>
-        </div>
-        <div className="flex items-center gap-1.5" aria-hidden="true">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
-          <span className="w-2 h-2 rounded-full bg-sky-400 shadow-sm shadow-sky-400/50" />
-          <span className="w-2 h-2 rounded-full bg-rose-400 shadow-sm shadow-rose-400/50" />
-          <span className="w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" />
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/60 leading-none mb-1.5">
+              Library Coverage
+            </p>
+            <div className="flex items-baseline gap-1.5">
+              <AnimatedNumber
+                value={totalScenarios}
+                className="text-white font-black text-[32px] leading-none tabular-nums tracking-tight"
+              />
+              <span className="text-white/60 text-[14px] font-bold">+</span>
+              <span className="text-white/80 text-[11px] font-semibold ml-1 leading-tight">
+                Clinical Scenarios
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
+            <span className="w-2 h-2 rounded-full bg-sky-400 shadow-sm shadow-sky-400/50" />
+            <span className="w-2 h-2 rounded-full bg-rose-400 shadow-sm shadow-rose-400/50" />
+            <span className="w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" />
+          </div>
         </div>
       </motion.div>
     </div>

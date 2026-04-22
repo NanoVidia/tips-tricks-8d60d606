@@ -81,26 +81,26 @@ export function MiniCaseOfDay({ onOpen }: Props) {
       </div>
 
       <div className="relative flex items-start gap-3">
-        <div className="w-9 h-9 rounded-xl bg-amber-500/20 ring-1 ring-amber-500/40 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-amber-500/20 ring-1 ring-amber-500/40 flex items-center justify-center shrink-0">
           <BookOpen className="w-4 h-4 text-amber-700 dark:text-amber-300" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[9px] font-black uppercase tracking-[0.22em] text-amber-700 dark:text-amber-300">
-              Case of the day
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700 dark:text-amber-300 leading-none">
+              Case of the Day
             </span>
-            <span className="text-[8.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/30">
+            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/30">
               {CAT_LABEL[c.category]}
             </span>
           </div>
-          <p className="text-foreground font-bold text-[13px] leading-tight mt-1 line-clamp-1">
+          <p className="text-foreground font-bold text-[13px] leading-snug mt-1.5 break-words">
             {c.title_en}
           </p>
-          <p className="text-muted-foreground text-[11px] leading-snug mt-0.5 line-clamp-2">
+          <p className="text-muted-foreground text-[11px] leading-snug mt-1 line-clamp-2">
             {c.situation_en}
           </p>
         </div>
-        <ArrowRight className="w-4 h-4 text-amber-700 dark:text-amber-300 shrink-0 mt-1" />
+        <ArrowRight className="w-4 h-4 text-amber-700 dark:text-amber-300 shrink-0 mt-1.5" />
       </div>
     </motion.button>
   );
