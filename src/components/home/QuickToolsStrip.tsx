@@ -33,16 +33,16 @@ export function QuickToolsStrip() {
     >
       <div className="flex items-end justify-between px-1 gap-2">
         <div className="min-w-0">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground leading-none">
+          <p className="text-[14px] font-black uppercase tracking-[0.18em] text-foreground leading-none">
             Clinical Tools
           </p>
-          <p className="text-[10px] text-muted-foreground mt-1 leading-none">
+          <p className="text-[10.5px] text-muted-foreground mt-1.5 leading-none">
             Calculators, drug safety & guidelines
           </p>
         </div>
         <Link
           to="/tools"
-          className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-primary hover:underline tracking-wide shrink-0"
+          className="inline-flex items-center gap-0.5 text-[11px] font-bold text-primary hover:underline tracking-wide shrink-0"
         >
           View all
           <ChevronRight className="w-3 h-3" />

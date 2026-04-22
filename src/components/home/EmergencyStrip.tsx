@@ -13,10 +13,10 @@ interface Emergency {
 }
 
 const EMERGENCIES: Emergency[] = [
-  { id: "pph", label: "Postpartum Hemorrhage", query: "PPH", protocol: "4 T's · Bakri · TXA", emoji: "🩸", ring: "ring-red-500/40", glow: "shadow-red-500/40" },
-  { id: "eclampsia", label: "Eclampsia / Seizure", query: "eclampsia", protocol: "MgSO₄ 4 g IV loading", emoji: "⚡", ring: "ring-violet-500/40", glow: "shadow-violet-500/40" },
-  { id: "shoulder", label: "Shoulder Dystocia", query: "shoulder dystocia", protocol: "HELPERR maneuvers", emoji: "🚨", ring: "ring-orange-500/40", glow: "shadow-orange-500/40" },
-  { id: "cord", label: "Cord Prolapse", query: "cord prolapse", protocol: "Knee-chest · STAT CS", emoji: "⏱️", ring: "ring-rose-500/40", glow: "shadow-rose-500/40" },
+  { id: "pph", label: "PPH", query: "PPH", protocol: "4 T's · Bakri · TXA", emoji: "🩸", ring: "ring-red-500/40", glow: "shadow-red-500/40" },
+  { id: "eclampsia", label: "Eclampsia", query: "eclampsia", protocol: "MgSO₄ 4g IV", emoji: "⚡", ring: "ring-violet-500/40", glow: "shadow-violet-500/40" },
+  { id: "shoulder", label: "Shoulder dystocia", query: "shoulder dystocia", protocol: "HELPERR", emoji: "🚨", ring: "ring-orange-500/40", glow: "shadow-orange-500/40" },
+  { id: "cord", label: "Cord prolapse", query: "cord prolapse", protocol: "Knee-chest · STAT CS", emoji: "⏱️", ring: "ring-rose-500/40", glow: "shadow-rose-500/40" },
 ];
 
 interface Props {
@@ -54,10 +54,10 @@ export function EmergencyStrip({ onPick }: Props) {
             <Siren className="w-3.5 h-3.5 text-red-200" strokeWidth={2.5} />
           </motion.span>
           <div className="min-w-0">
-            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-red-100 leading-none">
+            <p className="text-[14px] font-black uppercase tracking-[0.18em] text-red-100 leading-none">
               Emergency Protocols
             </p>
-            <p className="text-[9.5px] font-semibold text-red-200/80 tracking-wide mt-0.5 leading-none">
+            <p className="text-[10.5px] font-semibold text-red-200/80 tracking-wide mt-1 leading-none">
               One-tap lifesaving access
             </p>
           </div>
