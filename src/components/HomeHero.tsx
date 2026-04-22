@@ -196,11 +196,11 @@ export function HomeHero({
       >
         <div className="flex items-end justify-between px-1 gap-2">
           <div className="min-w-0">
-            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground leading-none flex items-center gap-1.5">
-              <Search className="w-3 h-3 text-primary" />
+            <p className="text-[14px] font-black uppercase tracking-[0.18em] text-foreground leading-none flex items-center gap-1.5">
+              <Search className="w-3.5 h-3.5 text-primary" />
               Browse by Content Type
             </p>
-            <p className="text-[10px] text-muted-foreground mt-1 leading-none">
+            <p className="text-[10.5px] text-muted-foreground mt-1.5 leading-none">
               Tap any card to filter the library
             </p>
           </div>
