@@ -111,12 +111,12 @@ export function HomeHero({
   // Emergencies live in the dedicated EmergencyStrip above — keep this list as
   // the broader "browse by content type" filter row.
   const chips: ChipItem[] = [
-    { id: "drugs", label: "Drugs & Dosing", query: "drug", phName: "Pill", gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30", hint: "MgSO₄ · Oxytocin · Heparin" },
-    { id: "protocols", label: "Protocols", query: "protocol", phName: "ClipboardText", gradient: "from-sky-500 to-blue-700", shadow: "shadow-sky-500/30", hint: "PPH · Eclampsia · Sepsis" },
-    { id: "procedures", label: "Procedures", query: "procedure", phName: "Scissors", gradient: "from-rose-500 to-pink-700", shadow: "shadow-rose-500/30", hint: "C-section · Forceps · D&C" },
-    { id: "obstetrics", label: "Obstetrics", query: "labor", phName: "Baby", gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", hint: "Labor · Delivery · Antenatal" },
-    { id: "clinic", label: "Clinic", query: "clinic", phName: "Stethoscope", gradient: "from-teal-500 to-cyan-700", shadow: "shadow-teal-500/30", hint: "Outpatient · Antenatal" },
-    { id: "mcqs", label: "Q&A / MCQs", query: "MCQ", phName: "Question", gradient: "from-emerald-500 to-teal-700", shadow: "shadow-emerald-500/30", hint: "Self-assessment items" },
+    { id: "drugs",      label: "Drugs & Dosing",        query: "drug",      phName: "Pill",          gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30",  hint: "MgSO₄ · Oxytocin · Heparin" },
+    { id: "protocols",  label: "Clinical Protocols",    query: "protocol",  phName: "ClipboardText", gradient: "from-sky-500 to-blue-700",       shadow: "shadow-sky-500/30",     hint: "PPH · Eclampsia · Sepsis" },
+    { id: "procedures", label: "Procedures & Surgery",  query: "procedure", phName: "Scissors",      gradient: "from-rose-500 to-pink-700",      shadow: "shadow-rose-500/30",    hint: "C-section · Forceps · D&C" },
+    { id: "obstetrics", label: "Obstetrics & Labor",    query: "labor",     phName: "Baby",          gradient: "from-amber-500 to-orange-600",   shadow: "shadow-amber-500/30",   hint: "Labor · Delivery · Antenatal" },
+    { id: "clinic",     label: "Outpatient Clinic",     query: "clinic",    phName: "Stethoscope",   gradient: "from-teal-500 to-cyan-700",      shadow: "shadow-teal-500/30",    hint: "Antenatal · Gynae visits" },
+    { id: "mcqs",       label: "Q&A and MCQs",          query: "MCQ",       phName: "Question",      gradient: "from-emerald-500 to-teal-700",   shadow: "shadow-emerald-500/30", hint: "Board-style self-assessment" },
   ];
 
   return (
