@@ -251,21 +251,30 @@ export function HomeHero({
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ ...SPRING, delay: 0.5 }}
-        className="relative overflow-hidden rounded-2xl p-4 flex items-center justify-between bg-gradient-to-br from-slate-700 to-slate-900 shadow-lg shadow-slate-900/40"
+        className="relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br from-slate-700 to-slate-900 shadow-lg shadow-slate-900/40"
       >
-        <div className="flex items-baseline gap-2">
-          <AnimatedNumber
-            value={totalScenarios}
-            className="text-white font-black text-[34px] leading-none tabular-nums tracking-tight"
-          />
-          <span className="text-white/60 text-[14px] font-bold">+</span>
-          <span className="text-white/75 text-[11px] font-semibold ml-1">Clinical Scenarios</span>
-        </div>
-        <div className="flex items-center gap-1.5" aria-hidden="true">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
-          <span className="w-2 h-2 rounded-full bg-sky-400 shadow-sm shadow-sky-400/50" />
-          <span className="w-2 h-2 rounded-full bg-rose-400 shadow-sm shadow-rose-400/50" />
-          <span className="w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" />
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/60 leading-none mb-1.5">
+              Library Coverage
+            </p>
+            <div className="flex items-baseline gap-1.5">
+              <AnimatedNumber
+                value={totalScenarios}
+                className="text-white font-black text-[32px] leading-none tabular-nums tracking-tight"
+              />
+              <span className="text-white/60 text-[14px] font-bold">+</span>
+              <span className="text-white/80 text-[11px] font-semibold ml-1 leading-tight">
+                Clinical Scenarios
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
+            <span className="w-2 h-2 rounded-full bg-sky-400 shadow-sm shadow-sky-400/50" />
+            <span className="w-2 h-2 rounded-full bg-rose-400 shadow-sm shadow-rose-400/50" />
+            <span className="w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" />
+          </div>
         </div>
       </motion.div>
     </div>
