@@ -98,11 +98,11 @@ export function DailyMcqWidget() {
       <div className="relative p-3.5">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5">
-            <span className="inline-flex w-5 h-5 items-center justify-center rounded-md bg-violet-500/25 ring-1 ring-violet-400/40">
-              <Brain className="w-3 h-3 text-violet-200" />
+            <span className="inline-flex w-6 h-6 items-center justify-center rounded-md bg-violet-500/25 ring-1 ring-violet-400/40">
+              <Brain className="w-3.5 h-3.5 text-violet-200" />
             </span>
-            <span className="text-[10px] font-black uppercase tracking-[0.22em] text-violet-100">
-              Today’s MCQ
+            <span className="text-[13px] font-black uppercase tracking-[0.18em] text-violet-100">
+              Today's MCQ
             </span>
           </div>
           <div className="flex items-center gap-1.5">
