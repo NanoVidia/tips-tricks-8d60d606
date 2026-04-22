@@ -737,8 +737,34 @@ export default function Index() {
                       Searching...
                     </div>
                   ) : suggestions.length === 0 ? (
-                    <div className="py-4 text-center text-xs text-muted-foreground">
-                      No matches for "{search.trim()}"
+                    <div className="py-5 px-4 text-center space-y-3">
+                      <p className="text-[12px] font-semibold text-foreground">
+                        No matches for <span className="text-primary">"{search.trim()}"</span>
+                      </p>
+                      <p className="text-[10.5px] text-muted-foreground leading-snug">
+                        Try a shorter keyword, check spelling, or ask the AI Mentor for a clinical answer.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const q = search.trim();
+                          setSuggestOpen(false);
+                          setSearchFocused(false);
+                          openAI({
+                            id: "search-query",
+                            category: "qa",
+                            title_en: q,
+                            situation_en: q,
+                            action_en: "",
+                            script_en: "",
+                            synonyms: null,
+                          });
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-[11px] font-bold shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        Ask AI about "{search.trim()}"
+                      </button>
                     </div>
                   ) : (
                     <ul className="py-1">
