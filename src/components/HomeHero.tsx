@@ -194,16 +194,16 @@ export function HomeHero({
         transition={{ ...SPRING, delay: 0.15 }}
         className="space-y-2.5"
       >
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-1.5">
-            <Search className="w-3 h-3 text-muted-foreground" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-              Search by type
-            </span>
+        <div className="flex items-end justify-between px-1 gap-2">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground leading-none flex items-center gap-1.5">
+              <Search className="w-3 h-3 text-primary" />
+              Browse by Content Type
+            </p>
+            <p className="text-[10px] text-muted-foreground mt-1 leading-none">
+              Tap any card to filter the library
+            </p>
           </div>
-          <span className="text-[9px] font-semibold text-muted-foreground/70">
-            Tap to filter
-          </span>
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
@@ -217,19 +217,19 @@ export function HomeHero({
               transition={{ ...SPRING, delay: 0.2 + idx * 0.05 }}
               whileTap={{ scale: 0.96 }}
               whileHover={{ y: -2 }}
-              className={`soft-tint relative overflow-hidden rounded-2xl p-3 text-left bg-gradient-to-br ${c.gradient} shadow-md ${c.shadow} active:shadow-sm transition-all`}
+              className={`soft-tint relative overflow-hidden rounded-2xl p-3 text-left bg-gradient-to-br ${c.gradient} shadow-md ${c.shadow} active:shadow-sm transition-all min-h-[82px]`}
               aria-label={`Search ${c.label}`}
             >
               <div className="absolute -bottom-2 -right-2 w-14 h-14 opacity-15 pointer-events-none" aria-hidden="true">
                 <PhIcon name={c.phName} size={56} tone="white" weight="fill" />
               </div>
-              <div className="relative flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shrink-0">
-                  <PhIcon name={c.phName} size={16} tone="white" weight="duotone" />
+              <div className="relative flex items-start gap-2.5 h-full">
+                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shrink-0">
+                  <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-white font-bold text-[12.5px] leading-tight truncate">{c.label}</p>
-                  <p className="text-white/70 text-[9.5px] leading-tight mt-0.5 truncate">{c.hint}</p>
+                  <p className="text-white font-bold text-[12px] leading-[1.15] break-words">{c.label}</p>
+                  <p className="text-white/70 text-[9.5px] leading-[1.2] mt-1 break-words">{c.hint}</p>
                 </div>
               </div>
             </motion.button>
