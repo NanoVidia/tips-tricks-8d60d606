@@ -86,10 +86,10 @@ export function MiniCaseOfDay({ onOpen }: Props) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700 dark:text-amber-300 leading-none">
+            <span className="text-[13px] font-black uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300 leading-none">
               Case of the Day
             </span>
-            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/30">
+            <span className="text-[9.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/30">
               {CAT_LABEL[c.category]}
             </span>
           </div>
