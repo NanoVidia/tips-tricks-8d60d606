@@ -293,7 +293,7 @@ export default function Index() {
             ? tokens
             : q.toLowerCase().split(/\s+/).filter((t) => t.length >= 2);
 
-        const scoreOf = (s: Scenario) => {
+        const scoreOf = (s: Scenario, strict: boolean) => {
           const title = (s.title_en || "").toLowerCase();
           const sit = (s.situation_en || "").toLowerCase();
           const act = (s.action_en || "").toLowerCase();
@@ -314,23 +314,37 @@ export default function Index() {
             if (inTitle || inSyn || inSit || inAct) matchedTokens++;
             if (title === tok) score += 12;
           }
-          // Strict AND: every meaningful token must appear *somewhere*.
-          if (matchedTokens < effectiveTokens.length) return 0;
-          // At least one match must be in a high-signal field (no action-only noise).
-          if (signalHits === 0) return 0;
+          if (strict) {
+            // Strict AND: every meaningful token must appear *somewhere*.
+            if (matchedTokens < effectiveTokens.length) return 0;
+            // At least one match must be in a high-signal field (no action-only noise).
+            if (signalHits === 0) return 0;
+          } else {
+            // Lenient: require at least one signal hit, but accept partial matches.
+            if (signalHits === 0 && matchedTokens === 0) return 0;
+          }
           // Heavy bonus for full-phrase match in title
           if (effectiveTokens.length > 1 && title.includes(q.toLowerCase())) score += 20;
           // Bonus if the title *starts* with the query — best UX signal.
           if (title.startsWith(q.toLowerCase())) score += 15;
           return score;
         };
-        const ranked = raw
-          .map((s) => ({ s, score: scoreOf(s), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
-          .filter((x) => x.score >= 5) // hard floor — no scrap matches
-          // Relevance first; urgency is a tie-breaker so on-topic results
-          // never get pushed down by an off-topic Critical row.
+        // First pass — strict relevance.
+        let ranked = raw
+          .map((s) => ({ s, score: scoreOf(s, true), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
+          .filter((x) => x.score >= 5)
           .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
           .map((x) => x.s);
+        // Fallback — if strict produced nothing, do a forgiving second pass so
+        // the user still sees the closest available matches instead of an
+        // empty screen.
+        if (ranked.length === 0) {
+          ranked = raw
+            .map((s) => ({ s, score: scoreOf(s, false), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
+            .filter((x) => x.score >= 3)
+            .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
+            .map((x) => x.s);
+        }
 
         setAllSearchResults(ranked);
         setTotalCount(ranked.length);
