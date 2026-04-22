@@ -13,10 +13,10 @@ interface Emergency {
 }
 
 const EMERGENCIES: Emergency[] = [
-  { id: "pph", label: "Postpartum Hemorrhage", query: "PPH", protocol: "4 T's · Bakri · TXA", emoji: "🩸", ring: "ring-red-500/40", glow: "shadow-red-500/40" },
-  { id: "eclampsia", label: "Eclampsia / Seizure", query: "eclampsia", protocol: "MgSO₄ 4 g IV loading", emoji: "⚡", ring: "ring-violet-500/40", glow: "shadow-violet-500/40" },
-  { id: "shoulder", label: "Shoulder Dystocia", query: "shoulder dystocia", protocol: "HELPERR maneuvers", emoji: "🚨", ring: "ring-orange-500/40", glow: "shadow-orange-500/40" },
-  { id: "cord", label: "Cord Prolapse", query: "cord prolapse", protocol: "Knee-chest · STAT CS", emoji: "⏱️", ring: "ring-rose-500/40", glow: "shadow-rose-500/40" },
+  { id: "pph", label: "PPH", query: "PPH", protocol: "4 T's · Bakri · TXA", emoji: "🩸", ring: "ring-red-500/40", glow: "shadow-red-500/40" },
+  { id: "eclampsia", label: "Eclampsia", query: "eclampsia", protocol: "MgSO₄ 4g IV", emoji: "⚡", ring: "ring-violet-500/40", glow: "shadow-violet-500/40" },
+  { id: "shoulder", label: "Shoulder dystocia", query: "shoulder dystocia", protocol: "HELPERR", emoji: "🚨", ring: "ring-orange-500/40", glow: "shadow-orange-500/40" },
+  { id: "cord", label: "Cord prolapse", query: "cord prolapse", protocol: "Knee-chest · STAT CS", emoji: "⏱️", ring: "ring-rose-500/40", glow: "shadow-rose-500/40" },
 ];
 
 interface Props {
