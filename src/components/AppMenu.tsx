@@ -370,6 +370,37 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
   );
 }
 
+function ScientificSources() {
+  const sources = [
+    ["ACOG", "Practice Bulletins, Clinical Practice Guidelines and Committee Opinions for obstetrics and gynecology topics."],
+    ["RCOG", "Green-top Guidelines and patient-safety guidance for obstetric emergencies and operative practice."],
+    ["NICE", "Evidence-based UK guidance for antenatal care, diabetes, preterm birth and related pathways."],
+    ["WHO", "Global maternal health recommendations including postpartum hemorrhage and antenatal care guidance."],
+    ["ESC", "Cardiovascular guidance relevant to pregnancy-associated cardiac risk and thromboembolic care."],
+  ];
+  return (
+    <div className="space-y-3">
+      <p className="text-muted-foreground text-xs leading-relaxed">
+        The app should be treated as an educational clinical companion. It highlights topics and workflows, but it does not replace official guidelines, local hospital protocols, senior review, or individualized patient assessment.
+      </p>
+      <div className="space-y-2">
+        {sources.map(([name, note]) => (
+          <div key={name} className="rounded-lg border border-border/70 bg-muted/30 p-3">
+            <p className="font-bold text-foreground flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-primary" />
+              {name}
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed mt-1">{note}</p>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs font-semibold text-foreground/80">
+        No generated image, protocol, AI answer, or summary should be considered authoritative unless verified against the current source document and local policy.
+      </p>
+    </div>
+  );
+}
+
 function FeedbackForm({ supportEmail }: { supportEmail: string }) {
   const [msg, setMsg] = useState("");
   return (
