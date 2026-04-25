@@ -9,6 +9,7 @@ import { DailyMcqWidget } from "@/components/home/DailyMcqWidget";
 import { QuickToolsStrip } from "@/components/home/QuickToolsStrip";
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
+type HomeTextSize = "small" | "medium" | "large";
 
 interface DailyCaseRef {
   id: string;
@@ -51,6 +52,13 @@ function AnimatedNumber({ value, className = "" }: { value: number; className?: 
 }
 
 const SPRING = { type: "spring" as const, stiffness: 150, damping: 14 };
+
+const TEXT_SIZE_OPTIONS: HomeTextSize[] = ["small", "medium", "large"];
+const HOME_TEXT_SCALE: Record<HomeTextSize, { section: string; sub: string; card: string; hint: string }> = {
+  small: { section: "text-[12px]", sub: "text-[9.5px]", card: "text-[11px]", hint: "text-[9px]" },
+  medium: { section: "text-[14px]", sub: "text-[10.5px]", card: "text-[12px]", hint: "text-[9.5px]" },
+  large: { section: "text-[16px]", sub: "text-[12px]", card: "text-[13.5px]", hint: "text-[10.5px]" },
+};
 
 const hapticTap = (ms: number = 10) => {
   try {
@@ -98,6 +106,18 @@ export function HomeHero({
   onSearchChip,
   onOpenDailyCase,
 }: HomeHeroProps) {
+  const [textSize, setTextSize] = useState<HomeTextSize>(() => {
+    if (typeof window === "undefined") return "medium";
+    const saved = window.localStorage.getItem("homeTextSize");
+    return TEXT_SIZE_OPTIONS.includes(saved as HomeTextSize) ? (saved as HomeTextSize) : "medium";
+  });
+  const textScale = HOME_TEXT_SCALE[textSize];
+
+  const updateTextSize = (size: HomeTextSize) => {
+    setTextSize(size);
+    window.localStorage.setItem("homeTextSize", size);
+  };
+
   type ChipItem = {
     id: string;
     label: string;
@@ -124,8 +144,29 @@ export function HomeHero({
       {/* Soft animated ambient background */}
       <AmbientBackground />
 
+      <div className="flex items-center justify-between gap-3 px-1">
+        <p className={`${textScale.sub} font-black uppercase tracking-[0.18em] text-muted-foreground leading-[1.35]`}>
+          Text size
+        </p>
+        <div className="inline-flex rounded-xl border border-border/70 bg-card p-1 shadow-editorial" role="group" aria-label="Home text size">
+          {TEXT_SIZE_OPTIONS.map((size) => (
+            <button
+              key={size}
+              type="button"
+              onClick={() => updateTextSize(size)}
+              className={`h-8 px-2.5 rounded-lg text-[10.5px] font-black capitalize transition-colors ${
+                textSize === size ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
+              aria-pressed={textSize === size}
+            >
+              {size}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* ⓪ Emergency Quick Access — top priority for time-critical use */}
-      <EmergencyStrip onPick={(q) => { hapticTap(15); onSearchChip?.(q); }} />
+      <EmergencyStrip textScale={textScale} onPick={(q) => { hapticTap(15); onSearchChip?.(q); }} />
 
       {/* ① Hero AI Banner — tap to open AI assistant */}
       <motion.button
@@ -196,11 +237,11 @@ export function HomeHero({
       >
         <div className="flex items-start justify-between px-1 gap-2">
           <div className="min-w-0 space-y-1.5">
-            <p className="text-[14px] font-black uppercase tracking-[0.18em] text-foreground leading-[1.2] flex items-start gap-1.5">
+            <p className={`${textScale.section} font-black uppercase tracking-[0.18em] text-foreground leading-[1.2] flex items-start gap-1.5`}>
               <Search className="w-3.5 h-3.5 text-primary" />
               Browse by Content Type
             </p>
-            <p className="text-[10.5px] text-muted-foreground leading-[1.35]">
+            <p className={`${textScale.sub} text-muted-foreground leading-[1.35]`}>
               Tap any card to filter the library
             </p>
           </div>
@@ -228,8 +269,8 @@ export function HomeHero({
                   <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-white font-bold text-[12px] leading-[1.15] break-words">{c.label}</p>
-                  <p className="text-white/70 text-[9.5px] leading-[1.2] mt-1 break-words">{c.hint}</p>
+                  <p className={`text-white font-bold ${textScale.card} leading-[1.2] break-words`}>{c.label}</p>
+                  <p className={`text-white/70 ${textScale.hint} leading-[1.25] mt-1.5 break-words`}>{c.hint}</p>
                 </div>
               </div>
             </motion.button>
@@ -238,13 +279,13 @@ export function HomeHero({
       </motion.div>
 
       {/* ③ Case of the day — opens scenario sheet */}
-      {onOpenDailyCase && <MiniCaseOfDay onOpen={onOpenDailyCase} />}
+      {onOpenDailyCase && <MiniCaseOfDay textScale={textScale} onOpen={onOpenDailyCase} />}
 
       {/* ④ Today's MCQ — interactive single-question widget */}
-      <DailyMcqWidget />
+      <DailyMcqWidget textScale={textScale} />
 
       {/* ⑤ Quick clinical tools row */}
-      <QuickToolsStrip />
+      <QuickToolsStrip textScale={textScale} />
 
       {/* ⑥ Total scenarios — single compact stat strip */}
       <motion.div
@@ -255,7 +296,7 @@ export function HomeHero({
       >
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[13px] font-black uppercase tracking-[0.2em] text-white/70 leading-none mb-2">
+            <p className={`${textScale.section} font-black uppercase tracking-[0.2em] text-white/70 leading-[1.2] mb-2.5`}>
               Library Coverage
             </p>
             <div className="flex items-baseline gap-1.5">
