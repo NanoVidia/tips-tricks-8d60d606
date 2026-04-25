@@ -26,7 +26,12 @@ function dailyOffset(modulo: number) {
  * Today's MCQ — picks one active MCQ deterministically per day, lets the
  * user answer inline with instant feedback + explanation reveal.
  */
-export function DailyMcqWidget() {
+interface Props {
+  textScale?: { section: string; sub: string; card: string; hint: string };
+}
+
+export function DailyMcqWidget({ textScale }: Props) {
+  const scale = textScale ?? { section: "text-[13px]", sub: "text-[10.5px]", card: "text-[12.5px]", hint: "text-[11.5px]" };
   const [mcq, setMcq] = useState<Mcq | null>(null);
   const [loading, setLoading] = useState(true);
   const [picked, setPicked] = useState<number | null>(null);
@@ -101,7 +106,7 @@ export function DailyMcqWidget() {
             <span className="inline-flex w-6 h-6 items-center justify-center rounded-md bg-violet-500/25 ring-1 ring-violet-400/40">
               <Brain className="w-3.5 h-3.5 text-violet-200" />
             </span>
-            <span className="text-[13px] font-black uppercase tracking-[0.18em] text-violet-100 leading-[1.2] pt-0.5">
+            <span className={`${scale.section} font-black uppercase tracking-[0.18em] text-violet-100 leading-[1.2] pt-0.5`}>
               Today's MCQ
             </span>
           </div>
@@ -115,7 +120,7 @@ export function DailyMcqWidget() {
           </div>
         </div>
 
-        <p className="text-white text-[12.5px] font-semibold leading-snug mb-2.5">
+        <p className={`text-white ${scale.card} font-semibold leading-[1.35] mb-2.5`}>
           {mcq.stem}
         </p>
 
@@ -172,7 +177,7 @@ export function DailyMcqWidget() {
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-violet-200 mb-1">
                   Explanation
                 </p>
-                <p className="text-white/90 text-[11.5px] leading-snug">{mcq.explanation}</p>
+                <p className={`text-white/90 ${scale.hint} leading-[1.35]`}>{mcq.explanation}</p>
               </div>
             </motion.div>
           )}
