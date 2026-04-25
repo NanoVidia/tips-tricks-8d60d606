@@ -21,10 +21,14 @@ const CAT_LABEL: Record<DailyCase["category"], string> = {
   clinic: "Clinic", or_labor: "OR / Labor", behavior: "Communication", qa: "Q&A",
 };
 
-interface Props { onOpen: (c: DailyCase) => void; }
+interface Props {
+  onOpen: (c: DailyCase) => void;
+  textScale?: { section: string; sub: string; card: string; hint: string };
+}
 
 /** Compact "Case of the day" card — opens the scenario sheet on tap. */
-export function MiniCaseOfDay({ onOpen }: Props) {
+export function MiniCaseOfDay({ onOpen, textScale }: Props) {
+  const scale = textScale ?? { section: "text-[13px]", sub: "text-[10.5px]", card: "text-[13px]", hint: "text-[11px]" };
   const [c, setC] = useState<DailyCase | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -86,17 +90,17 @@ export function MiniCaseOfDay({ onOpen }: Props) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-1.5 flex-wrap mb-2">
-            <span className="text-[13px] font-black uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300 leading-[1.2]">
+            <span className={`${scale.section} font-black uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300 leading-[1.2]`}>
               Case of the Day
             </span>
             <span className="text-[9.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/30">
               {CAT_LABEL[c.category]}
             </span>
           </div>
-          <p className="text-foreground font-bold text-[13px] leading-[1.35] break-words">
+          <p className={`text-foreground font-bold ${scale.card} leading-[1.35] break-words`}>
             {c.title_en}
           </p>
-          <p className="text-muted-foreground text-[11px] leading-[1.4] mt-1.5 line-clamp-2">
+          <p className={`text-muted-foreground ${scale.hint} leading-[1.4] mt-1.5 line-clamp-2`}>
             {c.situation_en}
           </p>
         </div>
