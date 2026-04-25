@@ -4,7 +4,9 @@ import { springTransition } from "@/lib/motion";
 
 interface Emergency {
   id: string;
-  label: string;
+  abbr: string;
+  nameEn: string;
+  nameAr: string;
   query: string;
   protocol: string;
   emoji: string;
@@ -13,10 +15,10 @@ interface Emergency {
 }
 
 const EMERGENCIES: Emergency[] = [
-  { id: "pph", label: "PPH", query: "PPH", protocol: "4 T's · Bakri · TXA", emoji: "🩸", ring: "ring-red-500/40", glow: "shadow-red-500/40" },
-  { id: "eclampsia", label: "Eclampsia", query: "eclampsia", protocol: "MgSO₄ 4g IV", emoji: "⚡", ring: "ring-violet-500/40", glow: "shadow-violet-500/40" },
-  { id: "shoulder", label: "Shoulder dystocia", query: "shoulder dystocia", protocol: "HELPERR", emoji: "🚨", ring: "ring-orange-500/40", glow: "shadow-orange-500/40" },
-  { id: "cord", label: "Cord prolapse", query: "cord prolapse", protocol: "Knee-chest · STAT CS", emoji: "⏱️", ring: "ring-rose-500/40", glow: "shadow-rose-500/40" },
+  { id: "pph", abbr: "PPH", nameEn: "Postpartum Hemorrhage", nameAr: "نزف ما بعد الولادة", query: "PPH postpartum hemorrhage", protocol: "4 T's · Bakri · TXA", emoji: "🩸", ring: "ring-red-500/40", glow: "shadow-red-500/40" },
+  { id: "eclampsia", abbr: "ECL", nameEn: "Eclampsia", nameAr: "تشنج الحمل", query: "eclampsia", protocol: "MgSO₄ 4g IV", emoji: "⚡", ring: "ring-violet-500/40", glow: "shadow-violet-500/40" },
+  { id: "shoulder", abbr: "SD", nameEn: "Shoulder Dystocia", nameAr: "تعسر ولادة الكتف", query: "shoulder dystocia", protocol: "HELPERR", emoji: "🚨", ring: "ring-orange-500/40", glow: "shadow-orange-500/40" },
+  { id: "cord", abbr: "UCP", nameEn: "Umbilical Cord Prolapse", nameAr: "تدلي الحبل السري", query: "cord prolapse", protocol: "Knee-chest · STAT CS", emoji: "⏱️", ring: "ring-rose-500/40", glow: "shadow-rose-500/40" },
 ];
 
 interface Props {
@@ -76,12 +78,17 @@ export function EmergencyStrip({ onPick }: Props) {
             whileTap={{ scale: 0.96 }}
             whileHover={{ y: -1 }}
             className={`group relative overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm ring-1 ${e.ring} px-2.5 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300`}
-            aria-label={`Open ${e.label} protocol`}
+            aria-label={`Open ${e.abbr} ${e.nameEn} protocol`}
           >
             <div className="flex items-start gap-2">
               <span className="text-[18px] leading-none shrink-0 mt-0.5">{e.emoji}</span>
               <div className="min-w-0 flex-1">
-                <p className="text-white font-bold text-[11.5px] leading-tight break-words">{e.label}</p>
+                <p className="text-white font-black text-[12px] leading-tight break-words">
+                  {e.abbr} <span className="text-red-200/80 font-bold">/</span> {e.nameEn}
+                </p>
+                <p className="text-red-100/85 text-[10px] leading-tight mt-1 font-semibold break-words" dir="rtl">
+                  {e.nameAr}
+                </p>
                 <p className="text-red-200/85 text-[9.5px] leading-tight mt-1 font-mono break-words">
                   {e.protocol}
                 </p>
