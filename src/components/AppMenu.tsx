@@ -4,6 +4,7 @@ import {
   MoreVertical, Info, Shield, FileText, Mail, HelpCircle, LifeBuoy,
   MessageSquare, Star, Share2, Tag, History, Award, Scale, Languages,
   Palette, Bell, Accessibility, Bug, LogOut, ExternalLink, Check, Heart,
+  BookOpen, Stethoscope, ClipboardCheck,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -23,7 +24,7 @@ const APP_NAME = "Tips & Tricks — OB/GYN";
 type DialogId =
   | "about" | "privacy" | "terms" | "contact" | "faq" | "help"
   | "feedback" | "version" | "changelog" | "credits" | "licenses"
-  | "language" | "theme" | "notifications" | "accessibility" | "bug" | null;
+  | "theme" | "notifications" | "accessibility" | "bug" | "sources" | null;
 
 interface Props {
   dark: boolean;
@@ -66,27 +67,35 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
     setTimeout(() => window.location.reload(), 600);
   };
 
-  const items: Array<{ icon: any; label: string; action: () => void; danger?: boolean; sep?: boolean }> = [
-    { icon: Info, label: "About", action: () => setDialog("about") },
-    { icon: HelpCircle, label: "FAQ", action: () => setDialog("faq") },
-    { icon: LifeBuoy, label: "Help & Support", action: () => setDialog("help") },
-    { icon: MessageSquare, label: "Feedback", action: () => setDialog("feedback"), sep: true },
-    { icon: Mail, label: "Contact", action: () => setDialog("contact") },
-    { icon: Share2, label: "Share App", action: handleShare },
-    { icon: Star, label: "Rate Us", action: handleRate },
-    { icon: Heart, label: "Donate / Support", action: () => window.open("https://lovable.app", "_blank"), sep: true },
-    { icon: Languages, label: "Language", action: () => setDialog("language") },
-    { icon: Palette, label: "Theme", action: () => setDialog("theme") },
-    { icon: Bell, label: "Notifications", action: () => setDialog("notifications") },
-    { icon: Accessibility, label: "Accessibility", action: () => setDialog("accessibility"), sep: true },
-    { icon: Shield, label: "Privacy Policy", action: () => setDialog("privacy") },
-    { icon: FileText, label: "Terms of Use", action: () => setDialog("terms") },
-    { icon: Scale, label: "Licenses", action: () => setDialog("licenses") },
-    { icon: Award, label: "Credits", action: () => setDialog("credits") },
-    { icon: History, label: "Changelog", action: () => setDialog("changelog") },
-    { icon: Bug, label: "Report a Bug", action: () => setDialog("bug") },
-    { icon: Tag, label: `Version ${APP_VERSION}`, action: () => setDialog("version"), sep: true },
-    { icon: LogOut, label: "Reset Local Data", action: handleLogout, danger: true },
+  const sections: Array<{ title: string; items: Array<{ icon: any; label: string; action: () => void; danger?: boolean }> }> = [
+    { title: "Clinical reference", items: [
+      { icon: Info, label: "About this app", action: () => setDialog("about") },
+      { icon: ClipboardCheck, label: "Scientific sources", action: () => setDialog("sources") },
+      { icon: HelpCircle, label: "Clinical FAQ", action: () => setDialog("faq") },
+      { icon: LifeBuoy, label: "How to use", action: () => setDialog("help") },
+    ]},
+    { title: "Preferences", items: [
+      { icon: Palette, label: "Theme", action: () => setDialog("theme") },
+      { icon: Bell, label: "Notifications", action: () => setDialog("notifications") },
+      { icon: Accessibility, label: "Accessibility", action: () => setDialog("accessibility") },
+    ]},
+    { title: "Support", items: [
+      { icon: Mail, label: "Contact", action: () => setDialog("contact") },
+      { icon: MessageSquare, label: "Feedback", action: () => setDialog("feedback") },
+      { icon: Bug, label: "Report a Bug", action: () => setDialog("bug") },
+      { icon: Share2, label: "Share App", action: handleShare },
+      { icon: Star, label: "Rate Us", action: handleRate },
+      { icon: Heart, label: "Donate / Support", action: () => window.open("https://lovable.app", "_blank") },
+    ]},
+    { title: "Legal & build", items: [
+      { icon: Shield, label: "Privacy Policy", action: () => setDialog("privacy") },
+      { icon: FileText, label: "Terms of Use", action: () => setDialog("terms") },
+      { icon: Scale, label: "Open-source licenses", action: () => setDialog("licenses") },
+      { icon: Award, label: "Credits", action: () => setDialog("credits") },
+      { icon: History, label: "Changelog", action: () => setDialog("changelog") },
+      { icon: Tag, label: `Version ${APP_VERSION}`, action: () => setDialog("version") },
+      { icon: LogOut, label: "Reset Local Data", action: handleLogout, danger: true },
+    ]},
   ];
 
   return (
@@ -105,16 +114,22 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
             {APP_NAME}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {items.map((it, i) => (
-            <div key={i}>
-              <DropdownMenuItem
-                onClick={(e) => { e.preventDefault(); it.action(); }}
-                className={`gap-2.5 cursor-pointer ${it.danger ? "text-destructive focus:text-destructive" : ""}`}
-              >
-                <it.icon className="w-4 h-4 shrink-0" />
-                <span className="flex-1">{it.label}</span>
-              </DropdownMenuItem>
-              {it.sep && <DropdownMenuSeparator />}
+          {sections.map((section) => (
+            <div key={section.title}>
+              <DropdownMenuLabel className="text-[9px] tracking-[0.18em] uppercase text-muted-foreground/80">
+                {section.title}
+              </DropdownMenuLabel>
+              {section.items.map((it) => (
+                <DropdownMenuItem
+                  key={it.label}
+                  onClick={(e) => { e.preventDefault(); it.action(); }}
+                  className={`gap-2.5 cursor-pointer min-h-9 ${it.danger ? "text-destructive focus:text-destructive" : ""}`}
+                >
+                  <it.icon className="w-4 h-4 shrink-0" />
+                  <span className="flex-1 leading-tight">{it.label}</span>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
             </div>
           ))}
         </DropdownMenuContent>
@@ -160,8 +175,8 @@ function titleFor(id: DialogId): string {
     contact: "Contact us", faq: "Frequently Asked Questions", help: "Help & Support",
     feedback: "Send Feedback", version: "Version Information", changelog: "What's New",
     credits: "Credits & Acknowledgements", licenses: "Open-source Licenses",
-    language: "Language", theme: "Theme", notifications: "Notifications",
-    accessibility: "Accessibility", bug: "Report a Bug",
+    theme: "Theme", notifications: "Notifications",
+    accessibility: "Accessibility", bug: "Report a Bug", sources: "Scientific sources",
   };
   return map[id || ""] || "";
 }
@@ -179,10 +194,10 @@ function subtitleFor(id: DialogId): string {
     changelog: "Recent updates",
     credits: "People & sources",
     licenses: "Third-party software",
-    language: "Display language",
     theme: "Light or dark",
     notifications: "Manage alerts",
     accessibility: "Visual & motion preferences",
+    sources: "Guidelines and evidence boundaries",
     bug: "Tell us what went wrong",
   };
   return map[id || ""] || "";
@@ -245,10 +260,11 @@ function DialogBody({
   if (id === "faq") return (
     <ul className="space-y-3">
       {[
-        ["Is the content peer-reviewed?", "Each entry references major guidelines (ACOG, NICE, RCOG, WHO) where applicable."],
-        ["Does it work offline?", "Core scenarios are cached. Some features (AI chat, video) need internet."],
+        ["What are the main source families?", "Clinical entries are aligned with established guideline bodies where relevant: ACOG, RCOG, NICE, WHO and ESC."],
+        ["Is this a guideline replacement?", "No. It is an educational bedside reference. Always verify against local protocols and current official guidance."],
+        ["Does it work offline?", "Some interface data may remain available locally, but AI chat, videos and database updates need internet."],
         ["Can I bookmark items?", "Yes — use the bookmark icon on tools and surgeries."],
-        ["Is patient data sent anywhere?", "No. Calculators run locally on your device."],
+        ["Should patient identifiers be entered?", "No. Do not enter names, MRNs, phone numbers or identifiable patient data into free-text tools."],
       ].map(([q, a]) => (
         <li key={q}><p className="font-semibold">{q}</p><p className="text-muted-foreground">{a}</p></li>
       ))}
@@ -299,10 +315,10 @@ function DialogBody({
 
   if (id === "credits") return (
     <ul className="space-y-2">
-      <li>Clinical content curated by OB/GYN consultants.</li>
+      <li>Clinical content is structured as educational OB/GYN reference material.</li>
       <li>Icons by <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Lucide</a> & <a href="https://phosphoricons.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Phosphor</a>.</li>
-      <li>Built with React, Vite, Tailwind CSS, Supabase.</li>
-      <li>Guidelines from ACOG, RCOG, NICE, WHO, ESC.</li>
+      <li>Built with React, Vite, Tailwind CSS and Lovable Cloud.</li>
+      <li>Reference families used across the app include ACOG, RCOG, NICE, WHO and ESC where applicable.</li>
     </ul>
   );
 
@@ -314,17 +330,7 @@ function DialogBody({
     </ul>
   );
 
-  if (id === "language") return (
-    <div className="space-y-2">
-      <p className="text-muted-foreground text-xs">App content is currently in English. Arabic UI is partially supported.</p>
-      {["English", "العربية (Beta)"].map((l, i) => (
-        <button key={l} className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted">
-          <span>{l}</span>
-          {i === 0 && <Check className="w-4 h-4 text-primary" />}
-        </button>
-      ))}
-    </div>
-  );
+  if (id === "sources") return <ScientificSources />;
 
   if (id === "theme") return (
     <div className="space-y-2">
@@ -360,6 +366,37 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
     <div className="flex justify-between gap-3 py-1.5 border-b border-border/40">
       <span className="text-muted-foreground text-xs">{label}</span>
       <span className={`text-xs ${mono ? "font-mono" : ""} text-right break-all`}>{value}</span>
+    </div>
+  );
+}
+
+function ScientificSources() {
+  const sources = [
+    ["ACOG", "Practice Bulletins, Clinical Practice Guidelines and Committee Opinions for obstetrics and gynecology topics."],
+    ["RCOG", "Green-top Guidelines and patient-safety guidance for obstetric emergencies and operative practice."],
+    ["NICE", "Evidence-based UK guidance for antenatal care, diabetes, preterm birth and related pathways."],
+    ["WHO", "Global maternal health recommendations including postpartum hemorrhage and antenatal care guidance."],
+    ["ESC", "Cardiovascular guidance relevant to pregnancy-associated cardiac risk and thromboembolic care."],
+  ];
+  return (
+    <div className="space-y-3">
+      <p className="text-muted-foreground text-xs leading-relaxed">
+        The app should be treated as an educational clinical companion. It highlights topics and workflows, but it does not replace official guidelines, local hospital protocols, senior review, or individualized patient assessment.
+      </p>
+      <div className="space-y-2">
+        {sources.map(([name, note]) => (
+          <div key={name} className="rounded-lg border border-border/70 bg-muted/30 p-3">
+            <p className="font-bold text-foreground flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-primary" />
+              {name}
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed mt-1">{note}</p>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs font-semibold text-foreground/80">
+        No generated image, protocol, AI answer, or summary should be considered authoritative unless verified against the current source document and local policy.
+      </p>
     </div>
   );
 }
