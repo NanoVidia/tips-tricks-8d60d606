@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { AIChatDrawer } from "@/components/AIChatDrawer";
 import { ScenarioCard } from "@/components/ScenarioCard";
+import { ClinicalSearchResultCard } from "@/components/ClinicalSearchResultCard";
 import { ScenarioSheet } from "@/components/ScenarioSheet";
 import { Pagination } from "@/components/Pagination";
 import { StatsStrip } from "@/components/StatsStrip";
@@ -33,6 +34,7 @@ import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2, AlertTriangle, AlertCircle, ShieldCheck } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { detectUrgency, URGENCY_WEIGHT, URGENCY_LABEL, type Urgency } from "@/lib/clinicalTags";
+import { rankSearchScenarios } from "@/lib/clinicalSearch";
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
@@ -124,7 +126,6 @@ export default function Index() {
   const [allSearchResults, setAllSearchResults] = useState<Scenario[]>([]);
   const [searchCatFilter, setSearchCatFilter] = useState<ScenarioCategory | null>(null);
   const [urgencyFilter, setUrgencyFilter] = useState<Urgency | null>(null);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<ScenarioCategory>>(new Set());
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
