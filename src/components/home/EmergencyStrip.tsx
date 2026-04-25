@@ -46,7 +46,7 @@ export function EmergencyStrip({ onPick }: Props) {
         transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <div className="flex items-center justify-between mb-3 px-0.5 gap-2">
+      <div className="flex items-start justify-between mb-4 px-0.5 gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <motion.span
             className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-red-500/25 ring-1 ring-red-400/40 shrink-0"
@@ -55,11 +55,11 @@ export function EmergencyStrip({ onPick }: Props) {
           >
             <Siren className="w-3.5 h-3.5 text-red-200" strokeWidth={2.5} />
           </motion.span>
-          <div className="min-w-0">
-            <p className="text-[14px] font-black uppercase tracking-[0.18em] text-red-100 leading-none">
+          <div className="min-w-0 space-y-1.5 pt-0.5">
+            <p className="text-[14px] font-black uppercase tracking-[0.18em] text-red-100 leading-[1.2]">
               Emergency Protocols
             </p>
-            <p className="text-[10.5px] font-semibold text-red-200/80 tracking-wide mt-1 leading-none">
+            <p className="text-[10.5px] font-semibold text-red-200/80 tracking-wide leading-[1.35]">
               One-tap lifesaving access
             </p>
           </div>
