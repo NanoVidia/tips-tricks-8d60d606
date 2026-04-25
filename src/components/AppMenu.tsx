@@ -175,8 +175,8 @@ function titleFor(id: DialogId): string {
     contact: "Contact us", faq: "Frequently Asked Questions", help: "Help & Support",
     feedback: "Send Feedback", version: "Version Information", changelog: "What's New",
     credits: "Credits & Acknowledgements", licenses: "Open-source Licenses",
-    language: "Language", theme: "Theme", notifications: "Notifications",
-    accessibility: "Accessibility", bug: "Report a Bug",
+    theme: "Theme", notifications: "Notifications",
+    accessibility: "Accessibility", bug: "Report a Bug", sources: "Scientific sources",
   };
   return map[id || ""] || "";
 }
@@ -194,10 +194,10 @@ function subtitleFor(id: DialogId): string {
     changelog: "Recent updates",
     credits: "People & sources",
     licenses: "Third-party software",
-    language: "Display language",
     theme: "Light or dark",
     notifications: "Manage alerts",
     accessibility: "Visual & motion preferences",
+    sources: "Guidelines and evidence boundaries",
     bug: "Tell us what went wrong",
   };
   return map[id || ""] || "";
