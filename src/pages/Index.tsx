@@ -1127,66 +1127,23 @@ export default function Index() {
             )}
 
             {isSearching ? (
-              <div className="space-y-4">
-                {groupedResults.map(({ cat, items }) => {
-                  const cfg = categoryConfig[cat];
-                  const collapsed = collapsedGroups.has(cat);
-                  return (
-                    <section key={cat} className="rounded-2xl border border-border/60 bg-card/40 overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => toggleGroup(cat)}
-                        aria-expanded={!collapsed}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-muted/40 transition"
-                      >
-                        <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
-                          <PhIcon name={cfg.phName as never} size={13} tone="white" weight="duotone" />
-                        </div>
-                        <h3 className="flex-1 text-left text-[13px] font-bold text-foreground truncate">
-                          {tabLabel(cat)}
-                        </h3>
-                        <span className="text-[10px] tabular-nums font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                          {formatNumber(items.length)}
-                        </span>
-                        <ChevronRight
-                          className={`w-4 h-4 text-muted-foreground transition-transform ${
-                            collapsed ? "" : "rotate-90"
-                          }`}
-                        />
-                      </button>
-                      <AnimatePresence initial={false}>
-                        {!collapsed && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                            className="overflow-hidden"
-                          >
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 pt-1">
-                              {items.map((item, idx) => (
-                                <ScenarioCard
-                                  key={item.id}
-                                  id={item.id}
-                                  title={item.title_en}
-                                  situation={item.situation_en}
-                                  category={item.category}
-                                  index={idx}
-                                  onOpen={() => openScenarioSheet(item)}
-                                  categoryConfig={categoryConfig}
-                                  highlight={debouncedSearch}
-                                  action={item.action_en}
-                                  script={item.script_en}
-                                  synonyms={item.synonyms}
-                                />
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </section>
-                  );
-                })}
+              <div className="space-y-3">
+                <div className="rounded-2xl border border-info/20 bg-info-soft/70 px-3.5 py-3 flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-info mt-0.5 shrink-0" strokeWidth={2.5} />
+                  <p className="text-[11px] leading-relaxed text-foreground/80 font-semibold">
+                    النتائج مرتّبة حسب صلة العنوان والمترادفات والسياق السريري، مع إبراز الحالات الأعلى أولوية أولاً.
+                  </p>
+                </div>
+                {filteredSearchResults.map((item, idx) => (
+                  <ClinicalSearchResultCard
+                    key={item.id}
+                    scenario={item}
+                    index={idx}
+                    onOpen={() => openScenarioSheet(item)}
+                    categoryConfig={categoryConfig}
+                    categoryLabel={tabLabel(item.category)}
+                  />
+                ))}
               </div>
             ) : (
               <>
