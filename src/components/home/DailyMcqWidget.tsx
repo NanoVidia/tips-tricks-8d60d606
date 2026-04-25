@@ -96,17 +96,17 @@ export function DailyMcqWidget() {
       />
 
       <div className="relative p-3.5">
-        <div className="flex items-center justify-between mb-2.5">
-          <div className="flex items-center gap-1.5">
+        <div className="flex items-start justify-between mb-3.5 gap-2">
+          <div className="flex items-start gap-1.5 min-w-0">
             <span className="inline-flex w-6 h-6 items-center justify-center rounded-md bg-violet-500/25 ring-1 ring-violet-400/40">
               <Brain className="w-3.5 h-3.5 text-violet-200" />
             </span>
-            <span className="text-[13px] font-black uppercase tracking-[0.18em] text-violet-100">
+            <span className="text-[13px] font-black uppercase tracking-[0.18em] text-violet-100 leading-[1.2] pt-0.5">
               Today's MCQ
             </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-violet-200/80">
+          <div className="flex items-center gap-1.5 flex-wrap justify-end pt-0.5">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-violet-200/80 leading-[1.25]">
               {mcq.topic}
             </span>
             <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-100 border border-violet-400/30">
