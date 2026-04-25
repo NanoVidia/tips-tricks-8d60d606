@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { AIChatDrawer } from "@/components/AIChatDrawer";
 import { ScenarioCard } from "@/components/ScenarioCard";
+import { ClinicalSearchResultCard } from "@/components/ClinicalSearchResultCard";
 import { ScenarioSheet } from "@/components/ScenarioSheet";
 import { Pagination } from "@/components/Pagination";
 import { StatsStrip } from "@/components/StatsStrip";
@@ -33,6 +34,7 @@ import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2, AlertTriangle, AlertCircle, ShieldCheck } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { detectUrgency, URGENCY_WEIGHT, URGENCY_LABEL, type Urgency } from "@/lib/clinicalTags";
+import { rankSearchScenarios } from "@/lib/clinicalSearch";
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
@@ -124,7 +126,6 @@ export default function Index() {
   const [allSearchResults, setAllSearchResults] = useState<Scenario[]>([]);
   const [searchCatFilter, setSearchCatFilter] = useState<ScenarioCategory | null>(null);
   const [urgencyFilter, setUrgencyFilter] = useState<Urgency | null>(null);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<ScenarioCategory>>(new Set());
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -272,79 +273,7 @@ export default function Index() {
         if (error) throw error;
         const raw = (data as Scenario[]) || [];
 
-        // Strict relevance ranking — drop noise, keep only on-topic matches.
-        // Tokens shorter than 3 chars are dropped (and common English stop-words),
-        // we require EVERY meaningful token to match somewhere in the doc (AND),
-        // and we require the match to land in a high-signal field (title /
-        // synonyms / situation) — a hit only in `action_en` is treated as noise.
-        const STOP = new Set([
-          "the","a","an","and","or","of","for","to","in","on","at","by","is","are",
-          "with","from","as","be","this","that","it","its","into","over","under",
-        ]);
-        const tokens = q
-          .toLowerCase()
-          .split(/\s+/)
-          .map((t) => t.replace(/[^\p{L}\p{N}+/-]/gu, ""))
-          .filter((t) => t.length >= 3 && !STOP.has(t));
-        // Fall back to original behaviour if the cleaned token list is empty
-        // (e.g. user typed a single 2-char acronym like "EL").
-        const effectiveTokens =
-          tokens.length > 0
-            ? tokens
-            : q.toLowerCase().split(/\s+/).filter((t) => t.length >= 2);
-
-        const scoreOf = (s: Scenario, strict: boolean) => {
-          const title = (s.title_en || "").toLowerCase();
-          const sit = (s.situation_en || "").toLowerCase();
-          const act = (s.action_en || "").toLowerCase();
-          const syn = (s.synonyms || []).join(" ").toLowerCase();
-          let score = 0;
-          let signalHits = 0; // hits in title/synonyms/situation
-          let matchedTokens = 0;
-          for (const tok of effectiveTokens) {
-            const inTitle = title.includes(tok);
-            const inSyn = syn.includes(tok);
-            const inSit = sit.includes(tok);
-            const inAct = act.includes(tok);
-            if (inTitle) score += 8;
-            if (inSyn)   score += 5;
-            if (inSit)   score += 3;
-            if (inAct)   score += 1;
-            if (inTitle || inSyn || inSit) signalHits++;
-            if (inTitle || inSyn || inSit || inAct) matchedTokens++;
-            if (title === tok) score += 12;
-          }
-          if (strict) {
-            // Strict AND: every meaningful token must appear *somewhere*.
-            if (matchedTokens < effectiveTokens.length) return 0;
-            // At least one match must be in a high-signal field (no action-only noise).
-            if (signalHits === 0) return 0;
-          } else {
-            // Lenient: require at least one signal hit, but accept partial matches.
-            if (signalHits === 0 && matchedTokens === 0) return 0;
-          }
-          // Heavy bonus for full-phrase match in title
-          if (effectiveTokens.length > 1 && title.includes(q.toLowerCase())) score += 20;
-          // Bonus if the title *starts* with the query — best UX signal.
-          if (title.startsWith(q.toLowerCase())) score += 15;
-          return score;
-        };
-        // First pass — strict relevance.
-        let ranked = raw
-          .map((s) => ({ s, score: scoreOf(s, true), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
-          .filter((x) => x.score >= 5)
-          .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
-          .map((x) => x.s);
-        // Fallback — if strict produced nothing, do a forgiving second pass so
-        // the user still sees the closest available matches instead of an
-        // empty screen.
-        if (ranked.length === 0) {
-          ranked = raw
-            .map((s) => ({ s, score: scoreOf(s, false), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
-            .filter((x) => x.score >= 3)
-            .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
-            .map((x) => x.s);
-        }
+        const ranked = rankSearchScenarios(q, raw);
 
         setAllSearchResults(ranked);
         setTotalCount(ranked.length);
@@ -378,11 +307,10 @@ export default function Index() {
 
   useEffect(() => { fetchScenarios(); }, [fetchScenarios]);
 
-  // Reset category/urgency filters & expand all groups when search query changes
+  // Reset category/urgency filters when search query changes
   useEffect(() => {
     setSearchCatFilter(null);
     setUrgencyFilter(null);
-    setCollapsedGroups(new Set());
   }, [debouncedSearch]);
 
   // Per-category counts within current search results
@@ -405,24 +333,6 @@ export default function Index() {
     if (urgencyFilter && detectUrgency(s) !== urgencyFilter) return false;
     return true;
   });
-
-  // Group filtered results by category, preserving rank order
-  const groupedResults = (() => {
-    const groups: Record<ScenarioCategory, Scenario[]> = { clinic: [], or_labor: [], behavior: [], qa: [] };
-    for (const s of filteredSearchResults) groups[s.category].push(s);
-    return tabIds
-      .map((cat) => ({ cat, items: groups[cat] }))
-      .filter((g) => g.items.length > 0);
-  })();
-
-  const toggleGroup = (cat: ScenarioCategory) => {
-    setCollapsedGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(cat)) next.delete(cat);
-      else next.add(cat);
-      return next;
-    });
-  };
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
@@ -1217,66 +1127,23 @@ export default function Index() {
             )}
 
             {isSearching ? (
-              <div className="space-y-4">
-                {groupedResults.map(({ cat, items }) => {
-                  const cfg = categoryConfig[cat];
-                  const collapsed = collapsedGroups.has(cat);
-                  return (
-                    <section key={cat} className="rounded-2xl border border-border/60 bg-card/40 overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => toggleGroup(cat)}
-                        aria-expanded={!collapsed}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-muted/40 transition"
-                      >
-                        <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
-                          <PhIcon name={cfg.phName as never} size={13} tone="white" weight="duotone" />
-                        </div>
-                        <h3 className="flex-1 text-left text-[13px] font-bold text-foreground truncate">
-                          {tabLabel(cat)}
-                        </h3>
-                        <span className="text-[10px] tabular-nums font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                          {formatNumber(items.length)}
-                        </span>
-                        <ChevronRight
-                          className={`w-4 h-4 text-muted-foreground transition-transform ${
-                            collapsed ? "" : "rotate-90"
-                          }`}
-                        />
-                      </button>
-                      <AnimatePresence initial={false}>
-                        {!collapsed && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                            className="overflow-hidden"
-                          >
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 pt-1">
-                              {items.map((item, idx) => (
-                                <ScenarioCard
-                                  key={item.id}
-                                  id={item.id}
-                                  title={item.title_en}
-                                  situation={item.situation_en}
-                                  category={item.category}
-                                  index={idx}
-                                  onOpen={() => openScenarioSheet(item)}
-                                  categoryConfig={categoryConfig}
-                                  highlight={debouncedSearch}
-                                  action={item.action_en}
-                                  script={item.script_en}
-                                  synonyms={item.synonyms}
-                                />
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </section>
-                  );
-                })}
+              <div className="space-y-3">
+                <div className="rounded-2xl border border-info/20 bg-info-soft/70 px-3.5 py-3 flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-info mt-0.5 shrink-0" strokeWidth={2.5} />
+                  <p className="text-[11px] leading-relaxed text-foreground/80 font-semibold">
+                    النتائج مرتّبة حسب صلة العنوان والمترادفات والسياق السريري، مع إبراز الحالات الأعلى أولوية أولاً.
+                  </p>
+                </div>
+                {filteredSearchResults.map((item, idx) => (
+                  <ClinicalSearchResultCard
+                    key={item.id}
+                    scenario={item}
+                    index={idx}
+                    onOpen={() => openScenarioSheet(item)}
+                    categoryConfig={categoryConfig}
+                    categoryLabel={tabLabel(item.category)}
+                  />
+                ))}
               </div>
             ) : (
               <>
