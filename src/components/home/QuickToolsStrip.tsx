@@ -29,14 +29,14 @@ export function QuickToolsStrip() {
       animate={{ y: 0, opacity: 1 }}
       transition={springTransition}
       aria-label="Quick clinical tools"
-      className="space-y-2.5"
+      className="space-y-3.5"
     >
-      <div className="flex items-end justify-between px-1 gap-2">
-        <div className="min-w-0">
-          <p className="text-[14px] font-black uppercase tracking-[0.18em] text-foreground leading-none">
+      <div className="flex items-start justify-between px-1 gap-2">
+        <div className="min-w-0 space-y-1.5">
+          <p className="text-[14px] font-black uppercase tracking-[0.18em] text-foreground leading-[1.2]">
             Clinical Tools
           </p>
-          <p className="text-[10.5px] text-muted-foreground mt-1.5 leading-none">
+          <p className="text-[10.5px] text-muted-foreground leading-[1.35]">
             Calculators, drug safety & guidelines
           </p>
         </div>

@@ -149,12 +149,12 @@ export function SmartBottomSheet({
             </button>
 
             {/* Header */}
-            <div className="px-5 pb-3 flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+            <div className="px-5 pb-4 flex items-start justify-between gap-2">
+              <div className="min-w-0 space-y-1.5">
+                <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-muted-foreground leading-[1.25]">
                   Smart hub
                 </p>
-                <h2 className="text-[15px] font-bold leading-tight truncate">{tabLabel}</h2>
+                <h2 className="text-[15px] font-bold leading-[1.25] break-words">{tabLabel}</h2>
               </div>
               <button
                 type="button"
