@@ -22,7 +22,12 @@ const TOOLS: Tool[] = [
 ];
 
 /** Quick access strip to clinical reference tools. */
-export function QuickToolsStrip() {
+interface Props {
+  textScale?: { section: string; sub: string; card: string; hint: string };
+}
+
+export function QuickToolsStrip({ textScale }: Props) {
+  const scale = textScale ?? { section: "text-[14px]", sub: "text-[10.5px]", card: "text-[11.5px]", hint: "text-[9.5px]" };
   return (
     <motion.section
       initial={{ y: 10, opacity: 0 }}
@@ -33,10 +38,10 @@ export function QuickToolsStrip() {
     >
       <div className="flex items-start justify-between px-1 gap-2">
         <div className="min-w-0 space-y-1.5">
-          <p className="text-[14px] font-black uppercase tracking-[0.18em] text-foreground leading-[1.2]">
+          <p className={`${scale.section} font-black uppercase tracking-[0.18em] text-foreground leading-[1.2]`}>
             Clinical Tools
           </p>
-          <p className="text-[10.5px] text-muted-foreground leading-[1.35]">
+          <p className={`${scale.sub} text-muted-foreground leading-[1.35]`}>
             Calculators, drug safety & guidelines
           </p>
         </div>
@@ -66,8 +71,8 @@ export function QuickToolsStrip() {
                 <t.Icon className="w-4 h-4" strokeWidth={2} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[11.5px] font-bold text-foreground leading-tight break-words">{t.label}</p>
-                <p className="text-[9.5px] text-muted-foreground leading-tight mt-0.5 truncate">{t.hint}</p>
+                <p className={`${scale.card} font-bold text-foreground leading-[1.2] break-words`}>{t.label}</p>
+                <p className={`${scale.hint} text-muted-foreground leading-[1.25] mt-1 truncate`}>{t.hint}</p>
               </div>
             </Link>
           </motion.div>
