@@ -273,79 +273,7 @@ export default function Index() {
         if (error) throw error;
         const raw = (data as Scenario[]) || [];
 
-        // Strict relevance ranking — drop noise, keep only on-topic matches.
-        // Tokens shorter than 3 chars are dropped (and common English stop-words),
-        // we require EVERY meaningful token to match somewhere in the doc (AND),
-        // and we require the match to land in a high-signal field (title /
-        // synonyms / situation) — a hit only in `action_en` is treated as noise.
-        const STOP = new Set([
-          "the","a","an","and","or","of","for","to","in","on","at","by","is","are",
-          "with","from","as","be","this","that","it","its","into","over","under",
-        ]);
-        const tokens = q
-          .toLowerCase()
-          .split(/\s+/)
-          .map((t) => t.replace(/[^\p{L}\p{N}+/-]/gu, ""))
-          .filter((t) => t.length >= 3 && !STOP.has(t));
-        // Fall back to original behaviour if the cleaned token list is empty
-        // (e.g. user typed a single 2-char acronym like "EL").
-        const effectiveTokens =
-          tokens.length > 0
-            ? tokens
-            : q.toLowerCase().split(/\s+/).filter((t) => t.length >= 2);
-
-        const scoreOf = (s: Scenario, strict: boolean) => {
-          const title = (s.title_en || "").toLowerCase();
-          const sit = (s.situation_en || "").toLowerCase();
-          const act = (s.action_en || "").toLowerCase();
-          const syn = (s.synonyms || []).join(" ").toLowerCase();
-          let score = 0;
-          let signalHits = 0; // hits in title/synonyms/situation
-          let matchedTokens = 0;
-          for (const tok of effectiveTokens) {
-            const inTitle = title.includes(tok);
-            const inSyn = syn.includes(tok);
-            const inSit = sit.includes(tok);
-            const inAct = act.includes(tok);
-            if (inTitle) score += 8;
-            if (inSyn)   score += 5;
-            if (inSit)   score += 3;
-            if (inAct)   score += 1;
-            if (inTitle || inSyn || inSit) signalHits++;
-            if (inTitle || inSyn || inSit || inAct) matchedTokens++;
-            if (title === tok) score += 12;
-          }
-          if (strict) {
-            // Strict AND: every meaningful token must appear *somewhere*.
-            if (matchedTokens < effectiveTokens.length) return 0;
-            // At least one match must be in a high-signal field (no action-only noise).
-            if (signalHits === 0) return 0;
-          } else {
-            // Lenient: require at least one signal hit, but accept partial matches.
-            if (signalHits === 0 && matchedTokens === 0) return 0;
-          }
-          // Heavy bonus for full-phrase match in title
-          if (effectiveTokens.length > 1 && title.includes(q.toLowerCase())) score += 20;
-          // Bonus if the title *starts* with the query — best UX signal.
-          if (title.startsWith(q.toLowerCase())) score += 15;
-          return score;
-        };
-        // First pass — strict relevance.
-        let ranked = raw
-          .map((s) => ({ s, score: scoreOf(s, true), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
-          .filter((x) => x.score >= 5)
-          .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
-          .map((x) => x.s);
-        // Fallback — if strict produced nothing, do a forgiving second pass so
-        // the user still sees the closest available matches instead of an
-        // empty screen.
-        if (ranked.length === 0) {
-          ranked = raw
-            .map((s) => ({ s, score: scoreOf(s, false), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
-            .filter((x) => x.score >= 3)
-            .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
-            .map((x) => x.s);
-        }
+        const ranked = rankSearchScenarios(q, raw);
 
         setAllSearchResults(ranked);
         setTotalCount(ranked.length);
@@ -379,11 +307,10 @@ export default function Index() {
 
   useEffect(() => { fetchScenarios(); }, [fetchScenarios]);
 
-  // Reset category/urgency filters & expand all groups when search query changes
+  // Reset category/urgency filters when search query changes
   useEffect(() => {
     setSearchCatFilter(null);
     setUrgencyFilter(null);
-    setCollapsedGroups(new Set());
   }, [debouncedSearch]);
 
   // Per-category counts within current search results
@@ -406,24 +333,6 @@ export default function Index() {
     if (urgencyFilter && detectUrgency(s) !== urgencyFilter) return false;
     return true;
   });
-
-  // Group filtered results by category, preserving rank order
-  const groupedResults = (() => {
-    const groups: Record<ScenarioCategory, Scenario[]> = { clinic: [], or_labor: [], behavior: [], qa: [] };
-    for (const s of filteredSearchResults) groups[s.category].push(s);
-    return tabIds
-      .map((cat) => ({ cat, items: groups[cat] }))
-      .filter((g) => g.items.length > 0);
-  })();
-
-  const toggleGroup = (cat: ScenarioCategory) => {
-    setCollapsedGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(cat)) next.delete(cat);
-      else next.add(cat);
-      return next;
-    });
-  };
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
