@@ -260,10 +260,11 @@ function DialogBody({
   if (id === "faq") return (
     <ul className="space-y-3">
       {[
-        ["Is the content peer-reviewed?", "Each entry references major guidelines (ACOG, NICE, RCOG, WHO) where applicable."],
-        ["Does it work offline?", "Core scenarios are cached. Some features (AI chat, video) need internet."],
+        ["What are the main source families?", "Clinical entries are aligned with established guideline bodies where relevant: ACOG, RCOG, NICE, WHO and ESC."],
+        ["Is this a guideline replacement?", "No. It is an educational bedside reference. Always verify against local protocols and current official guidance."],
+        ["Does it work offline?", "Some interface data may remain available locally, but AI chat, videos and database updates need internet."],
         ["Can I bookmark items?", "Yes — use the bookmark icon on tools and surgeries."],
-        ["Is patient data sent anywhere?", "No. Calculators run locally on your device."],
+        ["Should patient identifiers be entered?", "No. Do not enter names, MRNs, phone numbers or identifiable patient data into free-text tools."],
       ].map(([q, a]) => (
         <li key={q}><p className="font-semibold">{q}</p><p className="text-muted-foreground">{a}</p></li>
       ))}
@@ -314,10 +315,10 @@ function DialogBody({
 
   if (id === "credits") return (
     <ul className="space-y-2">
-      <li>Clinical content curated by OB/GYN consultants.</li>
+      <li>Clinical content is structured as educational OB/GYN reference material.</li>
       <li>Icons by <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Lucide</a> & <a href="https://phosphoricons.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Phosphor</a>.</li>
-      <li>Built with React, Vite, Tailwind CSS, Supabase.</li>
-      <li>Guidelines from ACOG, RCOG, NICE, WHO, ESC.</li>
+      <li>Built with React, Vite, Tailwind CSS and Lovable Cloud.</li>
+      <li>Reference families used across the app include ACOG, RCOG, NICE, WHO and ESC where applicable.</li>
     </ul>
   );
 
