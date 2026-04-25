@@ -23,13 +23,15 @@ const EMERGENCIES: Emergency[] = [
 
 interface Props {
   onPick: (query: string) => void;
+  textScale?: { section: string; sub: string; card: string; hint: string };
 }
 
 /**
  * High-priority emergency strip — single-tap access to lifesaving protocols.
  * Designed for time-critical retrieval: bold colour, no nesting, instant feedback.
  */
-export function EmergencyStrip({ onPick }: Props) {
+export function EmergencyStrip({ onPick, textScale }: Props) {
+  const scale = textScale ?? { section: "text-[14px]", sub: "text-[10.5px]", card: "text-[12px]", hint: "text-[9.5px]" };
   return (
     <motion.section
       initial={{ y: 8, opacity: 0 }}
@@ -56,10 +58,10 @@ export function EmergencyStrip({ onPick }: Props) {
             <Siren className="w-3.5 h-3.5 text-red-200" strokeWidth={2.5} />
           </motion.span>
           <div className="min-w-0 space-y-1.5 pt-0.5">
-            <p className="text-[14px] font-black uppercase tracking-[0.18em] text-red-100 leading-[1.2]">
+            <p className={`${scale.section} font-black uppercase tracking-[0.18em] text-red-100 leading-[1.2]`}>
               Emergency Protocols
             </p>
-            <p className="text-[10.5px] font-semibold text-red-200/80 tracking-wide leading-[1.35]">
+            <p className={`${scale.sub} font-semibold text-red-200/80 tracking-wide leading-[1.35]`}>
               One-tap lifesaving access
             </p>
           </div>
@@ -83,13 +85,13 @@ export function EmergencyStrip({ onPick }: Props) {
             <div className="flex items-start gap-2">
               <span className="text-[18px] leading-none shrink-0 mt-0.5">{e.emoji}</span>
               <div className="min-w-0 flex-1">
-                <p className="text-white font-black text-[12px] leading-tight break-words">
+                <p className={`text-white font-black ${scale.card} leading-[1.2] break-words`}>
                   {e.abbr} <span className="text-red-200/80 font-bold">/</span> {e.nameEn}
                 </p>
-                <p className="text-red-100/85 text-[10px] leading-tight mt-1 font-semibold break-words" dir="rtl">
+                <p className={`text-red-100/85 ${scale.hint} leading-[1.25] mt-1 font-semibold break-words`} dir="rtl">
                   {e.nameAr}
                 </p>
-                <p className="text-red-200/85 text-[9.5px] leading-tight mt-1 font-mono break-words">
+                <p className={`text-red-200/85 ${scale.hint} leading-[1.25] mt-1 font-mono break-words`}>
                   {e.protocol}
                 </p>
               </div>
