@@ -329,17 +329,7 @@ function DialogBody({
     </ul>
   );
 
-  if (id === "language") return (
-    <div className="space-y-2">
-      <p className="text-muted-foreground text-xs">App content is currently in English. Arabic UI is partially supported.</p>
-      {["English", "العربية (Beta)"].map((l, i) => (
-        <button key={l} className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted">
-          <span>{l}</span>
-          {i === 0 && <Check className="w-4 h-4 text-primary" />}
-        </button>
-      ))}
-    </div>
-  );
+  if (id === "sources") return <ScientificSources />;
 
   if (id === "theme") return (
     <div className="space-y-2">
