@@ -4,6 +4,7 @@ import {
   MoreVertical, Info, Shield, FileText, Mail, HelpCircle, LifeBuoy,
   MessageSquare, Star, Share2, Tag, History, Award, Scale, Languages,
   Palette, Bell, Accessibility, Bug, LogOut, ExternalLink, Check, Heart,
+  BookOpen, Stethoscope, ClipboardCheck,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -23,7 +24,7 @@ const APP_NAME = "Tips & Tricks — OB/GYN";
 type DialogId =
   | "about" | "privacy" | "terms" | "contact" | "faq" | "help"
   | "feedback" | "version" | "changelog" | "credits" | "licenses"
-  | "language" | "theme" | "notifications" | "accessibility" | "bug" | null;
+  | "theme" | "notifications" | "accessibility" | "bug" | "sources" | null;
 
 interface Props {
   dark: boolean;
@@ -66,27 +67,35 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
     setTimeout(() => window.location.reload(), 600);
   };
 
-  const items: Array<{ icon: any; label: string; action: () => void; danger?: boolean; sep?: boolean }> = [
-    { icon: Info, label: "About", action: () => setDialog("about") },
-    { icon: HelpCircle, label: "FAQ", action: () => setDialog("faq") },
-    { icon: LifeBuoy, label: "Help & Support", action: () => setDialog("help") },
-    { icon: MessageSquare, label: "Feedback", action: () => setDialog("feedback"), sep: true },
-    { icon: Mail, label: "Contact", action: () => setDialog("contact") },
-    { icon: Share2, label: "Share App", action: handleShare },
-    { icon: Star, label: "Rate Us", action: handleRate },
-    { icon: Heart, label: "Donate / Support", action: () => window.open("https://lovable.app", "_blank"), sep: true },
-    { icon: Languages, label: "Language", action: () => setDialog("language") },
-    { icon: Palette, label: "Theme", action: () => setDialog("theme") },
-    { icon: Bell, label: "Notifications", action: () => setDialog("notifications") },
-    { icon: Accessibility, label: "Accessibility", action: () => setDialog("accessibility"), sep: true },
-    { icon: Shield, label: "Privacy Policy", action: () => setDialog("privacy") },
-    { icon: FileText, label: "Terms of Use", action: () => setDialog("terms") },
-    { icon: Scale, label: "Licenses", action: () => setDialog("licenses") },
-    { icon: Award, label: "Credits", action: () => setDialog("credits") },
-    { icon: History, label: "Changelog", action: () => setDialog("changelog") },
-    { icon: Bug, label: "Report a Bug", action: () => setDialog("bug") },
-    { icon: Tag, label: `Version ${APP_VERSION}`, action: () => setDialog("version"), sep: true },
-    { icon: LogOut, label: "Reset Local Data", action: handleLogout, danger: true },
+  const sections: Array<{ title: string; items: Array<{ icon: any; label: string; action: () => void; danger?: boolean }> }> = [
+    { title: "Clinical reference", items: [
+      { icon: Info, label: "About this app", action: () => setDialog("about") },
+      { icon: ClipboardCheck, label: "Scientific sources", action: () => setDialog("sources") },
+      { icon: HelpCircle, label: "Clinical FAQ", action: () => setDialog("faq") },
+      { icon: LifeBuoy, label: "How to use", action: () => setDialog("help") },
+    ]},
+    { title: "Preferences", items: [
+      { icon: Palette, label: "Theme", action: () => setDialog("theme") },
+      { icon: Bell, label: "Notifications", action: () => setDialog("notifications") },
+      { icon: Accessibility, label: "Accessibility", action: () => setDialog("accessibility") },
+    ]},
+    { title: "Support", items: [
+      { icon: Mail, label: "Contact", action: () => setDialog("contact") },
+      { icon: MessageSquare, label: "Feedback", action: () => setDialog("feedback") },
+      { icon: Bug, label: "Report a Bug", action: () => setDialog("bug") },
+      { icon: Share2, label: "Share App", action: handleShare },
+      { icon: Star, label: "Rate Us", action: handleRate },
+      { icon: Heart, label: "Donate / Support", action: () => window.open("https://lovable.app", "_blank") },
+    ]},
+    { title: "Legal & build", items: [
+      { icon: Shield, label: "Privacy Policy", action: () => setDialog("privacy") },
+      { icon: FileText, label: "Terms of Use", action: () => setDialog("terms") },
+      { icon: Scale, label: "Open-source licenses", action: () => setDialog("licenses") },
+      { icon: Award, label: "Credits", action: () => setDialog("credits") },
+      { icon: History, label: "Changelog", action: () => setDialog("changelog") },
+      { icon: Tag, label: `Version ${APP_VERSION}`, action: () => setDialog("version") },
+      { icon: LogOut, label: "Reset Local Data", action: handleLogout, danger: true },
+    ]},
   ];
 
   return (
