@@ -114,16 +114,22 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
             {APP_NAME}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {items.map((it, i) => (
-            <div key={i}>
-              <DropdownMenuItem
-                onClick={(e) => { e.preventDefault(); it.action(); }}
-                className={`gap-2.5 cursor-pointer ${it.danger ? "text-destructive focus:text-destructive" : ""}`}
-              >
-                <it.icon className="w-4 h-4 shrink-0" />
-                <span className="flex-1">{it.label}</span>
-              </DropdownMenuItem>
-              {it.sep && <DropdownMenuSeparator />}
+          {sections.map((section) => (
+            <div key={section.title}>
+              <DropdownMenuLabel className="text-[9px] tracking-[0.18em] uppercase text-muted-foreground/80">
+                {section.title}
+              </DropdownMenuLabel>
+              {section.items.map((it) => (
+                <DropdownMenuItem
+                  key={it.label}
+                  onClick={(e) => { e.preventDefault(); it.action(); }}
+                  className={`gap-2.5 cursor-pointer min-h-9 ${it.danger ? "text-destructive focus:text-destructive" : ""}`}
+                >
+                  <it.icon className="w-4 h-4 shrink-0" />
+                  <span className="flex-1 leading-tight">{it.label}</span>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
             </div>
           ))}
         </DropdownMenuContent>
