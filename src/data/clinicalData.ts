@@ -1,13 +1,13 @@
 export interface ClinicalItem {
   id: string;
   title: string;
-  titleAr: string;,
+  titleAr: string;
   situation: string;
-  situationAr: string;,
+  situationAr: string;
   action: string;
-  actionAr: string;,
+  actionAr: string;
   script: string;
-  scriptAr: string;,
+  scriptAr: string;
 }
 
 export const clinicData: ClinicalItem[] = [
