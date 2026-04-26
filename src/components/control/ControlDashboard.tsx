@@ -18,7 +18,9 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { adminStats, ADMIN_TABLES_META, type AdminTable } from "@/lib/adminApi";
+import { ALL_MCQS } from "@/data/mcqBank";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Languages,
@@ -49,6 +51,12 @@ export default function ControlDashboard({
 
   const counts = data?.counts ?? {};
   const total = Object.values(counts).reduce((s, n) => s + n, 0);
+  const targetMcqs = 1000;
+  const shortExplanationCount = ALL_MCQS.filter((q) => q.explanation.trim().length < 80).length;
+  const weakReferenceCount = ALL_MCQS.filter((q) => !q.reference || q.reference.trim().length < 8).length;
+  const qualityReadyMcqs = Math.max(0, ALL_MCQS.length - shortExplanationCount - weakReferenceCount);
+  const rawProgress = Math.round((ALL_MCQS.length / targetMcqs) * 100);
+  const qualityProgress = Math.round((qualityReadyMcqs / targetMcqs) * 100);
 
   return (
     <div className="space-y-6">
@@ -103,6 +111,45 @@ export default function ControlDashboard({
           );
         })}
       </div>
+
+      <Card className="border-primary/20 bg-primary/5">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <HelpCircle className="h-4 w-4 text-primary" />
+            Content quality toward 1000 MCQs
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-4">
+            <div className="rounded-md border bg-card p-3">
+              <p className="text-[11px] text-muted-foreground">Total MCQs</p>
+              <p className="text-2xl font-bold tabular-nums">{ALL_MCQS.length}</p>
+              <p className="text-[11px] text-muted-foreground">Gap: {Math.max(0, targetMcqs - ALL_MCQS.length)}</p>
+            </div>
+            <div className="rounded-md border bg-card p-3">
+              <p className="text-[11px] text-muted-foreground">Quality-ready</p>
+              <p className="text-2xl font-bold tabular-nums text-primary">{qualityReadyMcqs}</p>
+              <p className="text-[11px] text-muted-foreground">Adjusted gap: {Math.max(0, targetMcqs - qualityReadyMcqs)}</p>
+            </div>
+            <div className="rounded-md border bg-card p-3">
+              <p className="text-[11px] text-muted-foreground">Short explanations</p>
+              <p className="text-2xl font-bold tabular-nums text-destructive">{shortExplanationCount}</p>
+              <p className="text-[11px] text-muted-foreground">Need expanded reasoning</p>
+            </div>
+            <div className="rounded-md border bg-card p-3">
+              <p className="text-[11px] text-muted-foreground">Weak references</p>
+              <p className="text-2xl font-bold tabular-nums">{weakReferenceCount}</p>
+              <p className="text-[11px] text-muted-foreground">Need source cleanup</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs"><span>Raw target progress</span><span>{rawProgress}%</span></div>
+            <Progress value={rawProgress} className="h-2" />
+            <div className="flex items-center justify-between text-xs"><span>Quality-adjusted progress</span><span>{qualityProgress}%</span></div>
+            <Progress value={qualityProgress} className="h-2" />
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
