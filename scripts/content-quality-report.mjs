@@ -9,11 +9,12 @@ const count = (text, pattern) => [...text.matchAll(pattern)].length;
 
 const mcqBank = read("src/data/mcqBank.ts");
 const mcqExtra = read("src/data/mcqBankExtra.ts");
+const mcqExpansion = read("src/data/mcqBankExpansion.ts");
 const surgeries = read("src/data/surgeriesData.ts");
 const tools = read("src/data/toolsData.ts");
 const clinical = read("src/data/clinicalData.ts");
 
-const qCalls = [...mcqExtra.matchAll(/Q\("([^"]+)","([^"]+)","([^"]+)","([\s\S]*?)",\[([\s\S]*?)\],(\d),"([\s\S]*?)","([\s\S]*?)"/g)];
+const qCalls = [...`${mcqExtra}\n${mcqExpansion}`.matchAll(/Q\("([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([\s\S]*?)",\s*\[([\s\S]*?)\],\s*(\d),\s*"([\s\S]*?)",\s*"([\s\S]*?)"/g)];
 const objectMcqs = count(mcqBank, /id:\s*"[^"]+"/g);
 const totalMcqs = objectMcqs + qCalls.length;
 const shortExplanations = qCalls
