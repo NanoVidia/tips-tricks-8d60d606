@@ -53,9 +53,11 @@ const CALC_REGISTRY: Record<string, { title: string; subtitle: string }> = {
 const STORAGE_TAB = "tools.activeTab";
 
 function polishMcq(q: MCQ): MCQ {
+  if (q.id === "lab-101") return { ...q, stem: "In many NICE-style labour charts, the active first stage of labour is conventionally documented from:", explanation: "NICE-style partograms traditionally document active first stage from ≥4 cm with regular painful contractions, while newer ACOG/WHO labour progress models often use 6 cm as the threshold for active-phase arrest. The exam answer depends on the guideline named in the stem.", reference: "NICE CG190; ACOG/WHO labour guidance" };
   if (q.id === "con-110") return { ...q, explanation: "The etonogestrel implant (Nexplanon) provides highly effective contraception for 3 years. It can be inserted at most times if pregnancy is reasonably excluded, and users should be counselled about irregular bleeding as the commonest reason for discontinuation." };
   if (q.id === "rei-101") return { ...q, explanation: "Infertility is failure to conceive after 12 months of regular unprotected intercourse; start assessment after 6 months if the woman is ≥35 years or earlier when there are red flags such as amenorrhoea, severe endometriosis, previous pelvic infection, or known male-factor risk." };
   if (q.id === "urg-105") return { ...q, explanation: "POP-Q stage 2 means the most distal prolapse point lies within 1 cm proximal or distal to the hymenal plane. It is a staging description, not a symptom score, and management depends on symptoms, compartment, patient goals, and examination findings." };
+  if (q.id === "urg-107") return { ...q, stem: "Most common pure symptom-defined urinary incontinence subtype in women is:", options: ["Stress urinary incontinence", "Urge urinary incontinence", "Continuous incontinence", "Overflow incontinence"], answerIndex: 0, explanation: "Stress urinary incontinence is commonly the most frequent pure symptom-defined subtype in women. Mixed incontinence is also very common and may predominate in some epidemiologic cohorts, so stems should specify whether they mean pure subtype or any reported leakage pattern.", reference: "NICE NG123; ICS terminology" };
   return q;
 }
 
