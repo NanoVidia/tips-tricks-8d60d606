@@ -1,4 +1,4 @@
-// Hook موحّد لجلب بيانات صفحة /tools من قاعدة البيانات مع fallback ذكي للكود.
+// Unified hook for loading /tools data from the database with static fallback data.
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
