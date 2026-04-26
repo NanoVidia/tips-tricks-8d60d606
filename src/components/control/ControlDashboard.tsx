@@ -105,6 +105,7 @@ export default function ControlDashboard({
                 <div>
                   <p className="text-sm font-medium leading-tight">{meta.label}</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">{table}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">{meta.description}</p>
                 </div>
               </CardContent>
             </Card>
@@ -159,7 +160,7 @@ export default function ControlDashboard({
           <p>• Select any card above to open its table editor.</p>
           <p>• Changes are saved directly to the database and become visible immediately.</p>
           <p>• Content edits do not require republishing the app.</p>
-          <p>• Upcoming sessions connect these tables to the app pages; some data may still come from code.</p>
+          <p>• The control panel covers interface text, settings, home sections, scenarios, questions, surgeries, tools, exams, and notifications.</p>
         </CardContent>
       </Card>
     </div>
