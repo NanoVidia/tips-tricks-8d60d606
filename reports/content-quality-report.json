@@ -1,9 +1,11 @@
 {
-  "generatedAt": "2026-04-26T21:34:00.443Z",
+  "generatedAt": "2026-04-26T21:59:36.562Z",
   "summary": {
     "staticMcqs": 1000,
     "targetMcqs": 1000,
     "mcqGap": 0,
+    "scopedObgynFertilityMcqs": 1000,
+    "outOfScopeMcqs": 0,
     "qualityReadyMcqs": 913,
     "qualityAdjustedGap": 87,
     "surgeries": 122,
@@ -327,7 +329,8 @@
       "Vaginal Fibroid Removal Myomectomy Surgery • PreOp Patient Education",
       "Uterine Artery Embolization: A Modern Alternative to Surgery for Fibroid Treatment | 3D Animation",
       "Urodynamics Explained"
-    ]
+    ],
+    "outOfScopeMcqs": []
   },
   "nextPriorities": [
     "Keep Tools MCQ connected to the unified MCQ bank, not a separate fixed mini-bank.",
