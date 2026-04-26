@@ -328,9 +328,10 @@ export const MCQ_BANK: MCQ[] = [
 ];
 
 import { MCQ_BANK_EXTRA } from "./mcqBankExtra";
+import { MCQ_BANK_EXPANSION } from "./mcqBankExpansion";
 
 // Combined bank used by the simulator and filter helper
-export const ALL_MCQS: MCQ[] = [...MCQ_BANK, ...MCQ_BANK_EXTRA];
+export const ALL_MCQS: MCQ[] = [...MCQ_BANK, ...MCQ_BANK_EXTRA, ...MCQ_BANK_EXPANSION];
 
 export const filterMCQs = (opts: {
   examId?: ExamId;
