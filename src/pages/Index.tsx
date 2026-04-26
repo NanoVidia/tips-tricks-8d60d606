@@ -387,8 +387,6 @@ export default function Index() {
               onClick={() => {
                 setActiveTab(null);
                 setSearch("");
-                setSearchCatFilter(null);
-                setUrgencyFilter(null);
                 setSuggestOpen(false);
                 setSearchFocused(false);
                 window.scrollTo({ top: 0, behavior: "smooth" });
