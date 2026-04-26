@@ -1,18 +1,43 @@
 {
-  "generatedAt": "2026-04-26T10:18:08.963Z",
+  "generatedAt": "2026-04-26T10:22:13.609Z",
   "summary": {
-    "staticMcqs": 204,
+    "staticMcqs": 230,
     "targetMcqs": 1000,
-    "mcqGap": 796,
+    "mcqGap": 770,
+    "qualityReadyMcqs": 143,
+    "qualityAdjustedGap": 857,
     "surgeries": 122,
     "emergencyProtocols": 6,
     "clinicalSeedCards": 16
   },
   "urgentFindings": [
-    "MCQ bank is 204; gap to 1000 is 796.",
+    "MCQ bank is 230; gap to 1000 is 770.",
     "60 static Q() explanations are under 80 characters.",
+    "27 static Q() references need strengthening.",
     "33 video titles contain weak relevance signals."
   ],
+  "distribution": {
+    "expansionTopics": {
+      "Antenatal Care": 18,
+      "Labour & Delivery": 18,
+      "Postpartum & PPH": 18,
+      "Hypertensive Disorders": 18,
+      "Gestational Diabetes": 18,
+      "Maternal-Fetal Medicine": 18,
+      "Gynecologic Oncology": 18,
+      "Reproductive Endocrinology & Infertility": 18,
+      "Contraception & Family Planning": 18,
+      "Urogynecology": 13,
+      "Benign Gynecology": 13,
+      "Adolescent & Menopause": 13,
+      "Ethics & Communication": 10
+    },
+    "expansionDifficulties": {
+      "easy": 69,
+      "medium": 92,
+      "hard": 50
+    }
+  },
   "samples": {
     "shortExplanations": [
       {
@@ -139,6 +164,133 @@
         "id": "mfm-109",
         "topic": "Maternal-Fetal Medicine",
         "explanationLength": 47
+      }
+    ],
+    "weakReferences": [
+      {
+        "id": "lab-102",
+        "topic": "Labour & Delivery",
+        "reference": "ACOG"
+      },
+      {
+        "id": "pph-104",
+        "topic": "Postpartum & PPH",
+        "reference": "BNF"
+      },
+      {
+        "id": "htn-108",
+        "topic": "Hypertensive Disorders",
+        "reference": "BNF"
+      },
+      {
+        "id": "gdm-114",
+        "topic": "Gestational Diabetes",
+        "reference": "ADA"
+      },
+      {
+        "id": "onc-101",
+        "topic": "Gynecologic Oncology",
+        "reference": "NHSCSP"
+      },
+      {
+        "id": "onc-102",
+        "topic": "Gynecologic Oncology",
+        "reference": "FIGO"
+      },
+      {
+        "id": "onc-104",
+        "topic": "Gynecologic Oncology",
+        "reference": "ACOG"
+      },
+      {
+        "id": "onc-107",
+        "topic": "Gynecologic Oncology",
+        "reference": "NCCN"
+      },
+      {
+        "id": "onc-108",
+        "topic": "Gynecologic Oncology",
+        "reference": "WHO"
+      },
+      {
+        "id": "onc-111",
+        "topic": "Gynecologic Oncology",
+        "reference": "NCCN"
+      },
+      {
+        "id": "onc-112",
+        "topic": "Gynecologic Oncology",
+        "reference": "WHO"
+      },
+      {
+        "id": "onc-113",
+        "topic": "Gynecologic Oncology",
+        "reference": "NHSCSP"
+      },
+      {
+        "id": "rei-104",
+        "topic": "Reproductive Endocrinology & Infertility",
+        "reference": "ESHRE"
+      },
+      {
+        "id": "rei-107",
+        "topic": "Reproductive Endocrinology & Infertility",
+        "reference": "ESHRE"
+      },
+      {
+        "id": "rei-109",
+        "topic": "Reproductive Endocrinology & Infertility",
+        "reference": "ACR"
+      },
+      {
+        "id": "con-103",
+        "topic": "Contraception & Family Planning",
+        "reference": "FSRH EC"
+      },
+      {
+        "id": "con-104",
+        "topic": "Contraception & Family Planning",
+        "reference": "FSRH EC"
+      },
+      {
+        "id": "con-105",
+        "topic": "Contraception & Family Planning",
+        "reference": "FSRH"
+      },
+      {
+        "id": "con-107",
+        "topic": "Contraception & Family Planning",
+        "reference": "UKMEC"
+      },
+      {
+        "id": "con-108",
+        "topic": "Contraception & Family Planning",
+        "reference": "FSRH"
+      },
+      {
+        "id": "con-114",
+        "topic": "Contraception & Family Planning",
+        "reference": "RCOG"
+      },
+      {
+        "id": "ben-104",
+        "topic": "Benign Gynecology",
+        "reference": "ESHRE"
+      },
+      {
+        "id": "ben-105",
+        "topic": "Benign Gynecology",
+        "reference": "FIGO"
+      },
+      {
+        "id": "ben-108",
+        "topic": "Benign Gynecology",
+        "reference": "ACOG"
+      },
+      {
+        "id": "ben-110",
+        "topic": "Benign Gynecology",
+        "reference": "ACOG"
       }
     ],
     "weakVideos": [
