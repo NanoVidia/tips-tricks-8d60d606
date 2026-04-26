@@ -333,6 +333,7 @@ import { MCQ_BANK_EXPANSION_PHASE2 } from "./mcqBankExpansionPhase2";
 import { MCQ_BANK_EXPANSION_PHASE3 } from "./mcqBankExpansionPhase3";
 import { MCQ_BANK_EXPANSION_PHASE4 } from "./mcqBankExpansionPhase4";
 import { MCQ_BANK_EXPANSION_PHASE5 } from "./mcqBankExpansionPhase5";
+import { MCQ_BANK_EXPANSION_PHASE6 } from "./mcqBankExpansionPhase6";
 
 const TOPIC_ORDER: Topic[] = [
   "Antenatal Care",
@@ -370,6 +371,7 @@ export const ALL_MCQS: MCQ[] = sortMcqsLogically([
   ...MCQ_BANK_EXPANSION_PHASE3,
   ...MCQ_BANK_EXPANSION_PHASE4,
   ...MCQ_BANK_EXPANSION_PHASE5,
+  ...MCQ_BANK_EXPANSION_PHASE6,
 ]);
 
 export const filterMCQs = (opts: {
