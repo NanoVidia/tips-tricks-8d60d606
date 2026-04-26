@@ -905,6 +905,13 @@ export default function Index() {
               setLastSearch(q);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
+            onSectionQuery={(category, q) => {
+              setActiveTab(category);
+              setLastTab(category as TabId);
+              setSearch(q);
+              setLastSearch(q);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
             onOpenDailyCase={(c) => openScenarioById(c.id, c.title_en)}
             />
           </>
