@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
 import { springTransition } from "@/lib/motion";
 
 interface Emergency {
@@ -43,29 +42,23 @@ export function EmergencyStrip({ onPick, textScale }: Props) {
       transition={{ ...springTransition, delay: 0.05 + idx * 0.04 }}
       whileTap={{ scale: 0.96 }}
       whileHover={{ y: -1 }}
-      className={`group relative flex h-full min-h-[128px] overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm ring-1 ${e.ring} px-2.5 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300`}
+      className={`group relative flex h-full min-h-[124px] overflow-visible rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm ring-1 ${e.ring} px-2 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300`}
       aria-label={`Open ${e.abbr} ${e.nameEn} protocol`}
     >
-      <div className="flex w-full items-start gap-2">
-        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-[16px] leading-none shrink-0 mt-0.5">
-          {e.emoji}
-        </span>
-        <div className="min-w-0 flex-1 self-stretch flex flex-col gap-2">
-          <div className="min-w-0 space-y-1">
-            <span className="inline-flex w-fit max-w-full rounded-md bg-white/8 px-1.5 py-0.5 text-[8.5px] font-black uppercase tracking-[0.14em] text-red-100/75 text-flow-compact">
+      <div className="grid w-full min-w-0 grid-rows-[auto_1fr_auto] gap-1.5">
+        <div className="flex min-w-0 items-center justify-between gap-1.5">
+          <span className="inline-flex max-w-full min-w-0 rounded-md bg-white/8 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.08em] text-red-100/75 leading-tight text-flow-compact">
               {e.group}
-            </span>
-            <p className={`text-flow-safe mobile-copy-align text-white font-black ${scale.card} leading-[1.25]`} lang="en">
-              <span className="inline-block whitespace-nowrap">{e.abbr}</span>{" "}
-              <span className="text-red-200/80 font-bold">/</span>{" "}
-              <span>{e.nameEn}</span>
-            </p>
-          </div>
-          <p className={`text-flow-compact mt-auto rounded-lg bg-white/5 px-2 py-1.5 text-red-200/90 ${scale.hint} leading-[1.35] font-mono`} lang="en">
-            {e.protocol}
-          </p>
+          </span>
+          <span className="shrink-0 text-[14px] leading-none" aria-hidden="true">{e.emoji}</span>
         </div>
-        <ChevronRight className="w-3.5 h-3.5 text-red-200/60 group-hover:text-red-100 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+        <p className="text-flow-safe mobile-copy-align text-[11px] font-black leading-[1.22] text-white" lang="en">
+          <span className="block text-[10px] tracking-[0.08em] text-red-100/80">{e.abbr}</span>
+          <span className="block">{e.nameEn}</span>
+        </p>
+        <p className="text-flow-safe rounded-lg bg-white/5 px-1.5 py-1.5 text-[9px] font-semibold leading-[1.3] text-red-100/90" lang="en">
+          {e.protocol}
+        </p>
       </div>
     </motion.button>
   );
@@ -99,7 +92,7 @@ export function EmergencyStrip({ onPick, textScale }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 auto-rows-fr gap-2.5 items-stretch">
+      <div className="grid grid-cols-2 auto-rows-fr gap-2 items-stretch">
         {EMERGENCIES.map((e, idx) => renderEmergencyButton(e, idx))}
       </div>
     </motion.section>

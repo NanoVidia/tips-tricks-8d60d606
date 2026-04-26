@@ -315,10 +315,7 @@
     h2 { font-size: max(1.375rem, 22px); }
     h3 { font-size: max(1.0625rem, 17px); }
 
-    p,
     li,
-    button,
-    a,
     label,
     input,
     textarea,
