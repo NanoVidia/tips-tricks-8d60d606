@@ -91,6 +91,7 @@ export function SurgeryVideo({ videoId, title, channel, surgeryName }: Props) {
   useEffect(() => {
     let cancelled = false;
     setChecking(true);
+    setVerified(null);
 
     supabase.functions.invoke("youtube-search", {
       body: { surgeryName, currentVideo: { videoId, title, channel } },
@@ -113,7 +114,15 @@ export function SurgeryVideo({ videoId, title, channel, surgeryName }: Props) {
   }, [surgeryName, videoId, title, channel]);
 
   const display = verified ?? { videoId, title, channel, score: initialScore, confidence: initialScore >= 70 ? "high" : initialScore >= 45 ? "medium" : "low" };
-  const confidenceLabel = display.confidence === "high" ? "Highly relevant" : display.confidence === "medium" ? "Moderately relevant" : "Needs review";
+  const isVerifiedEnough = (display.score ?? 0) >= MIN_RELEVANCE_SCORE;
+  const confidenceLabel = checking
+    ? "Reviewing"
+    : !isVerifiedEnough
+      ? "No verified match"
+      : display.confidence === "high"
+        ? "Verified match"
+        : "Good match";
+  const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${surgeryName} surgical technique obstetrics gynecology`)}`;
 
   return (
     <div className="space-y-1.5">
@@ -122,34 +131,42 @@ export function SurgeryVideo({ videoId, title, channel, surgeryName }: Props) {
           <Play className="w-3.5 h-3.5 text-primary" /> Video
         </h4>
         <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[9px] font-semibold text-muted-foreground">
-          {checking ? <Search className="h-3 w-3 animate-pulse" /> : <ShieldCheck className="h-3 w-3 text-primary" />}
-          {checking ? "Reviewing" : confidenceLabel}
+          {checking ? <Search className="h-3 w-3 animate-pulse" /> : isVerifiedEnough ? <ShieldCheck className="h-3 w-3 text-primary" /> : <AlertTriangle className="h-3 w-3" />}
+          {confidenceLabel}
         </span>
       </div>
 
-      <div className="aspect-video rounded-lg overflow-hidden bg-muted">
-        <iframe
-          key={display.videoId}
-          src={`https://www.youtube-nocookie.com/embed/${display.videoId}?rel=0&modestbranding=1`}
-          title={display.title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-          className="w-full h-full"
-        />
-      </div>
+      {isVerifiedEnough ? (
+        <div className="aspect-video rounded-lg overflow-hidden bg-muted">
+          <iframe
+            key={display.videoId}
+            src={`https://www.youtube-nocookie.com/embed/${display.videoId}?rel=0&modestbranding=1`}
+            title={display.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+            className="w-full h-full"
+          />
+        </div>
+      ) : (
+        <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+          لم يتم العثور على فيديو تعليمي موثوق مرتبط مباشرة بهذا الإجراء، لذلك لم يتم تضمين فيديو غير مؤكد.
+        </div>
+      )}
 
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <p className="text-[10px] text-muted-foreground">
-          {display.title} — {display.channel}
-        </p>
+        {isVerifiedEnough && (
+          <p className="text-[10px] text-muted-foreground">
+            {display.title} — {display.channel}
+          </p>
+        )}
         <a
-          href={`https://www.youtube.com/watch?v=${display.videoId}`}
+          href={isVerifiedEnough ? `https://www.youtube.com/watch?v=${display.videoId}` : youtubeSearchUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="text-[10px] flex items-center gap-1 text-primary hover:underline"
         >
-          Open on YouTube <ExternalLink className="w-2.5 h-2.5" />
+          {isVerifiedEnough ? "Open on YouTube" : "Search YouTube manually"} <ExternalLink className="w-2.5 h-2.5" />
         </a>
       </div>
     </div>
