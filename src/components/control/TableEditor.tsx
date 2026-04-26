@@ -178,11 +178,11 @@ export default function TableEditor({ table }: { table: AdminTable }) {
   }
 
   function startCreate() {
-    // Use keys from the first existing row as a template, or leave empty
-    const template: Row = {};
+    // Prefer the explicit table template so empty tables remain fully editable.
+    const template: Row = { ...meta.template };
     if (items[0]) {
       for (const k of Object.keys(items[0])) {
-        if (HIDDEN_COLS.has(k)) continue;
+        if (HIDDEN_COLS.has(k) || k in template) continue;
         const v = items[0][k];
         if (typeof v === "boolean") template[k] = false;
         else if (Array.isArray(v)) template[k] = [];
@@ -247,6 +247,9 @@ export default function TableEditor({ table }: { table: AdminTable }) {
           <h1 className="text-xl font-bold">{meta.label}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             {table} · {total} records
+          </p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-2xl">
+            {meta.description}
           </p>
         </div>
         <div className="flex items-center gap-2">
