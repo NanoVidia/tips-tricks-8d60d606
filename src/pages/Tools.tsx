@@ -20,9 +20,11 @@ import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { SurgeryLibrary } from "@/components/tools/SurgeryLibrary";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useToolsData } from "@/hooks/useToolsData";
+import { useAllMcqs } from "@/hooks/useMcqs";
 import { toast } from "@/hooks/use-toast";
 import { DisclaimerBanner, InlineDisclaimer } from "@/components/Disclaimer";
 import { PhIcon } from "@/components/ui/PhIcon";
+import type { MCQ } from "@/data/mcqBank";
 
 const sections = [
   { id: "favorites", label: "Favorites", icon: Star, ph: "Star" as const, color: "from-amber-400 to-orange-500" },
@@ -50,61 +52,19 @@ const CALC_REGISTRY: Record<string, { title: string; subtitle: string }> = {
 
 const STORAGE_TAB = "tools.activeTab";
 
-const mcqs = [
-  {
-    q: "A 32-year-old G2P1 at 34 weeks presents with BP 165/110, proteinuria 3+, and a generalized seizure. After ABC stabilization, what is the FIRST-line treatment to prevent further seizures?",
-    opts: ["Diazepam 10 mg IV", "Magnesium sulfate 4 g IV loading", "Phenytoin 1 g IV", "Labetalol 20 mg IV"],
-    correct: 1,
-    explain: "MgSO4 is the gold-standard anticonvulsant for eclampsia (Magpie trial). 4 g IV over 5–10 min loading + 1 g/h maintenance. Labetalol controls BP but not seizures.",
-  },
-  {
-    q: "Which intervention has the STRONGEST evidence for reducing preeclampsia in high-risk women?",
-    opts: ["Calcium 1.5 g/day", "Vitamin D 1000 IU/day", "Low-dose aspirin 75–150 mg from 12 weeks", "Bed rest"],
-    correct: 2,
-    explain: "ASPRE trial: aspirin 150 mg from 11–14 wk reduces preterm PET by ~62%. Calcium helps in low-intake populations. Bed rest is not recommended.",
-  },
-  {
-    q: "A primigravida is fully dilated for 3 hours with epidural and adequate contractions, but the head remains at +1 station with persistent OP position. Best next step?",
-    opts: ["Immediate CS", "Continue pushing another hour", "Trial of rotational instrumental delivery in theatre", "Augment with oxytocin"],
-    correct: 2,
-    explain: "Failure to progress in 2nd stage with OP position warrants trial in theatre — capable of immediate CS if delivery not achieved within 3 attempts/20 min.",
-  },
-  {
-    q: "Most appropriate first investigation for postmenopausal bleeding?",
-    opts: ["Endometrial biopsy", "Hysteroscopy", "Transvaginal ultrasound (endometrial thickness)", "MRI pelvis"],
-    correct: 2,
-    explain: "TVUS is first-line. Endometrial thickness ≤4 mm has high NPV (~99%) for malignancy. >4 mm → pipelle biopsy ± hysteroscopy.",
-  },
-  {
-    q: "Which is the most common cause of secondary amenorrhea (excluding pregnancy)?",
-    opts: ["Premature ovarian insufficiency", "Polycystic ovary syndrome", "Hyperprolactinemia", "Asherman's syndrome"],
-    correct: 1,
-    explain: "PCOS accounts for ~30% of secondary amenorrhea. Always exclude pregnancy first with βhCG.",
-  },
-  {
-    q: "A woman with previous classical CS presents at 36 weeks with severe abdominal pain and fetal bradycardia. Most likely diagnosis?",
-    opts: ["Placental abruption", "Uterine rupture", "Severe preeclampsia", "Acute appendicitis"],
-    correct: 1,
-    explain: "Classical CS scar has ~4–9% rupture risk (vs <1% for low transverse). Severe pain + fetal bradycardia in a scarred uterus = rupture until proven otherwise.",
-  },
-  {
-    q: "Best contraceptive choice for a 35-year-old smoker with migraine with aura?",
-    opts: ["Combined oral contraceptive", "Progesterone-only pill", "Copper IUD", "Combined patch"],
-    correct: 2,
-    explain: "Migraine with aura is UKMEC 4 (absolute contraindication) for combined hormonal contraception due to stroke risk. Copper IUD or POP/LNG-IUS are safe.",
-  },
-  {
-    q: "First-line drug for medical management of ectopic pregnancy?",
-    opts: ["Mifepristone", "Methotrexate IM single-dose", "Misoprostol PV", "Letrozole"],
-    correct: 1,
-    explain: "Single-dose MTX 50 mg/m² IM if hCG <5000, no fetal cardiac activity, mass <3.5 cm, hemodynamically stable, and reliable follow-up.",
-  },
-];
+function polishMcq(q: MCQ): MCQ {
+  if (q.id === "lab-101") return { ...q, stem: "In many NICE-style labour charts, the active first stage of labour is conventionally documented from:", explanation: "NICE-style partograms traditionally document active first stage from ≥4 cm with regular painful contractions, while newer ACOG/WHO labour progress models often use 6 cm as the threshold for active-phase arrest. The exam answer depends on the guideline named in the stem.", reference: "NICE CG190; ACOG/WHO labour guidance" };
+  if (q.id === "con-110") return { ...q, explanation: "The etonogestrel implant (Nexplanon) provides highly effective contraception for 3 years. It can be inserted at most times if pregnancy is reasonably excluded, and users should be counselled about irregular bleeding as the commonest reason for discontinuation." };
+  if (q.id === "rei-101") return { ...q, explanation: "Infertility is failure to conceive after 12 months of regular unprotected intercourse; start assessment after 6 months if the woman is ≥35 years or earlier when there are red flags such as amenorrhoea, severe endometriosis, previous pelvic infection, or known male-factor risk." };
+  if (q.id === "urg-105") return { ...q, explanation: "POP-Q stage 2 means the most distal prolapse point lies within 1 cm proximal or distal to the hymenal plane. It is a staging description, not a symptom score, and management depends on symptoms, compartment, patient goals, and examination findings." };
+  if (q.id === "urg-107") return { ...q, stem: "Most common pure symptom-defined urinary incontinence subtype in women is:", options: ["Stress urinary incontinence", "Urge urinary incontinence", "Continuous incontinence", "Overflow incontinence"], answerIndex: 0, explanation: "Stress urinary incontinence is commonly the most frequent pure symptom-defined subtype in women. Mixed incontinence is also very common and may predominate in some epidemiologic cohorts, so stems should specify whether they mean pure subtype or any reported leakage pattern.", reference: "NICE NG123; ICS terminology" };
+  return q;
+}
 
 function MCQCard({
   data, idx, onAnswer,
 }: {
-  data: typeof mcqs[0];
+  data: MCQ;
   idx: number;
   onAnswer: (correct: boolean) => void;
 }) {
@@ -113,17 +73,17 @@ function MCQCard({
   const handlePick = (i: number) => {
     if (reveal) return;
     setPicked(i);
-    onAnswer(i === data.correct);
+    onAnswer(i === data.answerIndex);
   };
   return (
     <Card className="p-4 border-border/50">
       <div className="flex items-start gap-2 mb-3">
         <Badge variant="outline" className="text-[10px] shrink-0">Q{idx + 1}</Badge>
-        <p className="text-sm font-medium leading-snug">{data.q}</p>
+        <p className="text-sm font-medium leading-snug">{data.stem}</p>
       </div>
       <div className="space-y-1.5" role="radiogroup" aria-label={`Question ${idx + 1}`}>
-        {data.opts.map((o, i) => {
-          const isCorrect = i === data.correct;
+        {data.options.map((o, i) => {
+          const isCorrect = i === data.answerIndex;
           const isPicked = i === picked;
           let cls = "border-border/50 bg-card hover:bg-muted/50";
           if (reveal && isCorrect) cls = "border-success/60 bg-success-soft text-success";
@@ -149,7 +109,8 @@ function MCQCard({
       {reveal && (
         <div className="mt-3 p-2.5 rounded-lg bg-muted/50 border border-border/40">
           <p className="text-[10px] uppercase tracking-wider font-bold text-primary mb-1">Explanation</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{data.explain}</p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">{data.explanation}</p>
+          {data.reference && <p className="text-[10px] text-muted-foreground/80 mt-1">Ref: {data.reference}</p>}
         </div>
       )}
     </Card>
@@ -262,10 +223,12 @@ export default function Tools() {
   const [drugSearch, setDrugSearch] = useState("");
   const [drugFilter, setDrugFilter] = useState<(typeof FDA_FILTERS)[number]>("All");
   const [offlineReady, setOfflineReady] = useState(false);
-  const [mcqOrder, setMcqOrder] = useState<number[]>(() => mcqs.map((_, i) => i));
+  const [mcqOrder, setMcqOrder] = useState<number[]>([]);
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
   const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
   const { protocols: emergencyProtocols, drugs: pregnancyDrugs, guidelines, ddx: ddxLibrary, source: toolsSource } = useToolsData();
+  const { mcqs: allMcqs, source: mcqSource, isLoading: mcqLoading } = useAllMcqs();
+  const mcqs = useMemo(() => allMcqs.map(polishMcq).filter((q) => q.options.length === 4 && q.answerIndex >= 0 && q.answerIndex <= 3), [allMcqs]);
 
   // Group bookmarks by type for the Favorites view
   const favorites = useMemo(() => {
@@ -290,7 +253,7 @@ export default function Tools() {
       }
     }
     return { calc, protocols, drugs, ddx, total: calc.length + protocols.length + drugs.length + ddx.length };
-  }, [bookmarkIds]);
+  }, [bookmarkIds, emergencyProtocols, pregnancyDrugs, ddxLibrary]);
 
   const jumpToCalc = (id: string) => {
     setActive("calc");
@@ -305,6 +268,11 @@ export default function Tools() {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_TAB, active);
   }, [active]);
+
+  useEffect(() => {
+    setMcqOrder(mcqs.map((_, i) => i));
+    setMcqAnswers({});
+  }, [mcqs]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -782,6 +750,7 @@ export default function Tools() {
                     of {mcqs.length}
                   </span>
                 </p>
+                <p className="text-[10px] text-muted-foreground">{mcqLoading ? "Loading bank…" : `${mcqSource === "db" ? "Database" : "Curated fallback"} bank`}</p>
               </div>
               <div className="flex gap-1.5">
                 <Button
@@ -804,7 +773,9 @@ export default function Tools() {
                 </Button>
               </div>
             </Card>
-            {mcqOrder.map((origIdx, displayIdx) => (
+            {mcqOrder.length === 0 ? (
+              <Card className="p-4 border-border/50 text-xs text-muted-foreground">No reviewed MCQs are available yet.</Card>
+            ) : mcqOrder.map((origIdx, displayIdx) => mcqs[origIdx] && (
               <MCQCard
                 key={`${origIdx}-${mcqOrder.join(",")}`}
                 data={mcqs[origIdx]}

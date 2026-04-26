@@ -1,0 +1,186 @@
+{
+  "generatedAt": "2026-04-26T10:16:58.320Z",
+  "summary": {
+    "staticMcqs": 204,
+    "targetMcqs": 1000,
+    "mcqGap": 796,
+    "surgeries": 122,
+    "emergencyProtocols": 6,
+    "clinicalSeedCards": 16
+  },
+  "urgentFindings": [
+    "MCQ bank is 204; gap to 1000 is 796.",
+    "60 static Q() explanations are under 80 characters.",
+    "33 video titles contain weak relevance signals."
+  ],
+  "samples": {
+    "shortExplanations": [
+      {
+        "id": "anc-103",
+        "topic": "Antenatal Care",
+        "explanationLength": 69
+      },
+      {
+        "id": "anc-111",
+        "topic": "Antenatal Care",
+        "explanationLength": 67
+      },
+      {
+        "id": "anc-113",
+        "topic": "Antenatal Care",
+        "explanationLength": 72
+      },
+      {
+        "id": "lab-103",
+        "topic": "Labour & Delivery",
+        "explanationLength": 67
+      },
+      {
+        "id": "lab-104",
+        "topic": "Labour & Delivery",
+        "explanationLength": 63
+      },
+      {
+        "id": "pph-101",
+        "topic": "Postpartum & PPH",
+        "explanationLength": 78
+      },
+      {
+        "id": "pph-109",
+        "topic": "Postpartum & PPH",
+        "explanationLength": 73
+      },
+      {
+        "id": "htn-101",
+        "topic": "Hypertensive Disorders",
+        "explanationLength": 61
+      },
+      {
+        "id": "htn-102",
+        "topic": "Hypertensive Disorders",
+        "explanationLength": 63
+      },
+      {
+        "id": "htn-105",
+        "topic": "Hypertensive Disorders",
+        "explanationLength": 53
+      },
+      {
+        "id": "htn-108",
+        "topic": "Hypertensive Disorders",
+        "explanationLength": 67
+      },
+      {
+        "id": "htn-110",
+        "topic": "Hypertensive Disorders",
+        "explanationLength": 62
+      },
+      {
+        "id": "htn-113",
+        "topic": "Hypertensive Disorders",
+        "explanationLength": 72
+      },
+      {
+        "id": "htn-114",
+        "topic": "Hypertensive Disorders",
+        "explanationLength": 63
+      },
+      {
+        "id": "gdm-101",
+        "topic": "Gestational Diabetes",
+        "explanationLength": 77
+      },
+      {
+        "id": "gdm-103",
+        "topic": "Gestational Diabetes",
+        "explanationLength": 57
+      },
+      {
+        "id": "gdm-108",
+        "topic": "Gestational Diabetes",
+        "explanationLength": 63
+      },
+      {
+        "id": "gdm-109",
+        "topic": "Gestational Diabetes",
+        "explanationLength": 57
+      },
+      {
+        "id": "gdm-114",
+        "topic": "Gestational Diabetes",
+        "explanationLength": 64
+      },
+      {
+        "id": "gdm-115",
+        "topic": "Gestational Diabetes",
+        "explanationLength": 71
+      },
+      {
+        "id": "mfm-101",
+        "topic": "Maternal-Fetal Medicine",
+        "explanationLength": 55
+      },
+      {
+        "id": "mfm-102",
+        "topic": "Maternal-Fetal Medicine",
+        "explanationLength": 75
+      },
+      {
+        "id": "mfm-105",
+        "topic": "Maternal-Fetal Medicine",
+        "explanationLength": 67
+      },
+      {
+        "id": "mfm-106",
+        "topic": "Maternal-Fetal Medicine",
+        "explanationLength": 75
+      },
+      {
+        "id": "mfm-109",
+        "topic": "Maternal-Fetal Medicine",
+        "explanationLength": 47
+      }
+    ],
+    "weakVideos": [
+      "Cervical cerclage for the MRCOG: RCOG Guideline. Preterm Birth. McDonald or Shirodkar suture.",
+      "Animation of Total Laparoscopic Hysterectomy",
+      "Laparoscopic Ovarian Cystectomy I Patient Positioning &amp; Port Placement Part 2",
+      "Can I get pregnant after I had my tubes removed??",
+      "Mayo Clinic Minute - When surgery for endometriosis is the answer",
+      "Having a Hysteroscopy - Patient Guide",
+      "Hysteroscopy Explained: Remove Uterine Polyps &amp; Fibroids Without Surgery!",
+      "NovaSure Advanced Endometrial Ablation Animation",
+      "Deviated Septum Surgery (Septoplasty)",
+      "LEEP or Cone Biopsy Instructions",
+      "Can I get pregnant after I had my tubes removed??",
+      "Can I get pregnant after I had my tubes removed??",
+      "What is ovarian torsion? #shorts",
+      "#OBGYN shows first trimester abortion simulation #shorts #medicalstudent",
+      "A Comprehensive Guide to Manual Vacuum Aspiration (MVA) Procedure- Ipas MVA® Plus (EN)",
+      "How to Remove a Bartholin&#39;s Cyst in UNDER 10 MINUTES!",
+      "The Z-stitch #appendix #suturing #surgery #doctor",
+      "Forcept Delivery Part3  #delivery #doctor #nursingexperts #pregnancy #nursingcare",
+      "Cervical cerclage for the MRCOG: RCOG Guideline. Preterm Birth. McDonald or Shirodkar suture.",
+      "Uterine inversion | Reproductive system physiology | NCLEX-RN | Khan Academy",
+      "Prolapsed Cord: Complications in Labor - Care of the Childbearing Family | Lecturio Nursing",
+      "#OBGYN shows first trimester abortion simulation #shorts #medicalstudent",
+      "#OBGYN shows first trimester abortion simulation #shorts #medicalstudent",
+      "Robotic hysterectomy for high BMI patients | TVASurg",
+      "Can I get pregnant after I had my tubes removed??",
+      "Can I get pregnant after I had my tubes removed??",
+      "Say Goodbye to Discomfort: Labiaplasty for Better Hygiene and Comfort | Labiaplasty surgery |#shorts",
+      "Asherman Syndrome: Scar Tissue After Hysteroscopy Explained",
+      "🎗 Ovarian Cancer: The Silent Threat 🎗 #medicalanimation #anatomy",
+      "Cold Knife Conization Procedure Explained",
+      "Vaginal Fibroid Removal Myomectomy Surgery • PreOp Patient Education",
+      "Uterine Artery Embolization: A Modern Alternative to Surgery for Fibroid Treatment | 3D Animation",
+      "Urodynamics Explained"
+    ]
+  },
+  "nextPriorities": [
+    "Keep Tools MCQ connected to the unified MCQ bank, not a separate fixed mini-bank.",
+    "Expand MCQs topic-by-topic to 300, then 500, then 1000 with references.",
+    "Replace or hide weak surgical videos instead of embedding low-confidence videos.",
+    "Enrich short Q&A cards with direct answer, reasoning, red flags, related branches, and reference."
+  ]
+}
