@@ -109,7 +109,7 @@ const TAB_LABEL_KEYS: Record<ScenarioCategory, string> = {
   qa: "tab.qa",
 };
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US-u-nu-latn").format(value);
-const normalizeDigits = (value: string) => value.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
+const normalizeDigits = (value: string) => value.replace(/[\u0660-\u0669]/g, (digit) => String("\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669".indexOf(digit)));
 
 // (Inline ClinicalCard removed — replaced by ScenarioCard + ScenarioSheet)
 
