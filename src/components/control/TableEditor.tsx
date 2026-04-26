@@ -1,4 +1,4 @@
-// محرّر عام لأي جدول — يعرض الأعمدة تلقائياً ويسمح بـ CRUD كامل
+// Generic table editor with automatic column rendering and CRUD actions
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Search, Edit2, Trash2, Save, X, RefreshCw } from "lucide-react";
@@ -116,7 +116,7 @@ function FieldEditor({
           try {
             onChange(JSON.parse(e.target.value));
           } catch {
-            // نسمح بكتابة غير صالحة مؤقتاً
+            // Allow temporarily invalid JSON while typing
           }
         }}
         className="font-mono text-xs"
@@ -165,7 +165,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  // الأعمدة المعروضة في الجدول (أول 4 عواميد ذات قيمة)
+  // Display columns in the table: first four non-hidden fields
   const displayCols =
     items[0]
       ? Object.keys(items[0]).filter((k) => !HIDDEN_COLS.has(k)).slice(0, 4)
@@ -178,7 +178,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
   }
 
   function startCreate() {
-    // نأخذ مفاتيح of أول صف موجود كقالب، أو نتركها فارغة
+    // Use keys from the first existing row as a template, or leave empty
     const template: Row = {};
     if (items[0]) {
       for (const k of Object.keys(items[0])) {
@@ -190,7 +190,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
         else if (typeof v === "number") template[k] = 0;
         else template[k] = "";
       }
-      // التفعيل افتراضياً true
+      // Default active records to true
       if ("active" in template) template.active = true;
     }
     setDraft(template);
@@ -201,7 +201,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
   async function handleSave() {
     setBusy(true);
     try {
-      // إزالة الحقول المخفية والـ id غير المسموحة
+      // Remove hidden fields and disallowed id values
       const payload: Row = {};
       for (const [k, v] of Object.entries(draft)) {
         if (HIDDEN_COLS.has(k)) continue;

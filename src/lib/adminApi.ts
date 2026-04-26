@@ -1,4 +1,4 @@
-// عميل موحد للتعامل مع Edge Function admin-control
+// Shared client for the admin-control backend function
 import { supabase } from "@/integrations/supabase/client";
 
 const TOKEN_KEY = "control_token";
@@ -90,7 +90,7 @@ export async function adminLogout() {
   try {
     await call("logout");
   } catch {
-    // تجاهل
+    // Ignore logout failures
   }
   clearStoredToken();
 }
