@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Check, X, ArrowRight, Loader2 } from "lucide-react";
+import { Brain, Check, X, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { springTransition } from "@/lib/motion";
@@ -32,10 +32,10 @@ interface Props {
 
 export function DailyMcqWidget({ textScale }: Props) {
   const scale = textScale ?? { section: "text-[13px]", sub: "text-[10.5px]", card: "text-[12.5px]", hint: "text-[11.5px]" };
-  const [mcq, setMcq] = useState<Mcq | null>(null);
+  const [mcqs, setMcqs] = useState<Mcq[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [picked, setPicked] = useState<number | null>(null);
-  const [revealed, setRevealed] = useState(false);
+  const [answers, setAnswers] = useState<Record<string, { picked: number; revealed: boolean }>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -53,10 +53,15 @@ export function DailyMcqWidget({ textScale }: Props) {
           .select("id, topic, difficulty, stem, options, answer_index, explanation")
           .eq("active", true)
           .order("id")
-          .range(offset, offset);
+          .range(offset, Math.min(offset + 119, total - 1));
         if (cancelled) return;
         if (error) throw error;
-        if (data && data[0]) setMcq(data[0] as Mcq);
+        if (data?.length) {
+          const bank = data as Mcq[];
+          setMcqs(bank);
+          setCurrentIndex(0);
+          setAnswers({});
+        }
       } catch (e) {
         console.error("Daily MCQ:", e);
       } finally {
@@ -65,6 +70,11 @@ export function DailyMcqWidget({ textScale }: Props) {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  const mcq = mcqs[currentIndex] ?? null;
+  const answer = mcq ? answers[mcq.id] : undefined;
+  const picked = answer?.picked ?? null;
+  const revealed = answer?.revealed ?? false;
 
   if (loading) {
     return (
@@ -78,8 +88,19 @@ export function DailyMcqWidget({ textScale }: Props) {
 
   const choose = (i: number) => {
     if (picked !== null) return;
-    setPicked(i);
-    setTimeout(() => setRevealed(true), 250);
+    setAnswers((prev) => ({ ...prev, [mcq.id]: { picked: i, revealed: false } }));
+    setTimeout(() => {
+      setAnswers((prev) => ({ ...prev, [mcq.id]: { picked: i, revealed: true } }));
+    }, 180);
+    if (mcqs.length > 1) {
+      setTimeout(() => {
+        setCurrentIndex((idx) => Math.min(idx + 1, mcqs.length - 1));
+      }, 1150);
+    }
+  };
+
+  const goPrevious = () => {
+    setCurrentIndex((idx) => Math.max(0, idx - 1));
   };
 
   return (
@@ -120,49 +141,59 @@ export function DailyMcqWidget({ textScale }: Props) {
           </div>
         </div>
 
-        <p className={`text-white ${scale.card} font-semibold leading-[1.35] mb-2.5`}>
-          {mcq.stem}
-        </p>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={mcq.id}
+            initial={{ opacity: 0, x: 14 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -14 }}
+            transition={{ duration: 0.22 }}
+          >
+            <p className={`text-white ${scale.card} font-semibold leading-[1.35] mb-2.5`}>
+              {mcq.stem}
+            </p>
 
-        <div className="space-y-1.5">
-          {mcq.options.map((opt, i) => {
-            const isPicked = picked === i;
-            const isCorrect = i === mcq.answer_index;
-            const showState = revealed && (isPicked || isCorrect);
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => choose(i)}
-                disabled={picked !== null}
-                className={`w-full text-left flex items-start gap-2 px-2.5 py-2 rounded-lg text-[11.5px] leading-snug transition-all duration-200 ${
-                  showState && isCorrect
-                    ? "bg-emerald-500/25 ring-1 ring-emerald-400 text-emerald-50"
-                    : showState && isPicked && !isCorrect
-                    ? "bg-red-500/25 ring-1 ring-red-400 text-red-50"
-                    : isPicked
-                    ? "bg-white/15 ring-1 ring-white/30 text-white"
-                    : "bg-white/5 hover:bg-white/10 ring-1 ring-white/10 text-white/90 disabled:opacity-60"
-                }`}
-              >
-                <span
-                  className={`shrink-0 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center mt-0.5 ${
-                    showState && isCorrect
-                      ? "bg-emerald-400 text-emerald-950"
-                      : showState && isPicked && !isCorrect
-                      ? "bg-red-400 text-red-950"
-                      : "bg-white/15 text-white"
-                  }`}
-                >
-                  {showState && isCorrect ? <Check className="w-2.5 h-2.5" strokeWidth={3} />
-                    : showState && isPicked && !isCorrect ? <X className="w-2.5 h-2.5" strokeWidth={3} />
-                    : String.fromCharCode(65 + i)}
-                </span>
-                <span className="flex-1 min-w-0">{opt}</span>
-              </button>
-            );
-          })}
-        </div>
+            <div className="space-y-1.5">
+              {mcq.options.map((opt, i) => {
+                const isPicked = picked === i;
+                const isCorrect = i === mcq.answer_index;
+                const showState = revealed && (isPicked || isCorrect);
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => choose(i)}
+                    disabled={picked !== null}
+                    className={`w-full text-left flex items-start gap-2 px-2.5 py-2 rounded-lg text-[11.5px] leading-snug transition-all duration-200 ${
+                      showState && isCorrect
+                        ? "bg-emerald-500/25 ring-1 ring-emerald-400 text-emerald-50"
+                        : showState && isPicked && !isCorrect
+                        ? "bg-red-500/25 ring-1 ring-red-400 text-red-50"
+                        : isPicked
+                        ? "bg-white/15 ring-1 ring-white/30 text-white"
+                        : "bg-white/5 hover:bg-white/10 ring-1 ring-white/10 text-white/90 disabled:opacity-60"
+                    }`}
+                  >
+                    <span
+                      className={`shrink-0 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center mt-0.5 ${
+                        showState && isCorrect
+                          ? "bg-emerald-400 text-emerald-950"
+                          : showState && isPicked && !isCorrect
+                          ? "bg-red-400 text-red-950"
+                          : "bg-white/15 text-white"
+                      }`}
+                    >
+                      {showState && isCorrect ? <Check className="w-2.5 h-2.5" strokeWidth={3} />
+                        : showState && isPicked && !isCorrect ? <X className="w-2.5 h-2.5" strokeWidth={3} />
+                        : String.fromCharCode(65 + i)}
+                    </span>
+                    <span className="flex-1 min-w-0">{opt}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        </AnimatePresence>
 
         <AnimatePresence>
           {revealed && (
@@ -183,7 +214,7 @@ export function DailyMcqWidget({ textScale }: Props) {
           )}
         </AnimatePresence>
 
-        <div className="mt-2.5 flex items-center justify-between">
+        <div className="mt-2.5 flex items-center justify-between gap-3">
           <Link
             to="/exams"
             className="inline-flex items-center gap-1 text-[11px] font-bold text-violet-100 hover:text-white transition-colors"
@@ -191,13 +222,14 @@ export function DailyMcqWidget({ textScale }: Props) {
             More questions
             <ArrowRight className="w-3 h-3" />
           </Link>
-          {picked !== null && (
+          {currentIndex > 0 && (
             <button
               type="button"
-              onClick={() => { setPicked(null); setRevealed(false); }}
-              className="text-[10px] font-bold text-violet-200/80 hover:text-white transition-colors"
+              onClick={goPrevious}
+              className="inline-flex items-center gap-1 text-[10px] font-bold text-violet-200/80 hover:text-white transition-colors"
             >
-              Try again
+              <ArrowLeft className="w-3 h-3" />
+              Previous question
             </button>
           )}
         </div>
