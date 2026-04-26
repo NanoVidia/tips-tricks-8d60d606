@@ -31,7 +31,7 @@ import { useTranslations } from "@/hooks/useTranslations";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
-import { Clock, Trash2, AlertTriangle, AlertCircle, ShieldCheck } from "lucide-react";
+import { Clock, Trash2, ShieldCheck } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { detectUrgency, URGENCY_WEIGHT, URGENCY_LABEL, type Urgency } from "@/lib/clinicalTags";
 import { rankSearchScenarios } from "@/lib/clinicalSearch";
@@ -1022,107 +1022,22 @@ export default function Index() {
               </span>
             </div>
 
-            {/* Urgency filter — clinical priority chips, only during search */}
             {isSearching && allSearchResults.length > 0 && (
-              <div
-                className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1 mb-2"
-                role="tablist"
-                aria-label="Filter by clinical urgency"
-              >
-                {([
-                  { key: null as Urgency | null, label: "All priorities", Icon: Search,
-                    activeCls: "bg-foreground text-background border-transparent",
-                    idleCls: "bg-card text-foreground border-border/60 hover:border-foreground/40",
-                    count: allSearchResults.length },
-                  { key: "critical" as Urgency, label: URGENCY_LABEL.critical, Icon: AlertTriangle,
-                    activeCls: "bg-red-500 text-white border-transparent shadow-sm shadow-red-500/30",
-                    idleCls: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 hover:bg-red-500/15",
-                    count: urgencyCounts.critical },
-                  { key: "urgent" as Urgency, label: URGENCY_LABEL.urgent, Icon: AlertCircle,
-                    activeCls: "bg-amber-500 text-white border-transparent shadow-sm shadow-amber-500/30",
-                    idleCls: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/15",
-                    count: urgencyCounts.urgent },
-                  { key: "routine" as Urgency, label: URGENCY_LABEL.routine, Icon: ShieldCheck,
-                    activeCls: "bg-emerald-500 text-white border-transparent shadow-sm shadow-emerald-500/30",
-                    idleCls: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/15",
-                    count: urgencyCounts.routine },
-                ]).map(({ key, label, Icon, activeCls, idleCls, count }) => {
-                  const active = urgencyFilter === key;
-                  return (
-                    <button
-                      key={String(key)}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => setUrgencyFilter(key)}
-                      disabled={count === 0}
-                      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
-                        active ? activeCls : idleCls
-                      } ${count === 0 ? "opacity-40 cursor-not-allowed" : ""}`}
-                    >
-                      <Icon className="w-3 h-3" strokeWidth={2.5} />
-                      <span>{label}</span>
-                      <span
-                        className={`tabular-nums text-[9px] px-1.5 py-0.5 rounded-full ${
-                          active ? "bg-white/25" : "bg-background/60"
-                        }`}
-                      >
-                        {formatNumber(count)}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Category filter chips — only shown during search */}
-            {isSearching && allSearchResults.length > 0 && (
-              <div
-                className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1 mb-3"
-                role="tablist"
-                aria-label="Filter search results by category"
-              >
-                {([null, ...tabIds] as (ScenarioCategory | null)[]).map((cat) => {
-                  const isAll = cat === null;
-                  const count = isAll ? allSearchResults.length : searchCounts[cat as ScenarioCategory];
-                  const active = searchCatFilter === cat;
-                  const cfg = isAll ? null : categoryConfig[cat as ScenarioCategory];
-                  const label = isAll ? "All" : tabLabel(cat as ScenarioCategory);
-                  return (
-                    <button
-                      key={isAll ? "all" : cat as string}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => setSearchCatFilter(cat)}
-                      disabled={count === 0}
-                      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
-                        active
-                          ? `text-primary-foreground border-transparent shadow-sm ${
-                              isAll ? "bg-primary" : `bg-gradient-to-br ${cfg!.gradient}`
-                            }`
-                          : "bg-card text-foreground border-border/60 hover:border-primary/40"
-                      } ${count === 0 ? "opacity-40 cursor-not-allowed" : ""}`}
-                    >
-                      {!isAll && (
-                        <PhIcon
-                          name={cfg!.phName as never}
-                          size={11}
-                          tone={active ? "white" : "gold"}
-                          weight={active ? "fill" : "duotone"}
-                        />
-                      )}
-                      <span>{label}</span>
-                      <span
-                        className={`tabular-nums text-[9px] px-1.5 py-0.5 rounded-full ${
-                          active ? "bg-white/25" : "bg-muted/70 text-muted-foreground"
-                        }`}
-                      >
-                        {formatNumber(count)}
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className="mb-3 rounded-2xl border border-border/70 bg-card px-3 py-2.5 shadow-editorial">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-black uppercase tracking-[0.16em] text-muted-foreground leading-tight">
+                      Priority-first clinical view
+                    </p>
+                    <p className="text-[12px] text-foreground/80 font-semibold leading-snug mt-1">
+                      Critical protocols and closest title matches are shown first.
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-[18px] font-black tabular-nums text-primary leading-none">{formatNumber(urgencyCounts.critical)}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground mt-1">critical</p>
+                  </div>
+                </div>
               </div>
             )}
 
