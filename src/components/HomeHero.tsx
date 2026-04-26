@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowRight, Search } from "lucide-react";
-import { PhIcon } from "@/components/ui/PhIcon";
+import { PhIcon, type PhIconProps } from "@/components/ui/PhIcon";
 import { AIRobot } from "@/components/AIRobot";
 import { EmergencyStrip } from "@/components/home/EmergencyStrip";
 import { MiniCaseOfDay } from "@/components/home/MiniCaseOfDay";
@@ -122,11 +122,20 @@ export function HomeHero({
     id: string;
     label: string;
     query: string;
-    phName: "Pill" | "ClipboardText" | "Scissors" | "Question" | "Baby" | "Stethoscope";
+    phName: PhIconProps["name"];
     gradient: string;
     shadow: string;
     hint: string;
   };
+
+  const priorityItems: Array<{ id: string; label: string; query: string; phName: PhIconProps["name"]; hint: string }> = [
+    { id: "high-risk", label: "High-risk obstetrics", query: "preeclampsia diabetes placenta previa fetal growth", phName: "WarningCircle", hint: "PET · GDM · FGR · Placenta" },
+    { id: "labor", label: "Labor ward decisions", query: "labor CTG induction shoulder dystocia operative delivery", phName: "Baby", hint: "CTG · induction · dystocia" },
+    { id: "fertility", label: "Fertility & IVF", query: "infertility ovulation induction IVF PCOS ovarian reserve", phName: "Dna", hint: "PCOS · IVF · ovarian reserve" },
+    { id: "gyn-surgery", label: "Gynae surgery", query: "hysterectomy laparoscopy myomectomy hysteroscopy complications", phName: "Scissors", hint: "Lap · hysteroscopy · anatomy" },
+    { id: "gyn-clinic", label: "Gynae clinic", query: "bleeding pelvic pain menopause contraception endometriosis", phName: "Stethoscope", hint: "AUB · pain · menopause" },
+    { id: "exams", label: "Boards & OSCE", query: "exam OSCE MRCOG Arab board EFOG MCQ", phName: "GraduationCap", hint: "MCQ · viva · stations" },
+  ];
 
   // Emergencies live in the dedicated EmergencyStrip above — keep this list as
   // the broader "browse by content type" filter row.
@@ -134,7 +143,7 @@ export function HomeHero({
     { id: "drugs",      label: "Drugs & Dosing",        query: "drug",      phName: "Pill",          gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30",  hint: "MgSO₄ · Oxytocin · Heparin" },
     { id: "protocols",  label: "Clinical Protocols",    query: "protocol",  phName: "ClipboardText", gradient: "from-sky-500 to-blue-700",       shadow: "shadow-sky-500/30",     hint: "PPH · Eclampsia · Sepsis" },
     { id: "procedures", label: "Procedures & Surgery",  query: "procedure", phName: "Scissors",      gradient: "from-rose-500 to-pink-700",      shadow: "shadow-rose-500/30",    hint: "C-section · Forceps · D&C" },
-    { id: "obstetrics", label: "Obstetrics & Labor",    query: "labor",     phName: "Baby",          gradient: "from-amber-500 to-orange-600",   shadow: "shadow-amber-500/30",   hint: "Labor · Delivery · Antenatal" },
+    { id: "obstetrics", label: "Obstetrics & Fertility", query: "obstetrics fertility", phName: "Baby", gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", hint: "Antenatal · Labor · IVF" },
     { id: "clinic",     label: "Outpatient Clinic",     query: "clinic",    phName: "Stethoscope",   gradient: "from-teal-500 to-cyan-700",      shadow: "shadow-teal-500/30",    hint: "Antenatal · Gynae visits" },
     { id: "mcqs",       label: "Q&A and MCQs",          query: "MCQ",       phName: "Question",      gradient: "from-emerald-500 to-teal-700",   shadow: "shadow-emerald-500/30", hint: "Board-style self-assessment" },
   ];
