@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowRight, Search } from "lucide-react";
-import { PhIcon } from "@/components/ui/PhIcon";
+import { PhIcon, type PhIconProps } from "@/components/ui/PhIcon";
 import { AIRobot } from "@/components/AIRobot";
 import { EmergencyStrip } from "@/components/home/EmergencyStrip";
 import { MiniCaseOfDay } from "@/components/home/MiniCaseOfDay";
@@ -122,11 +122,20 @@ export function HomeHero({
     id: string;
     label: string;
     query: string;
-    phName: "Pill" | "ClipboardText" | "Scissors" | "Question" | "Baby" | "Stethoscope";
+    phName: PhIconProps["name"];
     gradient: string;
     shadow: string;
     hint: string;
   };
+
+  const priorityItems: Array<{ id: string; label: string; query: string; phName: PhIconProps["name"]; hint: string }> = [
+    { id: "high-risk", label: "High-risk obstetrics", query: "preeclampsia diabetes placenta previa fetal growth", phName: "WarningCircle", hint: "PET · GDM · FGR · Placenta" },
+    { id: "labor", label: "Labor ward decisions", query: "labor CTG induction shoulder dystocia operative delivery", phName: "Baby", hint: "CTG · induction · dystocia" },
+    { id: "fertility", label: "Fertility & IVF", query: "infertility ovulation induction IVF PCOS ovarian reserve", phName: "Dna", hint: "PCOS · IVF · ovarian reserve" },
+    { id: "gyn-surgery", label: "Gynae surgery", query: "hysterectomy laparoscopy myomectomy hysteroscopy complications", phName: "Scissors", hint: "Lap · hysteroscopy · anatomy" },
+    { id: "gyn-clinic", label: "Gynae clinic", query: "bleeding pelvic pain menopause contraception endometriosis", phName: "Stethoscope", hint: "AUB · pain · menopause" },
+    { id: "exams", label: "Boards & OSCE", query: "exam OSCE MRCOG Arab board EFOG MCQ", phName: "GraduationCap", hint: "MCQ · viva · stations" },
+  ];
 
   // Emergencies live in the dedicated EmergencyStrip above — keep this list as
   // the broader "browse by content type" filter row.
@@ -134,7 +143,7 @@ export function HomeHero({
     { id: "drugs",      label: "Drugs & Dosing",        query: "drug",      phName: "Pill",          gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30",  hint: "MgSO₄ · Oxytocin · Heparin" },
     { id: "protocols",  label: "Clinical Protocols",    query: "protocol",  phName: "ClipboardText", gradient: "from-sky-500 to-blue-700",       shadow: "shadow-sky-500/30",     hint: "PPH · Eclampsia · Sepsis" },
     { id: "procedures", label: "Procedures & Surgery",  query: "procedure", phName: "Scissors",      gradient: "from-rose-500 to-pink-700",      shadow: "shadow-rose-500/30",    hint: "C-section · Forceps · D&C" },
-    { id: "obstetrics", label: "Obstetrics & Labor",    query: "labor",     phName: "Baby",          gradient: "from-amber-500 to-orange-600",   shadow: "shadow-amber-500/30",   hint: "Labor · Delivery · Antenatal" },
+    { id: "obstetrics", label: "Obstetrics & Fertility", query: "obstetrics fertility", phName: "Baby", gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", hint: "Antenatal · Labor · IVF" },
     { id: "clinic",     label: "Outpatient Clinic",     query: "clinic",    phName: "Stethoscope",   gradient: "from-teal-500 to-cyan-700",      shadow: "shadow-teal-500/30",    hint: "Antenatal · Gynae visits" },
     { id: "mcqs",       label: "Q&A and MCQs",          query: "MCQ",       phName: "Question",      gradient: "from-emerald-500 to-teal-700",   shadow: "shadow-emerald-500/30", hint: "Board-style self-assessment" },
   ];
@@ -209,7 +218,7 @@ export function HomeHero({
           {/* Text block */}
           <div className="flex-1 min-w-0 space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-white font-bold text-[16px] leading-tight">AI Medical Assistant</h2>
+              <h2 className="text-white font-bold text-[16px] leading-tight">OB/GYN & Fertility Mentor</h2>
               <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-green-400/20 text-green-300 border border-green-400/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                 Live
@@ -217,7 +226,7 @@ export function HomeHero({
             </div>
 
             <p className="text-white/75 text-[11px] leading-snug">
-              Calculators, drug safety & instant OB/GYN answers — 24/7.
+              Labor ward, gynae clinic, fertility, surgery, drugs, and exam decisions — in one clinical cockpit.
             </p>
 
             <div className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-bold text-white bg-white/10 px-2.5 py-1 rounded-full ring-1 ring-white/20">
@@ -227,6 +236,46 @@ export function HomeHero({
           </div>
         </div>
       </motion.button>
+
+      <motion.div
+        initial={{ y: 12, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ ...SPRING, delay: 0.08 }}
+        className="space-y-3.5"
+      >
+        <div className="px-1 space-y-1.5">
+          <p className={`${textScale.section} font-black uppercase tracking-[0.18em] text-foreground leading-[1.2]`}>
+            Essential OB/GYN Doctor Hub
+          </p>
+          <p className={`${textScale.sub} text-muted-foreground leading-[1.35]`}>
+            The fastest routes for obstetricians, gynecologists, fertility clinicians, residents, and exam candidates.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          {priorityItems.map((item, idx) => (
+            <motion.button
+              key={item.id}
+              type="button"
+              onClick={() => { hapticTap(8); onSearchChip?.(item.query); }}
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ ...SPRING, delay: 0.12 + idx * 0.04 }}
+              whileTap={{ scale: 0.97 }}
+              className="rounded-2xl border border-border/70 bg-card p-3 text-left shadow-editorial hover:border-primary/40 hover:bg-muted/35 transition-colors min-h-[86px]"
+            >
+              <div className="flex items-start gap-2.5">
+                <span className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <PhIcon name={item.phName} size={18} weight="duotone" />
+                </span>
+                <span className="min-w-0">
+                  <span className={`${textScale.card} block font-black leading-[1.18] text-foreground break-words`}>{item.label}</span>
+                  <span className={`${textScale.hint} block text-muted-foreground leading-[1.25] mt-1.5 break-words`}>{item.hint}</span>
+                </span>
+              </div>
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
 
       {/* ② Search-driven content type chips — replace previous category cards */}
       <motion.div
