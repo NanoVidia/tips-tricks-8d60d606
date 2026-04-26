@@ -21,9 +21,9 @@ function NotificationsBootstrap() {
 
 const queryClient = new QueryClient();
 
-// 🔒 حالة التجميد — يتحكم بها Lovable فقط من هنا (غير مرتبطة بـ DB).
-// لتجميد التطبيق للزوار: اجعل القيمة true. لإلغاء التجميد: false.
-// المطوّر يتجاوز عبر ?dev=1 (يُحفظ في localStorage) ويُعيد القفل عبر ?dev=0.
+// App freeze state — controlled only from here and not connected to the database.
+// Set true to freeze the published app for visitors; set false to unfreeze it.
+// Developers can override with ?dev=1 and lock again with ?dev=0.
 const APP_FROZEN = false;
 const DEV_KEY = "dev_unlock";
 
@@ -41,8 +41,8 @@ const App = () => {
     if (localStorage.getItem("a11y_large") === "1") document.documentElement.classList.add("large-text");
   }, []);
 
-  // Auto-unlock على preview/sandbox الخاصة بـ Lovable (عرض المطوّر).
-  // فقط الدومين المنشور (tips-tricks.lovable.app) يبقى مُجمَّداً للزوار.
+  // Auto-unlock in Lovable preview/sandbox environments.
+  // Only the published domain remains frozen for visitors when APP_FROZEN is true.
   const hostname = typeof window !== "undefined" ? window.location.hostname : "";
   const isLovablePreview =
     hostname.includes("id-preview--") ||
