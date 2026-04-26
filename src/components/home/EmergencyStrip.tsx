@@ -68,7 +68,7 @@ export function EmergencyStrip({ onPick, textScale }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 min-[390px]:grid-cols-2 auto-rows-fr gap-2.5 items-stretch">
         {EMERGENCIES.map((e, idx) => (
           <motion.button
             key={e.id}
@@ -79,23 +79,27 @@ export function EmergencyStrip({ onPick, textScale }: Props) {
             transition={{ ...springTransition, delay: 0.05 + idx * 0.04 }}
             whileTap={{ scale: 0.96 }}
             whileHover={{ y: -1 }}
-            className={`group relative overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm ring-1 ${e.ring} px-2.5 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300`}
+            className={`group relative flex h-full min-h-[118px] overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm ring-1 ${e.ring} px-3 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300`}
             aria-label={`Open ${e.abbr} ${e.nameEn} protocol`}
           >
-            <div className="flex items-start gap-2">
-              <span className="text-[18px] leading-none shrink-0 mt-0.5">{e.emoji}</span>
-              <div className="min-w-0 flex-1">
-                <p className={`text-white font-black ${scale.card} leading-[1.2] break-words`}>
-                  {e.abbr} <span className="text-red-200/80 font-bold">/</span> {e.nameEn}
-                </p>
-                <p className={`text-red-100/85 ${scale.hint} leading-[1.25] mt-1 font-semibold break-words`} dir="rtl">
-                  {e.nameAr}
-                </p>
-                <p className={`text-red-200/85 ${scale.hint} leading-[1.25] mt-1 font-mono break-words`}>
+            <div className="flex w-full items-start gap-2.5">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-[17px] leading-none shrink-0 mt-0.5">{e.emoji}</span>
+              <div className="min-w-0 flex-1 self-stretch flex flex-col gap-2">
+                <div className="min-w-0 space-y-1">
+                  <p className={`text-white font-black ${scale.card} leading-[1.28] break-words hyphens-auto`}>
+                    <span className="inline-block whitespace-nowrap">{e.abbr}</span>{" "}
+                    <span className="text-red-200/80 font-bold">/</span>{" "}
+                    <span>{e.nameEn}</span>
+                  </p>
+                  <p className={`text-red-100/85 ${scale.hint} leading-[1.45] font-semibold break-words`} dir="rtl">
+                    {e.nameAr}
+                  </p>
+                </div>
+                <p className={`mt-auto rounded-lg bg-white/5 px-2 py-1.5 text-red-200/90 ${scale.hint} leading-[1.35] font-mono break-words`}>
                   {e.protocol}
                 </p>
               </div>
-              <ChevronRight className="w-3 h-3 text-red-200/60 group-hover:text-red-100 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+              <ChevronRight className="w-3.5 h-3.5 text-red-200/60 group-hover:text-red-100 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
             </div>
           </motion.button>
         ))}
