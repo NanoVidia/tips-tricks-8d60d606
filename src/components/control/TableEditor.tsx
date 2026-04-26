@@ -75,7 +75,7 @@ function FieldEditor({
     return (
       <div className="flex items-center gap-2">
         <Switch checked={Boolean(value)} onCheckedChange={onChange} />
-        <span className="text-xs text-muted-foreground">{value ? "مفعّل" : "معطّل"}</span>
+        <span className="text-xs text-muted-foreground">{value ? "Active" : "Inactive"}</span>
       </div>
     );
   }
@@ -102,7 +102,7 @@ function FieldEditor({
               .filter(Boolean),
           )
         }
-        placeholder="عنصر واحد في كل سطر"
+        placeholder="One item per line"
         className="font-mono text-xs"
       />
     );
@@ -178,7 +178,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
   }
 
   function startCreate() {
-    // نأخذ مفاتيح من أول صف موجود كقالب، أو نتركها فارغة
+    // نأخذ مفاتيح of أول صف موجود كقالب، أو نتركها فارغة
     const template: Row = {};
     if (items[0]) {
       for (const k of Object.keys(items[0])) {
@@ -209,10 +209,10 @@ export default function TableEditor({ table }: { table: AdminTable }) {
       }
       if (creating) {
         await adminCreate(table, payload);
-        toast.success("تمت الإضافة");
+        toast.success("Added");
       } else if (editing) {
         await adminUpdate(table, String(editing.id), payload);
-        toast.success("تم التحديث");
+        toast.success("Updated");
       }
       setEditing(null);
       setCreating(false);
@@ -227,10 +227,10 @@ export default function TableEditor({ table }: { table: AdminTable }) {
   }
 
   async function handleDelete(row: Row) {
-    if (!confirm("حذف هذا السجل نهائياً؟")) return;
+    if (!confirm("Delete this record permanently?")) return;
     try {
       await adminDelete(table, String(row.id));
-      toast.success("تم الحذف");
+      toast.success("Deleted");
       qc.invalidateQueries({ queryKey: ["admin-list", table] });
       qc.invalidateQueries({ queryKey: ["admin-stats"] });
     } catch (err) {
@@ -246,7 +246,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
         <div>
           <h1 className="text-xl font-bold">{meta.label}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {table} · {total} سجل
+            {table} · {total} records
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -255,31 +255,31 @@ export default function TableEditor({ table }: { table: AdminTable }) {
           </Button>
           <Button size="sm" onClick={startCreate}>
             <Plus className="h-4 w-4" />
-            إضافة
+            Add
           </Button>
         </div>
       </div>
 
       <div className="relative">
-        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
             setPage(0);
           }}
-          placeholder="بحث..."
-          className="pr-10"
+          placeholder="Search..."
+          className="pl-10"
         />
       </div>
 
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">جارِ التحميل...</div>
+            <div className="p-8 text-center text-sm text-muted-foreground">Loading...</div>
           ) : items.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
-              لا توجد سجلات. اضغط "إضافة" للبدء.
+              No records. Select “Add” to get started.
             </div>
           ) : (
             <div className="divide-y">
@@ -321,10 +321,10 @@ export default function TableEditor({ table }: { table: AdminTable }) {
             disabled={page === 0}
             onClick={() => setPage((p) => Math.max(0, p - 1))}
           >
-            السابق
+            Previous
           </Button>
           <span className="text-muted-foreground">
-            صفحة {page + 1} من {totalPages}
+            Page {page + 1} of {totalPages}
           </span>
           <Button
             variant="outline"
@@ -332,7 +332,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
             disabled={page >= totalPages - 1}
             onClick={() => setPage((p) => p + 1)}
           >
-            التالي
+            Next
           </Button>
         </div>
       )}
@@ -347,10 +347,10 @@ export default function TableEditor({ table }: { table: AdminTable }) {
           }
         }}
       >
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {creating ? "إضافة سجل جديد" : "تعديل سجل"} — {meta.label}
+              {creating ? "Add new record" : "Edit record"} — {meta.label}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -372,7 +372,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
               })}
             {Object.keys(draft).filter((k) => !HIDDEN_COLS.has(k)).length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">
-                لا يوجد قالب — أضف سجلاً يدوياً عبر JSON أو انتظر بيانات seed.
+                No template is available yet. Add a record after seed data is available.
               </p>
             )}
           </div>
@@ -385,11 +385,11 @@ export default function TableEditor({ table }: { table: AdminTable }) {
               }}
             >
               <X className="h-4 w-4" />
-              إلغاء
+              Cancel
             </Button>
             <Button onClick={handleSave} disabled={busy}>
               <Save className="h-4 w-4" />
-              {busy ? "جارِ الحفظ..." : "حفظ"}
+              {busy ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>

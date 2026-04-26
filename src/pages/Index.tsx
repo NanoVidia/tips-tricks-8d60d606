@@ -1131,7 +1131,7 @@ export default function Index() {
                 <div className="rounded-2xl border border-info/20 bg-info-soft/70 px-3.5 py-3 flex items-start gap-2.5">
                   <ShieldCheck className="w-4 h-4 text-info mt-0.5 shrink-0" strokeWidth={2.5} />
                   <p className="text-[11px] leading-relaxed text-foreground/80 font-semibold">
-                    النتائج مرتّبة حسب صلة العنوان والمترادفات والسياق السريري، مع إبراز الحالات الأعلى أولوية أولاً.
+                    Results are ranked by title relevance, clinical synonyms, and scenario context, with higher-priority cases surfaced first.
                   </p>
                 </div>
                 {filteredSearchResults.map((item, idx) => (

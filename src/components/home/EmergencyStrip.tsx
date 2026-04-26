@@ -6,7 +6,6 @@ interface Emergency {
   id: string;
   abbr: string;
   nameEn: string;
-  nameAr: string;
   query: string;
   protocol: string;
   emoji: string;
@@ -15,10 +14,10 @@ interface Emergency {
 }
 
 const EMERGENCIES: Emergency[] = [
-  { id: "pph", abbr: "PPH", nameEn: "Postpartum Hemorrhage", nameAr: "نزف ما بعد الولادة", query: "PPH postpartum hemorrhage", protocol: "4 T's · Bakri · TXA", emoji: "🩸", ring: "ring-red-500/40", glow: "shadow-red-500/40" },
-  { id: "eclampsia", abbr: "ECL", nameEn: "Eclampsia", nameAr: "تشنج الحمل", query: "eclampsia", protocol: "MgSO₄ 4g IV", emoji: "⚡", ring: "ring-violet-500/40", glow: "shadow-violet-500/40" },
-  { id: "shoulder", abbr: "SD", nameEn: "Shoulder Dystocia", nameAr: "تعسر ولادة الكتف", query: "shoulder dystocia", protocol: "HELPERR", emoji: "🚨", ring: "ring-orange-500/40", glow: "shadow-orange-500/40" },
-  { id: "cord", abbr: "UCP", nameEn: "Umbilical Cord Prolapse", nameAr: "تدلي الحبل السري", query: "cord prolapse", protocol: "Knee-chest · STAT CS", emoji: "⏱️", ring: "ring-rose-500/40", glow: "shadow-rose-500/40" },
+  { id: "pph", abbr: "PPH", nameEn: "Postpartum Hemorrhage", query: "PPH postpartum hemorrhage", protocol: "4 T's · Bakri · TXA", emoji: "🩸", ring: "ring-red-500/40", glow: "shadow-red-500/40" },
+  { id: "eclampsia", abbr: "ECL", nameEn: "Eclampsia", query: "eclampsia", protocol: "MgSO₄ 4g IV", emoji: "⚡", ring: "ring-violet-500/40", glow: "shadow-violet-500/40" },
+  { id: "shoulder", abbr: "SD", nameEn: "Shoulder Dystocia", query: "shoulder dystocia", protocol: "HELPERR", emoji: "🚨", ring: "ring-orange-500/40", glow: "shadow-orange-500/40" },
+  { id: "cord", abbr: "UCP", nameEn: "Umbilical Cord Prolapse", query: "cord prolapse", protocol: "Knee-chest · STAT CS", emoji: "⏱️", ring: "ring-rose-500/40", glow: "shadow-rose-500/40" },
 ];
 
 interface Props {
@@ -90,9 +89,6 @@ export function EmergencyStrip({ onPick, textScale }: Props) {
                     <span className="inline-block whitespace-nowrap">{e.abbr}</span>{" "}
                     <span className="text-red-200/80 font-bold">/</span>{" "}
                     <span>{e.nameEn}</span>
-                  </p>
-                  <p className={`text-red-100/85 ${scale.hint} leading-[1.45] font-semibold break-words`} dir="rtl">
-                    {e.nameAr}
                   </p>
                 </div>
                 <p className={`mt-auto rounded-lg bg-white/5 px-2 py-1.5 text-red-200/90 ${scale.hint} leading-[1.35] font-mono break-words`}>

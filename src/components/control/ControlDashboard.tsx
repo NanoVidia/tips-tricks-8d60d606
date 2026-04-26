@@ -56,17 +56,17 @@ export default function ControlDashboard({
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <TrendingUp className="h-6 w-6 text-primary" />
-            لوحة القيادة
+            Dashboard
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            نظرة شاملة على كل محتوى التطبيق
+            Overview of app content
           </p>
         </div>
         <Card className="px-4 py-2 bg-primary/5 border-primary/20">
           <div className="flex items-center gap-2 text-sm">
             <Database className="h-4 w-4 text-primary" />
             <span className="font-bold text-primary">{total}</span>
-            <span className="text-muted-foreground">سجل في {Object.keys(counts).length} جدول</span>
+            <span className="text-muted-foreground">records across {Object.keys(counts).length} tables</span>
           </div>
         </Card>
       </div>
@@ -106,13 +106,13 @@ export default function ControlDashboard({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">إرشادات سريعة</CardTitle>
+          <CardTitle className="text-base">Quick guide</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>• اضغط على أي بطاقة أعلاه للانتقال إلى محرّر الجدول.</p>
-          <p>• كل تعديل يُحفظ مباشرة في قاعدة البيانات ويظهر للمستخدمين فوراً.</p>
-          <p>• التعديلات لا تتطلب إعادة نشر التطبيق.</p>
-          <p>• في الجلسات القادمة سنربط هذه الجداول بصفحات التطبيق (حالياً البيانات تأتي من الكود).</p>
+          <p>• Select any card above to open its table editor.</p>
+          <p>• Changes are saved directly to the database and become visible immediately.</p>
+          <p>• Content edits do not require republishing the app.</p>
+          <p>• Upcoming sessions connect these tables to the app pages; some data may still come from code.</p>
         </CardContent>
       </Card>
     </div>
