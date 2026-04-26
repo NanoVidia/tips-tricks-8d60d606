@@ -85,13 +85,13 @@ export function EmergencyStrip({ onPick, textScale }: Props) {
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-[17px] leading-none shrink-0 mt-0.5">{e.emoji}</span>
               <div className="min-w-0 flex-1 self-stretch flex flex-col gap-2">
                 <div className="min-w-0 space-y-1">
-                  <p className={`text-white font-black ${scale.card} leading-[1.28] break-words hyphens-auto`}>
+                  <p className={`text-flow-safe mobile-copy-align text-white font-black ${scale.card} leading-[1.28]`} lang="en">
                     <span className="inline-block whitespace-nowrap">{e.abbr}</span>{" "}
                     <span className="text-red-200/80 font-bold">/</span>{" "}
                     <span>{e.nameEn}</span>
                   </p>
                 </div>
-                <p className={`mt-auto rounded-lg bg-white/5 px-2 py-1.5 text-red-200/90 ${scale.hint} leading-[1.35] font-mono break-words`}>
+                <p className={`text-flow-compact mt-auto rounded-lg bg-white/5 px-2 py-1.5 text-red-200/90 ${scale.hint} leading-[1.35] font-mono`} lang="en">
                   {e.protocol}
                 </p>
               </div>

@@ -157,6 +157,43 @@
     font-feature-settings: "lnum", 'cv11', 'ss01', 'ss03';
     unicode-bidi: plaintext;
   }
+
+  article,
+  section,
+  aside,
+  button,
+  a,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  li,
+  label,
+  [role="button"],
+  [role="menuitem"],
+  [role="dialog"] {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    text-wrap: pretty;
+  }
+
+  button,
+  a,
+  [role="button"],
+  [role="menuitem"] {
+    text-align: start;
+  }
+
+  html,
+  body,
+  #root {
+    direction: ltr;
+  }
+
   .font-editorial {
     font-family: 'Playfair Display', Georgia, serif;
     letter-spacing: -0.015em;
@@ -223,6 +260,32 @@
     letter-spacing: 0.18em;
     font-weight: 700;
     font-size: 0.625rem;
+  }
+
+  .text-flow-safe {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    text-wrap: pretty;
+    line-break: auto;
+  }
+
+  .text-flow-compact {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+    text-wrap: balance;
+  }
+
+  @media (max-width: 480px) {
+    .mobile-copy-align {
+      text-align: start;
+      line-height: 1.35;
+    }
   }
 
   /* Editorial header gradient shadow — applied as a box-shadow so it never
