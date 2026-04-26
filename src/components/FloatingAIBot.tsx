@@ -21,10 +21,10 @@ type Msg = {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const SCENARIO = {
-  title_en: "General OB/GYN Assistant",
-  situation_en: "The doctor is asking a general obstetrics and gynecology question.",
-  action_en: "Provide evidence-based, professional medical guidance. Use tools for any calculation or drug lookup.",
-  script_en: "Answer as a knowledgeable OB/GYN consultant.",
+  title_en: "OB/GYN & Fertility Assistant",
+  situation_en: "The doctor is asking an obstetrics, gynecology, reproductive medicine, or fertility question.",
+  action_en: "Provide evidence-based specialist guidance only within OB/GYN and fertility. Decline unrelated medical specialties and redirect to a relevant specialist.",
+  script_en: "Answer as a knowledgeable OB/GYN and fertility consultant.",
 };
 
 /** One streaming round-trip with the gateway. Returns assistant text + any tool_calls. */
