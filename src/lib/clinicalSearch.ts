@@ -164,20 +164,22 @@ function relationBand(score: number, urgency: number, index: number) {
 
 export function rankSearchScenarios(query: string, rows: SearchScenario[]) {
   const queryVariants = expandClinicalSearchQueries(query);
+  if (queryVariants.length === 0 || rows.length === 0) return [];
+
   const bestScore = (s: SearchScenario, strict: boolean) =>
     Math.max(...queryVariants.map((variant) => scoreScenario(s, variant, strict)));
 
   let ranked = rows
-    .map((s) => ({ s, score: bestScore(s, true), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
+    .map((s, index) => ({ s, index, score: bestScore(s, true), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
     .filter((x) => x.score >= 8)
-    .sort((a, b) => (relationBand(a.score, a.urg, rows.indexOf(a.s)) - relationBand(b.score, b.urg, rows.indexOf(b.s))) || (b.score - a.score) || (b.urg - a.urg))
+    .sort((a, b) => (relationBand(a.score, a.urg, a.index) - relationBand(b.score, b.urg, b.index)) || (b.score - a.score) || (b.urg - a.urg))
     .map((x) => x.s);
 
   if (ranked.length === 0) {
     ranked = rows
-      .map((s) => ({ s, score: bestScore(s, false), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
+      .map((s, index) => ({ s, index, score: bestScore(s, false), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
       .filter((x) => x.score >= 6)
-      .sort((a, b) => (relationBand(a.score, a.urg, rows.indexOf(a.s)) - relationBand(b.score, b.urg, rows.indexOf(b.s))) || (b.score - a.score) || (b.urg - a.urg))
+      .sort((a, b) => (relationBand(a.score, a.urg, a.index) - relationBand(b.score, b.urg, b.index)) || (b.score - a.score) || (b.urg - a.urg))
       .map((x) => x.s);
   }
 
