@@ -13,11 +13,12 @@ const mcqExpansion = read("src/data/mcqBankExpansion.ts");
 const mcqExpansionPhase2 = read("src/data/mcqBankExpansionPhase2.ts");
 const mcqExpansionPhase3 = read("src/data/mcqBankExpansionPhase3.ts");
 const mcqExpansionPhase4 = read("src/data/mcqBankExpansionPhase4.ts");
+const mcqExpansionPhase5 = read("src/data/mcqBankExpansionPhase5.ts");
 const surgeries = read("src/data/surgeriesData.ts");
 const tools = read("src/data/toolsData.ts");
 const clinical = read("src/data/clinicalData.ts");
 
-const qCalls = [...`${mcqExtra}\n${mcqExpansion}\n${mcqExpansionPhase2}\n${mcqExpansionPhase3}\n${mcqExpansionPhase4}`.matchAll(/Q\("([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([\s\S]*?)",\s*\[([\s\S]*?)\],\s*(\d),\s*"([\s\S]*?)",\s*"([\s\S]*?)"/g)];
+const qCalls = [...`${mcqExtra}\n${mcqExpansion}\n${mcqExpansionPhase2}\n${mcqExpansionPhase3}\n${mcqExpansionPhase4}\n${mcqExpansionPhase5}`.matchAll(/Q\("([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([\s\S]*?)",\s*\[([\s\S]*?)\],\s*(\d),\s*"([\s\S]*?)",\s*"([\s\S]*?)"/g)];
 const objectMcqs = count(mcqBank, /id:\s*"[^"]+"/g);
 const totalMcqs = objectMcqs + qCalls.length;
 const topicCounts = qCalls.reduce((acc, m) => {
