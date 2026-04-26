@@ -1,5 +1,5 @@
-// النصوص الافتراضية المُضمَّنة بالكود — تُستخدم كـ fallback عندما يفشل تحميل DB.
-// أي تعديل في /control → app_translations يطغى على هذه القيم في الإنتاج.
+// Default embedded strings used as a fallback when backend translations fail to load.
+// Any /control → app_translations change overrides these values in production.
 export const defaultTranslations = {
   appTitle: "Tips & Tricks",
   appSubtitle: "Clinical bedside companion",
@@ -29,11 +29,11 @@ export const defaultTranslations = {
 export type TranslationKey = keyof typeof defaultTranslations;
 
 /**
- * @deprecated استخدم useTranslations() من "@/hooks/useTranslations" بدلاً منها للحصول على نصوص قابلة للتعديل من /control.
- * تظل موجودة كـ shim للتوافق الخلفي مع الكود القديم.
+ * @deprecated Use useTranslations() from "@/hooks/useTranslations" for editable /control strings.
+ * Kept as a backward-compatible shim for older code.
  */
 export function t() {
-  // نُرجع نفس البنية القديمة (مع tabs المتداخلة) للتوافق.
+  // Return the legacy nested tabs structure for compatibility.
   return {
     appTitle: defaultTranslations.appTitle,
     appSubtitle: defaultTranslations.appSubtitle,
