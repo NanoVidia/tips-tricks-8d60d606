@@ -64,18 +64,20 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <NotificationsBootstrap />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/index" element={<Index />} />
-            <Route path="/tools" element={<Tools />} />
-            <Route path="/exams" element={<Exams />} />
-            <Route path="/exams/compare" element={<ExamsCompare />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/control/login" element={<ControlLoginPage />} />
-            <Route path="/control" element={<Control />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<div className="min-h-screen bg-background" />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/index" element={<Index />} />
+              <Route path="/tools" element={<Tools />} />
+              <Route path="/exams" element={<Exams />} />
+              <Route path="/exams/compare" element={<ExamsCompare />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/control/login" element={<ControlLoginPage />} />
+              <Route path="/control" element={<Control />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
         {showFreeze && <FreezeOverlay />}
       </TooltipProvider>
