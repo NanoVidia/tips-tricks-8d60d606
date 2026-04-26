@@ -748,6 +748,7 @@ export default function Tools() {
                     of {mcqs.length}
                   </span>
                 </p>
+                <p className="text-[10px] text-muted-foreground">{mcqLoading ? "Loading bank…" : `${mcqSource === "db" ? "Database" : "Curated fallback"} bank`}</p>
               </div>
               <div className="flex gap-1.5">
                 <Button
@@ -770,7 +771,9 @@ export default function Tools() {
                 </Button>
               </div>
             </Card>
-            {mcqOrder.map((origIdx, displayIdx) => (
+            {mcqOrder.length === 0 ? (
+              <Card className="p-4 border-border/50 text-xs text-muted-foreground">No reviewed MCQs are available yet.</Card>
+            ) : mcqOrder.map((origIdx, displayIdx) => mcqs[origIdx] && (
               <MCQCard
                 key={`${origIdx}-${mcqOrder.join(",")}`}
                 data={mcqs[origIdx]}
