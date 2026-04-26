@@ -34,7 +34,7 @@ import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2, ShieldCheck } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { detectUrgency } from "@/lib/clinicalTags";
-import { rankSearchScenarios } from "@/lib/clinicalSearch";
+import { expandClinicalSearchQueries, rankSearchScenarios } from "@/lib/clinicalSearch";
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
@@ -265,11 +265,19 @@ export default function Index() {
       if (debouncedSearch.trim()) {
         // Global search across ALL categories — don't filter by activeTab.
         const q = debouncedSearch.trim();
-        const { data, error } = await supabase.rpc("search_scenarios", {
-          search_query: q,
-        });
-        if (error) throw error;
-        const raw = (data as Scenario[]) || [];
+        const queryVariants = expandClinicalSearchQueries(q);
+        const results = await Promise.all(
+          queryVariants.map((search_query) => supabase.rpc("search_scenarios", { search_query }))
+        );
+        const firstError = results.find((result) => result.error)?.error;
+        if (firstError) throw firstError;
+        const raw = Array.from(
+          new Map(
+            results
+              .flatMap((result) => (result.data as Scenario[]) || [])
+              .map((scenario) => [scenario.id, scenario])
+          ).values()
+        );
 
         const ranked = rankSearchScenarios(q, raw);
 
