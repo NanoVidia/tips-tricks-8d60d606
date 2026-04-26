@@ -72,7 +72,7 @@ function NavItem({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition text-right ${
+      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition text-left ${
         active
           ? "bg-primary text-primary-foreground font-medium shadow-sm"
           : "hover:bg-muted text-foreground"
@@ -110,7 +110,7 @@ function Navigation({
       <NavItem
         active={view === "dashboard"}
         icon={LayoutDashboard}
-        label="لوحة القيادة"
+        label="Dashboard"
         onClick={() => {
           setView("dashboard");
           onItemClick?.();
@@ -158,12 +158,12 @@ export default function Control() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    document.title = "لوحة التحكم — Tips & Tricks";
+    document.title = "Control Panel — Tips & Tricks";
     if (!authed) return;
     // التحقق من صلاحية الجلسة عند التحميل
     adminVerify().catch(() => {
       setAuthed(false);
-      toast.error("انتهت الجلسة، الرجاء تسجيل الدخول مجدداً");
+      toast.error("Session expired, please sign in again");
     });
   }, [authed]);
 
@@ -171,24 +171,24 @@ export default function Control() {
     await adminLogout();
     setAuthed(false);
     setView("dashboard");
-    toast.success("تم تسجيل الخروج");
+    toast.success("Signed out");
   }
 
   if (!authed) return <ControlLogin onSuccess={() => setAuthed(true)} />;
 
   const currentTitle =
-    view === "dashboard" ? "لوحة القيادة" : ADMIN_TABLES_META[view].label;
+    view === "dashboard" ? "Dashboard" : ADMIN_TABLES_META[view].label;
 
   return (
-    <div className="min-h-screen bg-background flex" dir="rtl">
+    <div className="min-h-screen bg-background flex">
       {/* Sidebar للأجهزة الكبيرة */}
-      <aside className="hidden lg:flex lg:flex-col w-64 border-l bg-card shrink-0 sticky top-0 h-screen">
+      <aside className="hidden lg:flex lg:flex-col w-64 border-r bg-card shrink-0 sticky top-0 h-screen">
         <div className="px-4 py-4 border-b flex items-center justify-between">
           <div>
-            <h2 className="font-bold text-sm">لوحة التحكم</h2>
+            <h2 className="font-bold text-sm">Control Panel</h2>
             <p className="text-[10px] text-muted-foreground">Tips & Tricks Admin</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleLogout} title="خروج">
+          <Button variant="ghost" size="icon" onClick={handleLogout} title="Sign out">
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
@@ -207,9 +207,9 @@ export default function Control() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72 p-0" dir="rtl">
+            <SheetContent side="right" className="w-72 p-0">
               <div className="px-4 py-4 border-b">
-                <h2 className="font-bold text-sm">لوحة التحكم</h2>
+                <h2 className="font-bold text-sm">Control Panel</h2>
               </div>
               <ScrollArea className="h-[calc(100vh-60px)]">
                 <Navigation view={view} setView={setView} onItemClick={() => setMobileOpen(false)} />
@@ -233,16 +233,14 @@ export default function Control() {
                 className="mb-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
               >
                 <ChevronLeft className="h-3 w-3" />
-                العودة للوحة القيادة
+                العودة لDashboard
               </button>
               <TableEditor table={view} />
             </>
           )}
 
           <Card className="mt-8 p-3 bg-amber-50/40 dark:bg-amber-950/10 border-amber-200/40 text-[11px] text-amber-900 dark:text-amber-200">
-            <strong>ملاحظة:</strong> هذه الجلسة الأولى من ست جلسات. الجداول جاهزة للتعديل،
-            لكن صفحات التطبيق ما زالت تقرأ من الكود. الربط الكامل (نقل البيانات + استخدامها في الصفحات)
-            يتم في الجلسات 2-6.
+            <strong>Note:</strong> This is the first of six setup sessions. Tables are editable now; full page data binding is completed across sessions 2–6.
           </Card>
         </div>
       </main>

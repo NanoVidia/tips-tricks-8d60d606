@@ -23,27 +23,27 @@ export const ADMIN_TABLES_META: Record<
   AdminTable,
   { label: string; group: string; icon?: string }
 > = {
-  app_translations: { label: "نصوص الواجهة", group: "ui", icon: "Languages" },
-  app_settings: { label: "إعدادات عامة", group: "ui", icon: "Settings" },
-  home_sections: { label: "أقسام الصفحة الرئيسية", group: "ui", icon: "LayoutGrid" },
-  mcq_questions: { label: "بنك الأسئلة", group: "content", icon: "HelpCircle" },
-  surgeries: { label: "موسوعة الجراحات", group: "content", icon: "Scissors" },
-  medical_scenarios: { label: "السيناريوهات السريرية", group: "content", icon: "Stethoscope" },
-  case_of_the_day: { label: "حالة اليوم", group: "content", icon: "CalendarDays" },
-  tools_protocols: { label: "بروتوكولات الطوارئ", group: "tools", icon: "AlertTriangle" },
-  tools_drugs: { label: "أدوية الحمل", group: "tools", icon: "Pill" },
-  tools_guidelines: { label: "الإرشادات الدولية", group: "tools", icon: "BookOpen" },
-  tools_ddx: { label: "التشخيص التفريقي", group: "tools", icon: "GitBranch" },
-  exams_meta: { label: "بيانات الامتحانات", group: "exams", icon: "GraduationCap" },
-  scheduled_notifications: { label: "الإشعارات", group: "notifications", icon: "Bell" },
+  app_translations: { label: "Interface text", group: "ui", icon: "Languages" },
+  app_settings: { label: "General settings", group: "ui", icon: "Settings" },
+  home_sections: { label: "Home sections", group: "ui", icon: "LayoutGrid" },
+  mcq_questions: { label: "Question bank", group: "content", icon: "HelpCircle" },
+  surgeries: { label: "Surgery library", group: "content", icon: "Scissors" },
+  medical_scenarios: { label: "Clinical scenarios", group: "content", icon: "Stethoscope" },
+  case_of_the_day: { label: "Case of the day", group: "content", icon: "CalendarDays" },
+  tools_protocols: { label: "Emergency protocols", group: "tools", icon: "AlertTriangle" },
+  tools_drugs: { label: "Pregnancy drugs", group: "tools", icon: "Pill" },
+  tools_guidelines: { label: "International guidelines", group: "tools", icon: "BookOpen" },
+  tools_ddx: { label: "Differential diagnosis", group: "tools", icon: "GitBranch" },
+  exams_meta: { label: "Exam data", group: "exams", icon: "GraduationCap" },
+  scheduled_notifications: { label: "Notifications", group: "notifications", icon: "Bell" },
 };
 
 export const TABLE_GROUPS: Record<string, { label: string; icon: string }> = {
-  ui: { label: "الواجهة والمظهر", icon: "Palette" },
-  content: { label: "المحتوى التعليمي", icon: "BookOpen" },
-  tools: { label: "الأدوات الطبية", icon: "Stethoscope" },
-  exams: { label: "الامتحانات", icon: "GraduationCap" },
-  notifications: { label: "الإشعارات", icon: "Bell" },
+  ui: { label: "Interface & appearance", icon: "Palette" },
+  content: { label: "Educational content", icon: "BookOpen" },
+  tools: { label: "Clinical tools", icon: "Stethoscope" },
+  exams: { label: "Exams", icon: "GraduationCap" },
+  notifications: { label: "Notifications", icon: "Bell" },
 };
 
 export function getStoredToken(): string | null {

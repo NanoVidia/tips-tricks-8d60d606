@@ -12,7 +12,7 @@ export default function ControlLogin({ onSuccess }: { onSuccess: () => void }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    document.title = "لوحة التحكم — Tips & Tricks";
+    document.title = "Control Panel — Tips & Tricks";
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -21,10 +21,10 @@ export default function ControlLogin({ onSuccess }: { onSuccess: () => void }) {
     setLoading(true);
     try {
       await adminLogin(password);
-      toast.success("تم تسجيل الدخول");
+      toast.success("Signed in");
       onSuccess();
     } catch (err) {
-      toast.error((err as Error).message || "كلمة مرور خاطئة");
+      toast.error((err as Error).message || "Incorrect password");
     } finally {
       setLoading(false);
     }
@@ -33,16 +33,16 @@ export default function ControlLogin({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4"
-      dir="rtl"
+     
     >
       <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="text-center space-y-3 pb-2">
           <div className="mx-auto h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center">
             <Shield className="h-7 w-7 text-primary" />
           </div>
-          <CardTitle className="text-2xl">لوحة التحكم الشاملة</CardTitle>
+          <CardTitle className="text-2xl">Control Panel</CardTitle>
           <p className="text-sm text-muted-foreground">
-            تحكّم بكل محتوى التطبيق من مكان واحد
+            Manage app content from one place
           </p>
         </CardHeader>
         <CardContent className="pt-4">
@@ -50,7 +50,7 @@ export default function ControlLogin({ onSuccess }: { onSuccess: () => void }) {
             <div className="space-y-2">
               <Label htmlFor="pwd" className="flex items-center gap-2">
                 <Lock className="h-3.5 w-3.5" />
-                كلمة مرور المسؤول
+                Admin password
               </Label>
               <Input
                 id="pwd"
@@ -64,10 +64,10 @@ export default function ControlLogin({ onSuccess }: { onSuccess: () => void }) {
               />
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? "جارِ التحقق..." : "دخول"}
+              {loading ? "Verifying..." : "Sign in"}
             </Button>
             <p className="text-[11px] text-center text-muted-foreground pt-2">
-              الجلسة صالحة لمدة 24 ساعة
+              Session remains valid for 24 hours
             </p>
           </form>
         </CardContent>

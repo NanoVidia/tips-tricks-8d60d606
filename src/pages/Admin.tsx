@@ -57,7 +57,7 @@ export default function Admin() {
       const data: any = await callAdmin("list", pwd);
       setItems(data.items ?? []);
     } catch (e: any) {
-      toast.error(e.message ?? "تعذر تحميل الإشعارات");
+      toast.error(e.message ?? "Failed to load notifications");
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (authed) refresh();
-    document.title = "لوحة الإشعارات — Tips & Tricks";
+    document.title = "Notifications — Tips & Tricks";
   }, [authed]);
 
   async function handleLogin(e: React.FormEvent) {
@@ -75,9 +75,9 @@ export default function Admin() {
       await callAdmin("login", password);
       sessionStorage.setItem(PASS_KEY, password);
       setAuthed(true);
-      toast.success("تم تسجيل الدخول");
+      toast.success("Signed in");
     } catch {
-      toast.error("كلمة المرور خاطئة");
+      toast.error("Incorrect password");
     } finally {
       setLoading(false);
     }
@@ -86,14 +86,14 @@ export default function Admin() {
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !body.trim()) {
-      toast.error("العنوان والنص مطلوبان");
+      toast.error("Title and body are required");
       return;
     }
     let scheduled_at: string;
     if (sendNow) {
       scheduled_at = new Date().toISOString();
     } else {
-      if (!date) return toast.error("اختر التاريخ");
+      if (!date) return toast.error("Select a date");
       const [hh, mm] = time.split(":").map(Number);
       const d = new Date(date);
       d.setHours(hh, mm, 0, 0);
@@ -107,14 +107,14 @@ export default function Admin() {
         scheduled_at,
         repeat_pattern: repeat,
       });
-      toast.success(sendNow ? "تم الإرسال للأجهزة" : "تمت الجدولة");
+      toast.success(sendNow ? "Sent to devices" : "Scheduled");
       setTitle("");
       setBody("");
       setRepeat("none");
       setSendNow(true);
       refresh();
     } catch (e: any) {
-      toast.error(e.message ?? "فشل الإنشاء");
+      toast.error(e.message ?? "Failed to create notification");
     } finally {
       setLoading(false);
     }
@@ -130,10 +130,10 @@ export default function Admin() {
   }
 
   async function remove(id: string) {
-    if (!confirm("حذف هذا الإشعار؟")) return;
+    if (!confirm("Delete this notification?")) return;
     try {
       await callAdmin("delete", password, { id });
-      toast.success("تم الحذف");
+      toast.success("Deleted");
       refresh();
     } catch (e: any) {
       toast.error(e.message);
@@ -142,18 +142,18 @@ export default function Admin() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4" dir="rtl">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-sm">
           <CardHeader className="text-center">
             <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
               <Lock className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle>لوحة الإشعارات</CardTitle>
+            <CardTitle>Notifications</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="pwd">كلمة مرور المسؤول</Label>
+                <Label htmlFor="pwd">Admin password</Label>
                 <Input
                   id="pwd"
                   type="password"
@@ -164,7 +164,7 @@ export default function Admin() {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
-                دخول
+                Sign in
               </Button>
             </form>
           </CardContent>
@@ -174,12 +174,12 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-6 px-4" dir="rtl">
+    <div className="min-h-screen bg-background py-6 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">لوحة الإشعارات</h1>
-            <p className="text-sm text-muted-foreground">أرسل إشعارات لأجهزة المستخدمين</p>
+            <h1 className="text-2xl font-bold">Notifications</h1>
+            <p className="text-sm text-muted-foreground">Send notifications to user devices</p>
           </div>
           <Button
             variant="ghost"
@@ -190,7 +190,7 @@ export default function Admin() {
               setPassword("");
             }}
           >
-            خروج
+            Sign out
           </Button>
         </div>
 
@@ -198,29 +198,29 @@ export default function Admin() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
-              إشعار جديد
+              New notification
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="t">العنوان</Label>
+                <Label htmlFor="t">Title</Label>
                 <Input
                   id="t"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="مثال: تذكير سريري"
+                  placeholder="Example: Clinical reminder"
                   maxLength={200}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="b">النص</Label>
+                <Label htmlFor="b">Body</Label>
                 <Textarea
                   id="b"
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
-                  placeholder="نص الإشعار الذي سيظهر على الجهاز"
+                  placeholder="Notification body shown on the device"
                   rows={3}
                   maxLength={1000}
                   required
@@ -229,8 +229,8 @@ export default function Admin() {
 
               <div className="flex items-center justify-between rounded-md border p-3">
                 <div>
-                  <Label className="cursor-pointer">إرسال فوري</Label>
-                  <p className="text-xs text-muted-foreground">سيظهر للمستخدمين عند المزامنة التالية</p>
+                  <Label className="cursor-pointer">Send now</Label>
+                  <p className="text-xs text-muted-foreground">Users will see it on the next sync</p>
                 </div>
                 <Switch checked={sendNow} onCheckedChange={setSendNow} />
               </div>
@@ -238,18 +238,18 @@ export default function Admin() {
               {!sendNow && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label>التاريخ</Label>
+                    <Label>Date</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full justify-start text-right font-normal",
+                            "w-full justify-start text-left font-normal",
                             !date && "text-muted-foreground",
                           )}
                         >
-                          <CalendarIcon className="ml-2 h-4 w-4" />
-                          {date ? format(date, "yyyy-MM-dd") : "اختر التاريخ"}
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {date ? format(date, "yyyy-MM-dd") : "Select a date"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
@@ -264,29 +264,29 @@ export default function Admin() {
                     </Popover>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="time">الوقت</Label>
+                    <Label htmlFor="time">Time</Label>
                     <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
                   </div>
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label>التكرار</Label>
+                <Label>Repeat</Label>
                 <Select value={repeat} onValueChange={(v: any) => setRepeat(v)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">بدون تكرار</SelectItem>
-                    <SelectItem value="daily">يومي</SelectItem>
-                    <SelectItem value="weekly">أسبوعي</SelectItem>
+                    <SelectItem value="none">No repeat</SelectItem>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
-                <Send className="ml-2 h-4 w-4" />
-                {sendNow ? "إرسال الآن" : "جدولة"}
+                <Send className="mr-2 h-4 w-4" />
+                {sendNow ? "Send now" : "Schedule"}
               </Button>
             </form>
           </CardContent>
@@ -294,11 +294,11 @@ export default function Admin() {
 
         <Card>
           <CardHeader>
-            <CardTitle>الإشعارات ({items.length})</CardTitle>
+            <CardTitle>Notifications ({items.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {items.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-6">لا توجد إشعارات بعد</p>
+              <p className="text-sm text-muted-foreground text-center py-6">No notifications yet</p>
             )}
             {items.map((n) => (
               <div key={n.id} className="flex items-start gap-3 rounded-md border p-3">
@@ -307,10 +307,10 @@ export default function Admin() {
                     <h3 className="font-medium truncate">{n.title}</h3>
                     {n.repeat_pattern !== "none" && (
                       <Badge variant="secondary" className="text-xs">
-                        {n.repeat_pattern === "daily" ? "يومي" : "أسبوعي"}
+                        {n.repeat_pattern === "daily" ? "Daily" : "Weekly"}
                       </Badge>
                     )}
-                    {!n.active && <Badge variant="outline" className="text-xs">معطّل</Badge>}
+                    {!n.active && <Badge variant="outline" className="text-xs">Inactive</Badge>}
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{n.body}</p>
                   <p className="text-xs text-muted-foreground mt-1">
@@ -318,10 +318,10 @@ export default function Admin() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="icon" onClick={() => toggleActive(n)} title="تفعيل/تعطيل">
+                  <Button variant="ghost" size="icon" onClick={() => toggleActive(n)} title="Toggle active">
                     <Power className={cn("h-4 w-4", n.active ? "text-primary" : "text-muted-foreground")} />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => remove(n.id)} title="حذف">
+                  <Button variant="ghost" size="icon" onClick={() => remove(n.id)} title="Delete">
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
@@ -337,7 +337,7 @@ export default function Admin() {
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
           >
             <Lock className="h-3 w-3" />
-            الانتقال إلى لوحة التحكم الكاملة (/control)
+            Open full control panel (/control)
           </a>
         </footer>
       </div>
