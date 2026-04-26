@@ -14,9 +14,10 @@ const TRUSTED_KEYWORDS = [
   "ubc", "green journal", "tvasurg", "augs", "figo", "society of gynecologic oncology",
 ];
 
-const WEAK_TERMS = ["patient guide", "patient education", "instructions", "explained", "what happens", "animation", "shorts", "#shorts", "can i get pregnant", "minute"];
+const WEAK_TERMS = ["patient", "patient guide", "patient education", "instructions", "explained", "what happens", "animation", "shorts", "#shorts", "can i get pregnant", "minute", "overview", "pov", "nclex", "nursing", "without surgery"];
 const WRONG_SPECIALTY_TERMS = ["deviated septum", "nasal", "sinus", "ent", "dental", "orthopedic", "knee", "hip", "appendix", "appendectomy", "gallbladder", "hernia"];
 const TECHNIQUE_TERMS = ["surgical", "surgery", "procedure", "technique", "operative", "operation", "laparoscopic", "hysteroscopic", "vaginal", "repair", "demonstration", "step", "steps", "osce"];
+const MIN_ACCEPT_SCORE = 68;
 
 function normalize(value: string): string {
   return (value || "").toLowerCase().replace(/&amp;/g, "and").replace(/[^a-z0-9]+/g, " ").trim();
@@ -65,7 +66,7 @@ function trustScore(channelTitle: string): number {
   return TRUSTED_KEYWORDS.some((k) => t.includes(k)) ? 1 : 0;
 }
 
-function relevanceScore(surgeryName: string, title: string, channelTitle: string): number {
+function relevanceReview(surgeryName: string, title: string, channelTitle: string): { score: number; reason: string } {
   const titleText = normalize(title);
   const channelText = normalize(channelTitle);
   const combinedText = `${titleText} ${channelText}`;
@@ -73,16 +74,28 @@ function relevanceScore(surgeryName: string, title: string, channelTitle: string
   const hits = tokens.filter((token) => titleText.includes(token) || channelText.includes(token)).length;
   const groups = topicGroups(surgeryName);
   const groupHits = groups.filter((group) => group.some((term) => combinedText.includes(normalize(term)))).length;
+  const weakHit = WEAK_TERMS.find((term) => titleText.includes(term) || channelText.includes(term));
+  const wrongHit = WRONG_SPECIALTY_TERMS.find((term) => titleText.includes(term) || channelText.includes(term));
+  const hasTechnique = TECHNIQUE_TERMS.some((term) => titleText.includes(term));
+
+  if (wrongHit) return { score: 0, reason: `Wrong specialty signal: ${wrongHit}` };
+  if (groups.length > 0 && groupHits === 0) return { score: 25, reason: "Procedure keywords were not matched" };
+
   let score = tokens.length ? Math.round((hits / tokens.length) * 45) : 0;
 
   score += Math.min(35, groupHits * 18);
 
   if (trustScore(channelText)) score += 20;
-  if (TECHNIQUE_TERMS.some((term) => titleText.includes(term))) score += 12;
-  if (WEAK_TERMS.some((term) => titleText.includes(term)) && !TECHNIQUE_TERMS.some((term) => titleText.includes(term))) score -= 35;
-  if (WRONG_SPECIALTY_TERMS.some((term) => titleText.includes(term) || channelText.includes(term))) score -= 75;
-  if (groups.length > 0 && groupHits === 0) score = Math.min(score, 35);
-  return Math.max(0, Math.min(100, score));
+  if (hasTechnique) score += 12;
+  if (weakHit) score -= hasTechnique ? 28 : 45;
+
+  const finalScore = Math.max(0, Math.min(100, score));
+  const reason = weakHit
+    ? `Weak educational signal: ${weakHit}`
+    : finalScore >= MIN_ACCEPT_SCORE
+      ? "Procedure and technique terms matched"
+      : "Low procedure-specific relevance";
+  return { score: finalScore, reason };
 }
 
 Deno.serve(async (req) => {
@@ -184,7 +197,7 @@ Deno.serve(async (req) => {
     // Rank: professional topic relevance first, trusted channel second, then original search order.
     const indexById = new Map(items.map((item) => [item.id.videoId, item.order]));
     valid.sort((a: any, b: any) => {
-      const rs = relevanceScore(surgeryName, b.snippet.title, b.snippet.channelTitle) - relevanceScore(surgeryName, a.snippet.title, a.snippet.channelTitle);
+      const rs = relevanceReview(surgeryName, b.snippet.title, b.snippet.channelTitle).score - relevanceReview(surgeryName, a.snippet.title, a.snippet.channelTitle).score;
       if (rs !== 0) return rs;
       const ts = trustScore(b.snippet.channelTitle) - trustScore(a.snippet.channelTitle);
       if (ts !== 0) return ts;
@@ -192,15 +205,15 @@ Deno.serve(async (req) => {
     });
 
     const best = valid[0];
-    const bestScore = relevanceScore(surgeryName, best.snippet.title, best.snippet.channelTitle);
-    const currentScore = currentVideo?.title ? relevanceScore(surgeryName, currentVideo.title, currentVideo.channel || "") : 0;
-    const selected = currentVideo?.videoId && currentScore >= bestScore && currentScore >= 60
-      ? { id: currentVideo.videoId, snippet: { title: currentVideo.title, channelTitle: currentVideo.channel || "" }, score: currentScore }
-      : { ...best, score: bestScore };
+    const bestReview = relevanceReview(surgeryName, best.snippet.title, best.snippet.channelTitle);
+    const currentReview = currentVideo?.title ? relevanceReview(surgeryName, currentVideo.title, currentVideo.channel || "") : { score: 0, reason: "No current video" };
+    const selected = currentVideo?.videoId && currentReview.score >= bestReview.score && currentReview.score >= MIN_ACCEPT_SCORE
+      ? { id: currentVideo.videoId, snippet: { title: currentVideo.title, channelTitle: currentVideo.channel || "" }, review: currentReview }
+      : { ...best, review: bestReview };
 
-    if (selected.score < 60) {
+    if (selected.review.score < MIN_ACCEPT_SCORE) {
       return new Response(
-        JSON.stringify({ found: false, reason: "low-relevance", score: selected.score }),
+        JSON.stringify({ found: false, reason: "low-relevance", score: selected.review.score, detail: selected.review.reason }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -211,8 +224,9 @@ Deno.serve(async (req) => {
         videoId: selected.id,
         title: selected.snippet.title,
         channel: selected.snippet.channelTitle,
-        score: selected.score,
-        confidence: selected.score >= 78 ? "high" : selected.score >= 60 ? "medium" : "low",
+        score: selected.review.score,
+        reason: selected.review.reason,
+        confidence: selected.review.score >= 82 ? "high" : selected.review.score >= MIN_ACCEPT_SCORE ? "medium" : "low",
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );

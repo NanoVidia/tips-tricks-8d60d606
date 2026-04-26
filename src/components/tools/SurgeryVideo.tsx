@@ -15,13 +15,14 @@ type VideoCandidate = {
   channel: string;
   confidence?: "high" | "medium" | "low";
   score?: number;
+  reason?: string;
 };
 
 const TRUSTED_CHANNEL_TERMS = ["rcog", "acog", "aagl", "iuga", "nejm", "mayo", "stanford", "ubc", "green journal", "tvasurg", "ircad"];
-const WEAK_VIDEO_TERMS = ["patient guide", "patient education", "instructions", "explained", "what happens", "animation", "shorts", "#shorts", "can i get pregnant", "minute"];
+const WEAK_VIDEO_TERMS = ["patient", "patient guide", "patient education", "instructions", "explained", "what happens", "animation", "shorts", "#shorts", "can i get pregnant", "minute", "overview", "pov", "nclex", "nursing", "without surgery"];
 const WRONG_SPECIALTY_TERMS = ["deviated septum", "nasal", "sinus", "ent", "dental", "orthopedic", "knee", "hip", "appendix", "appendectomy", "gallbladder", "hernia"];
 const TECHNIQUE_TERMS = ["surgical", "surgery", "procedure", "technique", "operative", "operation", "laparoscopic", "hysteroscopic", "vaginal", "repair", "demonstration", "step", "steps", "osce"];
-const MIN_RELEVANCE_SCORE = 60;
+const MIN_RELEVANCE_SCORE = 68;
 
 const normalize = (value: string) => value.toLowerCase().replace(/&amp;/g, "and").replace(/[^a-z0-9]+/g, " ").trim();
 const meaningfulTokens = (value: string) =>
@@ -62,7 +63,7 @@ function topicGroups(surgeryName: string): string[][] {
   return groups;
 }
 
-function localRelevanceScore(surgeryName: string, title: string, channel: string) {
+function localRelevance(surgeryName: string, title: string, channel: string): { score: number; reason: string } {
   const titleText = normalize(title);
   const channelText = normalize(channel);
   const combinedText = `${titleText} ${channelText}`;
@@ -70,21 +71,32 @@ function localRelevanceScore(surgeryName: string, title: string, channel: string
   const hits = procedureTokens.filter((token) => titleText.includes(token) || channelText.includes(token)).length;
   const groups = topicGroups(surgeryName);
   const groupHits = groups.filter((group) => group.some((term) => combinedText.includes(normalize(term)))).length;
+  const weakHit = WEAK_VIDEO_TERMS.find((term) => titleText.includes(term) || channelText.includes(term));
+  const wrongHit = WRONG_SPECIALTY_TERMS.find((term) => titleText.includes(term) || channelText.includes(term));
+  const hasTechnique = TECHNIQUE_TERMS.some((term) => titleText.includes(term));
+
+  if (wrongHit) return { score: 0, reason: `Wrong specialty signal: ${wrongHit}` };
+  if (groups.length > 0 && groupHits === 0) return { score: 25, reason: "Procedure keywords were not matched" };
+
   let score = procedureTokens.length ? Math.round((hits / procedureTokens.length) * 45) : 0;
 
   score += Math.min(35, groupHits * 18);
 
   if (TRUSTED_CHANNEL_TERMS.some((term) => channelText.includes(term))) score += 20;
-  if (TECHNIQUE_TERMS.some((term) => titleText.includes(term))) score += 12;
-  if (WEAK_VIDEO_TERMS.some((term) => titleText.includes(term)) && !TECHNIQUE_TERMS.some((term) => titleText.includes(term))) score -= 35;
-  if (WRONG_SPECIALTY_TERMS.some((term) => titleText.includes(term) || channelText.includes(term))) score -= 75;
-  if (groups.length > 0 && groupHits === 0) score = Math.min(score, 35);
+  if (hasTechnique) score += 12;
+  if (weakHit) score -= hasTechnique ? 28 : 45;
 
-  return Math.max(0, Math.min(100, score));
+  const finalScore = Math.max(0, Math.min(100, score));
+  const reason = weakHit
+    ? `Weak educational signal: ${weakHit}`
+    : finalScore >= MIN_RELEVANCE_SCORE
+      ? "Procedure and technique terms matched"
+      : "Low procedure-specific relevance";
+  return { score: finalScore, reason };
 }
 
 export function SurgeryVideo({ videoId, title, channel, surgeryName }: Props) {
-  const initialScore = useMemo(() => localRelevanceScore(surgeryName, title, channel), [surgeryName, title, channel]);
+  const initialReview = useMemo(() => localRelevance(surgeryName, title, channel), [surgeryName, title, channel]);
   const [verified, setVerified] = useState<VideoCandidate | null>(null);
   const [checking, setChecking] = useState(false);
 
@@ -104,6 +116,7 @@ export function SurgeryVideo({ videoId, title, channel, surgeryName }: Props) {
           channel: data.channel,
           confidence: data.confidence,
           score: data.score,
+          reason: data.reason,
         });
       }
     }).finally(() => {
@@ -113,7 +126,7 @@ export function SurgeryVideo({ videoId, title, channel, surgeryName }: Props) {
     return () => { cancelled = true; };
   }, [surgeryName, videoId, title, channel]);
 
-  const display = verified ?? { videoId, title, channel, score: initialScore, confidence: initialScore >= 70 ? "high" : initialScore >= 45 ? "medium" : "low" };
+  const display = verified ?? { videoId, title, channel, score: initialReview.score, reason: initialReview.reason, confidence: initialReview.score >= 82 ? "high" : initialReview.score >= MIN_RELEVANCE_SCORE ? "medium" : "low" };
   const isVerifiedEnough = (display.score ?? 0) >= MIN_RELEVANCE_SCORE;
   const confidenceLabel = checking
     ? "Reviewing"
@@ -151,6 +164,7 @@ export function SurgeryVideo({ videoId, title, channel, surgeryName }: Props) {
       ) : (
         <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
           لم يتم العثور على فيديو تعليمي موثوق مرتبط مباشرة بهذا الإجراء، لذلك لم يتم تضمين فيديو غير مؤكد.
+          {display.reason && <span className="mt-1 block text-[10px]">Reason: {display.reason}</span>}
         </div>
       )}
 
