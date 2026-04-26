@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { PhIcon, type PhIconProps } from "@/components/ui/PhIcon";
 import { AIRobot } from "@/components/AIRobot";
 import { EmergencyStrip } from "@/components/home/EmergencyStrip";
@@ -28,6 +28,8 @@ interface HomeHeroProps {
   onOpenClinic: () => void;
   /** Trigger a search from a content-type chip (e.g. "Drugs", "Protocols"). */
   onSearchChip?: (query: string) => void;
+  /** Open a specific clinical section with a context-aware search. */
+  onSectionQuery?: (category: ScenarioCategory, query: string) => void;
   /** Open today's case in the scenario sheet. */
   onOpenDailyCase?: (c: DailyCaseRef) => void;
   tabLabels: Record<ScenarioCategory, string>;
@@ -104,6 +106,7 @@ export function HomeHero({
   onOpenClinic,
   tabLabels,
   onSearchChip,
+  onSectionQuery,
   onOpenDailyCase,
 }: HomeHeroProps) {
   const [textSize, setTextSize] = useState<HomeTextSize>(() => {
@@ -118,34 +121,11 @@ export function HomeHero({
     window.localStorage.setItem("homeTextSize", size);
   };
 
-  type ChipItem = {
-    id: string;
-    label: string;
-    query: string;
-    phName: PhIconProps["name"];
-    gradient: string;
-    shadow: string;
-    hint: string;
-  };
-
-  const priorityItems: Array<{ id: string; label: string; query: string; phName: PhIconProps["name"]; hint: string }> = [
-    { id: "high-risk", label: "High-risk obstetrics", query: "preeclampsia diabetes placenta previa fetal growth", phName: "WarningCircle", hint: "PET · GDM · FGR · Placenta" },
-    { id: "labor", label: "Labor ward decisions", query: "labor CTG induction shoulder dystocia operative delivery", phName: "Baby", hint: "CTG · induction · dystocia" },
-    { id: "fertility", label: "Fertility & IVF", query: "infertility ovulation induction IVF PCOS ovarian reserve", phName: "Dna", hint: "PCOS · IVF · ovarian reserve" },
-    { id: "gyn-surgery", label: "Gynae surgery", query: "hysterectomy laparoscopy myomectomy hysteroscopy complications", phName: "Scissors", hint: "Lap · hysteroscopy · anatomy" },
-    { id: "gyn-clinic", label: "Gynae clinic", query: "bleeding pelvic pain menopause contraception endometriosis", phName: "Stethoscope", hint: "AUB · pain · menopause" },
-    { id: "exams", label: "Boards & OSCE", query: "exam OSCE MRCOG Arab board EFOG MCQ", phName: "GraduationCap", hint: "MCQ · viva · stations" },
-  ];
-
-  // Emergencies live in the dedicated EmergencyStrip above — keep this list as
-  // the broader "browse by content type" filter row.
-  const chips: ChipItem[] = [
-    { id: "drugs",      label: "Drugs & Dosing",        query: "drug",      phName: "Pill",          gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30",  hint: "MgSO₄ · Oxytocin · Heparin" },
-    { id: "protocols",  label: "Clinical Protocols",    query: "protocol",  phName: "ClipboardText", gradient: "from-sky-500 to-blue-700",       shadow: "shadow-sky-500/30",     hint: "PPH · Eclampsia · Sepsis" },
-    { id: "procedures", label: "Procedures & Surgery",  query: "procedure", phName: "Scissors",      gradient: "from-rose-500 to-pink-700",      shadow: "shadow-rose-500/30",    hint: "C-section · Forceps · D&C" },
-    { id: "obstetrics", label: "Obstetrics & Fertility", query: "obstetrics fertility", phName: "Baby", gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", hint: "Antenatal · Labor · IVF" },
-    { id: "clinic",     label: "Outpatient Clinic",     query: "clinic",    phName: "Stethoscope",   gradient: "from-teal-500 to-cyan-700",      shadow: "shadow-teal-500/30",    hint: "Antenatal · Gynae visits" },
-    { id: "mcqs",       label: "Q&A and MCQs",          query: "MCQ",       phName: "Question",      gradient: "from-emerald-500 to-teal-700",   shadow: "shadow-emerald-500/30", hint: "Board-style self-assessment" },
+  const sectionLinks: Array<{ id: ScenarioCategory; label: string; query: string; phName: PhIconProps["name"]; hint: string }> = [
+    { id: "clinic", label: "Clinic", query: "antenatal gynae clinic fertility PCOS AUB contraception menopause", phName: "Stethoscope", hint: "Antenatal · fertility · AUB" },
+    { id: "or_labor", label: "OR / Labor", query: "labor ward CTG induction cesarean PPH shoulder dystocia operative delivery", phName: "Baby", hint: "CTG · C-section · emergencies" },
+    { id: "behavior", label: "Behavior", query: "counseling consent breaking bad news confidentiality refusal communication", phName: "ChatCircleDots", hint: "Consent · counseling · ethics" },
+    { id: "qa", label: "Q&A Bank", query: "MRCOG Arab board EFOG OSCE MCQ viva high yield obstetrics gynecology fertility", phName: "Question", hint: "MCQ · OSCE · viva" },
   ];
 
   return (
