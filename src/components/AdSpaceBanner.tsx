@@ -3,15 +3,13 @@ import { Sparkles, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 
 /**
- * Professional multilingual "Available for Advertising / Sponsorship / Partnership" banner.
- * Rotates through 10 languages with a smooth crossfade + subtle slide.
+ * Professional "Available for Advertising / Sponsorship / Partnership" banner.
  */
 
 type Phrase = { headline: string; sub: string; dir: "ltr" | "rtl"; lang: string };
 
 const PHRASES: Phrase[] = [
   { lang: "en", dir: "ltr", headline: "Advertising · Sponsorship · Partnership", sub: "Available space — reach thousands of OB/GYN clinicians." },
-  { lang: "ar", dir: "rtl", headline: "إعلان · رعاية · شراكة", sub: "مساحة متاحة — تواصل مع آلاف أطباء النساء والولادة." },
   { lang: "fr", dir: "ltr", headline: "Publicité · Parrainage · Partenariat", sub: "Espace disponible — touchez des milliers de gynécologues." },
   { lang: "es", dir: "ltr", headline: "Publicidad · Patrocinio · Colaboración", sub: "Espacio disponible — llega a miles de ginecólogos." },
   { lang: "de", dir: "ltr", headline: "Werbung · Sponsoring · Partnerschaft", sub: "Platz verfügbar — erreichen Sie Tausende Gynäkologen." },
