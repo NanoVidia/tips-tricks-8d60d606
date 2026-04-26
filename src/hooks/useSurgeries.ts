@@ -1,4 +1,4 @@
-// Hook لجلب الجراحات من قاعدة البيانات مع fallback ذكي للكود.
+// Fetches surgeries from the database with a static fallback bank.
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { surgeries as STATIC_SURGERIES, type Surgery, type SurgeryCategory } from "@/data/surgeriesData";
