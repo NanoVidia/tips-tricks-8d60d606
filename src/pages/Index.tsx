@@ -993,7 +993,7 @@ export default function Index() {
                 )}
               </div>
               <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-1 rounded-full font-bold tabular-nums shrink-0">
-                {formatNumber(isSearching ? filteredSearchResults.length : totalCount)} {isSearching ? "matches" : "items"}
+                {formatNumber(isSearching ? allSearchResults.length : totalCount)} {isSearching ? "matches" : "items"}
               </span>
             </div>
 
@@ -1024,7 +1024,7 @@ export default function Index() {
                     Results are ranked by title relevance, clinical synonyms, and scenario context, with higher-priority cases surfaced first.
                   </p>
                 </div>
-                {filteredSearchResults.map((item, idx) => (
+                {allSearchResults.map((item, idx) => (
                   <ClinicalSearchResultCard
                     key={item.id}
                     scenario={item}
