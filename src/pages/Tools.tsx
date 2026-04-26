@@ -221,10 +221,12 @@ export default function Tools() {
   const [drugSearch, setDrugSearch] = useState("");
   const [drugFilter, setDrugFilter] = useState<(typeof FDA_FILTERS)[number]>("All");
   const [offlineReady, setOfflineReady] = useState(false);
-  const [mcqOrder, setMcqOrder] = useState<number[]>(() => mcqs.map((_, i) => i));
+  const [mcqOrder, setMcqOrder] = useState<number[]>([]);
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
   const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
   const { protocols: emergencyProtocols, drugs: pregnancyDrugs, guidelines, ddx: ddxLibrary, source: toolsSource } = useToolsData();
+  const { mcqs: allMcqs, source: mcqSource, isLoading: mcqLoading } = useAllMcqs();
+  const mcqs = useMemo(() => allMcqs.map(polishMcq).filter((q) => q.options.length === 4 && q.answerIndex >= 0 && q.answerIndex <= 3), [allMcqs]);
 
   // Group bookmarks by type for the Favorites view
   const favorites = useMemo(() => {
@@ -249,7 +251,7 @@ export default function Tools() {
       }
     }
     return { calc, protocols, drugs, ddx, total: calc.length + protocols.length + drugs.length + ddx.length };
-  }, [bookmarkIds]);
+  }, [bookmarkIds, emergencyProtocols, pregnancyDrugs, ddxLibrary]);
 
   const jumpToCalc = (id: string) => {
     setActive("calc");
@@ -264,6 +266,11 @@ export default function Tools() {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_TAB, active);
   }, [active]);
+
+  useEffect(() => {
+    setMcqOrder(mcqs.map((_, i) => i));
+    setMcqAnswers({});
+  }, [mcqs]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
