@@ -225,18 +225,18 @@ export function HomeHero({
       >
         <div className="px-1 space-y-1.5">
           <p className={`${textScale.section} font-black uppercase tracking-[0.18em] text-foreground leading-[1.2]`}>
-            Essential OB/GYN Doctor Hub
+            Quick Specialty Access
           </p>
           <p className={`${textScale.sub} text-muted-foreground leading-[1.35]`}>
-            The fastest routes for obstetricians, gynecologists, fertility clinicians, residents, and exam candidates.
+            Deep-link into each core OB/GYN area with a ready clinical query.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
-          {priorityItems.map((item, idx) => (
+          {sectionLinks.map((item, idx) => (
             <motion.button
               key={item.id}
               type="button"
-              onClick={() => { hapticTap(8); onSearchChip?.(item.query); }}
+              onClick={() => { hapticTap(8); onSectionQuery?.(item.id, item.query); }}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ ...SPRING, delay: 0.12 + idx * 0.04 }}
@@ -251,56 +251,6 @@ export function HomeHero({
                   <span className={`${textScale.card} block font-black leading-[1.18] text-foreground break-words`}>{item.label}</span>
                   <span className={`${textScale.hint} block text-muted-foreground leading-[1.25] mt-1.5 break-words`}>{item.hint}</span>
                 </span>
-              </div>
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* ② Search-driven content type chips — replace previous category cards */}
-      <motion.div
-        initial={{ y: 12, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ ...SPRING, delay: 0.15 }}
-        className="space-y-3.5"
-      >
-        <div className="flex items-start justify-between px-1 gap-2">
-          <div className="min-w-0 space-y-1.5">
-            <p className={`${textScale.section} font-black uppercase tracking-[0.18em] text-foreground leading-[1.2] flex items-start gap-1.5`}>
-              <Search className="w-3.5 h-3.5 text-primary" />
-              Browse by Content Type
-            </p>
-            <p className={`${textScale.sub} text-muted-foreground leading-[1.35]`}>
-              Tap any card to filter the library
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5">
-          {chips.map((c, idx) => (
-            <motion.button
-              key={c.id}
-              type="button"
-              onClick={() => { hapticTap(8); onSearchChip?.(c.query); }}
-              initial={{ y: 12, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ ...SPRING, delay: 0.2 + idx * 0.05 }}
-              whileTap={{ scale: 0.96 }}
-              whileHover={{ y: -2 }}
-              className={`soft-tint relative overflow-hidden rounded-2xl p-3 text-left bg-gradient-to-br ${c.gradient} shadow-md ${c.shadow} active:shadow-sm transition-all min-h-[82px]`}
-              aria-label={`Search ${c.label}`}
-            >
-              <div className="absolute -bottom-2 -right-2 w-14 h-14 opacity-15 pointer-events-none" aria-hidden="true">
-                <PhIcon name={c.phName} size={56} tone="white" weight="fill" />
-              </div>
-              <div className="relative flex items-start gap-2.5 h-full">
-                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shrink-0">
-                  <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-white font-bold ${textScale.card} leading-[1.2] break-words`}>{c.label}</p>
-                  <p className={`text-white/70 ${textScale.hint} leading-[1.25] mt-1.5 break-words`}>{c.hint}</p>
-                </div>
               </div>
             </motion.button>
           ))}
