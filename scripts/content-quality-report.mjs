@@ -17,9 +17,21 @@ const clinical = read("src/data/clinicalData.ts");
 const qCalls = [...`${mcqExtra}\n${mcqExpansion}`.matchAll(/Q\("([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([\s\S]*?)",\s*\[([\s\S]*?)\],\s*(\d),\s*"([\s\S]*?)",\s*"([\s\S]*?)"/g)];
 const objectMcqs = count(mcqBank, /id:\s*"[^"]+"/g);
 const totalMcqs = objectMcqs + qCalls.length;
+const topicCounts = qCalls.reduce((acc, m) => {
+  acc[m[2]] = (acc[m[2]] ?? 0) + 1;
+  return acc;
+}, {});
+const difficultyCounts = qCalls.reduce((acc, m) => {
+  acc[m[3]] = (acc[m[3]] ?? 0) + 1;
+  return acc;
+}, {});
 const shortExplanations = qCalls
   .map((m) => ({ id: m[1], topic: m[2], explanationLength: m[7].length }))
   .filter((q) => q.explanationLength < 80);
+const weakReferences = qCalls
+  .map((m) => ({ id: m[1], topic: m[2], reference: m[8] }))
+  .filter((q) => q.reference.length < 8 || /unknown|tbd|reference needed|wikipedia/i.test(q.reference));
+const qualityReadyMcqs = Math.max(0, totalMcqs - shortExplanations.length - weakReferences.length);
 
 const videoTitles = [...surgeries.matchAll(/videoTitle:\s*"([^"]*)"/g)].map((m) => m[1]);
 const weakVideoTerms = /(patient|guide|instructions|explained|animation|shorts|pregnant after|minute|nclex|nursing|deviated septum|appendix)/i;
@@ -31,6 +43,8 @@ const report = {
     staticMcqs: totalMcqs,
     targetMcqs: 1000,
     mcqGap: Math.max(0, 1000 - totalMcqs),
+    qualityReadyMcqs,
+    qualityAdjustedGap: Math.max(0, 1000 - qualityReadyMcqs),
     surgeries: count(surgeries, /id:\s*"[^"]+"/g),
     emergencyProtocols: count(tools, /id:\s*"[^"]+"/g),
     clinicalSeedCards: count(clinical, /id:\s*"[^"]+"/g),
@@ -38,10 +52,16 @@ const report = {
   urgentFindings: [
     totalMcqs < 1000 ? `MCQ bank is ${totalMcqs}; gap to 1000 is ${1000 - totalMcqs}.` : "MCQ target reached.",
     shortExplanations.length ? `${shortExplanations.length} static Q() explanations are under 80 characters.` : "No very short static Q() explanations detected.",
+    weakReferences.length ? `${weakReferences.length} static Q() references need strengthening.` : "No weak static Q() references detected.",
     weakVideos.length ? `${weakVideos.length} video titles contain weak relevance signals.` : "No weak video-title signals detected.",
   ],
+  distribution: {
+    expansionTopics: topicCounts,
+    expansionDifficulties: difficultyCounts,
+  },
   samples: {
     shortExplanations: shortExplanations.slice(0, 25),
+    weakReferences: weakReferences.slice(0, 25),
     weakVideos: weakVideos.slice(0, 40),
   },
   nextPriorities: [
