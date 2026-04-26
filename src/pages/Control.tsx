@@ -239,7 +239,7 @@ export default function Control() {
             </>
           )}
 
-          <Card className="mt-8 p-3 bg-amber-50/40 dark:bg-amber-950/10 border-amber-200/40 text-[11px] text-amber-900 dark:text-amber-200">
+          <Card className="mt-8 p-3 bg-warning-soft border-warning/30 text-[11px] text-warning-foreground dark:text-warning">
             <strong>Note:</strong> All core content areas are available here for editing. Changes save to the database and do not require republishing.
           </Card>
         </div>
