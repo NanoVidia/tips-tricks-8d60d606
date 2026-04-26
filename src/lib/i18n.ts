@@ -2,7 +2,7 @@
 // Any /control → app_translations change overrides these values in production.
 export const defaultTranslations = {
   appTitle: "Tips & Tricks",
-  appSubtitle: "Clinical bedside companion",
+  appSubtitle: "OB/GYN & Fertility bedside companion",
   appCredential: "Obstetrics & Gynecology",
   searchPlaceholder: "Smart Search — handles typos & synonyms...",
   noResults: "No results found.",
@@ -14,9 +14,9 @@ export const defaultTranslations = {
   askPlaceholder: "Ask about this scenario...",
   disclaimer: "Important Disclaimer",
   disclaimerText1:
-    "This is an educational reference tool for healthcare professionals only and does not provide medical diagnosis, treatment recommendations, or clinical advice.",
+    "This is an educational OB/GYN and fertility reference for qualified women's-health professionals only; it does not provide patient-specific diagnosis or treatment.",
   disclaimerText2:
-    "All clinical decisions must be made by qualified practitioners based on individual patient assessment.",
+    "All obstetric, gynecologic, reproductive-medicine, and fertility decisions must be made by qualified practitioners using current guidelines and individual patient assessment.",
   continueBtn: "I understand — Continue",
   page: "Page",
   of: "of",
