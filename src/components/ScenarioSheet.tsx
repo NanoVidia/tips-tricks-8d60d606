@@ -143,24 +143,29 @@ export function ScenarioSheet({
           </div>
 
           {/* Body - scrollable */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 space-y-3">
             {SECTIONS.map((s, i) => (
               <motion.div
                 key={s.key}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08 + i * 0.06 }}
-                className="relative rounded-2xl bg-card border border-border/50 p-4 overflow-hidden"
+                className="relative rounded-2xl bg-card border border-border/50 p-3.5 sm:p-4 overflow-hidden"
               >
                 <span className={`absolute left-0 top-0 bottom-0 w-1 ${s.bar}`} aria-hidden="true" />
-                <div
-                  className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-[0.16em] border ${s.accent} mb-2`}
-                >
-                  {s.label}
+                <div className="grid grid-cols-[10px_minmax(0,1fr)] gap-x-3 gap-y-1.5 pl-1">
+                  <span className={`mt-1.5 h-2.5 w-2.5 rounded-full ${s.bar}`} aria-hidden="true" />
+                  <div className="min-w-0 space-y-2">
+                    <div
+                      className={`w-fit max-w-full px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-[0.14em] border leading-4 text-flow-compact ${s.accent}`}
+                    >
+                      {s.label}
+                    </div>
+                    <p className="text-flow-safe mobile-copy-align hyphens-auto text-[13.5px] sm:text-[14px] leading-6 sm:leading-7 text-foreground" lang="en">
+                      {scenario[s.key as keyof Scenario] as string}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-[14px] leading-7 text-foreground">
-                  {scenario[s.key as keyof Scenario] as string}
-                </p>
               </motion.div>
             ))}
           </div>
