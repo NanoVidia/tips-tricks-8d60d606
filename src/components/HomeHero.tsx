@@ -218,7 +218,7 @@ export function HomeHero({
           {/* Text block */}
           <div className="flex-1 min-w-0 space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-white font-bold text-[16px] leading-tight">AI Medical Assistant</h2>
+              <h2 className="text-white font-bold text-[16px] leading-tight">OB/GYN & Fertility Mentor</h2>
               <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-green-400/20 text-green-300 border border-green-400/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                 Live
@@ -226,7 +226,7 @@ export function HomeHero({
             </div>
 
             <p className="text-white/75 text-[11px] leading-snug">
-              Calculators, drug safety & instant OB/GYN answers — 24/7.
+              Labor ward, gynae clinic, fertility, surgery, drugs, and exam decisions — in one clinical cockpit.
             </p>
 
             <div className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-bold text-white bg-white/10 px-2.5 py-1 rounded-full ring-1 ring-white/20">
@@ -236,6 +236,46 @@ export function HomeHero({
           </div>
         </div>
       </motion.button>
+
+      <motion.div
+        initial={{ y: 12, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ ...SPRING, delay: 0.08 }}
+        className="space-y-3.5"
+      >
+        <div className="px-1 space-y-1.5">
+          <p className={`${textScale.section} font-black uppercase tracking-[0.18em] text-foreground leading-[1.2]`}>
+            Essential OB/GYN Doctor Hub
+          </p>
+          <p className={`${textScale.sub} text-muted-foreground leading-[1.35]`}>
+            The fastest routes for obstetricians, gynecologists, fertility clinicians, residents, and exam candidates.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          {priorityItems.map((item, idx) => (
+            <motion.button
+              key={item.id}
+              type="button"
+              onClick={() => { hapticTap(8); onSearchChip?.(item.query); }}
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ ...SPRING, delay: 0.12 + idx * 0.04 }}
+              whileTap={{ scale: 0.97 }}
+              className="rounded-2xl border border-border/70 bg-card p-3 text-left shadow-editorial hover:border-primary/40 hover:bg-muted/35 transition-colors min-h-[86px]"
+            >
+              <div className="flex items-start gap-2.5">
+                <span className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <PhIcon name={item.phName} size={18} weight="duotone" />
+                </span>
+                <span className="min-w-0">
+                  <span className={`${textScale.card} block font-black leading-[1.18] text-foreground break-words`}>{item.label}</span>
+                  <span className={`${textScale.hint} block text-muted-foreground leading-[1.25] mt-1.5 break-words`}>{item.hint}</span>
+                </span>
+              </div>
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
 
       {/* ② Search-driven content type chips — replace previous category cards */}
       <motion.div
