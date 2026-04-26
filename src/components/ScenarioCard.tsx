@@ -83,10 +83,10 @@ const URGENCY_STYLE: Record<Urgency, { cls: string; Icon: typeof AlertTriangle }
 const SPECIALTY_STYLE: Record<Specialty, string> = {
   OB: "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/25",
   GYN: "bg-pink-500/10 text-pink-700 dark:text-pink-300 border-pink-500/25",
-  Surgery: "bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/25",
-  Anesthesia: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/25",
-  Emergency: "bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/25",
-  General: "bg-muted text-muted-foreground border-border/60",
+  Fertility: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25",
+  "Gyn Surgery": "bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/25",
+  "OB Anesthesia": "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/25",
+  "OB Emergency": "bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/25",
 };
 
 const EVIDENCE_STYLE: Record<EvidenceLevel, string> = {
