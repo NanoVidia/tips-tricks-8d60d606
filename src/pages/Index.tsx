@@ -317,6 +317,9 @@ export default function Index() {
       }
     } catch (e) {
       console.error("Fetch error:", e);
+      setAllSearchResults([]);
+      setScenarios([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
