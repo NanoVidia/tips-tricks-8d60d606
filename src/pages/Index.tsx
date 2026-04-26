@@ -400,14 +400,14 @@ export default function Index() {
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               <h1
-                className={`font-editorial italic font-black tracking-tight leading-[0.95] text-foreground transition-all ${
-                  scrolled ? "text-[21px] leading-tight" : "text-[28px] leading-[1.02]"
+                className={`font-editorial italic font-black tracking-tight leading-none text-foreground transition-all whitespace-nowrap ${
+                  scrolled ? "text-[19px]" : "text-[24px]"
                 }`}
               >
-                <span className="relative inline-block max-w-full">
+                <span className="relative inline-block max-w-full whitespace-nowrap">
                   <span
                     aria-hidden="true"
-                    className="absolute inset-x-0 -bottom-1 h-3 rounded-full bg-primary/18 blur-md will-change-auto"
+                    className="absolute inset-x-2 -bottom-0.5 h-2 rounded-full bg-primary/10 blur-sm will-change-auto"
                   />
                   <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_50%,hsl(var(--foreground))_100%)]">
                     {logoText.trim() || "OB/GYN Reference"}
