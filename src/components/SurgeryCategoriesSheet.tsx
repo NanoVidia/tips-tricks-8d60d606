@@ -2,7 +2,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Scissors, ArrowRight } from "lucide-react";
-import { surgeryCategories, type SurgeryCategory } from "@/data/surgeriesData";
+import type { SurgeryCategory } from "@/data/surgeriesData";
+import { surgeryCategories } from "@/data/surgeryCategories";
 import { useAllSurgeries } from "@/hooks/useSurgeries";
 import { PhIcon } from "@/components/ui/PhIcon";
 

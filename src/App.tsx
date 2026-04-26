@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import Tools from "./pages/Tools.tsx";
-import Admin from "./pages/Admin.tsx";
-import Control from "./pages/Control.tsx";
-import ControlLoginPage from "./pages/ControlLoginPage.tsx";
-import Exams from "./pages/Exams.tsx";
-import ExamsCompare from "./pages/ExamsCompare.tsx";
-import NotFound from "./pages/NotFound.tsx";
 import { FreezeOverlay } from "./components/FreezeOverlay";
 import { useLocalNotifications } from "./hooks/useLocalNotifications";
+
+const Index = lazy(() => import("./pages/Index.tsx"));
+const Tools = lazy(() => import("./pages/Tools.tsx"));
+const Admin = lazy(() => import("./pages/Admin.tsx"));
+const Control = lazy(() => import("./pages/Control.tsx"));
+const ControlLoginPage = lazy(() => import("./pages/ControlLoginPage.tsx"));
+const Exams = lazy(() => import("./pages/Exams.tsx"));
+const ExamsCompare = lazy(() => import("./pages/ExamsCompare.tsx"));
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 function NotificationsBootstrap() {
   useLocalNotifications();
@@ -63,18 +64,20 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <NotificationsBootstrap />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/index" element={<Index />} />
-            <Route path="/tools" element={<Tools />} />
-            <Route path="/exams" element={<Exams />} />
-            <Route path="/exams/compare" element={<ExamsCompare />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/control/login" element={<ControlLoginPage />} />
-            <Route path="/control" element={<Control />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<div className="min-h-screen bg-background" />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/index" element={<Index />} />
+              <Route path="/tools" element={<Tools />} />
+              <Route path="/exams" element={<Exams />} />
+              <Route path="/exams/compare" element={<ExamsCompare />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/control/login" element={<ControlLoginPage />} />
+              <Route path="/control" element={<Control />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
         {showFreeze && <FreezeOverlay />}
       </TooltipProvider>
