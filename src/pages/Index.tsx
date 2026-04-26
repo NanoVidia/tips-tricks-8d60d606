@@ -211,10 +211,21 @@ export default function Index() {
     setSuggestLoading(true);
     const handle = setTimeout(async () => {
       try {
-        const { data, error } = await supabase.rpc("search_scenarios", { search_query: q });
+        const queryVariants = expandClinicalSearchQueries(q);
+        const results = await Promise.all(
+          queryVariants.map((search_query) => supabase.rpc("search_scenarios", { search_query }))
+        );
         if (cancelled) return;
-        if (error) throw error;
-        setSuggestions(((data as Scenario[]) || []).slice(0, 5));
+        const firstError = results.find((result) => result.error)?.error;
+        if (firstError) throw firstError;
+        const raw = Array.from(
+          new Map(
+            results
+              .flatMap((result) => (result.data as Scenario[]) || [])
+              .map((scenario) => [scenario.id, scenario])
+          ).values()
+        );
+        setSuggestions(rankSearchScenarios(q, raw).slice(0, 5));
       } catch (e) {
         if (!cancelled) setSuggestions([]);
         console.error("Suggest error:", e);

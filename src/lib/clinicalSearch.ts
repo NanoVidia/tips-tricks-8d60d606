@@ -45,27 +45,39 @@ const isFourTsQuery = (query: string) => {
   return compact === "4t" || compact === "4ts" || compact === "fourts" || compact === "fourt";
 };
 
+const CLINICAL_QUERY_GROUPS = [
+  ["PPH", "postpartum hemorrhage", "postpartum haemorrhage", "heavy bleeding after delivery", "uterine atony", "massive transfusion"],
+  ["4 T's", "4T", "PPH causes", "Tone Tissue Trauma Thrombin", "uterine atony", "retained placenta", "genital tract trauma", "coagulopathy"],
+  ["eclampsia", "preeclampsia", "pre-eclampsia", "hypertension in pregnancy", "magnesium sulfate", "MgSO4", "seizure"],
+  ["shoulder dystocia", "McRoberts", "suprapubic pressure", "HELPERR", "difficult delivery"],
+  ["cord prolapse", "umbilical cord prolapse", "funic presentation"],
+  ["preterm labour", "preterm labor", "premature labor", "PPROM", "PROM", "tocolysis", "antenatal steroids"],
+  ["ectopic pregnancy", "tubal pregnancy", "adnexal mass", "methotrexate"],
+  ["VTE", "DVT", "pulmonary embolism", "PE", "thrombosis", "thromboembolism", "heparin", "LMWH"],
+  ["C-section", "cesarean", "caesarean", "CS", "LSCS", "operative delivery"],
+  ["antenatal", "prenatal", "ANC", "screening", "booking visit", "first visit"],
+  ["miscarriage", "abortion", "pregnancy loss", "retained products", "RPOC"],
+  ["sepsis", "maternal sepsis", "infection", "chorioamnionitis", "fever"],
+];
+
+const uniqueQueries = (queries: string[]) => Array.from(new Set(queries.map((item) => item.trim()).filter(Boolean)));
+
 export function expandClinicalSearchQueries(query: string) {
   const q = query.trim();
   if (!q) return [];
+  const compactQuery = compactClinicalTerm(q);
+  const expansions = [q];
 
-  if (isFourTsQuery(q)) {
-    return [
-      q,
-      "4 T's",
-      "PPH",
-      "postpartum hemorrhage",
-      "postpartum haemorrhage",
-      "PPH causes",
-      "uterine atony",
-      "retained placenta",
-      "genital tract trauma",
-      "coagulopathy",
-      "Tone Tissue Trauma Thrombin",
-    ];
+  for (const group of CLINICAL_QUERY_GROUPS) {
+    const matchesGroup = group.some((term) => {
+      const compactTerm = compactClinicalTerm(term);
+      return compactTerm === compactQuery || compactTerm.includes(compactQuery) || compactQuery.includes(compactTerm);
+    });
+
+    if (matchesGroup) expansions.push(...group);
   }
 
-  return [q];
+  return uniqueQueries(expansions).slice(0, 14);
 }
 
 const scenarioBlob = (s: SearchScenario) =>
@@ -127,15 +139,19 @@ function scoreScenario(s: SearchScenario, query: string, strict: boolean) {
 }
 
 export function rankSearchScenarios(query: string, rows: SearchScenario[]) {
+  const queryVariants = expandClinicalSearchQueries(query);
+  const bestScore = (s: SearchScenario, strict: boolean) =>
+    Math.max(...queryVariants.map((variant) => scoreScenario(s, variant, strict)));
+
   let ranked = rows
-    .map((s) => ({ s, score: scoreScenario(s, query, true), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
+    .map((s) => ({ s, score: bestScore(s, true), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
     .filter((x) => x.score >= 8)
     .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
     .map((x) => x.s);
 
   if (ranked.length === 0) {
     ranked = rows
-      .map((s) => ({ s, score: scoreScenario(s, query, false), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
+      .map((s) => ({ s, score: bestScore(s, false), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
       .filter((x) => x.score >= 6)
       .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
       .map((x) => x.s);
