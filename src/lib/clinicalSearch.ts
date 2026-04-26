@@ -6,9 +6,13 @@ export interface SearchScenario {
   id: string;
   category: ScenarioCategory;
   title_en: string;
+  title_ar?: string | null;
   situation_en: string;
+  situation_ar?: string | null;
   action_en: string;
+  action_ar?: string | null;
   script_en: string;
+  script_ar?: string | null;
   synonyms: string[] | null;
 }
 
@@ -46,18 +50,29 @@ const isFourTsQuery = (query: string) => {
 };
 
 const CLINICAL_QUERY_GROUPS = [
-  ["PPH", "postpartum hemorrhage", "postpartum haemorrhage", "heavy bleeding after delivery", "uterine atony", "massive transfusion"],
-  ["4 T's", "4T", "PPH causes", "Tone Tissue Trauma Thrombin", "uterine atony", "retained placenta", "genital tract trauma", "coagulopathy"],
-  ["eclampsia", "preeclampsia", "pre-eclampsia", "hypertension in pregnancy", "magnesium sulfate", "MgSO4", "seizure"],
-  ["shoulder dystocia", "McRoberts", "suprapubic pressure", "HELPERR", "difficult delivery"],
-  ["cord prolapse", "umbilical cord prolapse", "funic presentation"],
-  ["preterm labour", "preterm labor", "premature labor", "PPROM", "PROM", "tocolysis", "antenatal steroids"],
-  ["ectopic pregnancy", "tubal pregnancy", "adnexal mass", "methotrexate"],
-  ["VTE", "DVT", "pulmonary embolism", "PE", "thrombosis", "thromboembolism", "heparin", "LMWH"],
-  ["C-section", "cesarean", "caesarean", "CS", "LSCS", "operative delivery"],
-  ["antenatal", "prenatal", "ANC", "screening", "booking visit", "first visit"],
-  ["miscarriage", "abortion", "pregnancy loss", "retained products", "RPOC"],
-  ["sepsis", "maternal sepsis", "infection", "chorioamnionitis", "fever"],
+  ["PPH", "postpartum hemorrhage", "postpartum haemorrhage", "heavy bleeding after delivery", "نزيف بعد الولادة", "uterine atony", "retained placenta", "genital tract trauma", "coagulopathy", "massive transfusion", "bakri", "b-lynch"],
+  ["4 T's", "4T", "4 ts", "four ts", "PPH causes", "Tone Tissue Trauma Thrombin", "uterine atony", "retained placenta", "genital tract trauma", "coagulopathy", "thrombin", "tone", "tissue", "trauma"],
+  ["hypertension in pregnancy", "preeclampsia", "pre-eclampsia", "eclampsia", "ارتفاع ضغط الحمل", "magnesium sulfate", "MgSO4", "seizure", "HELLP", "severe features", "labetalol", "hydralazine"],
+  ["shoulder dystocia", "McRoberts", "suprapubic pressure", "HELPERR", "difficult delivery", "عسر ولادة الكتف", "posterior arm", "woods screw"],
+  ["cord prolapse", "umbilical cord prolapse", "funic presentation", "cord compression", "prolapsed cord", "تدلي الحبل السري"],
+  ["preterm labour", "preterm labor", "premature labor", "PPROM", "PROM", "tocolysis", "antenatal steroids", "magnesium neuroprotection", "preterm birth", "ولادة مبكرة"],
+  ["ectopic pregnancy", "tubal pregnancy", "adnexal mass", "methotrexate", "pregnancy of unknown location", "PUL", "حمل خارج الرحم"],
+  ["VTE", "DVT", "pulmonary embolism", "PE", "thrombosis", "thromboembolism", "heparin", "LMWH", "warfarin", "ضيق نفس", "جلطة"],
+  ["C-section", "cesarean", "caesarean", "CS", "LSCS", "operative delivery", "قيصرية", "classical cesarean", "VBAC", "TOLAC"],
+  ["antenatal", "prenatal", "ANC", "screening", "booking visit", "first visit", "زيارة الحمل", "risk assessment", "routine antenatal care"],
+  ["miscarriage", "abortion", "pregnancy loss", "retained products", "RPOC", "early pregnancy bleeding", "إجهاض", "threatened miscarriage", "septic miscarriage"],
+  ["sepsis", "maternal sepsis", "infection", "chorioamnionitis", "fever", "pyrexia", "septic shock", "حمى", "endometritis"],
+  ["CTG", "cardiotocography", "fetal distress", "non-reassuring fetal status", "fetal bradycardia", "late decelerations", "reduced variability"],
+  ["diabetes in pregnancy", "GDM", "gestational diabetes", "pre-existing diabetes", "insulin", "macrosomia", "سكر الحمل"],
+  ["placenta previa", "placenta praevia", "placenta accreta", "accreta spectrum", "PAS", "vasa previa", "antepartum hemorrhage", "APH"],
+  ["induction of labour", "induction of labor", "IOL", "cervical ripening", "bishop score", "prostaglandin", "oxytocin", "amniotomy"],
+  ["postpartum", "postnatal", "puerperium", "breastfeeding", "mastitis", "postpartum depression", "lochia"],
+  ["contraception", "family planning", "IUD", "IUCD", "implant", "COCP", "POP", "emergency contraception"],
+  ["infertility", "subfertility", "anovulation", "PCOS", "semen analysis", "ovulation induction", "IVF"],
+  ["cervical screening", "pap smear", "HPV", "colposcopy", "LEEP", "LLETZ", "cervical dysplasia"],
+  ["menopause", "HRT", "hot flushes", "postmenopausal bleeding", "PMB", "endometrial thickness"],
+  ["ovarian torsion", "torsion", "acute pelvic pain", "adnexal torsion", "ovarian cyst accident"],
+  ["UTI", "urinary tract infection", "pyelonephritis", "dysuria", "asymptomatic bacteriuria"],
 ];
 
 const uniqueQueries = (queries: string[]) => Array.from(new Set(queries.map((item) => item.trim()).filter(Boolean)));
@@ -77,7 +92,7 @@ export function expandClinicalSearchQueries(query: string) {
     if (matchesGroup) expansions.push(...group);
   }
 
-  return uniqueQueries(expansions).slice(0, 14);
+  return uniqueQueries(expansions).slice(0, 32);
 }
 
 const scenarioBlob = (s: SearchScenario) =>
