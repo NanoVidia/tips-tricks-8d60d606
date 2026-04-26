@@ -109,7 +109,7 @@ export default function ControlDashboard({
           <CardTitle className="text-base">Quick guide</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>• اضغط على أي بطاقة أعلاه للانتقال إلى محرّر الtables.</p>
+          <p>• Select any card above to open its table editor.</p>
           <p>• Changes are saved directly to the database and become visible immediately.</p>
           <p>• Content edits do not require republishing the app.</p>
           <p>• Upcoming sessions connect these tables to the app pages; some data may still come from code.</p>

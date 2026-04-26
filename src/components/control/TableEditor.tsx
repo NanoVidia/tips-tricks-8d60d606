@@ -279,7 +279,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
             <div className="p-8 text-center text-sm text-muted-foreground">Loading...</div>
           ) : items.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
-              لا توجد recordsات. اضغط "Add" للبدء.
+              No records. Select “Add” to get started.
             </div>
           ) : (
             <div className="divide-y">
@@ -350,7 +350,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {creating ? "Add records جديد" : "تعديل records"} — {meta.label}
+              {creating ? "Add new record" : "Edit record"} — {meta.label}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -372,7 +372,7 @@ export default function TableEditor({ table }: { table: AdminTable }) {
               })}
             {Object.keys(draft).filter((k) => !HIDDEN_COLS.has(k)).length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">
-                لا يوجد قالب — أضف recordsاً يدوياً عبر JSON أو انتظر بيانات seed.
+                No template is available yet. Add a record after seed data is available.
               </p>
             )}
           </div>
