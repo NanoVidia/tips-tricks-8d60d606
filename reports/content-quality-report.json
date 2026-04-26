@@ -1,41 +1,41 @@
 {
-  "generatedAt": "2026-04-26T10:31:28.956Z",
+  "generatedAt": "2026-04-26T10:36:24.272Z",
   "summary": {
-    "staticMcqs": 370,
+    "staticMcqs": 409,
     "targetMcqs": 1000,
-    "mcqGap": 630,
-    "qualityReadyMcqs": 283,
-    "qualityAdjustedGap": 717,
+    "mcqGap": 591,
+    "qualityReadyMcqs": 322,
+    "qualityAdjustedGap": 678,
     "surgeries": 122,
     "emergencyProtocols": 6,
     "clinicalSeedCards": 16
   },
   "urgentFindings": [
-    "MCQ bank is 370; gap to 1000 is 630.",
+    "MCQ bank is 409; gap to 1000 is 591.",
     "60 static Q() explanations are under 80 characters.",
     "27 static Q() references need strengthening.",
     "33 video titles contain weak relevance signals."
   ],
   "distribution": {
     "expansionTopics": {
-      "Antenatal Care": 29,
-      "Labour & Delivery": 29,
-      "Postpartum & PPH": 29,
-      "Hypertensive Disorders": 29,
-      "Gestational Diabetes": 29,
-      "Maternal-Fetal Medicine": 29,
-      "Gynecologic Oncology": 29,
-      "Reproductive Endocrinology & Infertility": 29,
-      "Contraception & Family Planning": 29,
-      "Urogynecology": 24,
-      "Benign Gynecology": 23,
-      "Adolescent & Menopause": 23,
-      "Ethics & Communication": 20
+      "Antenatal Care": 32,
+      "Labour & Delivery": 32,
+      "Postpartum & PPH": 32,
+      "Hypertensive Disorders": 32,
+      "Gestational Diabetes": 32,
+      "Maternal-Fetal Medicine": 32,
+      "Gynecologic Oncology": 32,
+      "Reproductive Endocrinology & Infertility": 32,
+      "Contraception & Family Planning": 32,
+      "Urogynecology": 27,
+      "Benign Gynecology": 26,
+      "Adolescent & Menopause": 26,
+      "Ethics & Communication": 23
     },
     "expansionDifficulties": {
-      "easy": 95,
-      "medium": 154,
-      "hard": 102
+      "easy": 108,
+      "medium": 167,
+      "hard": 115
     }
   },
   "samples": {
