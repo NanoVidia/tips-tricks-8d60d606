@@ -21,21 +21,21 @@ export type AdminTable =
 
 export const ADMIN_TABLES_META: Record<
   AdminTable,
-  { label: string; group: string; icon?: string }
+  { label: string; group: string; icon?: string; description: string; template: Record<string, unknown> }
 > = {
-  app_translations: { label: "Interface text", group: "ui", icon: "Languages" },
-  app_settings: { label: "General settings", group: "ui", icon: "Settings" },
-  home_sections: { label: "Home sections", group: "ui", icon: "LayoutGrid" },
-  mcq_questions: { label: "Question bank", group: "content", icon: "HelpCircle" },
-  surgeries: { label: "Surgery library", group: "content", icon: "Scissors" },
-  medical_scenarios: { label: "Clinical scenarios", group: "content", icon: "Stethoscope" },
-  case_of_the_day: { label: "Case of the day", group: "content", icon: "CalendarDays" },
-  tools_protocols: { label: "Emergency protocols", group: "tools", icon: "AlertTriangle" },
-  tools_drugs: { label: "Pregnancy drugs", group: "tools", icon: "Pill" },
-  tools_guidelines: { label: "International guidelines", group: "tools", icon: "BookOpen" },
-  tools_ddx: { label: "Differential diagnosis", group: "tools", icon: "GitBranch" },
-  exams_meta: { label: "Exam data", group: "exams", icon: "GraduationCap" },
-  scheduled_notifications: { label: "Notifications", group: "notifications", icon: "Bell" },
+  app_translations: { label: "Interface text", group: "ui", icon: "Languages", description: "Edit every visible label, title, helper text, and interface phrase.", template: { key: "new_label", en: "New label", ar: "New label", category: "general", context: "Where this text appears" } },
+  app_settings: { label: "General & AI settings", group: "ui", icon: "Settings", description: "Edit global settings, contact data, disclaimers, AI model, AI system addendum, and quick-prompt templates.", template: { key: "ai_system_addendum", value: "", category: "ai", description: "Optional extra instruction appended to the AI mentor prompt" } },
+  home_sections: { label: "Home sections", group: "ui", icon: "LayoutGrid", description: "Edit home blocks, titles, subtitles, links, icons, colors, ordering, and visibility.", template: { slot: "new_section", title_en: "New section", title_ar: "New section", subtitle_en: "Short description", subtitle_ar: "Short description", icon: "BookOpen", link: "/", color: "primary", display_order: 0, active: true } },
+  mcq_questions: { label: "Question bank", group: "content", icon: "HelpCircle", description: "Edit all exam questions, options, answer index, explanation, references, topic, difficulty, exam tags, and active status.", template: { external_id: "custom-001", topic: "General", difficulty: "medium", exams: [], stem: "Clinical question stem", options: ["Option A", "Option B", "Option C", "Option D"], answer_index: 0, explanation: "Detailed explanation with clinical reasoning and guideline reference.", reference: "Guideline / source", active: true } },
+  surgeries: { label: "Surgery library", group: "content", icon: "Scissors", description: "Edit procedures, categories, descriptions, steps JSON, pearls, references, videos, embedded surgery MCQs, and ordering.", template: { external_id: "custom-surgery", category: "Obstetric", name_en: "New procedure", name_ar: "New procedure", description: "Procedure summary", difficulty: 3, display_order: 0, steps: { approach: [], duration: "", indications: [], contraindications: [], preOp: [], steps: [], complications: [], postOp: [], videoTitle: "", videoChannel: "" }, pearls: [], references_list: [], mcqs: [], video_id: "", active: true } },
+  medical_scenarios: { label: "Clinical scenarios", group: "content", icon: "Stethoscope", description: "Edit scenarios used on the home page, search, sheets, and AI mentor context.", template: { category: "clinic", title_en: "New scenario", title_ar: "New scenario", situation_en: "Clinical situation", situation_ar: "Clinical situation", action_en: "Recommended action", action_ar: "Recommended action", script_en: "Patient-facing script", script_ar: "Patient-facing script", synonyms: [] } },
+  case_of_the_day: { label: "Case of the day", group: "content", icon: "CalendarDays", description: "Edit dated cases, answers, references, and active status.", template: { case_date: new Date().toISOString().slice(0, 10), title: "New case", body: "Case vignette", answer: "Teaching answer", references_list: [], active: true } },
+  tools_protocols: { label: "Emergency protocols", group: "tools", icon: "AlertTriangle", description: "Edit emergency protocol titles, steps, targets, color, ordering, and active status.", template: { external_id: "custom-protocol", title: "New protocol", title_ar: "New protocol", steps: [], targets: "Target endpoints", color: "red", display_order: 0, active: true } },
+  tools_drugs: { label: "Pregnancy drugs", group: "tools", icon: "Pill", description: "Edit drug names, pregnancy category, trimester guidance, lactation status, notes, and active status.", template: { name: "Drug name", category: "Category", trimester: "Trimester guidance", lactation: "Lactation guidance", notes: "Clinical notes", active: true } },
+  tools_guidelines: { label: "International guidelines", group: "tools", icon: "BookOpen", description: "Edit societies, regions, guideline bullets, color, ordering, and active status.", template: { society: "Society", region: "Region", color: "blue", items: [], display_order: 0, active: true } },
+  tools_ddx: { label: "Differential diagnosis", group: "tools", icon: "GitBranch", description: "Edit presentations, differential lists, red flags, ordering, and active status.", template: { presentation: "Clinical presentation", differentials: [], red_flags: "Red flags", display_order: 0, active: true } },
+  exams_meta: { label: "Exam data", group: "exams", icon: "GraduationCap", description: "Edit exam authorities, fees, duration, syllabus, registration links, references, and active status.", template: { exam_id: "NEW", authority: "Authority", country: "Country", country_code: "XX", flag: "🏳️", platform: "Platform", exam_name: "Exam name", level: "Level", format: "Format", duration: "Duration", questions: 0, pass_mark: "Pass mark", fee_usd: "Fee", validity_years: "Validity", official_url: "https://", register_url: "https://", syllabus: [], refs: [], notes: "", display_order: 0, active: true } },
+  scheduled_notifications: { label: "Notifications", group: "notifications", icon: "Bell", description: "Edit mobile notification title, body, timing, repeat pattern, and active status.", template: { title: "Notification title", body: "Notification body", scheduled_at: new Date().toISOString(), repeat_pattern: "none", active: true } },
 };
 
 export const TABLE_GROUPS: Record<string, { label: string; icon: string }> = {
