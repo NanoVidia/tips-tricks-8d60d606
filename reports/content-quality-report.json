@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-04-26T10:16:27.235Z",
+  "generatedAt": "2026-04-26T10:16:58.320Z",
   "summary": {
-    "staticMcqs": 191,
+    "staticMcqs": 204,
     "targetMcqs": 1000,
-    "mcqGap": 809,
+    "mcqGap": 796,
     "surgeries": 122,
     "emergencyProtocols": 6,
     "clinicalSeedCards": 16
   },
   "urgentFindings": [
-    "MCQ bank is 191; gap to 1000 is 809.",
+    "MCQ bank is 204; gap to 1000 is 796.",
     "60 static Q() explanations are under 80 characters.",
     "33 video titles contain weak relevance signals."
   ],
