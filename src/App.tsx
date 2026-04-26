@@ -8,6 +8,7 @@ import Index from "./pages/Index.tsx";
 import Tools from "./pages/Tools.tsx";
 import Admin from "./pages/Admin.tsx";
 import Control from "./pages/Control.tsx";
+import ControlLoginPage from "./pages/ControlLoginPage.tsx";
 import Exams from "./pages/Exams.tsx";
 import ExamsCompare from "./pages/ExamsCompare.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -69,6 +70,7 @@ const App = () => {
             <Route path="/exams" element={<Exams />} />
             <Route path="/exams/compare" element={<ExamsCompare />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/control/login" element={<ControlLoginPage />} />
             <Route path="/control" element={<Control />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
