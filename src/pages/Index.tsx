@@ -33,7 +33,7 @@ import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2, ShieldCheck } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
-import { detectUrgency, URGENCY_WEIGHT, URGENCY_LABEL, type Urgency } from "@/lib/clinicalTags";
+import { detectUrgency } from "@/lib/clinicalTags";
 import { rankSearchScenarios } from "@/lib/clinicalSearch";
 
 
@@ -124,8 +124,6 @@ export default function Index() {
   const [dark, setDark] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [allSearchResults, setAllSearchResults] = useState<Scenario[]>([]);
-  const [searchCatFilter, setSearchCatFilter] = useState<ScenarioCategory | null>(null);
-  const [urgencyFilter, setUrgencyFilter] = useState<Urgency | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -307,32 +305,12 @@ export default function Index() {
 
   useEffect(() => { fetchScenarios(); }, [fetchScenarios]);
 
-  // Reset category/urgency filters when search query changes
-  useEffect(() => {
-    setSearchCatFilter(null);
-    setUrgencyFilter(null);
-  }, [debouncedSearch]);
-
-  // Per-category counts within current search results
-  const searchCounts = (() => {
-    const c: Record<ScenarioCategory, number> = { clinic: 0, or_labor: 0, behavior: 0, qa: 0 };
-    for (const s of allSearchResults) c[s.category]++;
-    return c;
-  })();
-
   // Per-urgency counts within current search results
   const urgencyCounts = (() => {
-    const c: Record<Urgency, number> = { critical: 0, urgent: 0, routine: 0 };
+    const c = { critical: 0, urgent: 0, routine: 0 };
     for (const s of allSearchResults) c[detectUrgency(s)]++;
     return c;
   })();
-
-  // Filtered results based on chip selection (category + urgency)
-  const filteredSearchResults = allSearchResults.filter((s) => {
-    if (searchCatFilter && s.category !== searchCatFilter) return false;
-    if (urgencyFilter && detectUrgency(s) !== urgencyFilter) return false;
-    return true;
-  });
 
   const openAI = (s: Scenario) => { setAiScenario(s); setAiOpen(true); };
 
