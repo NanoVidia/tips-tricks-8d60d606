@@ -64,6 +64,7 @@ const App = () => {
           <NotificationsBootstrap />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/index" element={<Index />} />
             <Route path="/tools" element={<Tools />} />
             <Route path="/exams" element={<Exams />} />
             <Route path="/exams/compare" element={<ExamsCompare />} />
