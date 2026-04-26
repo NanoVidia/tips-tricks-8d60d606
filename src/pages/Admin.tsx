@@ -330,7 +330,7 @@ export default function Admin() {
           </CardContent>
         </Card>
 
-        {/* Footer: رابط مباشر للوحة التحكم الكاملة */}
+        {/* Footer: direct link to the full control panel */}
         <footer className="pt-2 pb-4 text-center">
           <a
             href="/control"

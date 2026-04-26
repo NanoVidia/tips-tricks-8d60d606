@@ -160,7 +160,7 @@ export default function Control() {
   useEffect(() => {
     document.title = "Control Panel — Tips & Tricks";
     if (!authed) return;
-    // التحقق من صلاحية الجلسة عند التحميل
+    // Verify session validity on load
     adminVerify().catch(() => {
       setAuthed(false);
       toast.error("Session expired, please sign in again");
@@ -181,7 +181,7 @@ export default function Control() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar للأجهزة الكبيرة */}
+      {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:flex-col w-64 border-r bg-card shrink-0 sticky top-0 h-screen">
         <div className="px-4 py-4 border-b flex items-center justify-between">
           <div>
@@ -197,9 +197,9 @@ export default function Control() {
         </ScrollArea>
       </aside>
 
-      {/* المحتوى الرئيسي */}
+      {/* Main content */}
       <main className="flex-1 min-w-0">
-        {/* Header للجوال */}
+        {/* Mobile header */}
         <header className="lg:hidden sticky top-0 z-30 bg-background/95 backdrop-blur border-b px-3 py-2 flex items-center justify-between gap-2">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
