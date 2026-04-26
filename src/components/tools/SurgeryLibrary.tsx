@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
-import { surgeryCategories, type Surgery, type SurgeryCategory } from "@/data/surgeriesData";
+import type { Surgery, SurgeryCategory } from "@/data/surgeriesData";
+import { surgeryCategories } from "@/data/surgeryCategories";
 import { SurgeryVideo } from "@/components/tools/SurgeryVideo";
 import { useAllSurgeries } from "@/hooks/useSurgeries";
 import { InlineDisclaimer } from "@/components/Disclaimer";
