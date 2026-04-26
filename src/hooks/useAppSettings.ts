@@ -1,10 +1,10 @@
-// Hook موحّد لجلب الإعدادات العامة من app_settings مع defaults مضمَّنة بالكود.
-// يقع تلقائياً على القيم الافتراضية إذا فشل التحميل أو لم يوجد المفتاح في DB.
+// Unified hook for loading app_settings with embedded defaults.
+// Falls back to defaults if loading fails or a key is missing.
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-// قيم defaults — تطابق السلوك الحالي قبل ربط DB.
-// ملاحظة: app_frozen يُتحكَّم به من src/App.tsx مباشرة (Lovable فقط)، وليس من DB.
+// Defaults mirror the current behavior before database values load.
+// Note: app_frozen is controlled directly from src/App.tsx, not from the database.
 export const defaultSettings = {
   whatsapp_number: "96899815505",
   whatsapp_label: "Contact on WhatsApp",
