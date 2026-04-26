@@ -405,6 +405,10 @@ export default function Index() {
                 }`}
               >
                 <span className="relative inline-block max-w-full">
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 -bottom-1 h-3 rounded-full bg-primary/18 blur-md will-change-auto"
+                  />
                   <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_50%,hsl(var(--foreground))_100%)]">
                     {logoText.trim() || "OB/GYN Reference"}
                   </span>
