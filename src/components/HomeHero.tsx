@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { PhIcon, type PhIconProps } from "@/components/ui/PhIcon";
 import { AIRobot } from "@/components/AIRobot";
 import { EmergencyStrip } from "@/components/home/EmergencyStrip";
@@ -28,6 +28,8 @@ interface HomeHeroProps {
   onOpenClinic: () => void;
   /** Trigger a search from a content-type chip (e.g. "Drugs", "Protocols"). */
   onSearchChip?: (query: string) => void;
+  /** Open a specific clinical section with a context-aware search. */
+  onSectionQuery?: (category: ScenarioCategory, query: string) => void;
   /** Open today's case in the scenario sheet. */
   onOpenDailyCase?: (c: DailyCaseRef) => void;
   tabLabels: Record<ScenarioCategory, string>;
@@ -104,6 +106,7 @@ export function HomeHero({
   onOpenClinic,
   tabLabels,
   onSearchChip,
+  onSectionQuery,
   onOpenDailyCase,
 }: HomeHeroProps) {
   const [textSize, setTextSize] = useState<HomeTextSize>(() => {
@@ -118,34 +121,11 @@ export function HomeHero({
     window.localStorage.setItem("homeTextSize", size);
   };
 
-  type ChipItem = {
-    id: string;
-    label: string;
-    query: string;
-    phName: PhIconProps["name"];
-    gradient: string;
-    shadow: string;
-    hint: string;
-  };
-
-  const priorityItems: Array<{ id: string; label: string; query: string; phName: PhIconProps["name"]; hint: string }> = [
-    { id: "high-risk", label: "High-risk obstetrics", query: "preeclampsia diabetes placenta previa fetal growth", phName: "WarningCircle", hint: "PET · GDM · FGR · Placenta" },
-    { id: "labor", label: "Labor ward decisions", query: "labor CTG induction shoulder dystocia operative delivery", phName: "Baby", hint: "CTG · induction · dystocia" },
-    { id: "fertility", label: "Fertility & IVF", query: "infertility ovulation induction IVF PCOS ovarian reserve", phName: "Dna", hint: "PCOS · IVF · ovarian reserve" },
-    { id: "gyn-surgery", label: "Gynae surgery", query: "hysterectomy laparoscopy myomectomy hysteroscopy complications", phName: "Scissors", hint: "Lap · hysteroscopy · anatomy" },
-    { id: "gyn-clinic", label: "Gynae clinic", query: "bleeding pelvic pain menopause contraception endometriosis", phName: "Stethoscope", hint: "AUB · pain · menopause" },
-    { id: "exams", label: "Boards & OSCE", query: "exam OSCE MRCOG Arab board EFOG MCQ", phName: "GraduationCap", hint: "MCQ · viva · stations" },
-  ];
-
-  // Emergencies live in the dedicated EmergencyStrip above — keep this list as
-  // the broader "browse by content type" filter row.
-  const chips: ChipItem[] = [
-    { id: "drugs",      label: "Drugs & Dosing",        query: "drug",      phName: "Pill",          gradient: "from-violet-500 to-fuchsia-700", shadow: "shadow-violet-500/30",  hint: "MgSO₄ · Oxytocin · Heparin" },
-    { id: "protocols",  label: "Clinical Protocols",    query: "protocol",  phName: "ClipboardText", gradient: "from-sky-500 to-blue-700",       shadow: "shadow-sky-500/30",     hint: "PPH · Eclampsia · Sepsis" },
-    { id: "procedures", label: "Procedures & Surgery",  query: "procedure", phName: "Scissors",      gradient: "from-rose-500 to-pink-700",      shadow: "shadow-rose-500/30",    hint: "C-section · Forceps · D&C" },
-    { id: "obstetrics", label: "Obstetrics & Fertility", query: "obstetrics fertility", phName: "Baby", gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", hint: "Antenatal · Labor · IVF" },
-    { id: "clinic",     label: "Outpatient Clinic",     query: "clinic",    phName: "Stethoscope",   gradient: "from-teal-500 to-cyan-700",      shadow: "shadow-teal-500/30",    hint: "Antenatal · Gynae visits" },
-    { id: "mcqs",       label: "Q&A and MCQs",          query: "MCQ",       phName: "Question",      gradient: "from-emerald-500 to-teal-700",   shadow: "shadow-emerald-500/30", hint: "Board-style self-assessment" },
+  const sectionLinks: Array<{ id: ScenarioCategory; label: string; query: string; phName: PhIconProps["name"]; hint: string }> = [
+    { id: "clinic", label: "Clinic", query: "antenatal gynae clinic fertility PCOS AUB contraception menopause", phName: "Stethoscope", hint: "Antenatal · fertility · AUB" },
+    { id: "or_labor", label: "OR / Labor", query: "labor ward CTG induction cesarean PPH shoulder dystocia operative delivery", phName: "Baby", hint: "CTG · C-section · emergencies" },
+    { id: "behavior", label: "Behavior", query: "counseling consent breaking bad news confidentiality refusal communication", phName: "ChatCircleDots", hint: "Consent · counseling · ethics" },
+    { id: "qa", label: "Q&A Bank", query: "MRCOG Arab board EFOG OSCE MCQ viva high yield obstetrics gynecology fertility", phName: "Question", hint: "MCQ · OSCE · viva" },
   ];
 
   return (
@@ -245,18 +225,18 @@ export function HomeHero({
       >
         <div className="px-1 space-y-1.5">
           <p className={`${textScale.section} font-black uppercase tracking-[0.18em] text-foreground leading-[1.2]`}>
-            Essential OB/GYN Doctor Hub
+            Quick Specialty Access
           </p>
           <p className={`${textScale.sub} text-muted-foreground leading-[1.35]`}>
-            The fastest routes for obstetricians, gynecologists, fertility clinicians, residents, and exam candidates.
+            Deep-link into each core OB/GYN area with a ready clinical query.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
-          {priorityItems.map((item, idx) => (
+          {sectionLinks.map((item, idx) => (
             <motion.button
               key={item.id}
               type="button"
-              onClick={() => { hapticTap(8); onSearchChip?.(item.query); }}
+              onClick={() => { hapticTap(8); onSectionQuery?.(item.id, item.query); }}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ ...SPRING, delay: 0.12 + idx * 0.04 }}
@@ -271,56 +251,6 @@ export function HomeHero({
                   <span className={`${textScale.card} block font-black leading-[1.18] text-foreground break-words`}>{item.label}</span>
                   <span className={`${textScale.hint} block text-muted-foreground leading-[1.25] mt-1.5 break-words`}>{item.hint}</span>
                 </span>
-              </div>
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* ② Search-driven content type chips — replace previous category cards */}
-      <motion.div
-        initial={{ y: 12, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ ...SPRING, delay: 0.15 }}
-        className="space-y-3.5"
-      >
-        <div className="flex items-start justify-between px-1 gap-2">
-          <div className="min-w-0 space-y-1.5">
-            <p className={`${textScale.section} font-black uppercase tracking-[0.18em] text-foreground leading-[1.2] flex items-start gap-1.5`}>
-              <Search className="w-3.5 h-3.5 text-primary" />
-              Browse by Content Type
-            </p>
-            <p className={`${textScale.sub} text-muted-foreground leading-[1.35]`}>
-              Tap any card to filter the library
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5">
-          {chips.map((c, idx) => (
-            <motion.button
-              key={c.id}
-              type="button"
-              onClick={() => { hapticTap(8); onSearchChip?.(c.query); }}
-              initial={{ y: 12, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ ...SPRING, delay: 0.2 + idx * 0.05 }}
-              whileTap={{ scale: 0.96 }}
-              whileHover={{ y: -2 }}
-              className={`soft-tint relative overflow-hidden rounded-2xl p-3 text-left bg-gradient-to-br ${c.gradient} shadow-md ${c.shadow} active:shadow-sm transition-all min-h-[82px]`}
-              aria-label={`Search ${c.label}`}
-            >
-              <div className="absolute -bottom-2 -right-2 w-14 h-14 opacity-15 pointer-events-none" aria-hidden="true">
-                <PhIcon name={c.phName} size={56} tone="white" weight="fill" />
-              </div>
-              <div className="relative flex items-start gap-2.5 h-full">
-                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/25 flex items-center justify-center shrink-0">
-                  <PhIcon name={c.phName} size={18} tone="white" weight="duotone" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-white font-bold ${textScale.card} leading-[1.2] break-words`}>{c.label}</p>
-                  <p className={`text-white/70 ${textScale.hint} leading-[1.25] mt-1.5 break-words`}>{c.hint}</p>
-                </div>
               </div>
             </motion.button>
           ))}
