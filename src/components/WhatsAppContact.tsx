@@ -1,4 +1,4 @@
-// زر/سطر تواصل WhatsApp مدفوع من app_settings (whatsapp_number, whatsapp_label).
+// WhatsApp contact row driven by app_settings (whatsapp_number, whatsapp_label).
 import { useAppSettings } from "@/hooks/useAppSettings";
 
 export function WhatsAppContact({ className = "" }: { className?: string }) {
@@ -6,7 +6,7 @@ export function WhatsAppContact({ className = "" }: { className?: string }) {
   const number = String(get("whatsapp_number") ?? "").replace(/[^0-9]/g, "");
   const label = get("whatsapp_label") ?? "WhatsApp";
   if (!number) return null;
-  // تنسيق العرض: +CCC NNNN NNNN
+  // Display format: +CCC NNNN NNNN
   const display = `+${number.replace(/(\d{3})(\d{4})(\d{4})/, "$1 $2 $3")}`;
   return (
     <div
