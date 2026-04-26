@@ -262,6 +262,32 @@
     font-size: 0.625rem;
   }
 
+  .text-flow-safe {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    text-wrap: pretty;
+    line-break: auto;
+  }
+
+  .text-flow-compact {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+    text-wrap: balance;
+  }
+
+  @media (max-width: 480px) {
+    .mobile-copy-align {
+      text-align: start;
+      line-height: 1.35;
+    }
+  }
+
   /* Editorial header gradient shadow — applied as a box-shadow so it never
      interferes with sticky positioning or stacking contexts. */
   .header-fade {
