@@ -353,10 +353,12 @@ export default function Index() {
       <div className="h-[3px] gradient-gold relative z-20" />
 
       <header
-        className={`header-fade sticky top-0 z-20 px-4 sm:px-5 border-b bg-card/85 backdrop-blur-md transition-all duration-300 ${
+        className={`header-fade sticky top-0 z-20 overflow-hidden px-4 sm:px-5 border-b bg-[linear-gradient(90deg,hsl(var(--primary)/0.18)_0%,hsl(var(--accent)/0.10)_42%,hsl(var(--card)/0.92)_100%)] backdrop-blur-md transition-all duration-300 ${
           scrolled ? "pt-2 pb-2 border-border/70" : "pt-4 pb-3.5 border-border/50"
         }`}
       >
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-2/3 bg-[radial-gradient(circle_at_8%_20%,hsl(var(--primary)/0.20),transparent_34%),linear-gradient(90deg,hsl(var(--primary)/0.12),transparent)]" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/55 via-accent/35 to-transparent" aria-hidden="true" />
         <div className="relative">
           {/* Issue line — hidden in compact mode */}
           <AnimatePresence initial={false}>
