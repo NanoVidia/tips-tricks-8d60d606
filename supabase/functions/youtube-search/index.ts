@@ -107,31 +107,41 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 1) Search
-    const searchUrl = new URL("https://www.googleapis.com/youtube/v3/search");
-    searchUrl.searchParams.set("part", "snippet");
-    searchUrl.searchParams.set("q", `${surgeryName} surgical technique obstetrics gynecology`);
-    searchUrl.searchParams.set("type", "video");
-    searchUrl.searchParams.set("videoEmbeddable", "true");
-    searchUrl.searchParams.set("videoSyndicated", "true");
-    searchUrl.searchParams.set("safeSearch", "strict");
-    searchUrl.searchParams.set("relevanceLanguage", "en");
-    searchUrl.searchParams.set("maxResults", "15");
-    searchUrl.searchParams.set("key", YOUTUBE_API_KEY);
+    // 1) Search with multiple precise professional queries, then dedupe candidates.
+    const queries = [
+      `${surgeryName} surgical technique obstetrics gynecology`,
+      `${surgeryName} operative video gynecology`,
+      `${surgeryName} procedure demonstration OB GYN`,
+      `${surgeryName} surgery steps`,
+    ];
+    const byId = new Map<string, { id: { videoId: string }; snippet: { title: string; channelTitle: string }; order: number }>();
 
-    const searchRes = await fetch(searchUrl);
-    if (!searchRes.ok) {
-      const text = await searchRes.text();
-      console.error(`YouTube search ${searchRes.status}: ${text}`);
-      return new Response(
-        JSON.stringify({ found: false, reason: "search-error", status: searchRes.status }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    for (const [queryIndex, query] of queries.entries()) {
+      const searchUrl = new URL("https://www.googleapis.com/youtube/v3/search");
+      searchUrl.searchParams.set("part", "snippet");
+      searchUrl.searchParams.set("q", query);
+      searchUrl.searchParams.set("type", "video");
+      searchUrl.searchParams.set("videoEmbeddable", "true");
+      searchUrl.searchParams.set("videoSyndicated", "true");
+      searchUrl.searchParams.set("safeSearch", "strict");
+      searchUrl.searchParams.set("relevanceLanguage", "en");
+      searchUrl.searchParams.set("maxResults", "12");
+      searchUrl.searchParams.set("key", YOUTUBE_API_KEY);
+
+      const searchRes = await fetch(searchUrl);
+      if (!searchRes.ok) {
+        const text = await searchRes.text();
+        console.error(`YouTube search ${searchRes.status}: ${text}`);
+        continue;
+      }
+
+      const searchData = await searchRes.json();
+      for (const [itemIndex, item] of ((searchData.items ?? []) as Array<{ id: { videoId: string }; snippet: { title: string; channelTitle: string } }>).entries()) {
+        if (item?.id?.videoId && !byId.has(item.id.videoId)) byId.set(item.id.videoId, { ...item, order: queryIndex * 100 + itemIndex });
+      }
     }
 
-    const searchData = await searchRes.json();
-    const items: Array<{ id: { videoId: string }; snippet: { title: string; channelTitle: string } }> =
-      searchData.items ?? [];
+    const items = [...byId.values()];
     if (items.length === 0) {
       return new Response(
         JSON.stringify({ found: false, reason: "no-results" }),
@@ -139,7 +149,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const ids = items.map((i) => i.id.videoId).filter(Boolean);
+    const ids = items.map((i) => i.id.videoId).filter(Boolean).slice(0, 50);
 
     // 2) Verify embeddability + status via videos.list
     const videosUrl = new URL("https://www.googleapis.com/youtube/v3/videos");
@@ -171,8 +181,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Rank: professional topic relevance first, trusted channel second, then original search order
-    const indexById = new Map(ids.map((id, i) => [id, i]));
+    // Rank: professional topic relevance first, trusted channel second, then original search order.
+    const indexById = new Map(items.map((item) => [item.id.videoId, item.order]));
     valid.sort((a: any, b: any) => {
       const rs = relevanceScore(surgeryName, b.snippet.title, b.snippet.channelTitle) - relevanceScore(surgeryName, a.snippet.title, a.snippet.channelTitle);
       if (rs !== 0) return rs;
@@ -184,9 +194,16 @@ Deno.serve(async (req) => {
     const best = valid[0];
     const bestScore = relevanceScore(surgeryName, best.snippet.title, best.snippet.channelTitle);
     const currentScore = currentVideo?.title ? relevanceScore(surgeryName, currentVideo.title, currentVideo.channel || "") : 0;
-    const selected = currentVideo?.videoId && currentScore >= bestScore && currentScore >= 45
+    const selected = currentVideo?.videoId && currentScore >= bestScore && currentScore >= 60
       ? { id: currentVideo.videoId, snippet: { title: currentVideo.title, channelTitle: currentVideo.channel || "" }, score: currentScore }
       : { ...best, score: bestScore };
+
+    if (selected.score < 60) {
+      return new Response(
+        JSON.stringify({ found: false, reason: "low-relevance", score: selected.score }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     return new Response(
       JSON.stringify({
@@ -195,7 +212,7 @@ Deno.serve(async (req) => {
         title: selected.snippet.title,
         channel: selected.snippet.channelTitle,
         score: selected.score,
-        confidence: selected.score >= 70 ? "high" : selected.score >= 45 ? "medium" : "low",
+        confidence: selected.score >= 78 ? "high" : selected.score >= 60 ? "medium" : "low",
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
