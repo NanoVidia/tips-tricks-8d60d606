@@ -96,7 +96,7 @@ export function expandClinicalSearchQueries(query: string) {
 }
 
 const scenarioBlob = (s: SearchScenario) =>
-  normalize([s.title_en, s.situation_en, s.action_en, s.script_en, (s.synonyms || []).join(" ")].filter(Boolean).join(" "));
+  normalize([s.title_en, s.title_ar, s.situation_en, s.situation_ar, s.action_en, s.action_ar, s.script_en, s.script_ar, (s.synonyms || []).join(" ")].filter(Boolean).join(" "));
 
 export function getSearchTokens(query: string) {
   const tokens = normalize(query)
@@ -113,12 +113,13 @@ function scoreScenario(s: SearchScenario, query: string, strict: boolean) {
   const q = normalize(query);
   const fourTs = isFourTsQuery(query);
   const tokens = getSearchTokens(query);
-  const title = normalize(s.title_en || "");
-  const sit = normalize(s.situation_en || "");
-  const act = normalize(s.action_en || "");
-  const script = normalize(s.script_en || "");
+  const title = normalize([s.title_en, s.title_ar].filter(Boolean).join(" "));
+  const sit = normalize([s.situation_en, s.situation_ar].filter(Boolean).join(" "));
+  const act = normalize([s.action_en, s.action_ar].filter(Boolean).join(" "));
+  const script = normalize([s.script_en, s.script_ar].filter(Boolean).join(" "));
   const syn = normalize((s.synonyms || []).join(" "));
   const blob = `${title} ${sit} ${act} ${script} ${syn}`;
+  const sourcePriority = query === query.trim() ? 1.15 : 1;
   let score = 0;
   let signalHits = 0;
   let matchedTokens = 0;
@@ -144,13 +145,21 @@ function scoreScenario(s: SearchScenario, query: string, strict: boolean) {
     if (inTitle || inSyn || inSit || inAct || inScript) matchedTokens++;
   }
 
-  if (fourTs && score > 0) return score;
+  if (fourTs && score > 0) return Math.round(score * sourcePriority);
   if (strict && (matchedTokens < tokens.length || signalHits === 0)) return 0;
   if (!strict && signalHits === 0 && matchedTokens === 0) return 0;
   if (tokens.length > 1 && title.includes(q)) score += 35;
   if (title.startsWith(q)) score += 25;
   if (title === q) score += 40;
-  return score;
+  if (blob.includes("protocol") || blob.includes("emergency") || blob.includes("management")) score += 6;
+  return Math.round(score * sourcePriority);
+}
+
+function relationBand(score: number, urgency: number, index: number) {
+  if (score >= 70) return 0;
+  if (score >= 42 && urgency >= 2) return 1;
+  if (score >= 28) return 2;
+  return 3 + Math.min(index, 2);
 }
 
 export function rankSearchScenarios(query: string, rows: SearchScenario[]) {
@@ -161,14 +170,14 @@ export function rankSearchScenarios(query: string, rows: SearchScenario[]) {
   let ranked = rows
     .map((s) => ({ s, score: bestScore(s, true), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
     .filter((x) => x.score >= 8)
-    .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
+    .sort((a, b) => (relationBand(a.score, a.urg, rows.indexOf(a.s)) - relationBand(b.score, b.urg, rows.indexOf(b.s))) || (b.score - a.score) || (b.urg - a.urg))
     .map((x) => x.s);
 
   if (ranked.length === 0) {
     ranked = rows
       .map((s) => ({ s, score: bestScore(s, false), urg: URGENCY_WEIGHT[detectUrgency(s)] }))
       .filter((x) => x.score >= 6)
-      .sort((a, b) => (b.score - a.score) || (b.urg - a.urg))
+      .sort((a, b) => (relationBand(a.score, a.urg, rows.indexOf(a.s)) - relationBand(b.score, b.urg, rows.indexOf(b.s))) || (b.score - a.score) || (b.urg - a.urg))
       .map((x) => x.s);
   }
 
