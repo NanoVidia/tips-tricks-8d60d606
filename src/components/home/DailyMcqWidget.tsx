@@ -53,12 +53,12 @@ export function DailyMcqWidget({ textScale }: Props) {
           .select("id, topic, difficulty, stem, options, answer_index, explanation")
           .eq("active", true)
           .order("id")
-          .limit(120);
+          .range(offset, Math.min(offset + 119, total - 1));
         if (cancelled) return;
         if (error) throw error;
         if (data?.length) {
           const bank = data as Mcq[];
-          setMcqs([...bank.slice(offset), ...bank.slice(0, offset)]);
+          setMcqs(bank);
           setCurrentIndex(0);
           setAnswers({});
         }
