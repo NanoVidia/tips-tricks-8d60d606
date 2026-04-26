@@ -38,6 +38,36 @@ const TRUSTED_VISUALS: Array<TrustedClinicalVisual & { keys: string[] }> = [
 
 const normalize = (value: string) => value.toLowerCase().replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
 
+const compactClinicalTerm = (value: string) => normalize(value).replace(/[^\p{L}\p{N}]/gu, "");
+
+const isFourTsQuery = (query: string) => {
+  const compact = compactClinicalTerm(query);
+  return compact === "4t" || compact === "4ts" || compact === "fourts" || compact === "fourt";
+};
+
+export function expandClinicalSearchQueries(query: string) {
+  const q = query.trim();
+  if (!q) return [];
+
+  if (isFourTsQuery(q)) {
+    return [
+      q,
+      "4 T's",
+      "PPH",
+      "postpartum hemorrhage",
+      "postpartum haemorrhage",
+      "PPH causes",
+      "uterine atony",
+      "retained placenta",
+      "genital tract trauma",
+      "coagulopathy",
+      "Tone Tissue Trauma Thrombin",
+    ];
+  }
+
+  return [q];
+}
+
 const scenarioBlob = (s: SearchScenario) =>
   normalize([s.title_en, s.situation_en, s.action_en, s.script_en, (s.synonyms || []).join(" ")].filter(Boolean).join(" "));
 
@@ -54,15 +84,23 @@ export function getSearchTokens(query: string) {
 
 function scoreScenario(s: SearchScenario, query: string, strict: boolean) {
   const q = normalize(query);
+  const fourTs = isFourTsQuery(query);
   const tokens = getSearchTokens(query);
   const title = normalize(s.title_en || "");
   const sit = normalize(s.situation_en || "");
   const act = normalize(s.action_en || "");
   const script = normalize(s.script_en || "");
   const syn = normalize((s.synonyms || []).join(" "));
+  const blob = `${title} ${sit} ${act} ${script} ${syn}`;
   let score = 0;
   let signalHits = 0;
   let matchedTokens = 0;
+
+  if (fourTs) {
+    if (blob.includes("4 t") || blob.includes("four t")) score += 60;
+    if (blob.includes("pph") || blob.includes("postpartum hemorrhage") || blob.includes("postpartum haemorrhage")) score += 28;
+    if (blob.includes("cause") || blob.includes("etiology") || blob.includes("atony")) score += 14;
+  }
 
   for (const tok of tokens) {
     const inTitle = title.includes(tok);
@@ -79,6 +117,7 @@ function scoreScenario(s: SearchScenario, query: string, strict: boolean) {
     if (inTitle || inSyn || inSit || inAct || inScript) matchedTokens++;
   }
 
+  if (fourTs && score > 0) return score;
   if (strict && (matchedTokens < tokens.length || signalHits === 0)) return 0;
   if (!strict && signalHits === 0 && matchedTokens === 0) return 0;
   if (tokens.length > 1 && title.includes(q)) score += 35;
