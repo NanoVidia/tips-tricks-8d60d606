@@ -9,21 +9,55 @@ const corsHeaders = {
 };
 
 const TRUSTED_KEYWORDS = [
-  "rcog", "acog", "aagl", "ircad", "nucleus medical",
-  "surgery 101", "esgo", "iuga", "osmosis", "armando hasudungan",
-  "lecturio", "geeky medics", "medscape", "nejm", "mayo clinic", "stanford", "ubc", "green journal", "tvasurg",
+  "rcog", "acog", "aagl", "ircad", "nucleus medical", "surgery 101", "esgo", "iuga", "osmosis",
+  "armando hasudungan", "lecturio", "geeky medics", "medscape", "nejm", "mayo clinic", "stanford",
+  "ubc", "green journal", "tvasurg", "augs", "figo", "society of gynecologic oncology",
 ];
 
-const WEAK_TERMS = ["patient guide", "instructions", "explained", "what happens", "shorts", "#shorts", "can i get pregnant"];
-const WRONG_SPECIALTY_TERMS = ["deviated septum", "ent", "dental", "orthopedic", "knee", "appendix"];
+const WEAK_TERMS = ["patient guide", "patient education", "instructions", "explained", "what happens", "animation", "shorts", "#shorts", "can i get pregnant", "minute"];
+const WRONG_SPECIALTY_TERMS = ["deviated septum", "nasal", "sinus", "ent", "dental", "orthopedic", "knee", "hip", "appendix", "appendectomy", "gallbladder", "hernia"];
+const TECHNIQUE_TERMS = ["surgical", "surgery", "procedure", "technique", "operative", "operation", "laparoscopic", "hysteroscopic", "vaginal", "repair", "demonstration", "step", "steps", "osce"];
 
 function normalize(value: string): string {
   return (value || "").toLowerCase().replace(/&amp;/g, "and").replace(/[^a-z0-9]+/g, " ").trim();
 }
 
 function meaningfulTokens(value: string): string[] {
-  const stop = new Set(["the", "and", "for", "with", "low", "mid", "open", "total", "partial"]);
+  const stop = new Set(["the", "and", "for", "with", "low", "mid", "open", "total", "partial", "section", "assisted"]);
   return normalize(value).split(" ").filter((token) => token.length > 2 && !stop.has(token));
+}
+
+function topicGroups(surgeryName: string): string[][] {
+  const name = normalize(surgeryName);
+  const groups: string[][] = [];
+  if (/cesarean|caesarean|c section|lscs/.test(name)) groups.push(["cesarean", "caesarean", "c section", "lscs"]);
+  if (/hysterect/.test(name)) groups.push(["hysterectomy", "hysterectomies"]);
+  if (/myomect|fibroid/.test(name)) groups.push(["myomectomy", "fibroid", "myoma"]);
+  if (/hysteroscop/.test(name)) groups.push(["hysteroscopy", "hysteroscopic"]);
+  if (/polyp/.test(name)) groups.push(["polypectomy", "polyp"]);
+  if (/ablation/.test(name)) groups.push(["ablation", "endometrial ablation"]);
+  if (/adhesiolysis|asherman/.test(name)) groups.push(["adhesiolysis", "asherman", "intrauterine adhesions"]);
+  if (/septum|septoplasty/.test(name)) groups.push(["uterine septum", "septum resection", "hysteroscopic septum"]);
+  if (/vacuum|ventouse/.test(name)) groups.push(["vacuum", "ventouse", "operative vaginal"]);
+  if (/forceps/.test(name)) groups.push(["forceps", "operative vaginal"]);
+  if (/placenta/.test(name)) groups.push(["placenta", "retained placenta", "manual removal"]);
+  if (/perineal|tear/.test(name)) groups.push(["perineal", "perineal repair", "tear repair"]);
+  if (/cerclage|shirodkar|mcdonald/.test(name)) groups.push(["cerclage", "mcdonald", "shirodkar"]);
+  if (/external cephalic|ecv/.test(name)) groups.push(["external cephalic", "ecv", "version"]);
+  if (/lynch/.test(name)) groups.push(["b lynch", "compression suture"]);
+  if (/bakri|balloon/.test(name)) groups.push(["bakri", "uterine balloon", "postpartum hemorrhage"]);
+  if (/cystectomy|ovarian cyst/.test(name)) groups.push(["ovarian cystectomy", "cystectomy", "ovarian cyst"]);
+  if (/salping/.test(name)) groups.push(["salpingectomy", "salpingostomy", "fallopian tube"]);
+  if (/laparoscopy|laparoscopic/.test(name)) groups.push(["laparoscopy", "laparoscopic"]);
+  if (/endometri/.test(name)) groups.push(["endometriosis", "endometrioma"]);
+  if (/sling|incontinence|tvt|tot/.test(name)) groups.push(["sling", "incontinence", "tvt", "tot", "mid urethral"]);
+  if (/sacrocolpopexy/.test(name)) groups.push(["sacrocolpopexy", "prolapse"]);
+  if (/colporrhaphy|cystocele|cystocoele/.test(name)) groups.push(["colporrhaphy", "cystocele", "cystocoele"]);
+  if (/sacrospinous/.test(name)) groups.push(["sacrospinous", "ligament fixation"]);
+  if (/colpocleisis/.test(name)) groups.push(["colpocleisis"]);
+  if (/lymph/.test(name)) groups.push(["lymph node", "lymphadenectomy", "lymph node dissection"]);
+  if (/leep|cone|conization|biopsy/.test(name)) groups.push(["leep", "cone biopsy", "conization", "lletz"]);
+  return groups;
 }
 
 function trustScore(channelTitle: string): number {
@@ -34,14 +68,20 @@ function trustScore(channelTitle: string): number {
 function relevanceScore(surgeryName: string, title: string, channelTitle: string): number {
   const titleText = normalize(title);
   const channelText = normalize(channelTitle);
+  const combinedText = `${titleText} ${channelText}`;
   const tokens = meaningfulTokens(surgeryName);
-  const hits = tokens.filter((token) => titleText.includes(token)).length;
-  let score = tokens.length ? Math.round((hits / tokens.length) * 70) : 0;
+  const hits = tokens.filter((token) => titleText.includes(token) || channelText.includes(token)).length;
+  const groups = topicGroups(surgeryName);
+  const groupHits = groups.filter((group) => group.some((term) => combinedText.includes(normalize(term)))).length;
+  let score = tokens.length ? Math.round((hits / tokens.length) * 45) : 0;
+
+  score += Math.min(35, groupHits * 18);
 
   if (trustScore(channelText)) score += 20;
-  if (["surgical", "surgery", "procedure", "technique", "operative", "laparoscopic", "hysteroscopic"].some((term) => titleText.includes(term))) score += 10;
-  if (WEAK_TERMS.some((term) => titleText.includes(term))) score -= 25;
-  if (WRONG_SPECIALTY_TERMS.some((term) => titleText.includes(term))) score -= 45;
+  if (TECHNIQUE_TERMS.some((term) => titleText.includes(term))) score += 12;
+  if (WEAK_TERMS.some((term) => titleText.includes(term)) && !TECHNIQUE_TERMS.some((term) => titleText.includes(term))) score -= 35;
+  if (WRONG_SPECIALTY_TERMS.some((term) => titleText.includes(term) || channelText.includes(term))) score -= 75;
+  if (groups.length > 0 && groupHits === 0) score = Math.min(score, 35);
   return Math.max(0, Math.min(100, score));
 }
 
