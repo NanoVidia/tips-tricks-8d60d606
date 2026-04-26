@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { getClinicalTags, URGENCY_LABEL, type Urgency } from "@/lib/clinicalTags";
-import { resolveTrustedClinicalVisual, type SearchScenario, type TrustedClinicalVisual } from "@/lib/clinicalSearch";
+import { resolveTrustedClinicalVisual, type SearchScenario } from "@/lib/clinicalSearch";
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
