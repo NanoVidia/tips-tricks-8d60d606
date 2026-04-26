@@ -11,9 +11,9 @@ export const defaultSettings = {
   logo_text: "OB/GYN Reference",
   logo_emoji: "🩺",
   disclaimer_short:
-    "Educational reference only — not a substitute for clinical judgment or individualized care.",
+    "OB/GYN and fertility education only — not a substitute for specialist clinical judgment or individualized care.",
   disclaimer_long:
-    "Educational use only. All content (AI responses, calculators, drug info, surgery library, MCQs) is for healthcare-professional reference. Verify against current guidelines and apply clinical judgment for every patient.",
+    "Educational use only. All content is limited to obstetrics, gynecology, reproductive medicine, and fertility care for qualified professionals. Verify against current OB/GYN guidelines and apply specialist clinical judgment for every patient.",
 } as const;
 
 export type SettingKey = keyof typeof defaultSettings;

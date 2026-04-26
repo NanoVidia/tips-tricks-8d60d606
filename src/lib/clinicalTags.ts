@@ -1,7 +1,7 @@
 /**
  * Clinical heuristics — turn raw scenario text into clinician-facing badges:
  *   • Urgency  (critical / urgent / routine)
- *   • Specialty (OB / GYN / Surgery / Anesthesia / Emergency / General)
+ *   • Domain (OB / GYN / Fertility / Gyn Surgery / OB Emergency / OB Anesthesia)
  *   • Evidence level (A / B / C)
  *   • Time-to-read estimate (minutes)
  *
@@ -10,7 +10,7 @@
  */
 
 export type Urgency = "critical" | "urgent" | "routine";
-export type Specialty = "OB" | "GYN" | "Surgery" | "Anesthesia" | "Emergency" | "General";
+export type Specialty = "OB" | "GYN" | "Fertility" | "Gyn Surgery" | "OB Emergency" | "OB Anesthesia";
 export type EvidenceLevel = "A" | "B" | "C";
 
 interface ScenarioLike {
@@ -59,9 +59,10 @@ export function detectUrgency(s: ScenarioLike): Urgency {
 /* ---------- Specialty ---------- */
 
 const SPECIALTY_KEYS: Array<{ s: Specialty; keys: string[] }> = [
-  { s: "Emergency", keys: ["emergency", "code blue", "arrest", "shock", "trauma"] },
-  { s: "Anesthesia", keys: ["anesthesia", "epidural", "spinal block", "intubation", "airway"] },
-  { s: "Surgery",   keys: ["c-section", "cesarean", "hysterectomy", "laparotomy", "laparoscopy", "myomectomy", "hysteroscopy", "tubal", "incision"] },
+  { s: "OB Emergency", keys: ["emergency", "code blue", "arrest", "shock", "trauma", "pph", "eclampsia"] },
+  { s: "OB Anesthesia", keys: ["anesthesia", "epidural", "spinal block", "intubation", "airway"] },
+  { s: "Gyn Surgery", keys: ["c-section", "cesarean", "hysterectomy", "laparotomy", "laparoscopy", "myomectomy", "hysteroscopy", "tubal", "incision"] },
+  { s: "Fertility", keys: ["fertility", "infertility", "ivf", "icsi", "ovulation", "ovarian reserve", "pcos"] },
   { s: "OB",        keys: ["pregnancy", "labor", "delivery", "antenatal", "postpartum", "fetal", "obstetric", "gestation", "trimester", "amniotic"] },
   { s: "GYN",       keys: ["gynecolog", "menstrual", "ovarian", "uterine fibroid", "endometr", "menopause", "contracept", "fertility"] },
 ];
@@ -71,16 +72,16 @@ export function detectSpecialty(s: ScenarioLike): Specialty {
   // OR/Labor → bias toward Surgery/OB
   if (s.category === "or_labor") {
     for (const grp of SPECIALTY_KEYS) {
-      if (grp.s === "Surgery" || grp.s === "OB") {
+      if (grp.s === "Gyn Surgery" || grp.s === "OB") {
         if (grp.keys.some((k) => t.includes(k))) return grp.s;
       }
     }
-    return "Surgery";
+    return "Gyn Surgery";
   }
   for (const grp of SPECIALTY_KEYS) {
     if (grp.keys.some((k) => t.includes(k))) return grp.s;
   }
-  return "General";
+  return s.category === "clinic" ? "GYN" : "OB";
 }
 
 /* ---------- Evidence level ---------- */
