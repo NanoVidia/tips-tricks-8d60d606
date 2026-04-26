@@ -2,7 +2,7 @@ import { Lock } from "lucide-react";
 
 /**
  * Global freeze overlay — blocks all pointer/keyboard interaction with the app.
- * Removed only when the user types "فك التجميد" (unfreeze).
+ * Removed only through the developer unlock flow.
  */
 export const FreezeOverlay = () => {
   return (

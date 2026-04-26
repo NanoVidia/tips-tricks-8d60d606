@@ -163,7 +163,7 @@ export function SurgeryVideo({ videoId, title, channel, surgeryName }: Props) {
         </div>
       ) : (
         <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
-          لم يتم العثور على فيديو تعليمي موثوق مرتبط مباشرة بهذا الإجراء، لذلك لم يتم تضمين فيديو غير مؤكد.
+          No trusted educational video directly matched this procedure, so an unverified video was not embedded.
           {display.reason && <span className="mt-1 block text-[10px]">Reason: {display.reason}</span>}
         </div>
       )}

@@ -25,7 +25,7 @@ export function InlineDisclaimer({ className = "" }: { className?: string }) {
 export function DisclaimerBanner({ className = "" }: { className?: string }) {
   const { get } = useAppSettings();
   const text = get("disclaimer_long") ?? defaultSettings.disclaimer_long;
-  // نُبرز أول جزء قبل النقطة كعنوان bold لو وُجد.
+  // Highlight the first sentence as a bold lead when present.
   const dotIdx = text.indexOf(".");
   const head = dotIdx > 0 ? text.slice(0, dotIdx + 1) : "";
   const rest = dotIdx > 0 ? text.slice(dotIdx + 1) : text;

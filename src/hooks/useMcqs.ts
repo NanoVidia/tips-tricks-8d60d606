@@ -1,5 +1,5 @@
-// Hook لجلب أسئلة MCQ من قاعدة البيانات مع fallback ذكي للكود.
-// إذا فشل التحميل من DB (شبكة، RLS، عطل) — يُرجع البنك المدمج في الكود.
+// Fetches MCQs from the database with a local fallback bank.
+// If loading fails, the hook returns the embedded question bank.
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_MCQS, type MCQ } from "@/data/mcqBank";
@@ -42,10 +42,7 @@ async function fetchAllMcqs(): Promise<MCQ[]> {
   return (data as DbRow[]).map(rowToMCQ);
 }
 
-/**
- * يُرجع كل الأسئلة المتاحة. عند الفشل يستخدم البنك المضمّن في الكود.
- * `source` يُخبر المستهلك بمصدر البيانات الفعلي (للعرض/التشخيص).
- */
+/** Returns all available questions and reports whether data came from the database or fallback bank. */
 export function useAllMcqs() {
   const q = useQuery({
     queryKey: ["mcq_questions", "all"],
@@ -60,7 +57,7 @@ export function useAllMcqs() {
   return { mcqs, source, isLoading: q.isLoading, error: q.error as Error | null };
 }
 
-/** فلترة أسئلة (نفس منطق filterMCQs الأصلي — تعمل على أي مصفوفة MCQ) */
+/** Filters any MCQ list using the same rules as the original filterMCQs helper. */
 export function filterMcqList(
   pool: MCQ[],
   opts: { examId?: ExamId; topic?: Topic | "All"; difficulty?: Difficulty | "All" },

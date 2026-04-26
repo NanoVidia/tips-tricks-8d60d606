@@ -1,5 +1,5 @@
-// Edge Function موحدة لكل عمليات لوحة التحكم
-// تتعامل مع: تسجيل الدخول، التحقق من الجلسة، CRUD لكل الجداول
+// Unified backend function for all control-panel operations.
+// Handles login, session verification, and CRUD for allowed tables.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -10,7 +10,7 @@ const corsHeaders = {
 
 const SESSION_DURATION_HOURS = 24;
 
-// الجداول المسموح بها مع أعمدتها للأمان
+// Allowed tables and searchable columns.
 const ALLOWED_TABLES: Record<string, { searchCols?: string[]; orderCol?: string }> = {
   app_settings: { searchCols: ["key", "category", "description"], orderCol: "key" },
   app_translations: { searchCols: ["key", "ar", "en", "category"], orderCol: "category" },
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       if (!adminPwd) return json({ error: "ADMIN_PASSWORD not configured" }, 500);
       if (password !== adminPwd) return json({ error: "invalid password" }, 401);
 
-      // تنظيف الجلسات المنتهية
+      // Clean expired sessions.
       await supabase.rpc("cleanup_expired_admin_sessions");
 
       const token = generateToken();
@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       return json({ token, expiresAt });
     }
 
-    // ========== كل العمليات الأخرى تحتاج توكن صالح ==========
+    // ========== All remaining operations require a valid token ==========
     const token =
       req.headers.get("x-admin-token") ?? (body.token as string | undefined) ?? "";
     if (!token) return json({ error: "missing token" }, 401);
@@ -97,12 +97,12 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
-    // ========== VERIFY (للتحقق من بقاء الجلسة) ==========
+    // ========== VERIFY ==========
     if (action === "verify") {
       return json({ ok: true, expiresAt: session.expires_at });
     }
 
-    // ========== STATS (لوحة القيادة) ==========
+    // ========== STATS ==========
     if (action === "stats") {
       const tables = Object.keys(ALLOWED_TABLES);
       const counts: Record<string, number> = {};
@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
       return json({ counts });
     }
 
-    // ========== عمليات CRUD العامة ==========
+    // ========== Generic CRUD operations ==========
     const table = body.table as string;
     if (!table || !ALLOWED_TABLES[table]) {
       return json({ error: "invalid table" }, 400);
@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
-    // BULK INSERT (للاستيراد JSON)
+    // BULK INSERT for JSON imports.
     if (action === "bulk_insert") {
       const records = body.records as Record<string, unknown>[];
       if (!Array.isArray(records) || records.length === 0) {

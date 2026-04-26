@@ -40,7 +40,7 @@ const TRUSTED_VISUALS: Array<TrustedClinicalVisual & { keys: string[] }> = [
   { id: "screening", label: "Screening visit", reference: "WHO · Antenatal care recommendations", keys: ["screening", "antenatal", "prenatal", "pap smear", "cervical"] },
 ];
 
-const normalize = (value: string) => value.toLowerCase().replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+const normalize = (value: string) => value.toLowerCase();
 
 const compactClinicalTerm = (value: string) => normalize(value).replace(/[^\p{L}\p{N}]/gu, "");
 
@@ -50,20 +50,20 @@ const isFourTsQuery = (query: string) => {
 };
 
 const CLINICAL_QUERY_GROUPS = [
-  ["PPH", "postpartum hemorrhage", "postpartum haemorrhage", "heavy bleeding after delivery", "نزيف بعد الولادة", "uterine atony", "retained placenta", "genital tract trauma", "coagulopathy", "massive transfusion", "bakri", "b-lynch"],
+  ["PPH", "postpartum hemorrhage", "postpartum haemorrhage", "heavy bleeding after delivery", "uterine atony", "retained placenta", "genital tract trauma", "coagulopathy", "massive transfusion", "bakri", "b-lynch"],
   ["4 T's", "4T", "4 ts", "four ts", "PPH causes", "Tone Tissue Trauma Thrombin", "uterine atony", "retained placenta", "genital tract trauma", "coagulopathy", "thrombin", "tone", "tissue", "trauma"],
-  ["hypertension in pregnancy", "preeclampsia", "pre-eclampsia", "eclampsia", "ارتفاع ضغط الحمل", "magnesium sulfate", "MgSO4", "seizure", "HELLP", "severe features", "labetalol", "hydralazine"],
-  ["shoulder dystocia", "McRoberts", "suprapubic pressure", "HELPERR", "difficult delivery", "عسر ولادة الكتف", "posterior arm", "woods screw"],
-  ["cord prolapse", "umbilical cord prolapse", "funic presentation", "cord compression", "prolapsed cord", "تدلي الحبل السري"],
-  ["preterm labour", "preterm labor", "premature labor", "PPROM", "PROM", "tocolysis", "antenatal steroids", "magnesium neuroprotection", "preterm birth", "ولادة مبكرة"],
-  ["ectopic pregnancy", "tubal pregnancy", "adnexal mass", "methotrexate", "pregnancy of unknown location", "PUL", "حمل خارج الرحم"],
-  ["VTE", "DVT", "pulmonary embolism", "PE", "thrombosis", "thromboembolism", "heparin", "LMWH", "warfarin", "ضيق نفس", "جلطة"],
-  ["C-section", "cesarean", "caesarean", "CS", "LSCS", "operative delivery", "قيصرية", "classical cesarean", "VBAC", "TOLAC"],
-  ["antenatal", "prenatal", "ANC", "screening", "booking visit", "first visit", "زيارة الحمل", "risk assessment", "routine antenatal care"],
-  ["miscarriage", "abortion", "pregnancy loss", "retained products", "RPOC", "early pregnancy bleeding", "إجهاض", "threatened miscarriage", "septic miscarriage"],
-  ["sepsis", "maternal sepsis", "infection", "chorioamnionitis", "fever", "pyrexia", "septic shock", "حمى", "endometritis"],
+  ["hypertension in pregnancy", "preeclampsia", "pre-eclampsia", "eclampsia", "magnesium sulfate", "MgSO4", "seizure", "HELLP", "severe features", "labetalol", "hydralazine"],
+  ["shoulder dystocia", "McRoberts", "suprapubic pressure", "HELPERR", "difficult delivery", "posterior arm", "woods screw"],
+  ["cord prolapse", "umbilical cord prolapse", "funic presentation", "cord compression", "prolapsed cord"],
+  ["preterm labour", "preterm labor", "premature labor", "PPROM", "PROM", "tocolysis", "antenatal steroids", "magnesium neuroprotection", "preterm birth"],
+  ["ectopic pregnancy", "tubal pregnancy", "adnexal mass", "methotrexate", "pregnancy of unknown location", "PUL"],
+  ["VTE", "DVT", "pulmonary embolism", "PE", "thrombosis", "thromboembolism", "heparin", "LMWH", "warfarin"],
+  ["C-section", "cesarean", "caesarean", "CS", "LSCS", "operative delivery", "classical cesarean", "VBAC", "TOLAC"],
+  ["antenatal", "prenatal", "ANC", "screening", "booking visit", "first visit", "risk assessment", "routine antenatal care"],
+  ["miscarriage", "abortion", "pregnancy loss", "retained products", "RPOC", "early pregnancy bleeding", "threatened miscarriage", "septic miscarriage"],
+  ["sepsis", "maternal sepsis", "infection", "chorioamnionitis", "fever", "pyrexia", "septic shock", "endometritis"],
   ["CTG", "cardiotocography", "fetal distress", "non-reassuring fetal status", "fetal bradycardia", "late decelerations", "reduced variability"],
-  ["diabetes in pregnancy", "GDM", "gestational diabetes", "pre-existing diabetes", "insulin", "macrosomia", "سكر الحمل"],
+  ["diabetes in pregnancy", "GDM", "gestational diabetes", "pre-existing diabetes", "insulin", "macrosomia"],
   ["placenta previa", "placenta praevia", "placenta accreta", "accreta spectrum", "PAS", "vasa previa", "antepartum hemorrhage", "APH"],
   ["induction of labour", "induction of labor", "IOL", "cervical ripening", "bishop score", "prostaglandin", "oxytocin", "amniotomy"],
   ["postpartum", "postnatal", "puerperium", "breastfeeding", "mastitis", "postpartum depression", "lochia"],
