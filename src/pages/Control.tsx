@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import {
   AlertTriangle,
   Bell,
@@ -32,7 +33,6 @@ import {
   getStoredToken,
   type AdminTable,
 } from "@/lib/adminApi";
-import ControlLogin from "@/components/control/ControlLogin";
 import ControlDashboard from "@/components/control/ControlDashboard";
 import TableEditor from "@/components/control/TableEditor";
 
@@ -174,7 +174,7 @@ export default function Control() {
     toast.success("Signed out");
   }
 
-  if (!authed) return <ControlLogin onSuccess={() => setAuthed(true)} />;
+  if (!authed) return <Navigate to="/control/login" replace />;
 
   const currentTitle =
     view === "dashboard" ? "Dashboard" : ADMIN_TABLES_META[view].label;
