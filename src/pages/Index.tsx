@@ -546,8 +546,8 @@ export default function Index() {
                 >
                   <div className="flex items-center justify-between gap-1.5 mb-2 px-0.5">
                     <div className="flex items-center gap-1.5">
-                      <Sparkles className="w-3 h-3 text-primary" />
-                      <span className="eyebrow text-muted-foreground">Popular searches</span>
+                      <ShieldCheck className="w-3 h-3 text-destructive" />
+                      <span className="eyebrow text-muted-foreground">Urgent OB/GYN first</span>
                     </div>
                     <button
                       type="button"
@@ -560,12 +560,12 @@ export default function Index() {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {[
-                      { label: "Preeclampsia", cat: "qa" as const },
-                      { label: "PPH", cat: "qa" as const },
+                      { label: "Massive PPH", cat: "or_labor" as const },
+                      { label: "Eclampsia", cat: "or_labor" as const },
                       { label: "Shoulder dystocia", cat: "or_labor" as const },
-                      { label: "GDM", cat: "qa" as const },
-                      { label: "Cervical insufficiency", cat: "clinic" as const },
-                      { label: "Anxious patient", cat: "behavior" as const },
+                      { label: "Cord prolapse", cat: "or_labor" as const },
+                      { label: "Placental abruption", cat: "or_labor" as const },
+                      { label: "Ruptured ectopic", cat: "clinic" as const },
                     ].map((chip) => (
                       <button
                         key={chip.label}
@@ -585,19 +585,19 @@ export default function Index() {
                     ))}
                   </div>
 
-                  {/* 🔥 Hot topics — hardest procedures, skills, tricks */}
+                  {/* 🔥 High-priority specialist topics — hardest procedures, skills, tricks */}
                   <div className="flex items-center gap-1.5 mt-4 mb-2 px-0.5">
                     <span className="text-[11px]">🔥</span>
-                    <span className="eyebrow text-muted-foreground">Hot topics for clinicians</span>
+                    <span className="eyebrow text-muted-foreground">High-yield OB/GYN & fertility</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
                     {[
                       { emoji: "⚡", label: "Shoulder dystocia", hint: "HELPERR drill", cat: "or_labor" as const, gradient: "from-rose-500/12 to-red-500/5", border: "border-rose-500/25" },
                       { emoji: "🩸", label: "Massive PPH", hint: "4 T's protocol", cat: "qa" as const, gradient: "from-red-500/12 to-pink-500/5", border: "border-red-500/25" },
                       { emoji: "🫀", label: "Eclampsia", hint: "MgSO₄ dosing", cat: "qa" as const, gradient: "from-violet-500/12 to-fuchsia-500/5", border: "border-violet-500/25" },
+                      { emoji: "🧬", label: "OHSS / IVF", hint: "Fertility emergency", cat: "clinic" as const, gradient: "from-emerald-500/12 to-teal-500/5", border: "border-emerald-500/25" },
                       { emoji: "🔪", label: "C-section tricks", hint: "Difficult delivery", cat: "or_labor" as const, gradient: "from-amber-500/12 to-orange-500/5", border: "border-amber-500/25" },
                       { emoji: "👶", label: "Breech delivery", hint: "Maneuvers", cat: "or_labor" as const, gradient: "from-sky-500/12 to-blue-500/5", border: "border-sky-500/25" },
-                      { emoji: "🧠", label: "Consent pitfalls", hint: "Ethics & law", cat: "behavior" as const, gradient: "from-emerald-500/12 to-teal-500/5", border: "border-emerald-500/25" },
                     ].map((item, idx) => (
                       <motion.button
                         key={item.label}
