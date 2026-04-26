@@ -331,9 +331,44 @@ import { MCQ_BANK_EXTRA } from "./mcqBankExtra";
 import { MCQ_BANK_EXPANSION } from "./mcqBankExpansion";
 import { MCQ_BANK_EXPANSION_PHASE2 } from "./mcqBankExpansionPhase2";
 import { MCQ_BANK_EXPANSION_PHASE3 } from "./mcqBankExpansionPhase3";
+import { MCQ_BANK_EXPANSION_PHASE4 } from "./mcqBankExpansionPhase4";
 
-// Combined bank used by the simulator and filter helper
-export const ALL_MCQS: MCQ[] = [...MCQ_BANK, ...MCQ_BANK_EXTRA, ...MCQ_BANK_EXPANSION, ...MCQ_BANK_EXPANSION_PHASE2, ...MCQ_BANK_EXPANSION_PHASE3];
+const TOPIC_ORDER: Topic[] = [
+  "Antenatal Care",
+  "Labour & Delivery",
+  "Postpartum & PPH",
+  "Hypertensive Disorders",
+  "Gestational Diabetes",
+  "Maternal-Fetal Medicine",
+  "Gynecologic Oncology",
+  "Reproductive Endocrinology & Infertility",
+  "Contraception & Family Planning",
+  "Urogynecology",
+  "Benign Gynecology",
+  "Adolescent & Menopause",
+  "Ethics & Communication",
+];
+
+const DIFFICULTY_ORDER: Difficulty[] = ["easy", "medium", "hard"];
+
+const sortMcqsLogically = (items: MCQ[]): MCQ[] =>
+  [...items].sort((a, b) => {
+    const topicDelta = TOPIC_ORDER.indexOf(a.topic) - TOPIC_ORDER.indexOf(b.topic);
+    if (topicDelta !== 0) return topicDelta;
+    const difficultyDelta = DIFFICULTY_ORDER.indexOf(a.difficulty) - DIFFICULTY_ORDER.indexOf(b.difficulty);
+    if (difficultyDelta !== 0) return difficultyDelta;
+    return a.id.localeCompare(b.id, undefined, { numeric: true });
+  });
+
+// Combined bank used by the simulator and filter helper — always grouped by clinical topic, then difficulty, then id.
+export const ALL_MCQS: MCQ[] = sortMcqsLogically([
+  ...MCQ_BANK,
+  ...MCQ_BANK_EXTRA,
+  ...MCQ_BANK_EXPANSION,
+  ...MCQ_BANK_EXPANSION_PHASE2,
+  ...MCQ_BANK_EXPANSION_PHASE3,
+  ...MCQ_BANK_EXPANSION_PHASE4,
+]);
 
 export const filterMCQs = (opts: {
   examId?: ExamId;
