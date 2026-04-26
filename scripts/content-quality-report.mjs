@@ -38,6 +38,26 @@ const weakReferences = qCalls
   .filter((q) => q.reference.length < 8 || /unknown|tbd|reference needed|wikipedia/i.test(q.reference));
 const qualityReadyMcqs = Math.max(0, totalMcqs - shortExplanations.length - weakReferences.length);
 
+const allowedObgynFertilityTopics = new Set([
+  "Antenatal Care",
+  "Labour & Delivery",
+  "Postpartum & PPH",
+  "Hypertensive Disorders",
+  "Gestational Diabetes",
+  "Maternal-Fetal Medicine",
+  "Gynecologic Oncology",
+  "Reproductive Endocrinology & Infertility",
+  "Contraception & Family Planning",
+  "Urogynecology",
+  "Benign Gynecology",
+  "Adolescent & Menopause",
+  "Ethics & Communication",
+]);
+const scopedExpansionMcqs = qCalls.filter((m) => allowedObgynFertilityTopics.has(m[2])).length;
+const outOfScopeExpansionMcqs = qCalls
+  .filter((m) => !allowedObgynFertilityTopics.has(m[2]))
+  .map((m) => ({ id: m[1], topic: m[2], stem: m[4].slice(0, 120) }));
+
 const videoTitles = [...surgeries.matchAll(/videoTitle:\s*"([^"]*)"/g)].map((m) => m[1]);
 const weakVideoTerms = /(patient|guide|instructions|explained|animation|shorts|pregnant after|minute|nclex|nursing|deviated septum|appendix)/i;
 const weakVideos = videoTitles.filter((title) => weakVideoTerms.test(title));
@@ -48,6 +68,8 @@ const report = {
     staticMcqs: totalMcqs,
     targetMcqs: 1000,
     mcqGap: Math.max(0, 1000 - totalMcqs),
+    scopedObgynFertilityMcqs: totalMcqs - outOfScopeExpansionMcqs.length,
+    outOfScopeMcqs: outOfScopeExpansionMcqs.length,
     qualityReadyMcqs,
     qualityAdjustedGap: Math.max(0, 1000 - qualityReadyMcqs),
     surgeries: count(surgeries, /id:\s*"[^"]+"/g),
@@ -68,6 +90,7 @@ const report = {
     shortExplanations: shortExplanations.slice(0, 25),
     weakReferences: weakReferences.slice(0, 25),
     weakVideos: weakVideos.slice(0, 40),
+    outOfScopeMcqs: outOfScopeExpansionMcqs.slice(0, 25),
   },
   nextPriorities: [
     "Keep Tools MCQ connected to the unified MCQ bank, not a separate fixed mini-bank.",
