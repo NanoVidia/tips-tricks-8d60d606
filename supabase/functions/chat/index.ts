@@ -257,7 +257,7 @@ Anchor your answers to THIS scenario when relevant — don't drift into generic 
         model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
+          ...cleanMessages,
         ],
         tools,
         stream: true,
