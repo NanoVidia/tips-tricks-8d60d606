@@ -483,7 +483,7 @@ export default function Index() {
               onChange={(e) => { setSearch(e.target.value); setSuggestOpen(true); }}
               onFocus={() => {
                 setSearchFocused(true);
-                if (search.trim().length >= 2) setSuggestOpen(true);
+                if (search.trim().length >= 1) setSuggestOpen(true);
               }}
               onBlur={() => { setTimeout(() => setSearchFocused(false), 150); }}
               onKeyDown={(e) => {
@@ -536,7 +536,7 @@ export default function Index() {
                 Rendered as an absolute overlay (like the suggestions dropdown)
                 so the search input + icon never shift vertically. */}
             <AnimatePresence>
-              {searchFocused && search.trim().length < 2 && (
+              {searchFocused && search.trim().length < 1 && (
                 <motion.div
                   initial={{ opacity: 0, y: -6, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -635,7 +635,7 @@ export default function Index() {
             </AnimatePresence>
 
             <AnimatePresence>
-              {suggestOpen && search.trim().length >= 2 && (
+              {suggestOpen && search.trim().length >= 1 && (
                 <motion.div
                   id="search-suggestions"
                   role="listbox"
