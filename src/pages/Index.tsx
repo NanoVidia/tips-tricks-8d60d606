@@ -199,10 +199,10 @@ export default function Index() {
     if (activeTab) setLastTab(activeTab as TabId);
   }, [activeTab, setLastTab]);
 
-  // Auto-suggest: fetch top 5 across all categories as user types
+  // Auto-suggest: fetch top 5 across all categories as user types (from 1 char for instant results)
   useEffect(() => {
     const q = search.trim();
-    if (q.length < 2) {
+    if (q.length < 1) {
       setSuggestions([]);
       setSuggestLoading(false);
       return;
