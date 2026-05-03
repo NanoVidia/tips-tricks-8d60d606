@@ -99,11 +99,105 @@ const tools = [
   },
 ];
 
+// Simple in-memory IP rate limiter (per isolate). Limits free abuse of AI credits
+// since this app currently has no user authentication.
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 15; // max 15 chat requests/min/IP
+const ipHits = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const rec = ipHits.get(ip);
+  if (!rec || rec.resetAt < now) {
+    ipHits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  if (rec.count >= RATE_LIMIT_MAX) return false;
+  rec.count += 1;
+  return true;
+}
+
+// Strip prompt-injection delimiters / control chars from scenario fields
+function sanitizeScenarioField(s: unknown, max = 500): string {
+  if (typeof s !== "string") return "";
+  return s
+    .replace(/[`*_~\[\]{}<>]/g, " ")
+    .replace(/\b(system|assistant|user)\s*:/gi, " ")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .slice(0, max)
+    .trim();
+}
+
+const MAX_MESSAGES = 20;
+const MAX_MESSAGE_CHARS = 2000;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, scenario } = await req.json();
+    // Rate-limit per IP
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      req.headers.get("cf-connecting-ip") ||
+      "unknown";
+    if (!checkRateLimit(ip)) {
+      return new Response(
+        JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return new Response(JSON.stringify({ error: "Invalid request body" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { messages, scenario: rawScenario } = body as { messages: unknown; scenario: unknown };
+
+    // Validate messages
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
+      return new Response(JSON.stringify({ error: "Invalid messages array" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const cleanMessages: Array<{ role: string; content: string }> = [];
+    for (const m of messages as Array<Record<string, unknown>>) {
+      if (!m || typeof m !== "object") {
+        return new Response(JSON.stringify({ error: "Invalid message" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const role = m.role;
+      const content = m.content;
+      if (role !== "user" && role !== "assistant" && role !== "tool" && role !== "system") {
+        return new Response(JSON.stringify({ error: "Invalid message role" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (typeof content !== "string" || content.length === 0 || content.length > MAX_MESSAGE_CHARS) {
+        return new Response(JSON.stringify({ error: "Message too long or empty" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Pass through tool_call_id / tool_calls if present (for tool flow), but sanitized roles only
+      const out: Record<string, unknown> = { role, content };
+      if (typeof m.tool_call_id === "string") out.tool_call_id = m.tool_call_id.slice(0, 200);
+      if (Array.isArray(m.tool_calls)) out.tool_calls = m.tool_calls;
+      if (typeof m.name === "string") out.name = m.name.slice(0, 100);
+      cleanMessages.push(out as { role: string; content: string });
+    }
+
+    // Validate + sanitize scenario
+    const scenarioObj = (rawScenario && typeof rawScenario === "object") ? rawScenario as Record<string, unknown> : {};
+    const scenario = {
+      title_en: sanitizeScenarioField(scenarioObj.title_en, 200),
+      situation_en: sanitizeScenarioField(scenarioObj.situation_en, 500),
+      action_en: sanitizeScenarioField(scenarioObj.action_en, 500),
+      script_en: sanitizeScenarioField(scenarioObj.script_en, 500),
+    };
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
