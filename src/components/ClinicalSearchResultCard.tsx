@@ -63,7 +63,7 @@ export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConf
                 </span>
               </div>
               <h3 className="text-flow-safe text-[16px] font-black text-foreground leading-snug" lang="en">
-                {scenario.title_en}
+                {highlightText(scenario.title_en, hl)}
               </h3>
             </div>
           </div>
