@@ -1073,7 +1073,7 @@ export default function Index() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 cv-auto">
                   {scenarios.map((item, idx) => (
                     <ScenarioCard
                       key={item.id}
