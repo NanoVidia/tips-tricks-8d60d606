@@ -156,6 +156,16 @@
     -webkit-font-feature-settings: "lnum";
     font-feature-settings: "lnum", 'cv11', 'ss01', 'ss03';
     unicode-bidi: plaintext;
+    /* Reserve space for the fixed BottomTabBar so content/accordions are
+       never hidden behind it. The bar height is ~56px + safe-area inset. */
+    --bottom-bar-height: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--bottom-bar-height);
+  }
+
+  /* Routes that hide the BottomTabBar (admin, control, disclaimer) reset
+     the reserved space via a body class set by the router-aware tab bar. */
+  body.no-bottom-bar {
+    padding-bottom: 0;
   }
 
   article,
