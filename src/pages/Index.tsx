@@ -25,7 +25,7 @@ import { SmartBottomSheet } from "@/components/SmartBottomSheet";
 import { CommandPalette } from "@/components/CommandPalette";
 import { useActivityTracker, type TabId } from "@/hooks/useActivityTracker";
 import { springTransition } from "@/lib/motion";
-import { AppMenu } from "@/components/AppMenu";
+
 import { RefreshDataButton } from "@/components/RefreshDataButton";
 
 import { useTranslations } from "@/hooks/useTranslations";
