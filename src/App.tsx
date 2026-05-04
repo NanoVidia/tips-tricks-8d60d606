@@ -24,6 +24,7 @@ const MenuPage = lazy(() => import("./pages/MenuPage.tsx"));
 const MenuHub = lazy(() => import("./pages/MenuHub.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
+import { FloatingBackButton } from "./components/FloatingBackButton";
 
 function NotificationsBootstrap() {
   useLocalNotifications();
@@ -97,6 +98,7 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+          <FloatingBackButton />
           <BottomTabBar />
         </BrowserRouter>
         {showFreeze && <FreezeOverlay />}
