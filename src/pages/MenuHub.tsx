@@ -6,8 +6,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
-// (Share-app entry removed by user request)
-void toast;
 import { APP_NAME, APP_VERSION, type MenuPageId } from "@/components/app-menu-content";
 
 type Item = {
