@@ -224,6 +224,7 @@ export default function Index() {
     const q = search.trim();
     if (q.length < 3) {
       setSuggestions([]);
+      setMcqSuggestions([]);
       setSuggestLoading(false);
       return;
     }
@@ -232,9 +233,24 @@ export default function Index() {
     const handle = setTimeout(async () => {
       try {
         const queryVariants = expandClinicalSearchQueries(q);
-        const results = await Promise.all(
-          queryVariants.map((search_query) => supabase.rpc("search_scenarios", { search_query }))
-        );
+        const [results, mcqRes] = await Promise.all([
+          Promise.all(
+            queryVariants.map((search_query) => supabase.rpc("search_scenarios", { search_query }))
+          ),
+          supabase
+            .from("mcq_questions")
+            .select("id, external_id, topic, difficulty, stem, explanation")
+            .eq("active", true)
+            .or(
+              queryVariants
+                .slice(0, 6)
+                .map((v) => v.replace(/[%,()]/g, " ").trim())
+                .filter(Boolean)
+                .map((v) => `stem.ilike.%${v}%,explanation.ilike.%${v}%,topic.ilike.%${v}%`)
+                .join(","),
+            )
+            .limit(5),
+        ]);
         if (cancelled) return;
         const firstError = results.find((result) => result.error)?.error;
         if (firstError) throw firstError;
@@ -246,8 +262,12 @@ export default function Index() {
           ).values()
         );
         setSuggestions(rankSearchScenarios(q, raw).slice(0, 5));
+        setMcqSuggestions(((mcqRes.data as McqSearchResult[] | null) ?? []).slice(0, 4));
       } catch (e) {
-        if (!cancelled) setSuggestions([]);
+        if (!cancelled) {
+          setSuggestions([]);
+          setMcqSuggestions([]);
+        }
         console.error("Suggest error:", e);
       } finally {
         if (!cancelled) setSuggestLoading(false);
