@@ -21,6 +21,7 @@ const Privacy = lazy(() => import("./pages/Privacy.tsx"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
 const MenuPage = lazy(() => import("./pages/MenuPage.tsx"));
+const MenuHub = lazy(() => import("./pages/MenuHub.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
 
@@ -90,6 +91,7 @@ const App = () => {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/disclaimer" element={<Disclaimer />} />
               <Route path="/about" element={<About />} />
+              <Route path="/menu" element={<MenuHub />} />
               <Route path="/menu/:pageId" element={<MenuPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

@@ -34,7 +34,7 @@ export function BottomTabBar() {
     },
     { to: "/tools", label: "Tools", icon: Wrench, match: (p: string) => p.startsWith("/tools") },
     {
-      to: "/menu/about",
+      to: "/menu",
       label: "Menu",
       icon: Menu,
       match: (p: string) => p.startsWith("/menu") || p === "/about",
@@ -45,7 +45,7 @@ export function BottomTabBar() {
     <nav
       role="navigation"
       aria-label="Primary"
-      className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card/98 backdrop-blur-xl shadow-[0_-4px_20px_-4px_hsl(var(--foreground)/0.08)] gpu-layer"
+      className="fixed bottom-0 inset-x-0 z-40 border-t-2 border-border bg-card shadow-[0_-6px_24px_-6px_hsl(var(--foreground)/0.18)] gpu-layer"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="grid grid-cols-4 max-w-lg mx-auto px-2 pt-1.5 pb-1">
@@ -75,8 +75,8 @@ export function BottomTabBar() {
                   />
                 </span>
                 <span
-                  className={`text-[11px] leading-none tracking-tight transition-colors ${
-                    active ? "text-primary font-bold" : "text-muted-foreground font-semibold group-hover:text-foreground"
+                  className={`text-[12px] leading-none tracking-tight transition-colors ${
+                    active ? "text-primary font-bold" : "text-foreground/70 font-semibold group-hover:text-foreground"
                   }`}
                 >
                   {tab.label}
