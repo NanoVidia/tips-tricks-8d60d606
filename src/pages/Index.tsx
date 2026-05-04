@@ -708,7 +708,7 @@ export default function Index() {
       </header>
 
       {/* Content */}
-      <main className="flex-1 px-4 sm:px-5 pb-8">
+      <main className="flex-1 px-4 sm:px-5 pb-8 w-full max-w-lg mx-auto">
         {/* Category tabs — hidden during search to keep results focused */}
         {activeTab && !isSearching && (
         <motion.div
