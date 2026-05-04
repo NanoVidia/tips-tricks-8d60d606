@@ -24,7 +24,7 @@ const URGENCY_STYLE: Record<Urgency, { cls: string; Icon: typeof AlertTriangle }
   routine: { cls: "bg-success-soft text-success border-success/25", Icon: ShieldCheck },
 };
 
-export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConfig, categoryLabel }: ClinicalSearchResultCardProps) {
+export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConfig, categoryLabel, query }: ClinicalSearchResultCardProps) {
   const tags = getClinicalTags({
     category: scenario.category,
     title_en: scenario.title_en,
@@ -36,6 +36,7 @@ export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConf
   const urgency = URGENCY_STYLE[tags.urgency];
   const visual = resolveTrustedClinicalVisual(scenario);
   const cfg = categoryConfig[scenario.category];
+  const hl = useMemo(() => buildHighlightRegex(query ?? ""), [query]);
 
   return (
     <motion.article
