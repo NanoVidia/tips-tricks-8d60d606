@@ -372,4 +372,44 @@
     outline-offset: 2px;
     border-radius: 6px;
   }
+
+  /* ============ Mobile / Android performance optimizations ============ */
+
+  /* Native momentum scrolling + prevent rubber-banding pull on body */
+  html, body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Kill the 300ms tap delay + gray flash on Android WebView */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Promote frequently-animated surfaces to their own GPU layer */
+  [data-radix-popper-content-wrapper],
+  [role="dialog"],
+  .gpu-layer {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
+  /* Lazy off-screen rendering for long lists (MCQs, scenarios) */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 220px;
+  }
+
+  /* Low-end device mode — strip expensive blur/shadow effects */
+  html.low-end [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  html.low-end .shadow-editorial,
+  html.low-end .shadow-gold,
+  html.low-end .header-fade {
+    box-shadow: 0 1px 0 0 hsl(var(--border) / 0.6) !important;
+  }
 }
