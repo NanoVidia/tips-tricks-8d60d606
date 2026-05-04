@@ -136,7 +136,7 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
       </DropdownMenu>
 
       <Dialog open={dialog !== null} onOpenChange={(o) => !o && close()}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-md max-h-[85vh] overflow-hidden flex flex-col rounded-lg">
           <DialogHeader>
             <DialogTitle className="font-editorial text-xl">
               {(dialog === "about" && aboutContent?.title)
