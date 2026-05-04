@@ -1131,6 +1131,18 @@ export default function Index() {
           <p className="text-[9px] text-muted-foreground/70 tracking-wider pt-0.5">
             Crafted with precision for OB/GYN excellence
           </p>
+          <nav aria-label="Legal" className="flex items-center justify-center flex-wrap gap-x-3 gap-y-1 pt-3 text-[11px]">
+            <Link to="/about" className="text-muted-foreground hover:text-gold transition-colors underline-offset-4 hover:underline">About</Link>
+            <span className="text-border" aria-hidden="true">·</span>
+            <Link to="/terms" className="text-muted-foreground hover:text-gold transition-colors underline-offset-4 hover:underline">Terms of Use</Link>
+            <span className="text-border" aria-hidden="true">·</span>
+            <Link to="/privacy" className="text-muted-foreground hover:text-gold transition-colors underline-offset-4 hover:underline">Privacy</Link>
+            <span className="text-border" aria-hidden="true">·</span>
+            <Link to="/disclaimer" className="text-muted-foreground hover:text-gold transition-colors underline-offset-4 hover:underline">Disclaimer</Link>
+          </nav>
+          <p className="text-[9px] text-muted-foreground/60 tracking-wider pt-2 uppercase">
+            Educational Use Only · Not a Medical Device
+          </p>
         </div>
       </footer>
 
