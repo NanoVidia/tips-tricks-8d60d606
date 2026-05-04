@@ -37,6 +37,7 @@ import { PhIcon } from "@/components/ui/PhIcon";
 import { detectUrgency } from "@/lib/clinicalTags";
 import { expandClinicalSearchQueries, rankSearchScenarios } from "@/lib/clinicalSearch";
 import { buildHighlightRegex, highlightText } from "@/lib/highlight";
+import { McqSearchSection, type McqSearchResult } from "@/components/McqSearchSection";
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
@@ -138,6 +139,7 @@ export default function Index() {
   });
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [allSearchResults, setAllSearchResults] = useState<Scenario[]>([]);
+  const [mcqResults, setMcqResults] = useState<McqSearchResult[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -294,14 +296,29 @@ export default function Index() {
         // Global search across ALL categories — don't filter by activeTab.
         const q = debouncedSearch.trim();
         const queryVariants = expandClinicalSearchQueries(q);
-        const results = await Promise.all(
-          queryVariants.map((search_query) => supabase.rpc("search_scenarios", { search_query }))
-        );
-        const firstError = results.find((result) => result.error)?.error;
+        const [scenarioResults, mcqRes] = await Promise.all([
+          Promise.all(
+            queryVariants.map((search_query) => supabase.rpc("search_scenarios", { search_query }))
+          ),
+          supabase
+            .from("mcq_questions")
+            .select("id, external_id, topic, difficulty, stem, explanation")
+            .eq("active", true)
+            .or(
+              queryVariants
+                .slice(0, 6)
+                .map((v) => v.replace(/[%,()]/g, " ").trim())
+                .filter(Boolean)
+                .map((v) => `stem.ilike.%${v}%,explanation.ilike.%${v}%,topic.ilike.%${v}%`)
+                .join(","),
+            )
+            .limit(20),
+        ]);
+        const firstError = scenarioResults.find((result) => result.error)?.error;
         if (firstError) throw firstError;
         const raw = Array.from(
           new Map(
-            results
+            scenarioResults
               .flatMap((result) => (result.data as Scenario[]) || [])
               .map((scenario) => [scenario.id, scenario])
           ).values()
@@ -310,12 +327,14 @@ export default function Index() {
         const ranked = rankSearchScenarios(q, raw);
 
         setAllSearchResults(ranked);
+        setMcqResults(((mcqRes.data as McqSearchResult[] | null) ?? []).slice(0, 12));
         setTotalCount(ranked.length);
         setScenarios(ranked);
         // Persist successful, non-trivial search
         if (ranked.length > 0) recent.add(q);
       } else {
         setAllSearchResults([]);
+        setMcqResults([]);
         const { count, error: cErr } = await supabase
           .from("medical_scenarios")
           .select("*", { count: "exact", head: true })
@@ -335,6 +354,7 @@ export default function Index() {
     } catch (e) {
       console.error("Fetch error:", e);
       setAllSearchResults([]);
+      setMcqResults([]);
       setScenarios([]);
       setTotalCount(0);
     } finally {
@@ -884,7 +904,7 @@ export default function Index() {
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
-        ) : (isSearching ? allSearchResults.length === 0 : scenarios.length === 0) ? (
+        ) : (isSearching ? (allSearchResults.length === 0 && mcqResults.length === 0) : scenarios.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
             <div className="w-12 h-12 rounded-2xl bg-muted/60 flex items-center justify-center">
               <Search className="w-5 h-5 text-muted-foreground" />
@@ -992,7 +1012,7 @@ export default function Index() {
                 )}
               </div>
               <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-1 rounded-full font-bold tabular-nums shrink-0">
-                {formatNumber(isSearching ? allSearchResults.length : totalCount)} {isSearching ? "matches" : "items"}
+                {formatNumber(isSearching ? allSearchResults.length + mcqResults.length : totalCount)} {isSearching ? "matches" : "items"}
               </span>
             </div>
 
@@ -1034,6 +1054,17 @@ export default function Index() {
                     query={debouncedSearch}
                   />
                 ))}
+                <McqSearchSection results={mcqResults} query={debouncedSearch} />
+                {allSearchResults.length === 0 && mcqResults.length === 0 && !loading && (
+                  <div className="rounded-2xl border border-border/60 bg-card p-6 text-center">
+                    <p className="text-sm font-bold text-foreground mb-1">
+                      No results for "{debouncedSearch.trim()}"
+                    </p>
+                    <p className="text-[12px] text-muted-foreground">
+                      Try a different spelling or clinical term (e.g. "PPH" instead of "PHP").
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <>
