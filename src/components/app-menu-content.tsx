@@ -25,7 +25,6 @@ export const MENU_PAGE_IDS = [
   "feedback",
   "version",
   "changelog",
-  
   "licenses",
   "theme",
   "notifications",
@@ -62,7 +61,6 @@ export function titleForMenuPage(
     feedback: "Send Feedback",
     version: "Version Information",
     changelog: "What's New",
-    
     licenses: "Open-source Licenses",
     theme: "Theme",
     notifications: "Notifications",
@@ -85,7 +83,6 @@ export function subtitleForMenuPage(id: MenuPageId) {
     feedback: "Help us improve",
     version: `Build ${APP_VERSION}`,
     changelog: "Recent updates",
-    
     licenses: "Third-party software",
     theme: "Light or dark",
     notifications: "Manage alerts",

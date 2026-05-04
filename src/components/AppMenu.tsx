@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MoreVertical, Info, Shield, FileText, Mail, HelpCircle, LifeBuoy,
-  MessageSquare, Star, Share2, Tag, History, Award, Scale,
+  MessageSquare, Star, Share2, Tag, History, Scale,
   Palette, Bell, Accessibility, Bug, LogOut, Heart, ClipboardCheck,
 } from "lucide-react";
 import {
@@ -73,7 +73,6 @@ export function AppMenu({ dark }: Props) {
       { icon: Shield, label: "Privacy Policy", action: () => openPage("privacy") },
       { icon: FileText, label: "Terms of Use", action: () => openPage("terms") },
       { icon: Scale, label: "Open-source licenses", action: () => openPage("licenses") },
-      
       { icon: History, label: "Changelog", action: () => openPage("changelog") },
       { icon: Tag, label: `Version ${APP_VERSION}`, action: () => openPage("version") },
       { icon: LogOut, label: "Reset Local Data", action: handleLogout, danger: true },
