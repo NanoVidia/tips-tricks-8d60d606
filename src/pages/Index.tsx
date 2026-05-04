@@ -296,14 +296,29 @@ export default function Index() {
         // Global search across ALL categories — don't filter by activeTab.
         const q = debouncedSearch.trim();
         const queryVariants = expandClinicalSearchQueries(q);
-        const results = await Promise.all(
-          queryVariants.map((search_query) => supabase.rpc("search_scenarios", { search_query }))
-        );
-        const firstError = results.find((result) => result.error)?.error;
+        const [scenarioResults, mcqRes] = await Promise.all([
+          Promise.all(
+            queryVariants.map((search_query) => supabase.rpc("search_scenarios", { search_query }))
+          ),
+          supabase
+            .from("mcq_questions")
+            .select("id, external_id, topic, difficulty, stem, explanation")
+            .eq("active", true)
+            .or(
+              queryVariants
+                .slice(0, 6)
+                .map((v) => v.replace(/[%,()]/g, " ").trim())
+                .filter(Boolean)
+                .map((v) => `stem.ilike.%${v}%,explanation.ilike.%${v}%,topic.ilike.%${v}%`)
+                .join(","),
+            )
+            .limit(20),
+        ]);
+        const firstError = scenarioResults.find((result) => result.error)?.error;
         if (firstError) throw firstError;
         const raw = Array.from(
           new Map(
-            results
+            scenarioResults
               .flatMap((result) => (result.data as Scenario[]) || [])
               .map((scenario) => [scenario.id, scenario])
           ).values()
@@ -312,12 +327,14 @@ export default function Index() {
         const ranked = rankSearchScenarios(q, raw);
 
         setAllSearchResults(ranked);
+        setMcqResults(((mcqRes.data as McqSearchResult[] | null) ?? []).slice(0, 12));
         setTotalCount(ranked.length);
         setScenarios(ranked);
         // Persist successful, non-trivial search
         if (ranked.length > 0) recent.add(q);
       } else {
         setAllSearchResults([]);
+        setMcqResults([]);
         const { count, error: cErr } = await supabase
           .from("medical_scenarios")
           .select("*", { count: "exact", head: true })
