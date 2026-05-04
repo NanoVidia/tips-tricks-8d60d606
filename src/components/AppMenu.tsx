@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MoreVertical, Info, Shield, FileText, Mail, HelpCircle, LifeBuoy,
-  MessageSquare, Star, Share2, Tag, History, Scale,
+  MessageSquare, Star, Tag, History, Scale,
   Palette, Bell, Accessibility, Bug, LogOut, Heart, ClipboardCheck,
 } from "lucide-react";
 import {
@@ -29,14 +29,6 @@ export function AppMenu({ dark }: Props) {
     setOpen(false);
   };
 
-  const handleShare = async () => {
-    const data = { title: APP_NAME, text: "OB/GYN clinical reference", url: window.location.origin };
-    try {
-      if (navigator.share) await navigator.share(data);
-      else { await navigator.clipboard.writeText(data.url); toast.success("Link copied"); }
-    } catch { /* user cancelled */ }
-    setOpen(false);
-  };
 
   const handleRate = () => {
     window.open("https://lovable.app", "_blank", "noopener,noreferrer");
@@ -65,7 +57,7 @@ export function AppMenu({ dark }: Props) {
       { icon: Mail, label: "Contact", action: () => openPage("contact") },
       { icon: MessageSquare, label: "Feedback", action: () => openPage("feedback") },
       { icon: Bug, label: "Report a Bug", action: () => openPage("bug") },
-      { icon: Share2, label: "Share App", action: handleShare },
+      
       { icon: Star, label: "Rate Us", action: handleRate },
       { icon: Heart, label: "Donate / Support", action: () => window.open("https://lovable.app", "_blank") },
     ]},
