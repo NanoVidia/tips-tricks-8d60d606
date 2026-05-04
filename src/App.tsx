@@ -21,6 +21,7 @@ const Privacy = lazy(() => import("./pages/Privacy.tsx"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
 const MenuPage = lazy(() => import("./pages/MenuPage.tsx"));
+const MenuHub = lazy(() => import("./pages/MenuHub.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
 
