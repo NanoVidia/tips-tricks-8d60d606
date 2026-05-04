@@ -77,7 +77,7 @@ export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConf
           <div className="rounded-xl border border-border/60 bg-muted/35 px-3 py-2">
             <p className="text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground leading-tight">Immediate action</p>
             <p className="text-flow-safe mt-1 text-[12px] font-semibold text-foreground/85 leading-relaxed line-clamp-2" lang="en">
-              {scenario.action_en || scenario.script_en || "Open for protocol details."}
+              {highlightText(scenario.action_en || scenario.script_en || "Open for protocol details.", hl)}
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2">
