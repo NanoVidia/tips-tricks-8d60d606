@@ -383,21 +383,29 @@ export default function Tools() {
                 type="button"
                 onClick={() => setActive(s.id)}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition ${
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-[12px] font-bold whitespace-nowrap border transition active:scale-[0.97] ${
                   isActive
                     ? `bg-gradient-to-r ${s.color} text-white border-transparent shadow-gold`
-                    : "bg-card border-border/60 text-muted-foreground hover:bg-muted/50 hover:border-primary/30"
+                    : "bg-card border-border/60 text-foreground hover:bg-muted/50 hover:border-primary/30"
                 }`}
               >
-                <PhIcon
-                  name={s.ph}
-                  size={14}
-                  weight={isActive || isFavBadge ? "fill" : "duotone"}
-                  tone={isActive ? "white" : isFavBadge ? "gold" : "current"}
-                />
+                <span
+                  className={`inline-flex items-center justify-center w-7 h-7 rounded-xl shrink-0 transition ${
+                    isActive
+                      ? "bg-white/20 ring-1 ring-white/30"
+                      : "bg-muted/70 ring-1 ring-border/60"
+                  }`}
+                >
+                  <PhIcon
+                    name={s.ph}
+                    size={18}
+                    weight={isActive || isFavBadge ? "fill" : "duotone"}
+                    tone={isActive ? "white" : isFavBadge ? "gold" : "current"}
+                  />
+                </span>
                 {s.label}
                 {s.id === "favorites" && favorites.total > 0 && (
-                  <span className={`text-[9px] tabular-nums px-1.5 rounded-full ${isActive ? "bg-white/25" : "bg-warning/20 text-warning"}`}>
+                  <span className={`text-[10px] tabular-nums px-1.5 py-0.5 rounded-full font-black ${isActive ? "bg-white/25" : "bg-warning/20 text-warning"}`}>
                     {favorites.total}
                   </span>
                 )}
