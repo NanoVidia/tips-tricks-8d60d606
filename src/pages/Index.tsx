@@ -1030,6 +1030,7 @@ export default function Index() {
                     onOpen={() => openScenarioSheet(item)}
                     categoryConfig={categoryConfig}
                     categoryLabel={tabLabel(item.category)}
+                    query={debouncedSearch}
                   />
                 ))}
               </div>
