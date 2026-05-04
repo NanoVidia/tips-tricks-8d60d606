@@ -25,7 +25,7 @@ export const MENU_PAGE_IDS = [
   "feedback",
   "version",
   "changelog",
-  "credits",
+  
   "licenses",
   "theme",
   "notifications",
@@ -62,7 +62,7 @@ export function titleForMenuPage(
     feedback: "Send Feedback",
     version: "Version Information",
     changelog: "What's New",
-    credits: "Credits & Acknowledgements",
+    
     licenses: "Open-source Licenses",
     theme: "Theme",
     notifications: "Notifications",
@@ -85,7 +85,7 @@ export function subtitleForMenuPage(id: MenuPageId) {
     feedback: "Help us improve",
     version: `Build ${APP_VERSION}`,
     changelog: "Recent updates",
-    credits: "People & sources",
+    
     licenses: "Third-party software",
     theme: "Light or dark",
     notifications: "Manage alerts",
@@ -207,14 +207,6 @@ export function MenuPageBody({
     </ul>
   );
 
-  if (id === "credits") return (
-    <ul className="space-y-2">
-      <li>Clinical content is structured as educational OB/GYN reference material.</li>
-      <li>Icons by <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Lucide</a> & <a href="https://phosphoricons.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Phosphor</a>.</li>
-      <li>Built with React, Vite, Tailwind CSS and Lovable Cloud.</li>
-      <li>Reference families used across the app include ACOG, RCOG, NICE, WHO and ESC where applicable.</li>
-    </ul>
-  );
 
   if (id === "licenses") return (
     <ul className="space-y-1 font-mono text-xs text-muted-foreground">
