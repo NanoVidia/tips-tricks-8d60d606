@@ -4,7 +4,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
-import { useToast } from "@/hooks/use-toast";
+
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
@@ -59,7 +59,7 @@ export function ScenarioSheet({
   categoryConfig,
   t,
 }: ScenarioSheetProps) {
-  const { toast } = useToast();
+  
 
   if (!scenario) return null;
   const cfg = categoryConfig[scenario.category];
