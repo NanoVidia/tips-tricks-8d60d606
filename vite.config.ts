@@ -28,4 +28,24 @@ export default defineConfig(({ mode }) => ({
     force: true,
     exclude: ["react", "react-dom", "@tanstack/react-query", "@tanstack/query-core", "@radix-ui/react-tooltip"],
   },
+  build: {
+    target: "es2020",
+    cssCodeSplit: true,
+    sourcemap: false,
+    minify: "esbuild",
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        // Split heavy vendors into their own chunks so the initial bundle is small
+        // and routes can stream in parallel — critical for mid-range Android.
+        manualChunks: {
+          "vendor-react": ["react", "react-dom", "react-router-dom"],
+          "vendor-motion": ["framer-motion"],
+          "vendor-supabase": ["@supabase/supabase-js"],
+          "vendor-query": ["@tanstack/react-query", "@tanstack/query-core"],
+          "vendor-icons": ["lucide-react"],
+        },
+      },
+    },
+  },
 }));
