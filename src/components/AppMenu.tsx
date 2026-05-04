@@ -15,10 +15,9 @@ import { APP_NAME, APP_VERSION, type MenuPageId } from "@/components/app-menu-co
 
 interface Props {
   dark: boolean;
-  onToggleTheme: () => void;
 }
 
-export function AppMenu({ dark, onToggleTheme }: Props) {
+export function AppMenu({ dark }: Props) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { get, all } = useAppSettings();
@@ -28,7 +27,6 @@ export function AppMenu({ dark, onToggleTheme }: Props) {
     navigate(`/menu/${page}`, {
       state: {
         dark,
-        settingsMap,
       },
     });
     setOpen(false);
