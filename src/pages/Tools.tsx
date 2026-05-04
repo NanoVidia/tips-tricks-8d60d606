@@ -591,41 +591,48 @@ export default function Tools() {
 
           {/* EMERGENCY */}
           <TabsContent value="emergency" className="space-y-3 mt-0">
+            <p className="px-1 text-[10px] text-muted-foreground mb-1">Drag the handle to reorder. Order is saved on this device.</p>
             <Accordion type="single" collapsible className="space-y-2">
-              {emergencyProtocols.map((p) => (
-                <AccordionItem
-                  key={p.id}
-                  value={p.id}
-                  id={`protocol-${p.id}`}
-                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
-                >
-                  <div className="flex items-center gap-2 pr-3">
-                    <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
-                      <div className="flex items-center gap-2.5 text-left">
-                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
-                          <Siren className="w-3.5 h-3.5 text-white" />
-                        </div>
-                        <span className="text-sm font-bold">{p.title}</span>
+              <SortableList
+                ids={emergencyProtocols.map((p) => p.id)}
+                onReorder={setProtocolOrder}
+              >
+                {emergencyProtocols.map((p) => (
+                  <SortableRow key={p.id} id={p.id} handleLabel={`Reorder ${p.title}`}>
+                    <AccordionItem
+                      value={p.id}
+                      id={`protocol-${p.id}`}
+                      className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
+                    >
+                      <div className="flex items-center gap-2 pr-3">
+                        <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
+                          <div className="flex items-center gap-2.5 text-left">
+                            <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
+                              <Siren className="w-3.5 h-3.5 text-white" />
+                            </div>
+                            <span className="text-sm font-bold">{p.title}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <BookmarkButton id={`protocol:${p.id}`} label={p.title} />
                       </div>
-                    </AccordionTrigger>
-                    <BookmarkButton id={`protocol:${p.id}`} label={p.title} />
-                  </div>
-                  <AccordionContent className="px-4 pb-4">
-                    <ol className="space-y-1.5">
-                      {p.steps.map((s, i) => (
-                        <li key={i} className="flex gap-2 text-[12px] leading-relaxed">
-                          <span className="font-black text-primary shrink-0 tabular-nums w-5">{i + 1}.</span>
-                          <span>{s}</span>
-                        </li>
-                      ))}
-                    </ol>
-                    <div className="mt-3 p-2.5 rounded-lg bg-success-soft border border-success/30">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-success mb-0.5">Targets</p>
-                      <p className="text-[11px] text-success">{p.targets}</p>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+                      <AccordionContent className="px-4 pb-4">
+                        <ol className="space-y-1.5">
+                          {p.steps.map((s, i) => (
+                            <li key={i} className="flex gap-2 text-[12px] leading-relaxed">
+                              <span className="font-black text-primary shrink-0 tabular-nums w-5">{i + 1}.</span>
+                              <span>{s}</span>
+                            </li>
+                          ))}
+                        </ol>
+                        <div className="mt-3 p-2.5 rounded-lg bg-success-soft border border-success/30">
+                          <p className="text-[10px] uppercase tracking-wider font-bold text-success mb-0.5">Targets</p>
+                          <p className="text-[11px] text-success">{p.targets}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </SortableRow>
+                ))}
+              </SortableList>
             </Accordion>
           </TabsContent>
 
