@@ -1054,6 +1054,17 @@ export default function Index() {
                     query={debouncedSearch}
                   />
                 ))}
+                <McqSearchSection results={mcqResults} query={debouncedSearch} />
+                {allSearchResults.length === 0 && mcqResults.length === 0 && !loading && (
+                  <div className="rounded-2xl border border-border/60 bg-card p-6 text-center">
+                    <p className="text-sm font-bold text-foreground mb-1">
+                      No results for "{debouncedSearch.trim()}"
+                    </p>
+                    <p className="text-[12px] text-muted-foreground">
+                      Try a different spelling or clinical term (e.g. "PPH" instead of "PHP").
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <>
