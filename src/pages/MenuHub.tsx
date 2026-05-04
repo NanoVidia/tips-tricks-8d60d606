@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Info, Shield, FileText, Mail, HelpCircle, LifeBuoy,
   MessageSquare, Star, Share2, Tag, History, Award, Scale,
-  Palette, Bell, Accessibility, Bug, LogOut, Heart, ClipboardCheck,
+  Palette, Bell, Accessibility, Bug, LogOut, ClipboardCheck,
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -55,7 +55,7 @@ export default function MenuHub() {
       { icon: Bug, label: "Report a bug", action: () => openPage("bug") },
       { icon: Share2, label: "Share app", action: handleShare },
       { icon: Star, label: "Rate us", action: handleRate },
-      { icon: Heart, label: "Donate / Support", action: () => window.open("https://lovable.app", "_blank") },
+      
     ]},
     { title: "Legal & build", items: [
       { icon: Shield, label: "Privacy Policy", action: () => openPage("privacy") },
