@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { ArrowRight, BookOpen, AlertTriangle, AlertCircle, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { getClinicalTags, URGENCY_LABEL, type Urgency } from "@/lib/clinicalTags";
 import { resolveTrustedClinicalVisual, type SearchScenario } from "@/lib/clinicalSearch";
+import { buildHighlightRegex, highlightText } from "@/lib/highlight";
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
@@ -13,6 +15,7 @@ interface ClinicalSearchResultCardProps {
   onOpen: () => void;
   categoryConfig: Record<ScenarioCategory, { phName: string; iconBg: string; gradient: string }>;
   categoryLabel: string;
+  query?: string;
 }
 
 const URGENCY_STYLE: Record<Urgency, { cls: string; Icon: typeof AlertTriangle }> = {
@@ -21,7 +24,7 @@ const URGENCY_STYLE: Record<Urgency, { cls: string; Icon: typeof AlertTriangle }
   routine: { cls: "bg-success-soft text-success border-success/25", Icon: ShieldCheck },
 };
 
-export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConfig, categoryLabel }: ClinicalSearchResultCardProps) {
+export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConfig, categoryLabel, query }: ClinicalSearchResultCardProps) {
   const tags = getClinicalTags({
     category: scenario.category,
     title_en: scenario.title_en,
@@ -33,6 +36,7 @@ export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConf
   const urgency = URGENCY_STYLE[tags.urgency];
   const visual = resolveTrustedClinicalVisual(scenario);
   const cfg = categoryConfig[scenario.category];
+  const hl = useMemo(() => buildHighlightRegex(query ?? ""), [query]);
 
   return (
     <motion.article
@@ -59,7 +63,7 @@ export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConf
                 </span>
               </div>
               <h3 className="text-flow-safe text-[16px] font-black text-foreground leading-snug" lang="en">
-                {scenario.title_en}
+                {highlightText(scenario.title_en, hl)}
               </h3>
             </div>
           </div>
@@ -68,12 +72,12 @@ export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConf
 
         <div className="mt-2.5 space-y-2 pl-9">
           <p className="text-flow-safe text-[12px] text-muted-foreground leading-relaxed line-clamp-2" lang="en">
-            {scenario.situation_en}
+            {highlightText(scenario.situation_en, hl)}
           </p>
           <div className="rounded-xl border border-border/60 bg-muted/35 px-3 py-2">
             <p className="text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground leading-tight">Immediate action</p>
             <p className="text-flow-safe mt-1 text-[12px] font-semibold text-foreground/85 leading-relaxed line-clamp-2" lang="en">
-              {scenario.action_en || scenario.script_en || "Open for protocol details."}
+              {highlightText(scenario.action_en || scenario.script_en || "Open for protocol details.", hl)}
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2">

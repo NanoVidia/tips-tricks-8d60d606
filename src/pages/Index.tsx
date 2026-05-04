@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -36,6 +36,7 @@ import { Clock, Trash2, ShieldCheck } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { detectUrgency } from "@/lib/clinicalTags";
 import { expandClinicalSearchQueries, rankSearchScenarios } from "@/lib/clinicalSearch";
+import { buildHighlightRegex, highlightText } from "@/lib/highlight";
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
@@ -160,6 +161,7 @@ export default function Index() {
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [searchFocused, setSearchFocused] = useState(false);
   const searchBoxRef = useRef<HTMLDivElement>(null);
+  const suggestHl = useMemo(() => buildHighlightRegex(search), [search]);
 
   // Sticky header compact mode on scroll
   const [scrolled, setScrolled] = useState(false);
@@ -200,7 +202,7 @@ export default function Index() {
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 250);
+    const timer = setTimeout(() => setDebouncedSearch(search), 80);
     return () => clearTimeout(timer);
   }, [search]);
 
@@ -247,7 +249,7 @@ export default function Index() {
       } finally {
         if (!cancelled) setSuggestLoading(false);
       }
-    }, 180);
+    }, 60);
     return () => { cancelled = true; clearTimeout(handle); };
   }, [search]);
 
@@ -671,7 +673,7 @@ export default function Index() {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="text-[12px] font-semibold text-foreground truncate leading-tight">
-                                  {s.title_en}
+                                  {highlightText(s.title_en, suggestHl)}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
                                   {tabLabel(s.category)}
@@ -1030,6 +1032,7 @@ export default function Index() {
                     onOpen={() => openScenarioSheet(item)}
                     categoryConfig={categoryConfig}
                     categoryLabel={tabLabel(item.category)}
+                    query={debouncedSearch}
                   />
                 ))}
               </div>
