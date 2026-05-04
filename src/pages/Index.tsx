@@ -161,6 +161,7 @@ export default function Index() {
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [searchFocused, setSearchFocused] = useState(false);
   const searchBoxRef = useRef<HTMLDivElement>(null);
+  const suggestHl = useMemo(() => buildHighlightRegex(search), [search]);
 
   // Sticky header compact mode on scroll
   const [scrolled, setScrolled] = useState(false);
