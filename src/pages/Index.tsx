@@ -26,6 +26,7 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { useActivityTracker, type TabId } from "@/hooks/useActivityTracker";
 import { springTransition } from "@/lib/motion";
 import { AppMenu } from "@/components/AppMenu";
+import { RefreshDataButton } from "@/components/RefreshDataButton";
 
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAppSettings } from "@/hooks/useAppSettings";
@@ -1143,6 +1144,9 @@ export default function Index() {
           <p className="text-[9px] text-muted-foreground/60 tracking-wider pt-2 uppercase">
             Educational Use Only · Not a Medical Device
           </p>
+          <div className="pt-3 flex justify-center">
+            <RefreshDataButton />
+          </div>
         </div>
       </footer>
 
