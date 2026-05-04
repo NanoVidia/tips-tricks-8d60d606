@@ -443,21 +443,20 @@
   .accordion-content-inner {
     transform-origin: top center;
     backface-visibility: hidden;
-    transform: translate3d(0, 0, 0);
   }
   [data-state="open"] > .accordion-content-inner {
-    animation: accordion-inner-in 220ms cubic-bezier(0.32, 0.72, 0, 1);
+    animation: accordion-inner-in 140ms cubic-bezier(0.22, 1, 0.36, 1);
   }
   [data-state="closed"] > .accordion-content-inner {
-    animation: accordion-inner-out 160ms cubic-bezier(0.32, 0.72, 0, 1);
+    animation: accordion-inner-out 100ms ease-out;
   }
   @keyframes accordion-inner-in {
-    from { opacity: 0; transform: translate3d(0, -6px, 0); }
+    from { opacity: 0; transform: translate3d(0, -4px, 0); }
     to   { opacity: 1; transform: translate3d(0, 0, 0); }
   }
   @keyframes accordion-inner-out {
-    from { opacity: 1; transform: translate3d(0, 0, 0); }
-    to   { opacity: 0; transform: translate3d(0, -4px, 0); }
+    from { opacity: 1; }
+    to   { opacity: 0; }
   }
 
   /* On low-end / reduce-motion: skip height tween entirely.
