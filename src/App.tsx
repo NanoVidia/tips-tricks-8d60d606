@@ -48,6 +48,9 @@ const App = () => {
     // Restore accessibility preferences
     if (localStorage.getItem("a11y_reduce") === "1") document.documentElement.classList.add("reduce-motion");
     if (localStorage.getItem("a11y_large") === "1") document.documentElement.classList.add("large-text");
+
+    // Auto-detect low-end devices (Android mid-range) and enable performance mode.
+    import("./lib/perfMode").then((m) => m.applyPerformanceMode());
   }, []);
 
   // Auto-unlock in Lovable preview/sandbox environments.
