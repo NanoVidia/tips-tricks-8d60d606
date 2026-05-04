@@ -10,7 +10,6 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { useAppSettings } from "@/hooks/useAppSettings";
 import { APP_NAME, APP_VERSION, type MenuPageId } from "@/components/app-menu-content";
 
 interface Props {
@@ -20,8 +19,6 @@ interface Props {
 export function AppMenu({ dark }: Props) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { get, all } = useAppSettings();
-  const settingsMap = (all as Record<string, any>) || {};
 
   const openPage = (page: MenuPageId) => {
     navigate(`/menu/${page}`, {
