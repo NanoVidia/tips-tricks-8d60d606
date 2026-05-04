@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, Search, Wrench, Menu } from "lucide-react";
 
 /**
  * Native-style bottom tab bar — fixed to viewport bottom, safe-area aware.
- * Hidden on admin/control routes and on the disclaimer splash.
+ * Hidden on admin/control routes and on the disclaimer splash. When hidden,
+ * the body's reserved bottom padding is also removed so pages render flush.
  */
 export function BottomTabBar() {
   const { pathname } = useLocation();
@@ -11,6 +13,12 @@ export function BottomTabBar() {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/control") ||
     pathname.startsWith("/disclaimer");
+
+  useEffect(() => {
+    document.body.classList.toggle("no-bottom-bar", hidden);
+    return () => { document.body.classList.remove("no-bottom-bar"); };
+  }, [hidden]);
+
   if (hidden) return null;
 
   const tabs = [
