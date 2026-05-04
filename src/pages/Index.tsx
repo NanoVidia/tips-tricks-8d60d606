@@ -37,6 +37,7 @@ import { PhIcon } from "@/components/ui/PhIcon";
 import { detectUrgency } from "@/lib/clinicalTags";
 import { expandClinicalSearchQueries, rankSearchScenarios } from "@/lib/clinicalSearch";
 import { buildHighlightRegex, highlightText } from "@/lib/highlight";
+import { McqSearchSection, type McqSearchResult } from "@/components/McqSearchSection";
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
@@ -138,6 +139,7 @@ export default function Index() {
   });
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [allSearchResults, setAllSearchResults] = useState<Scenario[]>([]);
+  const [mcqResults, setMcqResults] = useState<McqSearchResult[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
