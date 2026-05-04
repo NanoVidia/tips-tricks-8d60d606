@@ -88,26 +88,23 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
+        // Height is still required so siblings reflow correctly when an item
+        // opens/closes, but we pair it with an opacity fade and keep the
+        // transition short + snappy. Inner content uses transform-only motion
+        // (see .accordion-content-inner in index.css) to avoid per-frame
+        // layout work on the children themselves.
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0", opacity: "0" },
+          to: { height: "var(--radix-accordion-content-height)", opacity: "1" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)", opacity: "1" },
+          to: { height: "0", opacity: "0" },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        "accordion-down": "accordion-down 180ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "accordion-up": "accordion-up 160ms cubic-bezier(0.4, 0, 1, 1)",
       },
     },
   },
