@@ -12,12 +12,12 @@ export const defaultTranslations = {
   discussAI: "Discuss with AI",
   askAI: "Ask anything about this clinical scenario...",
   askPlaceholder: "Ask about this scenario...",
-  disclaimer: "Important Disclaimer",
+  disclaimer: "Educational Use Only",
   disclaimerText1:
-    "This is an educational OB/GYN and fertility reference for qualified women's-health professionals only; it does not provide patient-specific diagnosis or treatment.",
+    "Tips & Tricks is an educational and academic reference for people interested in women's health, obstetrics, gynecology and fertility topics. It is NOT a medical device and does NOT provide diagnosis, treatment or emergency advice.",
   disclaimerText2:
-    "All obstetric, gynecologic, reproductive-medicine, and fertility decisions must be made by qualified practitioners using current guidelines and individual patient assessment.",
-  continueBtn: "I understand — Continue",
+    "Always consult a qualified healthcare professional for any personal medical concern. By continuing you confirm you understand this is for educational guidance only.",
+  continueBtn: "I Understand — Continue",
   page: "Page",
   of: "of",
   "tab.clinic": "Clinic",
