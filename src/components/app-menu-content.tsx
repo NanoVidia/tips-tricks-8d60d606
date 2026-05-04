@@ -80,7 +80,7 @@ export function subtitleForMenuPage(id: MenuPageId) {
     privacy: "How we handle your data",
     terms: "Conditions of use",
     contact: "Reach the team",
-    faq: "Common questions",
+    faq: "Searchable answers across 7 topics",
     help: "Get assistance",
     feedback: "Help us improve",
     version: `Build ${APP_VERSION}`,
