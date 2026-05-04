@@ -597,7 +597,9 @@ export default function Tools() {
 
           {/* EMERGENCY */}
           <TabsContent value="emergency" className="space-y-3 mt-0">
-            <p className="px-1 text-[10px] text-muted-foreground mb-1">Drag the handle to reorder. Order is saved on this device.</p>
+            <p className="px-1 text-[10px] text-muted-foreground mb-1">
+              Drag the handle to reorder, or focus it and press <kbd className="rounded border border-border bg-muted px-1 font-mono text-[10px]">Space</kbd> then arrow keys. Order is saved on this device.
+            </p>
             <Accordion type="single" collapsible value={openProtocol} onValueChange={setOpenProtocol} className="space-y-2">
               <SortableList
                 ids={emergencyProtocols.map((p) => p.id)}
@@ -744,11 +746,15 @@ export default function Tools() {
 
           {/* DDx */}
           <TabsContent value="ddx" className="space-y-3 mt-0">
-            <p className="px-1 text-[10px] text-muted-foreground mb-1">Drag the handle to reorder. Order is saved on this device.</p>
+            <p className="px-1 text-[10px] text-muted-foreground mb-1">
+              Drag the handle to reorder, or focus it and press <kbd className="rounded border border-border bg-muted px-1 font-mono text-[10px]">Space</kbd> then arrow keys. Order is saved on this device.
+            </p>
             <Accordion type="single" collapsible value={openDdx} onValueChange={setOpenDdx} className="space-y-2">
               <SortableList
                 ids={ddxLibrary.map((d) => d.presentation)}
                 onReorder={setDdxOrder}
+                itemTypeLabel="differential"
+                getItemLabel={(id) => id}
               >
                 {ddxLibrary.map((d) => (
                   <SortableRow key={d.presentation} id={d.presentation} handleLabel={`Reorder ${d.presentation}`}>
