@@ -473,7 +473,7 @@ export default function Index() {
               >
                 {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
               </button>
-              <AppMenu dark={dark} onToggleTheme={toggleDark} />
+              <AppMenu dark={dark} />
             </div>
           </div>
 
