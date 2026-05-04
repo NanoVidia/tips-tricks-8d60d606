@@ -95,6 +95,7 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+          <BottomTabBar />
         </BrowserRouter>
         {showFreeze && <FreezeOverlay />}
         {!disclaimerAccepted && !onAdminPanel && <DisclaimerSplash onAccept={acceptDisclaimer} />}
