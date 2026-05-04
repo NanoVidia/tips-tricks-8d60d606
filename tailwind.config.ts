@@ -94,7 +94,7 @@ export default {
         // (see .accordion-content-inner in index.css) to avoid per-frame
         // layout work on the children themselves.
         "accordion-down": {
-          from: { height: "0", opacity: "0" },
+          from: { height: "0", opacity: "0.4" },
           to: { height: "var(--radix-accordion-content-height)", opacity: "1" },
         },
         "accordion-up": {
@@ -103,8 +103,9 @@ export default {
         },
       },
       animation: {
-        "accordion-down": "accordion-down 180ms cubic-bezier(0.22, 1, 0.36, 1)",
-        "accordion-up": "accordion-up 160ms cubic-bezier(0.4, 0, 1, 1)",
+        // Same easing for open/close keeps motion symmetric and predictable.
+        "accordion-down": "accordion-down 220ms cubic-bezier(0.32, 0.72, 0, 1)",
+        "accordion-up": "accordion-up 180ms cubic-bezier(0.32, 0.72, 0, 1)",
       },
     },
   },

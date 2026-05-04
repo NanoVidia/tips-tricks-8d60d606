@@ -423,25 +423,36 @@
     box-shadow: 0 1px 0 0 hsl(var(--border) / 0.6) !important;
   }
 
-  /* ============ Accordion: transform-only inner motion ============
-     The Radix <Content> wrapper still tweens `height` so siblings reflow
-     correctly, but its child only animates transform + opacity — these are
-     compositor-only properties and don't trigger layout/paint on the
-     content tree itself. */
+  /* ============ Accordion: smooth, jank-free open/close ============
+     Strategy:
+     - Radix <Content> tweens `height` so siblings reflow naturally.
+     - Inner wrapper animates only transform + opacity (compositor-only).
+     - `contain: layout paint` scopes reflow to the panel itself so the
+       rest of the page doesn't re-layout each frame.
+     - `will-change` is applied only while the panel is animating (via
+       data-state) and then released — avoids permanent GPU layers that
+       hurt scrolling on low-RAM devices. */
+  [data-radix-accordion-content] {
+    overflow: hidden;
+    contain: layout paint style;
+  }
+  [data-radix-accordion-content][data-state="open"],
+  [data-radix-accordion-content][data-state="closed"] {
+    will-change: height;
+  }
   .accordion-content-inner {
     transform-origin: top center;
-    will-change: transform, opacity;
     backface-visibility: hidden;
-    transform: translateZ(0);
+    transform: translate3d(0, 0, 0);
   }
   [data-state="open"] > .accordion-content-inner {
-    animation: accordion-inner-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+    animation: accordion-inner-in 220ms cubic-bezier(0.32, 0.72, 0, 1);
   }
   [data-state="closed"] > .accordion-content-inner {
-    animation: accordion-inner-out 140ms cubic-bezier(0.4, 0, 1, 1);
+    animation: accordion-inner-out 160ms cubic-bezier(0.32, 0.72, 0, 1);
   }
   @keyframes accordion-inner-in {
-    from { opacity: 0; transform: translate3d(0, -4px, 0); }
+    from { opacity: 0; transform: translate3d(0, -6px, 0); }
     to   { opacity: 1; transform: translate3d(0, 0, 0); }
   }
   @keyframes accordion-inner-out {
@@ -449,16 +460,15 @@
     to   { opacity: 0; transform: translate3d(0, -4px, 0); }
   }
 
-  /* On low-end / reduce-motion, skip the height tween entirely — open/close
-     becomes instant for layout, with only a tiny opacity fade on the inner
-     wrapper. Eliminates per-frame reflow on cheap devices. */
+  /* On low-end / reduce-motion: skip height tween entirely.
+     Open/close becomes instant for layout — no per-frame reflow. */
   html.low-end [data-radix-accordion-content],
   html.reduce-motion [data-radix-accordion-content] {
     animation: none !important;
+    will-change: auto;
   }
   html.low-end .accordion-content-inner,
   html.reduce-motion .accordion-content-inner {
     animation: none !important;
-    will-change: auto;
   }
 }
