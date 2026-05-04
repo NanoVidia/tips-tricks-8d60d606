@@ -40,10 +40,12 @@ const AccordionContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Content
     ref={ref}
-    className="overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
     {...props}
   >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+    {/* Inner wrapper handles the visual motion via transform + opacity only,
+        so the children themselves never trigger layout during the tween. */}
+    <div className={cn("accordion-content-inner pb-4 pt-0", className)}>{children}</div>
   </AccordionPrimitive.Content>
 ));
 
