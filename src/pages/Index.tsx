@@ -904,7 +904,7 @@ export default function Index() {
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <p className="text-xs text-muted-foreground">Loading...</p>
           </div>
-        ) : (isSearching ? allSearchResults.length === 0 : scenarios.length === 0) ? (
+        ) : (isSearching ? (allSearchResults.length === 0 && mcqResults.length === 0) : scenarios.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
             <div className="w-12 h-12 rounded-2xl bg-muted/60 flex items-center justify-center">
               <Search className="w-5 h-5 text-muted-foreground" />
@@ -1012,7 +1012,7 @@ export default function Index() {
                 )}
               </div>
               <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-1 rounded-full font-bold tabular-nums shrink-0">
-                {formatNumber(isSearching ? allSearchResults.length : totalCount)} {isSearching ? "matches" : "items"}
+                {formatNumber(isSearching ? allSearchResults.length + mcqResults.length : totalCount)} {isSearching ? "matches" : "items"}
               </span>
             </div>
 
