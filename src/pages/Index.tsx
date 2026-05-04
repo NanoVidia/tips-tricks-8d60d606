@@ -158,6 +158,7 @@ export default function Index() {
 
   // Auto-suggest state
   const [suggestions, setSuggestions] = useState<Scenario[]>([]);
+  const [mcqSuggestions, setMcqSuggestions] = useState<McqSearchResult[]>([]);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [suggestLoading, setSuggestLoading] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
