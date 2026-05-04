@@ -105,6 +105,8 @@ interface SortableRowProps {
   className?: string;
   /** ARIA label for the drag handle */
   handleLabel?: string;
+  /** Marks this row as the currently expanded/open item — shows a badge + dot. */
+  isOpen?: boolean;
 }
 
 /**
@@ -112,8 +114,12 @@ interface SortableRowProps {
  * draggable surface — taps elsewhere (e.g. the Accordion trigger) work
  * normally. Keyboard users can focus the handle and use space + arrows to
  * reorder; a visual tooltip appears on focus to make this obvious.
+ *
+ * When `isOpen` is true, an "Open" pill is shown next to the handle so
+ * users keep track of which row is expanded — especially useful while
+ * dragging or scanning a long list.
  */
-export function SortableRow({ id, children, className, handleLabel = "Reorder" }: SortableRowProps) {
+export function SortableRow({ id, children, className, handleLabel = "Reorder", isOpen = false }: SortableRowProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [focused, setFocused] = useState(false);
 
@@ -128,25 +134,47 @@ export function SortableRow({ id, children, className, handleLabel = "Reorder" }
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative flex items-stretch ${className ?? ""} ${isDragging ? "shadow-lg ring-2 ring-primary/40 rounded-2xl" : ""}`}
+      className={`relative flex items-stretch ${className ?? ""}
+        ${isDragging ? "shadow-lg ring-2 ring-primary/40 rounded-2xl" : ""}
+        ${isOpen && !isDragging ? "ring-1 ring-primary/40 rounded-2xl" : ""}`}
     >
       <button
         type="button"
-        aria-label={handleLabel}
+        aria-label={isOpen ? `${handleLabel} (currently open)` : handleLabel}
         aria-describedby={KEYBOARD_HINT_ID}
         aria-roledescription="sortable"
-        title="Drag, or press Space then arrows to reorder"
+        title={isOpen ? "Currently open · drag or press Space then arrows to reorder" : "Drag, or press Space then arrows to reorder"}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         {...attributes}
         {...listeners}
-        className={`flex shrink-0 items-center justify-center px-1.5 cursor-grab active:cursor-grabbing touch-none rounded-l-2xl transition-colors outline-none
+        className={`relative flex shrink-0 items-center justify-center px-1.5 cursor-grab active:cursor-grabbing touch-none rounded-l-2xl transition-colors outline-none
           ${focused || isDragging
             ? "bg-primary/15 text-primary ring-2 ring-primary/60 ring-offset-1 ring-offset-background"
-            : "text-muted-foreground/50 hover:text-foreground hover:bg-muted/60"}`}
+            : isOpen
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground/50 hover:text-foreground hover:bg-muted/60"}`}
       >
         <GripVertical className="h-4 w-4" />
+        {/* Tiny pulsing dot marking the open row at-a-glance. */}
+        {isOpen && (
+          <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary ring-2 ring-card" />
+          </span>
+        )}
       </button>
+
+      {/* "Open" pill — visible at all times for the open row, so users always
+          know which item is expanded inside the sortable list. */}
+      {isOpen && !isDragging && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-6 top-1/2 z-30 -translate-y-1/2 whitespace-nowrap rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary-foreground shadow-sm"
+        >
+          Open
+        </span>
+      )}
 
       {/* Visual keyboard hint — appears when handle is focused via keyboard. */}
       {focused && !isDragging && (
