@@ -227,6 +227,12 @@ export default function Tools() {
   const [offlineReady, setOfflineReady] = useState(false);
   const [mcqOrder, setMcqOrder] = useState<number[]>([]);
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
+  // Persist which accordion item is open per category — keeps the open panel
+  // unchanged across drag-reorders and across page reloads.
+  const [openProtocol, setOpenProtocol] = useState<string>(() => localStorage.getItem("tools.open.emergency") || "");
+  const [openDdx, setOpenDdx] = useState<string>(() => localStorage.getItem("tools.open.ddx") || "");
+  useEffect(() => { localStorage.setItem("tools.open.emergency", openProtocol); }, [openProtocol]);
+  useEffect(() => { localStorage.setItem("tools.open.ddx", openDdx); }, [openDdx]);
   const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
   const { protocols: rawEmergencyProtocols, drugs: pregnancyDrugs, guidelines, ddx: rawDdxLibrary, source: toolsSource } = useToolsData();
   // Persist user's drag-reordered sequence per category in localStorage.
@@ -592,7 +598,7 @@ export default function Tools() {
           {/* EMERGENCY */}
           <TabsContent value="emergency" className="space-y-3 mt-0">
             <p className="px-1 text-[10px] text-muted-foreground mb-1">Drag the handle to reorder. Order is saved on this device.</p>
-            <Accordion type="single" collapsible className="space-y-2">
+            <Accordion type="single" collapsible value={openProtocol} onValueChange={setOpenProtocol} className="space-y-2">
               <SortableList
                 ids={emergencyProtocols.map((p) => p.id)}
                 onReorder={setProtocolOrder}
@@ -737,7 +743,7 @@ export default function Tools() {
           {/* DDx */}
           <TabsContent value="ddx" className="space-y-3 mt-0">
             <p className="px-1 text-[10px] text-muted-foreground mb-1">Drag the handle to reorder. Order is saved on this device.</p>
-            <Accordion type="single" collapsible className="space-y-2">
+            <Accordion type="single" collapsible value={openDdx} onValueChange={setOpenDdx} className="space-y-2">
               <SortableList
                 ids={ddxLibrary.map((d) => d.presentation)}
                 onReorder={setDdxOrder}
