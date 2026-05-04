@@ -72,7 +72,7 @@ export function ClinicalSearchResultCard({ scenario, index, onOpen, categoryConf
 
         <div className="mt-2.5 space-y-2 pl-9">
           <p className="text-flow-safe text-[12px] text-muted-foreground leading-relaxed line-clamp-2" lang="en">
-            {scenario.situation_en}
+            {highlightText(scenario.situation_en, hl)}
           </p>
           <div className="rounded-xl border border-border/60 bg-muted/35 px-3 py-2">
             <p className="text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground leading-tight">Immediate action</p>
