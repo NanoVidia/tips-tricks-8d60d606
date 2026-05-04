@@ -372,7 +372,7 @@ export default function Tools() {
 
         <nav
           aria-label="Tools sections"
-          className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-1 px-1 pb-0.5"
+          className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 sm:-mx-5 px-4 sm:px-5 pb-1"
         >
           {sections.map((s) => {
             const isActive = active === s.id;
@@ -383,32 +383,42 @@ export default function Tools() {
                 type="button"
                 onClick={() => setActive(s.id)}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-[12px] font-bold whitespace-nowrap border transition active:scale-[0.97] ${
+                className={`group relative flex flex-col items-center justify-start gap-1.5 min-w-[78px] px-2 pt-2.5 pb-2 rounded-2xl border whitespace-nowrap transition-all active:scale-[0.96] ${
                   isActive
-                    ? `bg-gradient-to-r ${s.color} text-white border-transparent shadow-gold`
-                    : "bg-card border-border/60 text-foreground hover:bg-muted/50 hover:border-primary/30"
+                    ? "border-primary/30 bg-primary/8 shadow-sm"
+                    : "border-border/60 bg-card hover:border-primary/20 hover:bg-muted/40"
                 }`}
               >
                 <span
-                  className={`inline-flex items-center justify-center w-7 h-7 rounded-xl shrink-0 transition ${
+                  className={`relative inline-flex items-center justify-center w-11 h-11 rounded-2xl shrink-0 transition-all ${
                     isActive
-                      ? "bg-white/20 ring-1 ring-white/30"
-                      : "bg-muted/70 ring-1 ring-border/60"
+                      ? `bg-gradient-to-br ${s.color} text-white shadow-md ring-2 ring-white/40 dark:ring-white/10`
+                      : "bg-muted/60 text-foreground ring-1 ring-border/60 group-hover:bg-muted"
                   }`}
                 >
                   <PhIcon
                     name={s.ph}
-                    size={18}
-                    weight={isActive || isFavBadge ? "fill" : "duotone"}
+                    size={22}
+                    weight={isActive ? "fill" : isFavBadge ? "fill" : "duotone"}
                     tone={isActive ? "white" : isFavBadge ? "gold" : "current"}
                   />
+                  {s.id === "favorites" && favorites.total > 0 && (
+                    <span
+                      className={`absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 inline-flex items-center justify-center rounded-full text-[10px] font-black tabular-nums ring-2 ring-card ${
+                        isActive ? "bg-white text-primary" : "bg-warning text-warning-foreground"
+                      }`}
+                    >
+                      {favorites.total}
+                    </span>
+                  )}
                 </span>
-                {s.label}
-                {s.id === "favorites" && favorites.total > 0 && (
-                  <span className={`text-[10px] tabular-nums px-1.5 py-0.5 rounded-full font-black ${isActive ? "bg-white/25" : "bg-warning/20 text-warning"}`}>
-                    {favorites.total}
-                  </span>
-                )}
+                <span
+                  className={`text-[11px] leading-tight tracking-tight transition-colors ${
+                    isActive ? "text-primary font-bold" : "text-foreground/80 font-semibold group-hover:text-foreground"
+                  }`}
+                >
+                  {s.label}
+                </span>
               </button>
             );
           })}
