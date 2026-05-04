@@ -602,6 +602,8 @@ export default function Tools() {
               <SortableList
                 ids={emergencyProtocols.map((p) => p.id)}
                 onReorder={setProtocolOrder}
+                itemTypeLabel="protocol"
+                getItemLabel={(id) => emergencyProtocols.find((p) => p.id === id)?.title}
               >
                 {emergencyProtocols.map((p) => (
                   <SortableRow key={p.id} id={p.id} handleLabel={`Reorder ${p.title}`}>
