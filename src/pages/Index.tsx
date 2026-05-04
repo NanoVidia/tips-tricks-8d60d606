@@ -249,7 +249,7 @@ export default function Index() {
       } finally {
         if (!cancelled) setSuggestLoading(false);
       }
-    }, 180);
+    }, 60);
     return () => { cancelled = true; clearTimeout(handle); };
   }, [search]);
 
