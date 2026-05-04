@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import {
   Info, Shield, FileText, Mail, HelpCircle, LifeBuoy,
-  MessageSquare, Star, Tag, History, Award, Scale,
+  MessageSquare, Star, Tag, History, Scale,
   Palette, Bell, Accessibility, Bug, LogOut, ClipboardCheck,
   ChevronRight,
 } from "lucide-react";
@@ -54,7 +54,7 @@ export default function MenuHub() {
       { icon: Shield, label: "Privacy Policy", action: () => openPage("privacy") },
       { icon: FileText, label: "Terms of Use", action: () => openPage("terms") },
       { icon: Scale, label: "Open-source licenses", action: () => openPage("licenses") },
-      { icon: Award, label: "Credits", action: () => openPage("credits") },
+      
       { icon: History, label: "Changelog", action: () => openPage("changelog") },
       { icon: Tag, label: `Version ${APP_VERSION}`, action: () => openPage("version") },
       { icon: LogOut, label: "Reset local data", action: handleLogout, danger: true },
