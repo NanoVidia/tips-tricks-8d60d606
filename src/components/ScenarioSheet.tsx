@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MessageCircle, Share2, ArrowLeft } from "lucide-react";
+import { MessageCircle, ArrowLeft } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { PhIcon } from "@/components/ui/PhIcon";
@@ -64,19 +64,6 @@ export function ScenarioSheet({
   if (!scenario) return null;
   const cfg = categoryConfig[scenario.category];
 
-  const handleShare = async () => {
-    const text = `${scenario.title_en}\n\n${scenario.situation_en}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: scenario.title_en, text });
-      } else {
-        await navigator.clipboard.writeText(text);
-        toast({ title: "Copied to clipboard ✓" });
-      }
-    } catch {
-      /* user cancelled */
-    }
-  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -111,14 +98,6 @@ export function ScenarioSheet({
             <span className="flex-1 text-center text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground truncate px-2">
               Scenario
             </span>
-            <button
-              type="button"
-              onClick={handleShare}
-              aria-label="Share"
-              className="w-11 h-11 inline-flex items-center justify-center rounded-2xl border border-border/60 bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 transition active:scale-[0.97]"
-            >
-              <Share2 className="w-4 h-4" />
-            </button>
           </div>
 
           {/* Header */}
