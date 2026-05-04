@@ -207,14 +207,6 @@ export function MenuPageBody({
     </ul>
   );
 
-  if (id === "credits") return (
-    <ul className="space-y-2">
-      <li>Clinical content is structured as educational OB/GYN reference material.</li>
-      <li>Icons by <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Lucide</a> & <a href="https://phosphoricons.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Phosphor</a>.</li>
-      <li>Built with React, Vite, Tailwind CSS and Lovable Cloud.</li>
-      <li>Reference families used across the app include ACOG, RCOG, NICE, WHO and ESC where applicable.</li>
-    </ul>
-  );
 
   if (id === "licenses") return (
     <ul className="space-y-1 font-mono text-xs text-muted-foreground">
