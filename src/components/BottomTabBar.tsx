@@ -34,7 +34,7 @@ export function BottomTabBar() {
     },
     { to: "/tools", label: "Tools", icon: Wrench, match: (p: string) => p.startsWith("/tools") },
     {
-      to: "/menu/about",
+      to: "/menu",
       label: "Menu",
       icon: Menu,
       match: (p: string) => p.startsWith("/menu") || p === "/about",

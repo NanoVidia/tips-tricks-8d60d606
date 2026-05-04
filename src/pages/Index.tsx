@@ -426,7 +426,6 @@ export default function Index() {
               >
                 {dark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
               </button>
-              <AppMenu dark={dark} />
             </div>
           </div>
 
