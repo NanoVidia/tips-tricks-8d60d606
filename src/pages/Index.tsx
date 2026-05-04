@@ -587,8 +587,8 @@ export default function Index() {
                         <div className="relative flex items-start gap-1.5">
                           <span className="text-base leading-none mt-0.5">{item.emoji}</span>
                           <div className="min-w-0 flex-1">
-                            <p className="text-[11px] font-bold text-foreground leading-tight truncate">{item.label}</p>
-                            <p className="text-[9px] text-muted-foreground leading-tight mt-0.5 truncate">{item.hint}</p>
+                            <p className="text-[11px] font-bold text-foreground leading-tight break-words">{item.label}</p>
+                            <p className="text-[9px] text-muted-foreground leading-tight mt-0.5 break-words">{item.hint}</p>
                           </div>
                         </div>
                       </motion.button>
@@ -671,10 +671,10 @@ export default function Index() {
                                 <PhIcon name={cfg.phName} size={14} tone="white" />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <p className="text-[12px] font-semibold text-foreground truncate leading-tight">
+                                <p className="text-[12px] font-semibold text-foreground leading-tight break-words line-clamp-2">
                                   {highlightText(s.title_en, suggestHl)}
                                 </p>
-                                <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
+                                <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 break-words line-clamp-1">
                                   {tabLabel(s.category)}
                                 </p>
                               </div>
@@ -770,7 +770,7 @@ export default function Index() {
                 >
                   <PhIcon name={config.phName} size={13} tone={active ? "white" : "gold"} weight={active ? "fill" : "duotone"} />
                 </motion.span>
-                <span className="relative flex-1 min-w-0 text-left leading-[1.15] text-[10.5px] truncate">{tabLabel(id)}</span>
+                <span className="relative flex-1 min-w-0 text-left leading-[1.15] text-[10.5px] break-words line-clamp-2">{tabLabel(id)}</span>
                 <span
                   className={`relative shrink-0 text-[9px] tabular-nums font-black px-1.5 py-0.5 rounded-full transition-colors ${
                     active
@@ -826,7 +826,7 @@ export default function Index() {
                       <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/80">
                         Continue where you left off
                       </p>
-                      <p className="text-[13px] font-bold text-foreground leading-tight truncate mt-0.5">
+                      <p className="text-[13px] font-bold text-foreground leading-tight break-words line-clamp-2 mt-0.5">
                         {activity.lastScenario.title}
                       </p>
                     </div>
@@ -958,7 +958,7 @@ export default function Index() {
                   <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/80">
                     Ask AI Mentor
                   </span>
-                  <span className="block text-[13px] font-bold leading-tight truncate mt-0.5">
+                  <span className="block text-[13px] font-bold leading-tight break-words line-clamp-2 mt-0.5">
                     "{debouncedSearch.trim()}"
                   </span>
                 </span>

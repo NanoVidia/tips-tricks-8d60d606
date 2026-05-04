@@ -562,7 +562,7 @@ export default function Tools() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-[12px] font-bold text-foreground leading-tight">{d.name}</p>
-                          <p className="text-[10px] text-muted-foreground leading-tight truncate">FDA {d.category} • {d.trimester}</p>
+                          <p className="text-[10px] text-muted-foreground leading-tight break-words">FDA {d.category} • {d.trimester}</p>
                         </div>
                         <BookmarkButton id={`drug:${d.name}`} label={d.name} />
                       </button>
