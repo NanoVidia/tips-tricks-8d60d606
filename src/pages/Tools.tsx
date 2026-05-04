@@ -24,6 +24,8 @@ import { useAllMcqs } from "@/hooks/useMcqs";
 import { toast } from "@/hooks/use-toast";
 import { DisclaimerBanner, InlineDisclaimer } from "@/components/Disclaimer";
 import { PhIcon } from "@/components/ui/PhIcon";
+import { SortableList, SortableRow } from "@/components/SortableList";
+import { useOrderedItems } from "@/hooks/useOrderedItems";
 import type { MCQ } from "@/data/mcqBank";
 
 const sections = [
@@ -226,7 +228,18 @@ export default function Tools() {
   const [mcqOrder, setMcqOrder] = useState<number[]>([]);
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, boolean>>({});
   const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
-  const { protocols: emergencyProtocols, drugs: pregnancyDrugs, guidelines, ddx: ddxLibrary, source: toolsSource } = useToolsData();
+  const { protocols: rawEmergencyProtocols, drugs: pregnancyDrugs, guidelines, ddx: rawDdxLibrary, source: toolsSource } = useToolsData();
+  // Persist user's drag-reordered sequence per category in localStorage.
+  const { ordered: emergencyProtocols, setOrder: setProtocolOrder } = useOrderedItems(
+    "tools.order.emergency",
+    rawEmergencyProtocols,
+    (p) => p.id,
+  );
+  const { ordered: ddxLibrary, setOrder: setDdxOrder } = useOrderedItems(
+    "tools.order.ddx",
+    rawDdxLibrary,
+    (d) => d.presentation,
+  );
   const { mcqs: allMcqs, source: mcqSource, isLoading: mcqLoading } = useAllMcqs();
   const mcqs = useMemo(() => allMcqs.map(polishMcq).filter((q) => q.options.length === 4 && q.answerIndex >= 0 && q.answerIndex <= 3), [allMcqs]);
 
@@ -578,41 +591,48 @@ export default function Tools() {
 
           {/* EMERGENCY */}
           <TabsContent value="emergency" className="space-y-3 mt-0">
+            <p className="px-1 text-[10px] text-muted-foreground mb-1">Drag the handle to reorder. Order is saved on this device.</p>
             <Accordion type="single" collapsible className="space-y-2">
-              {emergencyProtocols.map((p) => (
-                <AccordionItem
-                  key={p.id}
-                  value={p.id}
-                  id={`protocol-${p.id}`}
-                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
-                >
-                  <div className="flex items-center gap-2 pr-3">
-                    <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
-                      <div className="flex items-center gap-2.5 text-left">
-                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
-                          <Siren className="w-3.5 h-3.5 text-white" />
-                        </div>
-                        <span className="text-sm font-bold">{p.title}</span>
+              <SortableList
+                ids={emergencyProtocols.map((p) => p.id)}
+                onReorder={setProtocolOrder}
+              >
+                {emergencyProtocols.map((p) => (
+                  <SortableRow key={p.id} id={p.id} handleLabel={`Reorder ${p.title}`}>
+                    <AccordionItem
+                      value={p.id}
+                      id={`protocol-${p.id}`}
+                      className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
+                    >
+                      <div className="flex items-center gap-2 pr-3">
+                        <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
+                          <div className="flex items-center gap-2.5 text-left">
+                            <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color} shrink-0`}>
+                              <Siren className="w-3.5 h-3.5 text-white" />
+                            </div>
+                            <span className="text-sm font-bold">{p.title}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <BookmarkButton id={`protocol:${p.id}`} label={p.title} />
                       </div>
-                    </AccordionTrigger>
-                    <BookmarkButton id={`protocol:${p.id}`} label={p.title} />
-                  </div>
-                  <AccordionContent className="px-4 pb-4">
-                    <ol className="space-y-1.5">
-                      {p.steps.map((s, i) => (
-                        <li key={i} className="flex gap-2 text-[12px] leading-relaxed">
-                          <span className="font-black text-primary shrink-0 tabular-nums w-5">{i + 1}.</span>
-                          <span>{s}</span>
-                        </li>
-                      ))}
-                    </ol>
-                    <div className="mt-3 p-2.5 rounded-lg bg-success-soft border border-success/30">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-success mb-0.5">Targets</p>
-                      <p className="text-[11px] text-success">{p.targets}</p>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+                      <AccordionContent className="px-4 pb-4">
+                        <ol className="space-y-1.5">
+                          {p.steps.map((s, i) => (
+                            <li key={i} className="flex gap-2 text-[12px] leading-relaxed">
+                              <span className="font-black text-primary shrink-0 tabular-nums w-5">{i + 1}.</span>
+                              <span>{s}</span>
+                            </li>
+                          ))}
+                        </ol>
+                        <div className="mt-3 p-2.5 rounded-lg bg-success-soft border border-success/30">
+                          <p className="text-[10px] uppercase tracking-wider font-bold text-success mb-0.5">Targets</p>
+                          <p className="text-[11px] text-success">{p.targets}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </SortableRow>
+                ))}
+              </SortableList>
             </Accordion>
           </TabsContent>
 
@@ -716,42 +736,49 @@ export default function Tools() {
 
           {/* DDx */}
           <TabsContent value="ddx" className="space-y-3 mt-0">
+            <p className="px-1 text-[10px] text-muted-foreground mb-1">Drag the handle to reorder. Order is saved on this device.</p>
             <Accordion type="single" collapsible className="space-y-2">
-              {ddxLibrary.map((d) => (
-                <AccordionItem
-                  key={d.presentation}
-                  value={d.presentation}
-                  id={`ddx-${d.presentation}`}
-                  className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
-                >
-                  <div className="flex items-center gap-2 pr-3">
-                    <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
-                      <div className="flex items-center gap-2.5 text-left">
-                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shrink-0">
-                          <Brain className="w-3.5 h-3.5 text-white" />
-                        </div>
-                        <span className="text-sm font-bold">{d.presentation}</span>
+              <SortableList
+                ids={ddxLibrary.map((d) => d.presentation)}
+                onReorder={setDdxOrder}
+              >
+                {ddxLibrary.map((d) => (
+                  <SortableRow key={d.presentation} id={d.presentation} handleLabel={`Reorder ${d.presentation}`}>
+                    <AccordionItem
+                      value={d.presentation}
+                      id={`ddx-${d.presentation}`}
+                      className="border-0 bg-card rounded-2xl overflow-hidden border border-border/50 scroll-mt-32"
+                    >
+                      <div className="flex items-center gap-2 pr-3">
+                        <AccordionTrigger className="flex-1 px-4 py-3 hover:no-underline">
+                          <div className="flex items-center gap-2.5 text-left">
+                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shrink-0">
+                              <Brain className="w-3.5 h-3.5 text-white" />
+                            </div>
+                            <span className="text-sm font-bold">{d.presentation}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <BookmarkButton id={`ddx:${d.presentation}`} label={d.presentation} />
                       </div>
-                    </AccordionTrigger>
-                    <BookmarkButton id={`ddx:${d.presentation}`} label={d.presentation} />
-                  </div>
-                  <AccordionContent className="px-4 pb-4">
-                    <p className="text-[10px] uppercase tracking-wider font-bold text-primary mb-1.5">Differentials</p>
-                    <ul className="space-y-1 mb-3">
-                      {d.differentials.map((x, i) => (
-                        <li key={i} className="flex gap-2 text-[12px] leading-relaxed">
-                          <span className="text-primary">•</span>
-                          <span>{x}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="p-2.5 rounded-lg bg-danger-soft border border-danger/30">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-danger mb-0.5">Red Flags</p>
-                      <p className="text-[11px] text-danger">{d.redFlags}</p>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+                      <AccordionContent className="px-4 pb-4">
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-primary mb-1.5">Differentials</p>
+                        <ul className="space-y-1 mb-3">
+                          {d.differentials.map((x, i) => (
+                            <li key={i} className="flex gap-2 text-[12px] leading-relaxed">
+                              <span className="text-primary">•</span>
+                              <span>{x}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="p-2.5 rounded-lg bg-danger-soft border border-danger/30">
+                          <p className="text-[10px] uppercase tracking-wider font-bold text-danger mb-0.5">Red Flags</p>
+                          <p className="text-[11px] text-danger">{d.redFlags}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </SortableRow>
+                ))}
+              </SortableList>
             </Accordion>
 
             <DrugInteractionChecker />
