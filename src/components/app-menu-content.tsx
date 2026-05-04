@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { FaqSection } from "@/components/FaqSection";
 
 export const APP_VERSION = "1.4.0";
 export const APP_NAME = "Tips & Tricks — OB/GYN";
@@ -162,19 +163,7 @@ export function MenuPageBody({
     </div>
   );
 
-  if (id === "faq") return (
-    <ul className="space-y-3">
-      {[
-        ["What are the main source families?", "Clinical entries are aligned with established guideline bodies where relevant: ACOG, RCOG, NICE, WHO and ESC."],
-        ["Is this a guideline replacement?", "No. It is an educational bedside reference. Always verify against local protocols and current official guidance."],
-        ["Does it work offline?", "Some interface data may remain available locally, but AI chat, videos and database updates need internet."],
-        ["Can I bookmark items?", "Yes — use the bookmark icon on tools and surgeries."],
-        ["Should patient identifiers be entered?", "No. Do not enter names, MRNs, phone numbers or identifiable patient data into free-text tools."],
-      ].map(([q, a]) => (
-        <li key={q}><p className="font-semibold">{q}</p><p className="text-muted-foreground">{a}</p></li>
-      ))}
-    </ul>
-  );
+  if (id === "faq") return <FaqSection />;
 
   if (id === "help") return (
     <>
