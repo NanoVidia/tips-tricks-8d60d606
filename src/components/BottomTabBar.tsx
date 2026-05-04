@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Search, Wrench, Menu } from "lucide-react";
+import { Home, Star, Wrench, Menu } from "lucide-react";
 
 /**
  * Native-style bottom tab bar — fixed to viewport bottom, safe-area aware.
@@ -26,11 +26,13 @@ export function BottomTabBar() {
   const tabs = [
     { to: "/", label: "Home", icon: Home, match: (p: string) => p === "/" || p === "/index" },
     {
-      to: "/?focus=search",
-      label: "Search",
-      icon: Search,
+      to: "/tools?tab=favorites",
+      label: "Saved",
+      icon: Star,
       match: (p: string) =>
-        p === "/" && typeof window !== "undefined" && window.location.search.includes("focus=search"),
+        p.startsWith("/tools") &&
+        typeof window !== "undefined" &&
+        window.location.search.includes("tab=favorites"),
     },
     { to: "/tools", label: "Tools", icon: Wrench, match: (p: string) => p.startsWith("/tools") },
     {
