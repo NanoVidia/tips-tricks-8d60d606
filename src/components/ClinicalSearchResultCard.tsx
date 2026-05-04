@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { ArrowRight, BookOpen, AlertTriangle, AlertCircle, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { BookmarkButton } from "@/components/tools/BookmarkButton";
 import { PhIcon } from "@/components/ui/PhIcon";
 import { getClinicalTags, URGENCY_LABEL, type Urgency } from "@/lib/clinicalTags";
 import { resolveTrustedClinicalVisual, type SearchScenario } from "@/lib/clinicalSearch";
+import { buildHighlightRegex, highlightText } from "@/lib/highlight";
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
 
@@ -13,6 +15,7 @@ interface ClinicalSearchResultCardProps {
   onOpen: () => void;
   categoryConfig: Record<ScenarioCategory, { phName: string; iconBg: string; gradient: string }>;
   categoryLabel: string;
+  query?: string;
 }
 
 const URGENCY_STYLE: Record<Urgency, { cls: string; Icon: typeof AlertTriangle }> = {
