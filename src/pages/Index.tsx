@@ -202,7 +202,7 @@ export default function Index() {
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 250);
+    const timer = setTimeout(() => setDebouncedSearch(search), 80);
     return () => clearTimeout(timer);
   }, [search]);
 
