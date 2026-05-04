@@ -381,61 +381,23 @@ export default function Index() {
   const totalScenarios = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen gradient-paper text-foreground flex flex-col max-w-lg mx-auto relative tabular-nums">
+    <div className="min-h-screen gradient-paper text-foreground flex flex-col w-full mx-auto relative tabular-nums pb-20">
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
         style={{ backgroundImage: "radial-gradient(hsl(0 0% 10%) 1px, transparent 1px)", backgroundSize: "3px 3px" }}
         aria-hidden="true"
       />
-      <div className="h-[3px] gradient-gold relative z-20" />
 
       <header
-        className={`header-fade sticky top-0 z-20 overflow-hidden px-4 sm:px-5 bg-[linear-gradient(90deg,hsl(var(--primary)/0.18)_0%,hsl(var(--accent)/0.10)_42%,hsl(var(--card)/0.92)_100%)] backdrop-blur-md transition-all duration-300 rounded-b-[40px] sm:rounded-b-[56px] ${
-          scrolled ? "pt-2 pb-6 sm:pb-8" : "pt-4 pb-8 sm:pb-10"
+        className={`sticky top-0 z-20 px-4 sm:px-5 bg-card/95 backdrop-blur-md border-b border-border/60 transition-all duration-200 ${
+          scrolled ? "pb-3" : "pb-4"
         }`}
+        style={{ paddingTop: `calc(env(safe-area-inset-top) + ${scrolled ? "0.5rem" : "0.75rem"})` }}
       >
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-2/3 bg-[radial-gradient(circle_at_8%_20%,hsl(var(--primary)/0.20),transparent_34%),linear-gradient(90deg,hsl(var(--primary)/0.12),transparent)]" aria-hidden="true" />
-        {/* Soft glow concentrated under the curve */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-12 sm:h-16 rounded-b-[40px] sm:rounded-b-[56px] bg-[radial-gradient(ellipse_60%_100%_at_50%_100%,hsl(var(--primary)/0.22),transparent_70%)]"
-        />
-        {/* Hairline highlight tracing the curve */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-3 sm:inset-x-5 bottom-0 h-px rounded-full bg-gradient-to-r from-transparent via-primary/55 to-transparent"
-        />
-        {/* Centered gold accent — tiny luxurious dot of light */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-px left-1/2 -translate-x-1/2 h-2.5 w-24 rounded-full bg-gradient-to-r from-transparent via-gold/70 to-transparent blur-[2px]"
-        />
-        <div className="relative">
-          {/* Issue line — hidden in compact mode */}
-          <AnimatePresence initial={false}>
-            {!scrolled && (
-              <motion.div
-                key="issue-line"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="flex items-center justify-between mb-4 text-[9px] tracking-[0.22em] uppercase font-bold text-muted-foreground">
-                  <span className="flex items-center gap-1.5 min-w-0 truncate">
-                    <span className="inline-block w-1 h-1 rounded-full bg-gold" />
-                    <span className="truncate">{issueDate()}</span>
-                  </span>
-                  <span className="text-gold/90 shrink-0 ml-2">Vol. I</span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Masthead — collapses to small in compact mode */}
-          <div className={`flex items-start justify-between gap-3 transition-all ${scrolled ? "mb-3" : "mb-4"}`}>
-            <motion.button
+        <div className="relative max-w-lg mx-auto">
+          {/* App bar — title + actions (native style) */}
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <button
               type="button"
               onClick={() => {
                 setActiveTab(null);
@@ -445,54 +407,26 @@ export default function Index() {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               aria-label="Go to home"
-              className="min-w-0 flex-1 flex flex-col gap-1.5 pr-1 text-start cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-80 transition-opacity"
-              initial={{ y: 6, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="min-w-0 flex-1 flex items-center gap-2 text-start cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-80 transition-opacity"
             >
-              <h1
-                className={`font-editorial italic font-black tracking-tight leading-none text-foreground transition-all whitespace-nowrap ${
-                  scrolled ? "text-[19px]" : "text-[24px]"
-                }`}
-              >
-                <span className="relative inline-block max-w-full whitespace-nowrap">
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-3 -bottom-0.5 h-1.5 rounded-full bg-primary/5 blur-[3px] will-change-auto"
-                  />
-                  <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,hsl(var(--foreground))_0%,hsl(var(--primary))_50%,hsl(var(--foreground))_100%)]">
-                    {logoText.trim() || "OB/GYN Reference"}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className={`absolute left-0 -bottom-1.5 h-[2px] w-full origin-left bg-gradient-to-r from-primary via-primary/50 to-transparent transition-all ${
-                      scrolled ? "scale-x-75" : "scale-x-100"
-                    }`}
-                  />
-                </span>
-              </h1>
-              <span
-                className={`self-start inline-flex max-w-full items-center rounded-md border border-primary/25 bg-primary/5 text-primary font-semibold uppercase tracking-[0.18em] transition-all ${
-                  scrolled ? "px-1.5 py-0.5 text-[8px]" : "px-2 py-0.5 text-[9px]"
-                }`}
-              >
-                OB/GYN Reference
+              <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-primary text-primary-foreground shrink-0 shadow-sm">
+                <Stethoscope className="w-4 h-4" strokeWidth={2.5} />
               </span>
-            </motion.button>
-            <div className="flex items-center gap-1.5 shrink-0 self-start">
+              <h1 className="font-bold tracking-tight leading-tight text-foreground text-[17px] truncate">
+                {logoText.trim() || "OB/GYN Reference"}
+              </h1>
+            </button>
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={toggleDark}
-                className="p-2 rounded-xl bg-card border border-border/60 hover:border-gold/50 hover:bg-muted transition-all"
+                className="p-2 rounded-full hover:bg-muted active:scale-95 transition-all"
                 aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
               >
-                {dark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-foreground" />}
+                {dark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
               </button>
               <AppMenu dark={dark} />
             </div>
           </div>
-
-          {/* Hairline divider — hidden in compact */}
-          {!scrolled && <div className="divider-editorial mb-4" aria-hidden="true" />}
 
           {/* Search bar with auto-suggest */}
           <motion.div
