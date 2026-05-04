@@ -37,7 +37,6 @@ import { PhIcon } from "@/components/ui/PhIcon";
 import { detectUrgency } from "@/lib/clinicalTags";
 import { expandClinicalSearchQueries, rankSearchScenarios } from "@/lib/clinicalSearch";
 import { buildHighlightRegex, highlightText } from "@/lib/highlight";
-import { useMemo } from "react";
 
 
 type ScenarioCategory = "clinic" | "or_labor" | "behavior" | "qa";
