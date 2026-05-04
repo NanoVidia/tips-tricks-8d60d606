@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -26,7 +27,7 @@ function NotificationsBootstrap() {
   return null;
 }
 
-const queryClient = new QueryClient();
+
 
 // App freeze state — controlled only from here and not connected to the database.
 // Set true to freeze the published app for visitors; set false to unfreeze it.
