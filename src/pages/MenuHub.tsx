@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import {
   Info, Shield, FileText, Mail, HelpCircle, LifeBuoy,
-  MessageSquare, Star, Share2, Tag, History, Award, Scale,
+  MessageSquare, Star, Tag, History, Award, Scale,
   Palette, Bell, Accessibility, Bug, LogOut, ClipboardCheck,
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
+// (Share-app entry removed by user request)
+void toast;
 import { APP_NAME, APP_VERSION, type MenuPageId } from "@/components/app-menu-content";
 
 type Item = {
@@ -20,13 +22,6 @@ export default function MenuHub() {
   const navigate = useNavigate();
   const openPage = (page: MenuPageId) => navigate(`/menu/${page}`);
 
-  const handleShare = async () => {
-    const data = { title: APP_NAME, text: "OB/GYN clinical reference", url: window.location.origin };
-    try {
-      if (navigator.share) await navigator.share(data);
-      else { await navigator.clipboard.writeText(data.url); toast.success("Link copied"); }
-    } catch { /* cancelled */ }
-  };
 
   const handleRate = () => window.open("https://lovable.app", "_blank", "noopener,noreferrer");
 
@@ -53,7 +48,7 @@ export default function MenuHub() {
       { icon: Mail, label: "Contact", action: () => openPage("contact") },
       { icon: MessageSquare, label: "Feedback", action: () => openPage("feedback") },
       { icon: Bug, label: "Report a bug", action: () => openPage("bug") },
-      { icon: Share2, label: "Share app", action: handleShare },
+      
       { icon: Star, label: "Rate us", action: handleRate },
       
     ]},
