@@ -236,16 +236,27 @@ export default function Tools() {
   const { ids: bookmarkIds, isBookmarked, toggle: toggleBookmark, clear: clearBookmarks } = useBookmarks();
   const { protocols: rawEmergencyProtocols, drugs: pregnancyDrugs, guidelines, ddx: rawDdxLibrary, source: toolsSource } = useToolsData();
   // Persist user's drag-reordered sequence per category in localStorage.
-  const { ordered: emergencyProtocols, setOrder: setProtocolOrder } = useOrderedItems(
+  const { ordered: emergencyProtocols, setOrder: setProtocolOrderRaw } = useOrderedItems(
     "tools.order.emergency",
     rawEmergencyProtocols,
     (p) => p.id,
   );
-  const { ordered: ddxLibrary, setOrder: setDdxOrder } = useOrderedItems(
+  const { ordered: ddxLibrary, setOrder: setDdxOrderRaw } = useOrderedItems(
     "tools.order.ddx",
     rawDdxLibrary,
     (d) => d.presentation,
   );
+  // Wrap reorder setters with a small toast so users get clear feedback that
+  // the new order has been saved on this device (works for both mouse and
+  // keyboard reordering).
+  const setProtocolOrder = (ids: string[]) => {
+    setProtocolOrderRaw(ids);
+    toast({ title: "Order saved", description: "Emergency protocols reordered on this device." });
+  };
+  const setDdxOrder = (ids: string[]) => {
+    setDdxOrderRaw(ids);
+    toast({ title: "Order saved", description: "Differentials reordered on this device." });
+  };
   const { mcqs: allMcqs, source: mcqSource, isLoading: mcqLoading } = useAllMcqs();
   const mcqs = useMemo(() => allMcqs.map(polishMcq).filter((q) => q.options.length === 4 && q.answerIndex >= 0 && q.answerIndex <= 3), [allMcqs]);
 
