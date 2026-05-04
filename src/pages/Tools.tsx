@@ -608,7 +608,7 @@ export default function Tools() {
                 getItemLabel={(id) => emergencyProtocols.find((p) => p.id === id)?.title}
               >
                 {emergencyProtocols.map((p) => (
-                  <SortableRow key={p.id} id={p.id} handleLabel={`Reorder ${p.title}`}>
+                  <SortableRow key={p.id} id={p.id} handleLabel={`Reorder ${p.title}`} isOpen={openProtocol === p.id}>
                     <AccordionItem
                       value={p.id}
                       id={`protocol-${p.id}`}
@@ -757,7 +757,7 @@ export default function Tools() {
                 getItemLabel={(id) => id}
               >
                 {ddxLibrary.map((d) => (
-                  <SortableRow key={d.presentation} id={d.presentation} handleLabel={`Reorder ${d.presentation}`}>
+                  <SortableRow key={d.presentation} id={d.presentation} handleLabel={`Reorder ${d.presentation}`} isOpen={openDdx === d.presentation}>
                     <AccordionItem
                       value={d.presentation}
                       id={`ddx-${d.presentation}`}
