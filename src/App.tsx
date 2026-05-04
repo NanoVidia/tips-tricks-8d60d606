@@ -36,6 +36,7 @@ const DEV_KEY = "dev_unlock";
 
 const App = () => {
   const [devUnlocked, setDevUnlocked] = useState(false);
+  const { accepted: disclaimerAccepted, accept: acceptDisclaimer } = useDisclaimer();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -82,7 +83,14 @@ const App = () => {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/disclaimer" element={<Disclaimer />} />
+              <Route path="/about" element={<About />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+        {showFreeze && <FreezeOverlay />}
+        {!disclaimerAccepted && !onAdminPanel && <DisclaimerSplash onAccept={acceptDisclaimer} />}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
