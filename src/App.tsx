@@ -22,6 +22,7 @@ const Disclaimer = lazy(() => import("./pages/Disclaimer.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
 const MenuPage = lazy(() => import("./pages/MenuPage.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
+import { BottomTabBar } from "./components/BottomTabBar";
 
 function NotificationsBootstrap() {
   useLocalNotifications();
@@ -94,6 +95,7 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+          <BottomTabBar />
         </BrowserRouter>
         {showFreeze && <FreezeOverlay />}
         {!disclaimerAccepted && !onAdminPanel && <DisclaimerSplash onAccept={acceptDisclaimer} />}
