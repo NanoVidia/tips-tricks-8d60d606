@@ -15,6 +15,9 @@ const ControlLoginPage = lazy(() => import("./pages/ControlLoginPage.tsx"));
 const Exams = lazy(() => import("./pages/Exams.tsx"));
 const ExamsCompare = lazy(() => import("./pages/ExamsCompare.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const Terms = lazy(() => import("./pages/Terms.tsx"));
+const Privacy = lazy(() => import("./pages/Privacy.tsx"));
+const Disclaimer = lazy(() => import("./pages/Disclaimer.tsx"));
 
 function NotificationsBootstrap() {
   useLocalNotifications();
@@ -74,6 +77,9 @@ const App = () => {
               <Route path="/admin" element={<Admin />} />
               <Route path="/control/login" element={<ControlLoginPage />} />
               <Route path="/control" element={<Control />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
