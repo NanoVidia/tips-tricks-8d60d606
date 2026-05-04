@@ -122,7 +122,19 @@ export default function Index() {
   const tabLabel = (c: ScenarioCategory) => t(TAB_LABEL_KEYS[c] as never);
   const [activeTab, setActiveTab] = useState<ScenarioCategory | null>(null);
   const [search, setSearch] = useState("");
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(() => {
+    if (typeof document === "undefined") return false;
+    const saved = localStorage.getItem("theme_mode");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+      return true;
+    }
+    if (saved === "light") {
+      document.documentElement.classList.remove("dark");
+      return false;
+    }
+    return document.documentElement.classList.contains("dark");
+  });
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [allSearchResults, setAllSearchResults] = useState<Scenario[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -165,8 +177,10 @@ export default function Index() {
 
   const toggleDark = () => {
     setDark((d) => {
-      document.documentElement.classList.toggle("dark", !d);
-      return !d;
+      const next = !d;
+      document.documentElement.classList.toggle("dark", next);
+      localStorage.setItem("theme_mode", next ? "dark" : "light");
+      return next;
     });
   };
 
