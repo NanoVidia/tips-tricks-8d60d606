@@ -292,7 +292,7 @@ export function SmartBottomSheet({
                                 {i + 1}
                               </span>
                               <span className="flex-1 min-w-0">
-                                <span className="block text-[12px] font-bold text-foreground leading-tight truncate">
+                                <span className="block text-[12px] font-bold text-foreground leading-tight break-words line-clamp-2">
                                   {v.title}
                                 </span>
                                 <span className="block text-[9px] text-muted-foreground mt-0.5">
