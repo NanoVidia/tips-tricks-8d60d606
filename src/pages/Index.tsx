@@ -650,12 +650,12 @@ export default function Index() {
                   transition={{ duration: 0.12 }}
                   className="absolute left-0 right-0 top-full mt-2 bg-card border border-border/60 rounded-2xl shadow-xl shadow-black/5 overflow-hidden z-30"
                 >
-                  {suggestLoading && suggestions.length === 0 ? (
+                  {suggestLoading && suggestions.length === 0 && mcqSuggestions.length === 0 ? (
                     <div className="flex items-center justify-center gap-2 py-4 text-xs text-muted-foreground">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       Searching...
                     </div>
-                  ) : suggestions.length === 0 ? (
+                  ) : suggestions.length === 0 && mcqSuggestions.length === 0 ? (
                     <div className="py-5 px-4 text-center space-y-3">
                       <p className="text-[12px] font-semibold text-foreground">
                         No matches for <span className="text-primary">"{search.trim()}"</span>
@@ -686,45 +686,100 @@ export default function Index() {
                       </button>
                     </div>
                   ) : (
-                    <ul className="py-1">
-                      {suggestions.map((s, idx) => {
-                        const cfg = categoryConfig[s.category];
-                        const Icon = cfg.icon;
-                        const isHi = idx === highlightIdx;
-                        return (
-                          <li key={s.id}>
-                            <button
-                              id={`suggest-${idx}`}
-                              role="option"
-                              aria-selected={isHi}
-                              type="button"
-                              onMouseEnter={() => setHighlightIdx(idx)}
-                              onClick={() => {
-                                setActiveTab(s.category);
-                                setSuggestOpen(false);
-                                openAI(s);
-                              }}
-                              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition ${
-                                isHi ? "bg-muted/70" : "hover:bg-muted/40"
-                              }`}
-                            >
-                              <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
-                                <PhIcon name={cfg.phName} size={14} tone="white" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-[12px] font-semibold text-foreground leading-tight break-words line-clamp-2">
-                                  {highlightText(s.title_en, suggestHl)}
-                                </p>
-                                <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 break-words line-clamp-1">
-                                  {tabLabel(s.category)}
-                                </p>
-                              </div>
-                              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
-                            </button>
-                          </li>
-                        );
-                      })}
-                      <li className="border-t border-border/40">
+                    <div className="py-1 max-h-[60vh] overflow-y-auto">
+                      {suggestions.length > 0 && (
+                        <>
+                          <div className="flex items-center justify-between px-3 pt-2 pb-1">
+                            <span className="text-[9px] font-black uppercase tracking-[0.14em] text-muted-foreground">
+                              Scenarios
+                            </span>
+                            <span className="text-[9px] font-bold text-muted-foreground tabular-nums">
+                              {suggestions.length}
+                            </span>
+                          </div>
+                          <ul>
+                            {suggestions.map((s, idx) => {
+                              const cfg = categoryConfig[s.category];
+                              const isHi = idx === highlightIdx;
+                              return (
+                                <li key={s.id}>
+                                  <button
+                                    id={`suggest-${idx}`}
+                                    role="option"
+                                    aria-selected={isHi}
+                                    type="button"
+                                    onMouseEnter={() => setHighlightIdx(idx)}
+                                    onClick={() => {
+                                      setActiveTab(s.category);
+                                      setSuggestOpen(false);
+                                      openAI(s);
+                                    }}
+                                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition ${
+                                      isHi ? "bg-muted/70" : "hover:bg-muted/40"
+                                    }`}
+                                  >
+                                    <div className={`p-1.5 rounded-lg ${cfg.iconBg} shrink-0`}>
+                                      <PhIcon name={cfg.phName} size={14} tone="white" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-[12px] font-semibold text-foreground leading-tight break-words line-clamp-2">
+                                        {highlightText(s.title_en, suggestHl)}
+                                      </p>
+                                      <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 break-words line-clamp-1">
+                                        {tabLabel(s.category)}
+                                      </p>
+                                    </div>
+                                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </>
+                      )}
+
+                      {mcqSuggestions.length > 0 && (
+                        <>
+                          {suggestions.length > 0 && <div className="border-t border-border/40 my-1" />}
+                          <div className="flex items-center justify-between px-3 pt-2 pb-1">
+                            <span className="text-[9px] font-black uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400">
+                              Exam questions
+                            </span>
+                            <span className="text-[9px] font-bold text-muted-foreground tabular-nums">
+                              {mcqSuggestions.length}
+                            </span>
+                          </div>
+                          <ul>
+                            {mcqSuggestions.map((m) => (
+                              <li key={m.id}>
+                                <Link
+                                  to="/exams"
+                                  onClick={() => {
+                                    setSuggestOpen(false);
+                                    setSearchFocused(false);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition hover:bg-muted/40"
+                                >
+                                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 shrink-0">
+                                    <HelpCircle className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-[12px] font-semibold text-foreground leading-tight break-words line-clamp-2">
+                                      {highlightText(m.stem, suggestHl)}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 break-words line-clamp-1">
+                                      {m.topic} · {m.difficulty}
+                                    </p>
+                                  </div>
+                                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+
+                      <div className="border-t border-border/40">
                         <button
                           type="button"
                           onClick={() => {
@@ -738,8 +793,8 @@ export default function Index() {
                           <Search className="w-3 h-3" />
                           See all results
                         </button>
-                      </li>
-                    </ul>
+                      </div>
+                    </div>
                   )}
                 </motion.div>
               )}
