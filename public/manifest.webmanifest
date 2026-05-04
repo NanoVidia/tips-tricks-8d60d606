@@ -2,14 +2,20 @@
   "name": "Tips & Tricks — OB/GYN Reference",
   "short_name": "Tips & Tricks",
   "description": "Bedside OB/GYN scenarios, scripts, calculators and AI assistant for clinicians.",
-  "start_url": "/",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
   "background_color": "#f5f3ee",
-  "theme_color": "#1a1a1a",
+  "theme_color": "#f5f3ee",
   "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
   "categories": ["medical", "education", "productivity"],
   "icons": [
-    { "src": "/placeholder.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
