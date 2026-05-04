@@ -91,11 +91,6 @@ const App = () => {
         </BrowserRouter>
         {showFreeze && <FreezeOverlay />}
         {!disclaimerAccepted && !onAdminPanel && <DisclaimerSplash onAccept={acceptDisclaimer} />}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-        {showFreeze && <FreezeOverlay />}
       </TooltipProvider>
     </QueryClientProvider>
   );
