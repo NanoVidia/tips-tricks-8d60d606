@@ -16,7 +16,9 @@ export function BottomTabBar() {
 
   useEffect(() => {
     document.body.classList.toggle("no-bottom-bar", hidden);
-    return () => { document.body.classList.remove("no-bottom-bar"); };
+    return () => {
+      document.body.classList.remove("no-bottom-bar");
+    };
   }, [hidden]);
 
   if (hidden) return null;
@@ -27,34 +29,65 @@ export function BottomTabBar() {
       to: "/?focus=search",
       label: "Search",
       icon: Search,
-      match: (p: string) => p === "/" && typeof window !== "undefined" && window.location.search.includes("focus=search"),
+      match: (p: string) =>
+        p === "/" && typeof window !== "undefined" && window.location.search.includes("focus=search"),
     },
     { to: "/tools", label: "Tools", icon: Wrench, match: (p: string) => p.startsWith("/tools") },
-    { to: "/menu/about", label: "Menu", icon: Menu, match: (p: string) => p.startsWith("/menu") || p === "/about" },
+    {
+      to: "/menu/about",
+      label: "Menu",
+      icon: Menu,
+      match: (p: string) => p.startsWith("/menu") || p === "/about",
+    },
   ];
 
   return (
     <nav
       role="navigation"
       aria-label="Primary"
-      className="fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-card/95 backdrop-blur-md gpu-layer"
+      className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card/98 backdrop-blur-xl shadow-[0_-4px_20px_-4px_hsl(var(--foreground)/0.08)] gpu-layer"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="grid grid-cols-4 max-w-lg mx-auto">
+      <ul className="grid grid-cols-4 max-w-lg mx-auto px-2 pt-1.5 pb-1">
         {tabs.map((tab) => {
           const active = tab.match(pathname);
           const Icon = tab.icon;
           return (
-            <li key={tab.label}>
+            <li key={tab.label} className="flex">
               <NavLink
                 to={tab.to}
-                className={`flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold transition-colors active:scale-95 ${
-                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                }`}
                 aria-current={active ? "page" : undefined}
+                className="group relative flex-1 flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl active:scale-95 transition-transform"
               >
-                <Icon className="w-5 h-5" strokeWidth={active ? 2.4 : 2} />
-                <span className="leading-none">{tab.label}</span>
+                {/* Active pill background behind icon */}
+                <span
+                  className={`flex items-center justify-center w-12 h-7 rounded-2xl transition-all ${
+                    active
+                      ? "bg-primary/15"
+                      : "bg-transparent group-hover:bg-muted/60"
+                  }`}
+                >
+                  <Icon
+                    className={`w-[22px] h-[22px] transition-all ${
+                      active ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                    }`}
+                    strokeWidth={active ? 2.5 : 2}
+                  />
+                </span>
+                <span
+                  className={`text-[11px] leading-none tracking-tight transition-colors ${
+                    active ? "text-primary font-bold" : "text-muted-foreground font-semibold group-hover:text-foreground"
+                  }`}
+                >
+                  {tab.label}
+                </span>
+                {/* Top accent indicator for active tab */}
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-1.5 left-1/2 -translate-x-1/2 h-[3px] w-8 rounded-full bg-primary"
+                  />
+                )}
               </NavLink>
             </li>
           );

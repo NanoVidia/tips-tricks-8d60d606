@@ -158,7 +158,7 @@
     unicode-bidi: plaintext;
     /* Reserve space for the fixed BottomTabBar so content/accordions are
        never hidden behind it. The bar height is ~56px + safe-area inset. */
-    --bottom-bar-height: calc(56px + env(safe-area-inset-bottom, 0px));
+    --bottom-bar-height: calc(68px + env(safe-area-inset-bottom, 0px));
     padding-bottom: var(--bottom-bar-height);
   }
 
