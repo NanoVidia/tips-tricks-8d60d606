@@ -457,6 +457,7 @@ export default function Index() {
               aria-label="Go to home"
               className="group relative min-w-0 flex-1 flex items-center text-start cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-90 transition-opacity"
             >
+              <span aria-hidden="true" className="logo-pulse" />
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -inset-x-2 -inset-y-1 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent blur-md opacity-70 group-hover:opacity-100 transition-opacity"
