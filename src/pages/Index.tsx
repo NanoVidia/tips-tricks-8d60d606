@@ -890,6 +890,9 @@ export default function Index() {
         </motion.div>
         )}
         {!activeTab && !isSearching ? (
+          !countsLoaded ? (
+            <HomeSkeleton />
+          ) : (
           <>
             {/* Desktop-only ⌘K hint — hidden on mobile to avoid duplicating the main search bar */}
             <motion.button
