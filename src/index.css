@@ -471,3 +471,54 @@
     animation: none !important;
   }
 }
+
+/* === Logo pulse ring ===
+   Lightweight, GPU-accelerated halo that gently breathes around the header logo.
+   Uses transform/opacity only (no layout/paint thrash) and disables itself on
+   low-end devices and when the user prefers reduced motion. */
+@layer components {
+  .logo-pulse {
+    position: absolute;
+    inset: -6px -10px;
+    border-radius: 1.25rem;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+      ellipse at center,
+      hsl(var(--primary) / 0.28) 0%,
+      hsl(var(--primary) / 0.10) 45%,
+      transparent 75%
+    );
+    transform: translateZ(0) scale(0.96);
+    opacity: 0.55;
+    will-change: transform, opacity;
+    animation: logo-pulse 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  .logo-pulse::after {
+    content: "";
+    position: absolute;
+    inset: 4px 8px;
+    border-radius: 1rem;
+    border: 1px solid hsl(var(--primary) / 0.35);
+    opacity: 0;
+    transform: translateZ(0) scale(0.94);
+    animation: logo-pulse-ring 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes logo-pulse {
+    0%, 100% { transform: translateZ(0) scale(0.96); opacity: 0.45; }
+    50%      { transform: translateZ(0) scale(1.04); opacity: 0.85; }
+  }
+  @keyframes logo-pulse-ring {
+    0%   { transform: translateZ(0) scale(0.94); opacity: 0.55; }
+    70%  { transform: translateZ(0) scale(1.10); opacity: 0;    }
+    100% { transform: translateZ(0) scale(1.10); opacity: 0;    }
+  }
+  html.low-end .logo-pulse,
+  html.reduce-motion .logo-pulse,
+  html.low-end .logo-pulse::after,
+  html.reduce-motion .logo-pulse::after {
+    animation: none !important;
+    opacity: 0.4;
+    will-change: auto;
+  }
+}
