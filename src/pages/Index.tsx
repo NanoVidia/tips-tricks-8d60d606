@@ -17,6 +17,7 @@ import { StatsStrip } from "@/components/StatsStrip";
 import { CaseOfTheDay } from "@/components/CaseOfTheDay";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { HomeHero } from "@/components/HomeHero";
+import { HomeSkeleton } from "@/components/HomeSkeleton";
 import logoImg from "@/assets/logo-tips-tricks.png";
 import { AdSpaceBanner } from "@/components/AdSpaceBanner";
 import { SurgeryCategoriesSheet } from "@/components/SurgeryCategoriesSheet";
@@ -156,6 +157,7 @@ export default function Index() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const { state: activity, setLastSearch, setLastTab, setLastScenario } = useActivityTracker();
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
+  const [countsLoaded, setCountsLoaded] = useState(false);
 
   // Auto-suggest state
   const [suggestions, setSuggestions] = useState<Scenario[]>([]);
@@ -200,6 +202,7 @@ export default function Index() {
       const counts: Record<string, number> = {};
       tabIds.forEach((cat, idx) => { counts[cat] = results[idx].count || 0; });
       setCategoryCounts(counts as Record<ScenarioCategory, number>);
+      setCountsLoaded(true);
     }
     fetchCounts();
   }, []);
@@ -888,6 +891,9 @@ export default function Index() {
         </motion.div>
         )}
         {!activeTab && !isSearching ? (
+          !countsLoaded ? (
+            <HomeSkeleton />
+          ) : (
           <>
             {/* Desktop-only ⌘K hint — hidden on mobile to avoid duplicating the main search bar */}
             <motion.button
@@ -981,6 +987,7 @@ export default function Index() {
             onOpenDailyCase={(c) => openScenarioById(c.id, c.title_en)}
             />
           </>
+          )
         ) : loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
