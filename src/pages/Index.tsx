@@ -466,7 +466,7 @@ export default function Index() {
                 src={dark ? logoImgDark : logoImg}
                 key={dark ? "dark" : "light"}
                 alt={logoText.trim() || "OB/GYN Reference"}
-                className="relative h-10 w-auto max-w-full object-contain drop-shadow-[0_2px_6px_hsl(var(--primary)/0.18)] transition-transform duration-300 group-hover:scale-[1.02]"
+                className="relative h-8 sm:h-10 md:h-11 lg:h-12 w-auto max-w-[60vw] sm:max-w-[280px] md:max-w-[320px] object-contain drop-shadow-[0_2px_6px_hsl(var(--primary)/0.18)] transition-transform duration-300 group-hover:scale-[1.02]"
                 draggable={false}
               />
               <h1 className="sr-only">{logoText.trim() || "OB/GYN Reference"}</h1>
