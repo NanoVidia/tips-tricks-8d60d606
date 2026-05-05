@@ -101,11 +101,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)", opacity: "1" },
           to: { height: "0", opacity: "0" },
         },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         // Same easing for open/close keeps motion symmetric and predictable.
         "accordion-down": "accordion-down 160ms cubic-bezier(0.22, 1, 0.36, 1)",
         "accordion-up": "accordion-up 120ms cubic-bezier(0.4, 0, 1, 1)",
+        shimmer: "shimmer 1.6s infinite",
       },
     },
   },

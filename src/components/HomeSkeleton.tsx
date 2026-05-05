@@ -8,7 +8,7 @@ function Shimmer({ className = "" }: { className?: string }) {
       className={`relative overflow-hidden rounded-2xl bg-muted/40 ${className}`}
       aria-hidden="true"
     >
-      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.6s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
     </div>
   );
 }
