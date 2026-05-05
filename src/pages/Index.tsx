@@ -986,6 +986,7 @@ export default function Index() {
             onOpenDailyCase={(c) => openScenarioById(c.id, c.title_en)}
             />
           </>
+          )
         ) : loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
