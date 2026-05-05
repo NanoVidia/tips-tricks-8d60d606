@@ -156,6 +156,7 @@ export default function Index() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const { state: activity, setLastSearch, setLastTab, setLastScenario } = useActivityTracker();
   const [categoryCounts, setCategoryCounts] = useState<Record<ScenarioCategory, number>>({ clinic: 0, or_labor: 0, behavior: 0, qa: 0 });
+  const [countsLoaded, setCountsLoaded] = useState(false);
 
   // Auto-suggest state
   const [suggestions, setSuggestions] = useState<Scenario[]>([]);
@@ -200,6 +201,7 @@ export default function Index() {
       const counts: Record<string, number> = {};
       tabIds.forEach((cat, idx) => { counts[cat] = results[idx].count || 0; });
       setCategoryCounts(counts as Record<ScenarioCategory, number>);
+      setCountsLoaded(true);
     }
     fetchCounts();
   }, []);
