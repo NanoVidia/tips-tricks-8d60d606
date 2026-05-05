@@ -462,7 +462,8 @@ export default function Index() {
                 className="pointer-events-none absolute -inset-x-2 -inset-y-1 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent blur-md opacity-70 group-hover:opacity-100 transition-opacity"
               />
               <img
-                src={logoImg}
+                src={dark ? logoImgDark : logoImg}
+                key={dark ? "dark" : "light"}
                 alt={logoText.trim() || "OB/GYN Reference"}
                 className="relative h-10 w-auto max-w-full object-contain drop-shadow-[0_2px_6px_hsl(var(--primary)/0.18)] transition-transform duration-300 group-hover:scale-[1.02] dark:brightness-[1.15] dark:contrast-110"
                 draggable={false}
