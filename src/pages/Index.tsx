@@ -18,8 +18,8 @@ import { CaseOfTheDay } from "@/components/CaseOfTheDay";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { HomeHero } from "@/components/HomeHero";
 import { HomeSkeleton } from "@/components/HomeSkeleton";
-import logoImg from "@/assets/logo-tips-tricks.png";
-import logoImgDark from "@/assets/logo-tips-tricks-dark.png";
+
+
 import { AdSpaceBanner } from "@/components/AdSpaceBanner";
 import { SurgeryCategoriesSheet } from "@/components/SurgeryCategoriesSheet";
 import { ExamsFlagsSheet } from "@/components/ExamsFlagsSheet";
@@ -455,21 +455,14 @@ export default function Index() {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               aria-label="Go to home"
-              className="group relative min-w-0 flex-1 flex items-center text-start cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-90 transition-opacity"
+              className="min-w-0 flex-1 flex items-center gap-2 text-start cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-80 transition-opacity"
             >
-              <span aria-hidden="true" className="logo-pulse" />
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-x-2 -inset-y-1 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent blur-md opacity-70 group-hover:opacity-100 transition-opacity"
-              />
-              <img
-                src={dark ? logoImgDark : logoImg}
-                key={dark ? "dark" : "light"}
-                alt={logoText.trim() || "OB/GYN Reference"}
-                className="relative h-8 sm:h-10 md:h-11 lg:h-12 w-auto max-w-[60vw] sm:max-w-[280px] md:max-w-[320px] object-contain drop-shadow-[0_2px_6px_hsl(var(--primary)/0.18)] transition-transform duration-300 group-hover:scale-[1.02]"
-                draggable={false}
-              />
-              <h1 className="sr-only">{logoText.trim() || "OB/GYN Reference"}</h1>
+              <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-primary text-primary-foreground shrink-0 shadow-sm">
+                <Stethoscope className="w-4 h-4" strokeWidth={2.5} />
+              </span>
+              <h1 className="font-bold tracking-tight leading-tight text-foreground text-[17px] truncate">
+                {logoText.trim() || "OB/GYN Reference"}
+              </h1>
             </button>
             <div className="flex items-center gap-1 shrink-0">
               <button
