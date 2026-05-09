@@ -72,6 +72,47 @@ export default function SafeHome() {
     setAnswered(0);
   };
 
+  if (!accepted) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-5 py-8">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-lg p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="w-11 h-11 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center">
+              <ShieldCheck className="w-5 h-5" />
+            </span>
+            <div>
+              <h2 className="font-bold text-[17px] leading-tight">Welcome to Tips &amp; Tricks</h2>
+              <p className="text-[12px] text-muted-foreground">Please review and accept to continue</p>
+            </div>
+          </div>
+          <div className="rounded-xl bg-muted/60 border border-border p-3 text-[13px] leading-relaxed max-h-56 overflow-y-auto">
+            <p className="mb-2">
+              This app provides <strong>general-knowledge entertainment only</strong>.
+              It is <strong>not</strong> medical, legal, or professional advice.
+            </p>
+            <p className="mb-2">
+              Quiz progress is stored locally on your device. No personal data is collected.
+            </p>
+            <p>
+              By tapping <strong>Accept &amp; Continue</strong> you confirm you are 18+
+              and agree to the Terms, Disclaimer, and Privacy notice.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => openLegal("terms")}
+            className="text-[12px] text-primary underline"
+          >
+            Read full Terms &amp; Disclaimer →
+          </button>
+          <Button onClick={acceptLegal} className="w-full" size="lg">
+            <Check className="w-4 h-4 mr-1.5" /> Accept &amp; Continue
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
