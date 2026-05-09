@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { SAFE_QUESTIONS, type SafeQuestion } from "@/data/safeQuestions";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText } from "lucide-react";
+import SafeLegal from "./SafeLegal";
 
 /**
  * Safe Mode landing page.
@@ -9,7 +10,9 @@ import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle } from "lucide-
  * No diagnosis, no treatment, no dosages — pure professional/general knowledge.
  */
 export default function SafeHome() {
+  const [view, setView] = useState<"quiz" | "legal">("quiz");
   const [order, setOrder] = useState<number[]>(() => SAFE_QUESTIONS.map((_, i) => i));
+  if (view === "legal") return <SafeLegal onBack={() => setView("quiz")} />;
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -160,6 +163,21 @@ export default function SafeHome() {
           For general professional knowledge only. Not medical advice.
         </p>
       </main>
+
+      <footer className="border-t border-border bg-card/60">
+        <div className="max-w-2xl mx-auto px-4 py-5 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setView("legal")}
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary hover:underline"
+          >
+            <FileText className="w-4 h-4" /> Terms &amp; Disclaimer
+          </button>
+          <p className="text-[10px] text-muted-foreground text-center">
+            © {new Date().getFullYear()} Tips &amp; Tricks · Educational entertainment only
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
