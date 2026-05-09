@@ -25,6 +25,8 @@ const MenuHub = lazy(() => import("./pages/MenuHub.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
 import { FloatingBackButton } from "./components/FloatingBackButton";
+import { SAFE_MODE } from "./lib/safeMode";
+const SafeHome = lazy(() => import("./pages/SafeHome.tsx"));
 
 function NotificationsBootstrap() {
   useLocalNotifications();
