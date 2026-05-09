@@ -67,7 +67,7 @@ export default function SafeHome() {
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="font-bold text-[16px] leading-tight truncate">
-              OB/GYN Professionals — General Knowledge Quiz
+              Tips &amp; Tricks — General Knowledge
             </h1>
             <p className="text-[11px] text-muted-foreground leading-tight">
               100 non-clinical questions · history, language, communication, career
