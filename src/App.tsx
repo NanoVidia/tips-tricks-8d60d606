@@ -73,6 +73,22 @@ const App = () => {
   const onAdminPanel = path.startsWith("/admin") || path.startsWith("/control");
   const showFreeze = APP_FROZEN && !devUnlocked && !onAdminPanel && !isLovablePreview;
 
+  // SAFE MODE: render only the non-clinical quiz page.
+  // Hides all clinical routes, disclaimer, bottom tabs, and back button.
+  if (SAFE_MODE) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Suspense fallback={<div className="min-h-screen bg-background" />}>
+            <SafeHome />
+          </Suspense>
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
