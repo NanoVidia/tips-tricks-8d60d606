@@ -25,6 +25,7 @@ const MenuHub = lazy(() => import("./pages/MenuHub.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
 import { FloatingBackButton } from "./components/FloatingBackButton";
+import { AccessGate } from "./components/AccessGate";
 import { SAFE_MODE } from "./lib/safeMode";
 const SafeHome = lazy(() => import("./pages/SafeHome.tsx"));
 
@@ -100,9 +101,9 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/index" element={<Index />} />
-              <Route path="/tools" element={<Tools />} />
-              <Route path="/exams" element={<Exams />} />
-              <Route path="/exams/compare" element={<ExamsCompare />} />
+              <Route path="/tools" element={<AccessGate featureLabel="الأدوات السريرية"><Tools /></AccessGate>} />
+              <Route path="/exams" element={<AccessGate featureLabel="الاختبارات وبنك الأسئلة"><Exams /></AccessGate>} />
+              <Route path="/exams/compare" element={<AccessGate featureLabel="مقارنة الاختبارات"><ExamsCompare /></AccessGate>} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/control/login" element={<ControlLoginPage />} />
               <Route path="/control" element={<Control />} />
