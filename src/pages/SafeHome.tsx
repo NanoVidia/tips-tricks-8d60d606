@@ -1,15 +1,19 @@
 import { useMemo, useState } from "react";
 import { SAFE_QUESTIONS, type SafeQuestion } from "@/data/safeQuestions";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck } from "lucide-react";
 import SafeLegal from "./SafeLegal";
+
+const LEGAL_ACCEPTED_KEY = "safe_legal_accepted_v1";
 
 /**
  * Safe Mode landing page.
  * Renders 100 NON-clinical professional questions.
- * No diagnosis, no treatment, no dosages — pure professional/general knowledge.
  */
 export default function SafeHome() {
+  const [accepted, setAccepted] = useState<boolean>(() => {
+    try { return localStorage.getItem(LEGAL_ACCEPTED_KEY) === "1"; } catch { return false; }
+  });
   const [view, setView] = useState<{ name: "quiz" } | { name: "legal"; section?: string }>({ name: "quiz" });
   const [order, setOrder] = useState<number[]>(() => SAFE_QUESTIONS.map((_, i) => i));
   const [idx, setIdx] = useState(0);
@@ -17,10 +21,16 @@ export default function SafeHome() {
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+
+  const acceptLegal = () => {
+    try { localStorage.setItem(LEGAL_ACCEPTED_KEY, "1"); } catch { /* ignore */ }
+    setAccepted(true);
+  };
   const openLegal = (section?: string) => setView({ name: "legal", section });
   if (view.name === "legal") return <SafeLegal onBack={() => setView({ name: "quiz" })} initialSection={view.section} />;
 
   const q: SafeQuestion = useMemo(() => SAFE_QUESTIONS[order[idx]], [order, idx]);
+
 
   const choose = (i: number) => {
     if (revealed) return;
