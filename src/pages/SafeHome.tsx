@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle } from "lucide-
 
 /**
  * Safe Mode landing page.
- * Renders 100 NON-clinical professional questions for OB/GYN doctors.
+ * Renders 100 NON-clinical professional questions.
  * No diagnosis, no treatment, no dosages — pure professional/general knowledge.
  */
 export default function SafeHome() {
