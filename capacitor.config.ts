@@ -1,27 +1,62 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
+/**
+ * Capacitor configuration — base build metadata.
+ *
+ * App identity (used by Google Play & App Store):
+ *  - appId        → Application ID / Package name (UNCHANGEABLE after first publish)
+ *  - appName      → Display name on the device home screen
+ *
+ * Versioning (must be bumped for every Play Store upload):
+ *  - versionName  → Public version shown to users (e.g. "1.0.0")
+ *  - versionCode  → Internal integer; MUST increase on every upload
+ *
+ * To produce a signed AAB for Google Play:
+ *   npm run build && npx cap sync android
+ *   cd android && ./gradlew bundleRelease
+ *   # Output: android/app/build/outputs/bundle/release/app-release.aab
+ *
+ * NOTE: versionName / versionCode below are read by a small Gradle hook
+ * (see android/app/build.gradle snippet in the README) so you can manage
+ * them from one place instead of editing build.gradle each time.
+ */
+export const APP_VERSION_NAME = "1.0.0";
+export const APP_VERSION_CODE = 1;
+
 const config: CapacitorConfig = {
-  appId: "app.lovable.f15d3c7d05d949cb9278ed7124c335f7",
-  appName: "tips-tricks",
+  // ---- Identity ----
+  appId: "app.lovable.tipstricks",
+  appName: "Tips & Tricks",
+
+  // ---- Web build output ----
   webDir: "dist",
+
+  // ---- Base metadata ----
+  // Used by some Capacitor plugins and as the default <html lang="...">
+  // The full marketing description lives in Google Play Console listing.
+  bundledWebRuntime: false,
+
+  // ---- Hot-reload from Lovable sandbox preview ----
+  // Remove the `server` block before producing a production AAB / IPA.
   server: {
     url: "https://f15d3c7d-05d9-49cb-9278-ed7124c335f7.lovableproject.com?forceHideBadge=true",
     cleartext: true,
   },
-  // Android-specific tuning for mid-range devices
+
+  // ---- Android tuning ----
   android: {
-    // Enable hardware-accelerated mixin and let WebView use the GPU
-    backgroundColor: "#f6f9fc",
-    // Smooth scroll + remove default overscroll glow that costs frames
-    overrideUserAgent: undefined,
+    backgroundColor: "#ffffff",
     appendUserAgent: "TipsTricksAndroid",
-    // Only allow remote debugging when explicitly running a debug build
     webContentsDebuggingEnabled: false,
   },
+
+  // ---- iOS tuning ----
   ios: {
-    backgroundColor: "#f6f9fc",
+    backgroundColor: "#ffffff",
     contentInset: "automatic",
   },
+
+  // ---- Plugins ----
   plugins: {
     LocalNotifications: {
       smallIcon: "ic_stat_icon",
@@ -29,7 +64,7 @@ const config: CapacitorConfig = {
     },
     SplashScreen: {
       launchShowDuration: 600,
-      backgroundColor: "#f6f9fc",
+      backgroundColor: "#ffffff",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
