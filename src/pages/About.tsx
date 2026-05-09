@@ -22,11 +22,7 @@ export default function About() {
             An academic reference for women's-health learners
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            <strong>Tips &amp; Tricks</strong> is an educational and reference application
-            for students, learners and people interested in topics related to obstetrics,
-            gynecology and fertility. It is designed for academic review, exam preparation
-            and general guidance — <strong>not</strong> for clinical diagnosis, treatment
-            or emergency use.
+            An educational quiz and reference app for academic study and exam preparation. Includes daily questions, study notes and reference summaries for educational purposes only — not for diagnosis or treatment.
           </p>
         </section>
 
