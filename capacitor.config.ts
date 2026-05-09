@@ -23,6 +23,11 @@ import type { CapacitorConfig } from "@capacitor/cli";
 export const APP_VERSION_NAME = "1.0.0";
 export const APP_VERSION_CODE = 1;
 
+// Set CAP_ENV=production before running `npx cap sync android` to drop the
+// hot-reload server block and produce a fully offline AAB:
+//   CAP_ENV=production npm run build && npx cap sync android
+const isProduction = process.env.CAP_ENV === "production";
+
 const config: CapacitorConfig = {
   // ---- Identity ----
   appId: "app.lovable.tipstricks",
@@ -30,24 +35,24 @@ const config: CapacitorConfig = {
 
   // ---- Web build output ----
   webDir: "dist",
-
-  // ---- Base metadata ----
-  // Used by some Capacitor plugins and as the default <html lang="...">
-  // The full marketing description lives in Google Play Console listing.
   bundledWebRuntime: false,
 
-  // ---- Hot-reload from Lovable sandbox preview ----
-  // Remove the `server` block before producing a production AAB / IPA.
-  server: {
-    url: "https://f15d3c7d-05d9-49cb-9278-ed7124c335f7.lovableproject.com?forceHideBadge=true",
-    cleartext: true,
-  },
+  // ---- Hot-reload from Lovable sandbox preview (DEV only) ----
+  ...(isProduction
+    ? {}
+    : {
+        server: {
+          url: "https://f15d3c7d-05d9-49cb-9278-ed7124c335f7.lovableproject.com?forceHideBadge=true",
+          cleartext: true,
+        },
+      }),
 
   // ---- Android tuning ----
   android: {
     backgroundColor: "#ffffff",
     appendUserAgent: "TipsTricksAndroid",
     webContentsDebuggingEnabled: false,
+    allowMixedContent: false,
   },
 
   // ---- iOS tuning ----
