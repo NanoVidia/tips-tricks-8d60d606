@@ -1,13 +1,13 @@
 {
-  "name": "Tips & Tricks — Daily Knowledge Quiz",
-  "short_name": "Tips & Tricks",
-  "description": "Fun daily quizzes with tips, history, language and career knowledge. Educational entertainment only.",
+  "name": "Tips & Tricks – OB/GYN Daily Knowledge Quiz",
+  "short_name": "Tips & Tricks – OB/GYN",
+  "description": "Educational OB/GYN tips, daily questions and reference summaries for academic study and exam preparation. Educational use only.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "orientation": "portrait",
-  "categories": ["education", "productivity", "lifestyle"],
+  "categories": ["education", "medical", "reference"],
   "icons": [
     {
       "src": "/icon-192.png",
