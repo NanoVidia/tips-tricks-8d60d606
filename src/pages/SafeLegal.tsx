@@ -1,11 +1,24 @@
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 /**
- * Non-clinical Terms & Disclaimer page for Safe Mode.
- * Pure educational/entertainment language — no medical claims.
+ * Non-clinical info & legal hub for Safe Mode.
+ * Sections: About, FAQ, Credits, Changelog, Storage Notice, Terms, Disclaimer, Privacy.
  */
-export default function SafeLegal({ onBack }: { onBack: () => void }) {
+export default function SafeLegal({
+  onBack,
+  initialSection,
+}: {
+  onBack: () => void;
+  initialSection?: string;
+}) {
+  useEffect(() => {
+    if (!initialSection) return;
+    const el = document.getElementById(initialSection);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [initialSection]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
@@ -13,52 +26,167 @@ export default function SafeLegal({ onBack }: { onBack: () => void }) {
           <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
             <ArrowLeft className="w-4 h-4" /> Back
           </Button>
-          <h1 className="font-bold text-[16px] truncate">Terms &amp; Disclaimer</h1>
+          <h1 className="font-bold text-[16px] truncate">Info &amp; Legal</h1>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-5 py-6 space-y-8 pb-24 leading-relaxed">
-        <section className="space-y-3">
-          <h2 className="text-xl font-bold">Terms of Use</h2>
-          <p className="text-sm text-muted-foreground">Last updated: May 2026</p>
+      <main className="max-w-2xl mx-auto px-5 py-6 space-y-10 pb-24 leading-relaxed">
+        {/* About */}
+        <section id="about" className="space-y-3 scroll-mt-20">
+          <h2 className="text-xl font-bold">About</h2>
           <p className="text-sm">
-            <strong>Tips &amp; Tricks</strong> is a general-knowledge and professional-tips
-            entertainment app. By using the app you agree to use it for personal,
-            non-commercial educational entertainment only.
+            <strong>Tips &amp; Tricks</strong> is a light general-knowledge quiz app
+            built for curious minds. Each round mixes history, language, communication
+            and career topics into bite-sized questions you can answer in under a minute.
+          </p>
+          <p className="text-sm">
+            Our goal: make daily learning feel like a small, enjoyable habit — clean
+            interface, no ads in your face, and no account required.
+          </p>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="space-y-3 scroll-mt-20">
+          <h2 className="text-xl font-bold">FAQ</h2>
+          <div className="space-y-3 text-sm">
+            <div>
+              <p className="font-semibold">How do I play?</p>
+              <p className="text-muted-foreground">
+                Pick an answer, read the explanation, then tap Next. Use Shuffle to
+                randomize the order.
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold">Is my progress saved?</p>
+              <p className="text-muted-foreground">
+                Yes — locally on your device. Nothing is uploaded. Reset score anytime.
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold">Do I need an account?</p>
+              <p className="text-muted-foreground">No. The app works fully offline.</p>
+            </div>
+            <div>
+              <p className="font-semibold">Are the questions medical advice?</p>
+              <p className="text-muted-foreground">
+                No. All content is general-knowledge entertainment only.
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold">How can I suggest a question?</p>
+              <p className="text-muted-foreground">
+                Email us at{" "}
+                <a href="mailto:support@tips-tricks.app" className="text-primary underline">
+                  support@tips-tricks.app
+                </a>
+                .
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Credits & Sources */}
+        <section id="credits" className="space-y-3 scroll-mt-20">
+          <h2 className="text-xl font-bold">Credits &amp; Sources</h2>
+          <p className="text-sm">
+            Questions are drawn from publicly available educational and historical
+            references, including:
           </p>
           <ul className="list-disc pr-6 ps-6 space-y-1 text-sm">
-            <li>You must be 18 years or older to use the app.</li>
-            <li>Content (questions, tips, text) is provided “as is” without warranty.</li>
-            <li>Do not copy, resell, or redistribute the content without permission.</li>
-            <li>We may update or change the content and features at any time.</li>
-            <li>Misuse of the app may result in access being revoked.</li>
+            <li>Wikipedia (CC BY-SA) — historical and biographical facts.</li>
+            <li>Merriam-Webster &amp; Oxford dictionaries — word origins.</li>
+            <li>Public-domain books on communication and professional ethics.</li>
+            <li>Open educational resources (OER) for general knowledge.</li>
+          </ul>
+          <p className="text-xs text-muted-foreground">
+            Icons by Lucide. Fonts via system defaults. No third-party trackers.
+          </p>
+        </section>
+
+        {/* Changelog */}
+        <section id="changelog" className="space-y-3 scroll-mt-20">
+          <h2 className="text-xl font-bold">Changelog</h2>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <p className="font-semibold">v1.2 — May 2026</p>
+              <p className="text-muted-foreground">
+                Added Info &amp; Legal hub, FAQ, and storage notice.
+              </p>
+            </li>
+            <li>
+              <p className="font-semibold">v1.1 — May 2026</p>
+              <p className="text-muted-foreground">
+                Introduced Shuffle and Reset Score controls.
+              </p>
+            </li>
+            <li>
+              <p className="font-semibold">v1.0 — May 2026</p>
+              <p className="text-muted-foreground">
+                Initial release — 100 general-knowledge questions.
+              </p>
+            </li>
           </ul>
         </section>
 
-        <section className="space-y-3">
+        {/* Storage Notice */}
+        <section id="storage" className="space-y-3 scroll-mt-20">
+          <h2 className="text-xl font-bold">Local Storage Notice</h2>
+          <p className="text-sm">
+            This app stores a small amount of data on your device only:
+          </p>
+          <ul className="list-disc pr-6 ps-6 space-y-1 text-sm">
+            <li>Your current question index and score.</li>
+            <li>Your accessibility preferences (motion, text size).</li>
+          </ul>
+          <p className="text-sm">
+            No cookies are set, no analytics are sent, and no personal data leaves
+            your device. You can clear all data anytime by clearing the app storage
+            from your system settings.
+          </p>
+        </section>
+
+        {/* Terms */}
+        <section id="terms" className="space-y-3 scroll-mt-20">
+          <h2 className="text-xl font-bold">Terms of Use</h2>
+          <p className="text-sm text-muted-foreground">Last updated: May 2026</p>
+          <p className="text-sm">
+            By using <strong>Tips &amp; Tricks</strong> you agree to use it for
+            personal, non-commercial educational entertainment only.
+          </p>
+          <ul className="list-disc pr-6 ps-6 space-y-1 text-sm">
+            <li>You must be 18 years or older.</li>
+            <li>Content is provided “as is” without warranty.</li>
+            <li>Do not copy, resell, or redistribute the content.</li>
+            <li>We may update content and features at any time.</li>
+          </ul>
+        </section>
+
+        {/* Disclaimer */}
+        <section id="disclaimer" className="space-y-3 scroll-mt-20">
           <h2 className="text-xl font-bold">Disclaimer</h2>
           <div className="rounded-xl border border-amber-300/40 bg-amber-50/60 dark:bg-amber-950/20 p-3 text-[13px] text-amber-900 dark:text-amber-200">
             This app is for <strong>general knowledge and entertainment only</strong>.
-            It is <strong>not</strong> medical, legal, or professional advice and is not
-            intended to diagnose, treat, or guide any health decision.
+            It is <strong>not</strong> medical, legal, or professional advice and is
+            not intended to diagnose, treat, or guide any health decision.
           </div>
           <ul className="list-disc pr-6 ps-6 space-y-1 text-sm">
-            <li>Questions cover history, language, communication and career topics.</li>
             <li>Always consult a qualified professional for personal decisions.</li>
-            <li>The authors are not liable for any action taken based on this content.</li>
+            <li>The authors are not liable for actions taken based on this content.</li>
             <li>In emergencies, contact your local emergency services immediately.</li>
           </ul>
         </section>
 
-        <section className="space-y-3">
+        {/* Privacy */}
+        <section id="privacy" className="space-y-3 scroll-mt-20">
           <h2 className="text-xl font-bold">Privacy</h2>
           <p className="text-sm">
-            The app does not collect personal health data. Quiz progress is stored
-            locally on your device and can be reset at any time.
+            We do not collect personal data. Quiz progress is stored locally on your
+            device and can be reset at any time.
           </p>
         </section>
 
-        <section className="space-y-3">
+        {/* Contact */}
+        <section id="contact" className="space-y-3 scroll-mt-20">
           <h2 className="text-xl font-bold">Contact</h2>
           <p className="text-sm">
             Questions or feedback?{" "}
