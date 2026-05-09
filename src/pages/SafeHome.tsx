@@ -10,14 +10,15 @@ import SafeLegal from "./SafeLegal";
  * No diagnosis, no treatment, no dosages — pure professional/general knowledge.
  */
 export default function SafeHome() {
-  const [view, setView] = useState<"quiz" | "legal">("quiz");
+  const [view, setView] = useState<{ name: "quiz" } | { name: "legal"; section?: string }>({ name: "quiz" });
   const [order, setOrder] = useState<number[]>(() => SAFE_QUESTIONS.map((_, i) => i));
-  if (view === "legal") return <SafeLegal onBack={() => setView("quiz")} />;
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const openLegal = (section?: string) => setView({ name: "legal", section });
+  if (view.name === "legal") return <SafeLegal onBack={() => setView({ name: "quiz" })} initialSection={view.section} />;
 
   const q: SafeQuestion = useMemo(() => SAFE_QUESTIONS[order[idx]], [order, idx]);
 
