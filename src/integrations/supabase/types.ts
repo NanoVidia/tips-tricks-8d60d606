@@ -353,6 +353,45 @@ export type Database = {
         }
         Relationships: []
       }
+      purchase_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          notification_type: number | null
+          order_id: string | null
+          processed: boolean
+          product_id: string | null
+          purchase_token: string | null
+          raw_payload: Json
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          notification_type?: number | null
+          order_id?: string | null
+          processed?: boolean
+          product_id?: string | null
+          purchase_token?: string | null
+          raw_payload?: Json
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          notification_type?: number | null
+          order_id?: string | null
+          processed?: boolean
+          product_id?: string | null
+          purchase_token?: string | null
+          raw_payload?: Json
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       scheduled_notifications: {
         Row: {
           active: boolean
@@ -383,6 +422,60 @@ export type Database = {
           scheduled_at?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          auto_renewing: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          last_verified_at: string | null
+          order_id: string | null
+          plan: Database["public"]["Enums"]["subscription_plan"] | null
+          product_id: string | null
+          purchase_token: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at: string | null
+          trial_started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_renewing?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          last_verified_at?: string | null
+          order_id?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"] | null
+          product_id?: string | null
+          purchase_token?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_renewing?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          last_verified_at?: string | null
+          order_id?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"] | null
+          product_id?: string | null
+          purchase_token?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -590,12 +683,40 @@ export type Database = {
         }
         Relationships: []
       }
+      trial_starts: {
+        Row: {
+          created_at: string
+          device_id: string | null
+          ends_at: string
+          id: string
+          started_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_id?: string | null
+          ends_at: string
+          id?: string
+          started_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string | null
+          ends_at?: string
+          id?: string
+          started_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       cleanup_expired_admin_sessions: { Args: never; Returns: undefined }
+      has_active_access: { Args: { _user_id: string }; Returns: boolean }
       search_scenarios: {
         Args: {
           category_filter?: Database["public"]["Enums"]["scenario_category"]
@@ -626,6 +747,15 @@ export type Database = {
     }
     Enums: {
       scenario_category: "clinic" | "or_labor" | "behavior" | "qa"
+      subscription_plan: "monthly" | "yearly" | "lifetime"
+      subscription_status:
+        | "trial"
+        | "active"
+        | "expired"
+        | "cancelled"
+        | "on_hold"
+        | "paused"
+        | "refunded"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -754,6 +884,16 @@ export const Constants = {
   public: {
     Enums: {
       scenario_category: ["clinic", "or_labor", "behavior", "qa"],
+      subscription_plan: ["monthly", "yearly", "lifetime"],
+      subscription_status: [
+        "trial",
+        "active",
+        "expired",
+        "cancelled",
+        "on_hold",
+        "paused",
+        "refunded",
+      ],
     },
   },
 } as const
