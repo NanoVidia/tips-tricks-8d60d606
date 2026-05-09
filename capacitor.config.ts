@@ -26,7 +26,7 @@ export const APP_VERSION_CODE = 1;
 const config: CapacitorConfig = {
   // ---- Identity ----
   appId: "app.lovable.tipstricks",
-  appName: "Tips & Tricks",
+  appName: "Tips & Tricks – OB/GYN",
 
   // ---- Web build output ----
   webDir: "dist",
