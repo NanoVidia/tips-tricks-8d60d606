@@ -166,13 +166,31 @@ export default function SafeHome() {
       </main>
 
       <footer className="border-t border-border bg-card/60">
-        <div className="max-w-2xl mx-auto px-4 py-5 flex flex-col items-center gap-2">
+        <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {[
+              { id: "about", label: "About" },
+              { id: "faq", label: "FAQ" },
+              { id: "credits", label: "Credits & Sources" },
+              { id: "changelog", label: "Changelog" },
+              { id: "storage", label: "Storage Notice" },
+            ].map((it) => (
+              <button
+                key={it.id}
+                type="button"
+                onClick={() => openLegal(it.id)}
+                className="rounded-xl border border-border bg-background px-3 py-2 text-[12px] font-semibold hover:bg-muted transition-colors"
+              >
+                {it.label}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
-            onClick={() => setView("legal")}
-            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary hover:underline"
+            onClick={() => openLegal("terms")}
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary hover:underline mx-auto block"
           >
-            <FileText className="w-4 h-4" /> Terms &amp; Disclaimer
+            <FileText className="w-4 h-4 inline" /> Terms &amp; Disclaimer
           </button>
           <p className="text-[10px] text-muted-foreground text-center">
             © {new Date().getFullYear()} Tips &amp; Tricks · Educational entertainment only
