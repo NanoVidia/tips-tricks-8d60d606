@@ -1,21 +1,23 @@
 {
-  "name": "Tips & Tricks — Professionals Guide",
+  "name": "Tips & Tricks — Daily Knowledge Quiz",
   "short_name": "Tips & Tricks",
-  "description": "Professional tips, general knowledge, and career insights for women's health specialists.",
-  "id": "/?source=pwa",
-  "start_url": "/?source=pwa",
-  "scope": "/",
+  "description": "Fun daily quizzes with tips, history, language and career knowledge. Educational entertainment only.",
+  "start_url": "/",
   "display": "standalone",
-  "display_override": ["fullscreen", "standalone", "minimal-ui"],
-  "background_color": "#f5f3ee",
-  "theme_color": "#f5f3ee",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "orientation": "portrait",
-  "lang": "en",
-  "dir": "ltr",
   "categories": ["education", "productivity", "lifestyle"],
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }

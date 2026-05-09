@@ -67,7 +67,7 @@ export default function SafeLegal({
               <p className="text-muted-foreground">No. The app works fully offline.</p>
             </div>
             <div>
-              <p className="font-semibold">Are the questions medical advice?</p>
+              <p className="font-semibold">Are the questions professional advice?</p>
               <p className="text-muted-foreground">
                 No. All content is general-knowledge entertainment only.
               </p>
@@ -166,13 +166,13 @@ export default function SafeLegal({
           <h2 className="text-xl font-bold">Disclaimer</h2>
           <div className="rounded-xl border border-amber-300/40 bg-amber-50/60 dark:bg-amber-950/20 p-3 text-[13px] text-amber-900 dark:text-amber-200">
             This app is for <strong>general knowledge and entertainment only</strong>.
-            It is <strong>not</strong> medical, legal, or professional advice and is
-            not intended to diagnose, treat, or guide any health decision.
+            It is <strong>not</strong> professional advice and is not intended to
+            guide any personal, financial, or life decision.
           </div>
           <ul className="list-disc pr-6 ps-6 space-y-1 text-sm">
             <li>Always consult a qualified professional for personal decisions.</li>
             <li>The authors are not liable for actions taken based on this content.</li>
-            <li>In emergencies, contact your local emergency services immediately.</li>
+            <li>For urgent matters, contact the appropriate qualified service.</li>
           </ul>
         </section>
 
