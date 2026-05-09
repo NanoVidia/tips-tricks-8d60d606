@@ -457,12 +457,21 @@ export default function Index() {
               aria-label="Go to home"
               className="min-w-0 flex-1 flex items-center gap-2 text-start cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-80 transition-opacity"
             >
-              <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-primary text-primary-foreground shrink-0 shadow-sm">
-                <Stethoscope className="w-4 h-4" strokeWidth={2.5} />
+              <span className="relative inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-600 text-white shrink-0 shadow-sm" aria-label="Obstetrics & Gynecology">
+                <Baby className="w-4 h-4" strokeWidth={2.5} />
+                <span className="absolute -bottom-1 -end-1 w-3.5 h-3.5 rounded-full bg-card border border-border/60 flex items-center justify-center shadow-sm">
+                  <Stethoscope className="w-2 h-2 text-rose-500" strokeWidth={3} />
+                </span>
               </span>
-              <h1 className="font-bold tracking-tight leading-tight text-foreground text-[17px] truncate">
-                {logoText.trim() || "OB/GYN Reference"}
-              </h1>
+              <div className="min-w-0 flex flex-col">
+                <h1 className="font-bold tracking-tight leading-tight text-foreground text-[17px] truncate">
+                  {logoText.trim() || "OB/GYN Reference"}
+                </h1>
+                <span className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60 text-rose-600 dark:text-rose-300 text-[10px] font-semibold uppercase tracking-wider w-fit">
+                  <Baby className="w-2.5 h-2.5" strokeWidth={2.5} />
+                  OB/GYN
+                </span>
+              </div>
             </button>
             <div className="flex items-center gap-1 shrink-0">
               <button
