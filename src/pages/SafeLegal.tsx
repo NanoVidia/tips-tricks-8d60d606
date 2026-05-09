@@ -183,6 +183,14 @@ export default function SafeLegal({
             We do not collect personal data. Quiz progress is stored locally on your
             device and can be reset at any time.
           </p>
+          <a
+            href="/privacy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-[13px] font-semibold text-primary hover:bg-primary/20 transition-colors"
+          >
+            Open full Privacy Policy ↗
+          </a>
         </section>
 
         {/* Contact */}
