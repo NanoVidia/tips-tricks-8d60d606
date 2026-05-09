@@ -151,7 +151,7 @@ export default function SafeLegal({
           <p className="text-sm text-muted-foreground">Last updated: May 2026</p>
           <p className="text-sm">
             By using <strong>Tips &amp; Tricks</strong> you agree to use it for
-            personal, non-commercial educational entertainment only.
+            personal, non-commercial educational purposes only.
           </p>
           <ul className="list-disc pr-6 ps-6 space-y-1 text-sm">
             <li>You must be 18 years or older.</li>
@@ -159,21 +159,37 @@ export default function SafeLegal({
             <li>Do not copy, resell, or redistribute the content.</li>
             <li>We may update content and features at any time.</li>
           </ul>
+          <a
+            href="/terms.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-[13px] font-semibold text-primary hover:bg-primary/20 transition-colors"
+          >
+            Open full Terms &amp; Disclaimer ↗
+          </a>
         </section>
 
         {/* Disclaimer */}
         <section id="disclaimer" className="space-y-3 scroll-mt-20">
           <h2 className="text-xl font-bold">Disclaimer</h2>
           <div className="rounded-xl border border-amber-300/40 bg-amber-50/60 dark:bg-amber-950/20 p-3 text-[13px] text-amber-900 dark:text-amber-200">
-            This app is for <strong>general knowledge and entertainment only</strong>.
-            It is <strong>not</strong> professional advice and is not intended to
-            guide any personal, financial, or life decision.
+            This app is for <strong>educational and exam-preparation
+            purposes only</strong>. It does <strong>not</strong> provide
+            diagnosis, treatment recommendations, or drug dosages.
           </div>
           <ul className="list-disc pr-6 ps-6 space-y-1 text-sm">
-            <li>Always consult a qualified professional for personal decisions.</li>
+            <li>Always rely on official guidelines and your own clinical judgement.</li>
             <li>The authors are not liable for actions taken based on this content.</li>
-            <li>For urgent matters, contact the appropriate qualified service.</li>
+            <li>For urgent matters, follow your institution's protocols.</li>
           </ul>
+          <a
+            href="/terms.html#disclaimer"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-[13px] font-semibold text-primary underline"
+          >
+            Read full disclaimer ↗
+          </a>
         </section>
 
         {/* Privacy */}
