@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { SAFE_QUESTIONS, type SafeQuestion } from "@/data/safeQuestions";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles } from "lucide-react";
 import SafeLegal from "./SafeLegal";
 
 const LEGAL_ACCEPTED_KEY = "safe_legal_accepted_v1";
@@ -88,7 +88,7 @@ export default function SafeHome() {
           <div className="rounded-xl bg-muted/60 border border-border p-3 text-[13px] leading-relaxed max-h-56 overflow-y-auto">
             <p className="mb-2">
               This app provides <strong>general-knowledge entertainment only</strong>.
-              It is <strong>not</strong> medical, legal, or professional advice.
+              It is for entertainment only and does <strong>not</strong> provide professional advice.
             </p>
             <p className="mb-2">
               Quiz progress is stored locally on your device. No personal data is collected.
@@ -117,15 +117,15 @@ export default function SafeHome() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center font-black text-lg">
-            Q
+          <div className="w-10 h-10 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center">
+            <Sparkles className="w-5 h-5" strokeWidth={2.5} />
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="font-bold text-[16px] leading-tight truncate">
-              Tips &amp; Tricks — General Knowledge
+              Tips &amp; Tricks — Daily Quiz
             </h1>
             <p className="text-[11px] text-muted-foreground leading-tight">
-              100 non-clinical questions · history, language, communication, career
+              100 fun questions · history, language, communication, career
             </p>
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function SafeHome() {
         </div>
 
         <p className="text-center text-[11px] text-muted-foreground pt-2">
-          For general professional knowledge only. Not medical advice.
+          For general knowledge and entertainment only.
         </p>
       </main>
 
