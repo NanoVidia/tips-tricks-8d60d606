@@ -21,7 +21,7 @@ export const PLANS: Plan[] = [
   {
     id: "monthly",
     productId: "obgyn_monthly",
-    price: 7.99,
+    price: 3.99,
     labelEn: "Monthly",
     labelAr: "شهري",
     per: "/mo",
@@ -29,7 +29,7 @@ export const PLANS: Plan[] = [
   {
     id: "yearly",
     productId: "obgyn_yearly",
-    price: 49.99,
+    price: 24.99,
     labelEn: "Yearly",
     labelAr: "سنوي",
     per: "/yr",
@@ -39,7 +39,7 @@ export const PLANS: Plan[] = [
   {
     id: "lifetime",
     productId: "obgyn_lifetime",
-    price: 119.99,
+    price: 59.99,
     labelEn: "Lifetime",
     labelAr: "مدى الحياة",
     per: "one-time",
