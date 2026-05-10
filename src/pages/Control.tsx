@@ -189,7 +189,11 @@ export default function Control() {
   if (!authed) return <Navigate to="/control/login" replace />;
 
   const currentTitle =
-    view === "dashboard" ? "Dashboard" : ADMIN_TABLES_META[view].label;
+    view === "dashboard"
+      ? "Dashboard"
+      : view === "billing"
+        ? "Billing Monitor"
+        : ADMIN_TABLES_META[view].label;
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -237,6 +241,18 @@ export default function Control() {
         <div className="p-4 lg:p-6 max-w-6xl mx-auto">
           {view === "dashboard" ? (
             <ControlDashboard onNavigate={(t) => setView(t)} />
+          ) : view === "billing" ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setView("dashboard")}
+                className="mb-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <ChevronLeft className="h-3 w-3" />
+                Back to dashboard
+              </button>
+              <BillingMonitor />
+            </>
           ) : (
             <>
               <button
