@@ -1,20 +1,25 @@
-// Thin Google Play Billing shim.
+// Google Play Billing shim with server-side verification.
 //
-// On native Android (Capacitor), this wraps `cordova-plugin-purchase` (RMC IAP)
-// which talks directly to Google Play Billing Library v7 and renders the
-// official Play bottom-sheet payment UI — no external website, no redirect.
+// On native Android (Capacitor), wraps `cordova-plugin-purchase` (RMC IAP).
+// On web preview, the plugin is absent and these functions throw, so the
+// Paywall component falls back to local entitlement for testing.
 //
-// On web preview, the plugin is absent and the functions throw, so the Paywall
-// component falls back to a local entitlement for testing.
-//
-// To enable real billing on Android:
-//   1. bun add cordova-plugin-purchase
-//   2. npx cap sync android
-//   3. Add products in Google Play Console with IDs from `plans.ts`.
-//   4. Wire the Service Account JSON into the `verify-purchase` edge function.
+// Flow:
+//   1. Play Billing returns { productId, purchaseToken } on approval.
+//   2. We POST them to the `verify-purchase` edge function which calls the
+//      Google Play Developer API to confirm authenticity.
+//   3. Only after the server confirms, we grant the local entitlement and
+//      acknowledge the transaction (`p.finish()`).
 
 import { PLANS, type PlanId } from "./plans";
 import { grantEntitlement } from "./trial";
+import { supabase } from "@/integrations/supabase/client";
+
+type ApprovedPayload = {
+  id: string;
+  transaction?: { purchaseToken?: string; nativePurchase?: { purchaseToken?: string } };
+  finish: () => void;
+};
 
 type GlobalWithStore = typeof window & {
   CdvPurchase?: {
@@ -24,8 +29,7 @@ type GlobalWithStore = typeof window & {
       order: (productId: string) => Promise<void>;
       restorePurchases: () => Promise<void>;
       when: () => {
-        approved: (cb: (p: { id: string; verify: () => Promise<unknown>; finish: () => void }) => void) => void;
-        verified: (cb: (p: { id: string; finish: () => void }) => void) => void;
+        approved: (cb: (p: ApprovedPayload) => void) => void;
         finished: (cb: (p: { id: string }) => void) => void;
       };
     };
@@ -42,6 +46,15 @@ function getStore() {
   return w.CdvPurchase;
 }
 
+async function verifyOnServer(productId: string, purchaseToken: string) {
+  const { data, error } = await supabase.functions.invoke("verify-purchase", {
+    body: { productId, purchaseToken },
+  });
+  if (error) throw error;
+  if (!data?.ok) throw new Error("server-verification-failed");
+  return data as { ok: true; plan: PlanId; expiresAt: string | null };
+}
+
 export async function initStore() {
   if (initialized) return;
   const { store, ProductType, Platform } = getStore();
@@ -54,11 +67,19 @@ export async function initStore() {
     })),
   );
 
-  store.when().approved((p) => p.verify());
-  store.when().verified((p) => {
-    const plan = PLANS.find((x) => x.productId === p.id);
-    if (plan) grantEntitlement(plan.id);
-    p.finish();
+  store.when().approved(async (p) => {
+    try {
+      const token =
+        p.transaction?.purchaseToken ?? p.transaction?.nativePurchase?.purchaseToken;
+      if (!token) throw new Error("missing-purchase-token");
+      const result = await verifyOnServer(p.id, token);
+      grantEntitlement(result.plan);
+      p.finish();
+    } catch (err) {
+      // Do NOT call finish() — Play will retry verification on next app launch
+      // and the user keeps a record server-side via RTDN webhook.
+      console.error("[billing] server verification failed", err);
+    }
   });
 
   await store.initialize([Platform.GOOGLE_PLAY]);

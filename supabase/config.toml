@@ -11,3 +11,13 @@ verify_jwt = false
 
 [functions.youtube-search]
 verify_jwt = false
+
+[functions.verify-service-account]
+verify_jwt = false
+
+[functions.verify-purchase]
+verify_jwt = false
+
+[functions.play-rtdn-webhook]
+verify_jwt = false
+
