@@ -188,7 +188,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                             </div>
                           </div>
                           <div className="text-left shrink-0">
-                            <div className="font-black text-lg leading-none">${p.price}</div>
+                            <div className="font-black text-lg leading-none">{formatPrice(p.id, p.price)}</div>
                             <div className="text-[10px] text-muted-foreground mt-0.5">{p.per}</div>
                           </div>
                           <div
@@ -303,7 +303,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                     </div>
                     <div className="flex-1 pt-0.5">
                       <div className="font-bold text-[14px]">
-                        اليوم السابع — يبدأ الاشتراك بـ ${selectedPlan.price}
+                        اليوم السابع — يبدأ الاشتراك بـ {formatPrice(selected, selectedPlan.price)}
                         <span className="text-muted-foreground font-medium"> {selectedPlan.per}</span>
                       </div>
                       <div className="text-[12px] text-muted-foreground mt-0.5">
@@ -332,7 +332,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                     <div className="font-bold text-[14px]">{selectedPlan.labelAr}</div>
                   </div>
                   <div className="text-left">
-                    <div className="font-black text-base">${selectedPlan.price}</div>
+                    <div className="font-black text-base">{formatPrice(selected, selectedPlan.price)}</div>
                     <div className="text-[10px] text-muted-foreground">بعد التجربة • {selectedPlan.per}</div>
                   </div>
                 </div>
@@ -364,7 +364,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                 </button>
 
                 <p className="text-[10.5px] text-muted-foreground/80 text-center leading-relaxed mt-4">
-                  بالضغط على «ابدأ التجربة» فإنك توافق على بدء اشتراك يتجدد تلقائياً بسعر ${selectedPlan.price}{" "}
+                  بالضغط على «ابدأ التجربة» فإنك توافق على بدء اشتراك يتجدد تلقائياً بسعر {formatPrice(selected, selectedPlan.price)}{" "}
                   {selectedPlan.per} بعد انتهاء أيام التجربة الـ{TRIAL_DAYS}، عبر حساب Google Play الخاص بك.
                 </p>
               </motion.div>
