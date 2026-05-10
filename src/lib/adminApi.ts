@@ -142,3 +142,50 @@ export async function adminDelete(table: AdminTable, id: string) {
 export async function adminBulkInsert(table: AdminTable, records: Record<string, unknown>[]) {
   return call<{ items: unknown[]; inserted: number }>("bulk_insert", { table, records });
 }
+
+// ---------- Billing monitor ----------
+export interface BillingMonitorData {
+  stats: {
+    total: number;
+    active: number;
+    trial: number;
+    expired: number;
+    canceled: number;
+    byPlan: Record<string, number>;
+  };
+  events24h: number;
+  events7d: number;
+  eventTypes: Record<string, number>;
+  subscriptions: Array<{
+    id: string;
+    user_id: string;
+    plan: string | null;
+    status: string;
+    product_id: string | null;
+    order_id: string | null;
+    purchase_token: string | null;
+    auto_renewing: boolean;
+    current_period_end: string | null;
+    trial_ends_at: string | null;
+    last_verified_at: string | null;
+    created_at: string;
+    updated_at: string;
+  }>;
+  events: Array<{
+    id: string;
+    user_id: string | null;
+    event_type: string;
+    notification_type: number | null;
+    product_id: string | null;
+    order_id: string | null;
+    purchase_token: string | null;
+    raw_payload: Record<string, unknown>;
+    processed: boolean;
+    created_at: string;
+  }>;
+}
+
+export async function adminBillingMonitor(opts: { eventsLimit?: number; subsLimit?: number } = {}) {
+  return call<BillingMonitorData>("billing_monitor", opts);
+}
+
