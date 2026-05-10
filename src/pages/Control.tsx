@@ -55,7 +55,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Palette,
 };
 
-type View = "dashboard" | AdminTable;
+type View = "dashboard" | "billing" | AdminTable;
 
 function NavItem({
   active,
@@ -115,6 +115,16 @@ function Navigation({
         label="Dashboard"
         onClick={() => {
           setView("dashboard");
+          onItemClick?.();
+        }}
+      />
+      <NavItem
+        active={view === "billing"}
+        icon={CreditCard}
+        label="Billing Monitor"
+        badge="LIVE"
+        onClick={() => {
+          setView("billing");
           onItemClick?.();
         }}
       />
