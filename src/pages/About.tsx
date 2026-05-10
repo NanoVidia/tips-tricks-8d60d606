@@ -44,18 +44,17 @@ export default function About() {
           ))}
         </section>
 
-        <section className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5">
-          <h3 className="font-bold text-destructive mb-2">Not a Medical Device</h3>
+        <section className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5" dir="rtl">
+          <h3 className="font-bold text-destructive mb-2">ليس جهازاً طبياً</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            This application does not diagnose, treat, cure or prevent any disease or
-            condition. It does not replace professional medical advice. For any personal
-            health concern please consult a qualified healthcare professional. In an
-            emergency, contact your local emergency services immediately.
+            هذا التطبيق مرجع تعليمي في طب النساء والولادة فقط، ولا يقوم بتشخيص أو علاج أو الوقاية من أي مرض،
+            ولا يُغني عن استشارة طبيب مختص. لأي مشكلة صحية شخصية يُرجى مراجعة طبيب النساء والولادة المعالج،
+            وفي حالات الطوارئ اتصل بخدمات الطوارئ المحلية فوراً.
           </p>
         </section>
 
-        <section>
-          <h3 className="font-semibold mb-3">Legal</h3>
+        <section dir="rtl">
+          <h3 className="font-semibold mb-3">المستندات القانونية</h3>
           <div className="flex flex-wrap gap-3 text-sm">
             <Link to="/terms" className="text-primary underline-offset-4 hover:underline">Terms of Use</Link>
             <span className="text-muted-foreground">·</span>
