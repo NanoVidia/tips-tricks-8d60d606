@@ -56,11 +56,11 @@ export default function About() {
         <section dir="rtl">
           <h3 className="font-semibold mb-3">المستندات القانونية</h3>
           <div className="flex flex-wrap gap-3 text-sm">
-            <Link to="/terms" className="text-primary underline-offset-4 hover:underline">Terms of Use</Link>
+            <Link to="/terms" className="text-primary underline-offset-4 hover:underline">شروط الاستخدام</Link>
             <span className="text-muted-foreground">·</span>
-            <Link to="/privacy" className="text-primary underline-offset-4 hover:underline">Privacy Policy</Link>
+            <Link to="/privacy" className="text-primary underline-offset-4 hover:underline">سياسة الخصوصية</Link>
             <span className="text-muted-foreground">·</span>
-            <Link to="/disclaimer" className="text-primary underline-offset-4 hover:underline">Educational Disclaimer</Link>
+            <Link to="/disclaimer" className="text-primary underline-offset-4 hover:underline">إخلاء المسؤولية التعليمي</Link>
           </div>
         </section>
       </main>
