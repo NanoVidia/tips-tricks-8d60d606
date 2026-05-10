@@ -9,29 +9,32 @@ export default function About() {
           <Link to="/" aria-label="Back to home" className="p-2 rounded-lg hover:bg-muted transition">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-lg font-bold">About — Tips & Tricks</h1>
+          <h1 className="text-lg font-bold">حول التطبيق — Tips & Tricks OB/GYN</h1>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-5 py-8 space-y-8">
-        <section>
+        <section dir="rtl">
           <span className="inline-block text-xs font-semibold uppercase tracking-wider text-primary mb-2">
-            Educational Platform
+            مرجع طب النساء والولادة • OB/GYN Reference
           </span>
           <h2 className="text-3xl font-bold leading-tight mb-3">
-            An academic reference for women's-health learners
+            مرجع تعليمي متخصص في طب النساء والولادة
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            An educational quiz and reference app for academic study and exam preparation. Includes daily questions, study notes and reference summaries for educational purposes only — not for diagnosis or treatment.
+            تطبيق <strong>Tips & Tricks – OB/GYN</strong> هو مرجع أكاديمي متكامل لطلاب الطب والأطباء المقيمين والاختصاصيين في
+            <strong> طب النساء والتوليد</strong>. يضم بنك أسئلة (MCQs)، سيناريوهات سريرية، مكتبة عمليات جراحية،
+            بروتوكولات الطوارئ، أدوية الحمل والإرضاع، وأدوات حسابية متخصصة — لأغراض التعليم والمراجعة الأكاديمية فقط،
+            وليس بديلاً عن التشخيص أو العلاج الطبي.
           </p>
         </section>
 
-        <section className="grid sm:grid-cols-2 gap-4">
+        <section className="grid sm:grid-cols-2 gap-4" dir="rtl">
           {[
-            { icon: BookOpen, title: "Reference Library", body: "Curated educational scenarios, study notes and quick-reference summaries." },
-            { icon: GraduationCap, title: "Exam Preparation", body: "MCQ banks and study modes for academic preparation." },
-            { icon: ShieldCheck, title: "Privacy First", body: "No personal health data is collected. Inputs are processed locally on your device." },
-            { icon: Users, title: "For Learners", body: "Built for students and people interested in women's-health education — not a clinical tool." },
+            { icon: BookOpen, title: "مكتبة OB/GYN المرجعية", body: "سيناريوهات سريرية، عمليات جراحية، بروتوكولات وإرشادات في طب النساء والتوليد." },
+            { icon: GraduationCap, title: "تحضير الامتحانات", body: "بنوك أسئلة MCQs لامتحانات الاختصاص والبورد في النساء والولادة." },
+            { icon: ShieldCheck, title: "خصوصيتك أولاً", body: "لا نجمع أي بيانات صحية شخصية. كل المدخلات تُعالَج محلياً على جهازك." },
+            { icon: Users, title: "لمن هذا التطبيق؟", body: "طلاب الطب، الأطباء المقيمون، اختصاصيو النساء والولادة — مرجع تعليمي وليس أداة سريرية." },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="rounded-2xl border border-border/60 bg-card p-5">
               <Icon className="w-6 h-6 text-primary mb-3" />
