@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
@@ -17,6 +17,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { PLANS, type PlanId, TRIAL_DAYS } from "@/lib/billing/plans";
 import { grantEntitlement } from "@/lib/billing/trial";
+import { getLivePrice, isBillingAvailable } from "@/lib/billing/store";
 import { toast } from "sonner";
 
 interface PaywallProps {
@@ -28,6 +29,29 @@ interface PaywallProps {
 type Step = "plans" | "trial-explainer";
 
 export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
+  // Live localized prices from Google Play (null on web preview).
+  const [livePrices, setLivePrices] = useState<Record<PlanId, string | null>>({
+    monthly: null,
+    yearly: null,
+    lifetime: null,
+  });
+
+  useEffect(() => {
+    const refresh = () => {
+      setLivePrices({
+        monthly: getLivePrice("monthly"),
+        yearly: getLivePrice("yearly"),
+        lifetime: getLivePrice("lifetime"),
+      });
+    };
+    refresh();
+    window.addEventListener("billing-products-updated", refresh);
+    return () => window.removeEventListener("billing-products-updated", refresh);
+  }, []);
+
+  const formatPrice = (planId: PlanId, fallback: number) =>
+    livePrices[planId] ?? `$${fallback}`;
+
   const [selected, setSelected] = useState<PlanId>("yearly");
   const [step, setStep] = useState<Step>("plans");
   const [busy, setBusy] = useState(false);
