@@ -115,6 +115,77 @@ Deno.serve(async (req) => {
       return json({ counts });
     }
 
+    // ========== BILLING MONITOR ==========
+    // Aggregates subscriptions + recent purchase_events for the admin dashboard.
+    if (action === "billing_monitor") {
+      const eventsLimit = Math.min(Number(body.eventsLimit ?? 100), 500);
+      const subsLimit = Math.min(Number(body.subsLimit ?? 100), 500);
+
+      const [subsRes, eventsRes, allSubsCount] = await Promise.all([
+        supabase
+          .from("subscriptions")
+          .select("*")
+          .order("updated_at", { ascending: false })
+          .limit(subsLimit),
+        supabase
+          .from("purchase_events")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(eventsLimit),
+        supabase.from("subscriptions").select("status, plan", { count: "exact" }),
+      ]);
+
+      if (subsRes.error) return json({ error: subsRes.error.message }, 500);
+      if (eventsRes.error) return json({ error: eventsRes.error.message }, 500);
+
+      const subs = subsRes.data ?? [];
+      const events = eventsRes.data ?? [];
+      const allSubs = allSubsCount.data ?? [];
+
+      // Aggregate stats from full subscriptions table.
+      const now = Date.now();
+      const stats = {
+        total: allSubs.length,
+        active: 0,
+        trial: 0,
+        expired: 0,
+        canceled: 0,
+        byPlan: { monthly: 0, yearly: 0, lifetime: 0 } as Record<string, number>,
+      };
+      for (const s of allSubs) {
+        const status = (s as { status?: string }).status ?? "unknown";
+        if (status === "active") stats.active++;
+        else if (status === "trial") stats.trial++;
+        else if (status === "expired") stats.expired++;
+        else if (status === "canceled") stats.canceled++;
+        const plan = (s as { plan?: string }).plan;
+        if (plan && stats.byPlan[plan] !== undefined) stats.byPlan[plan]++;
+      }
+
+      // Event breakdown last 24h / 7d.
+      const day = 24 * 60 * 60 * 1000;
+      const events24h = events.filter(
+        (e) => now - new Date((e as { created_at: string }).created_at).getTime() < day,
+      ).length;
+      const events7d = events.filter(
+        (e) => now - new Date((e as { created_at: string }).created_at).getTime() < 7 * day,
+      ).length;
+      const eventTypes: Record<string, number> = {};
+      for (const e of events) {
+        const t = (e as { event_type?: string }).event_type ?? "unknown";
+        eventTypes[t] = (eventTypes[t] ?? 0) + 1;
+      }
+
+      return json({
+        stats,
+        events24h,
+        events7d,
+        eventTypes,
+        subscriptions: subs,
+        events,
+      });
+    }
+
     // ========== Generic CRUD operations ==========
     const table = body.table as string;
     if (!table || !ALLOWED_TABLES[table]) {
