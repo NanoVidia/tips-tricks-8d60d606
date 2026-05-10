@@ -6,6 +6,7 @@ import {
   BookOpen,
   CalendarDays,
   ChevronLeft,
+  CreditCard,
   GitBranch,
   GraduationCap,
   HelpCircle,
@@ -35,6 +36,7 @@ import {
 } from "@/lib/adminApi";
 import ControlDashboard from "@/components/control/ControlDashboard";
 import TableEditor from "@/components/control/TableEditor";
+import BillingMonitor from "@/components/control/BillingMonitor";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Languages,
