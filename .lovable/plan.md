@@ -1,263 +1,88 @@
-## تقرير الفحص الأولي الشامل
 
-تمت مراجعة بنية التطبيق ومصادر المحتوى وقاعدة البيانات في وضع القراءة فقط. النتيجة الأساسية: التطبيق غني لكنه يحتوي على فجوة واضحة بين الوصف التسويقي/الوظيفي وبين حجم المحتوى الفعلي وجودة بعض العناصر.
+# AAB Readiness Audit + Safe Home Enhancement
 
-### 1) الأسئلة MCQ
+## Part 1 — Infrastructure Audit (read-only findings)
 
-**النتائج الحالية:**
-- قاعدة البيانات تحتوي على **191 سؤالاً نشطاً فقط** في `mcq_questions`، وليست 1000 سؤال فعلياً داخل قاعدة البيانات.
-- بنك الكود الاحتياطي يحتوي تقريباً على **~191 سؤالاً** أيضاً: `MCQ_BANK` + `MCQ_BANK_EXTRA`.
-- التوزيع الحالي جيد كبداية لكنه غير كافٍ لمحاكاة بنك ألف سؤال:
-  - أغلب المواضيع بين 16 و17 سؤالاً.
-  - موضوعات أقل تغطية: Ethics حوالي 8، Menopause/Adolescent حوالي 11، Benign/Urogyn حوالي 11.
-- لا توجد أخطاء بنيوية كبيرة في قاعدة البيانات:
-  - خيارات كل سؤال = 4.
-  - `answer_index` داخل النطاق 0–3.
-  - المراجع موجودة.
-- توجد أسئلة قصيرة أو شرحها غير وافٍ، منها أمثلة محددة:
-  - `con-110`: شرح قصير جداً: “Etonogestrel implant: 3 years.”
-  - `rei-101`: تعريف مختصر جداً.
-  - `urg-105`: شرح مختصر يحتاج تفصيل.
-- يوجد تعارض محتمل داخل البنك الثابت: سؤال “Most common type of urinary incontinence in women” مضبوط على Mixed، بينما كثير من الامتحانات تعتبر Stress الأكثر شيوعاً عرضياً/في المجتمع حسب صياغة السؤال. يحتاج تدقيق صياغة ومصدر.
-- سؤال `lab-002` يقول active phase من 6 cm، بينما `lab-101` يقول conventionally ≥4 cm. هذا ليس خطأ مطلقاً، لكنه يحتاج توحيد منهجي أو توضيح “NICE/old vs ACOG/WHO modern definition”.
+### A. Notifications ✅ Mostly ready
+- `useLocalNotifications` hook syncs from `scheduled_notifications` table to Capacitor `LocalNotifications` plugin on every focus/online event.
+- Permission flow (`checkPermissions` → `requestPermissions`) implemented correctly.
+- Cancels previous schedules to avoid duplicates, supports `none/daily/weekly` repeats.
+- Icon (`ic_stat_icon`) declared in `capacitor.config.ts`.
+- ⚠ Issue: `useLocalNotifications` is mounted **only inside `NotificationsBootstrap`** which lives **inside the non-SAFE branch** of `App.tsx`. In `SAFE_MODE = true` the hook never runs → no notifications scheduled on the released AAB.
+- ⚠ The `scheduled_notifications` table needs at least one active row for testing.
 
-**الاستنتاج:**
-الأسئلة ليست “ألف سؤال” بعد، وبعض الإجابات تحتاج رفع جودة الشرح والمراجع وتوحيد الصياغات حسب الجهة الامتحانية.
+### B. Payments / Google Play Billing ✅ Solid pipeline
+- `initStore()` registers products at boot, listens for `approved`, server-verifies via `verify-purchase` edge function, then calls `p.finish()`.
+- `check-access` edge function reconciles entitlement every 5 min + on focus (via `useAccess`).
+- RTDN webhook `play-rtdn-webhook` handles renewals/cancellations.
+- Admin **Billing Monitor** exposes purchase events.
+- ⚠ Same SAFE_MODE issue: Paywall, AccessGate, billing init are all behind the non-safe branch. In SAFE_MODE the AAB ships **with no IAP UI exposed**, which is fine for first launch but means the in-app product IDs won't show in Play Console "active in app" until SAFE_MODE is turned off.
+- ⚠ `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` secret is set — verify it has Play Developer API access enabled.
 
-### 2) أسئلة صفحة Tools المنفصلة
+### C. App version metadata ⚠ Needs bump before upload
+- `capacitor.config.ts` exports `APP_VERSION_NAME = "1.0.0"` and `APP_VERSION_CODE = 1`.
+- Confirm the Gradle hook in `android/app/build.gradle` actually reads these (mentioned in README, must be present in the local Android project).
+- For every Play upload, `versionCode` MUST increment.
+- `appId: app.lovable.tipstricks` ✅ stable.
+- App display name `Tips & Tricks – OB/GYN` — Google may flag the "OB/GYN" suffix as medical positioning during the SAFE_MODE submission. Recommend a neutral display name for v1.0.0 (e.g. **"Tips & Tricks Daily Quiz"**), then change it after the medical version is approved separately.
+- `index.html` `<title>`, meta description, OG tags still mention "OB/GYN" → align with the safe submission.
 
-**النتائج:**
-- صفحة Tools تحتوي على بنك MCQ صغير مدمج داخل `src/pages/Tools.tsx` من 8 أسئلة فقط.
-- هذا البنك منفصل عن بنك الامتحانات الرئيسي، مما يسبب تكراراً وتفاوتاً في الجودة.
-
-**الاستنتاج:**
-ينبغي توحيد مصدر الأسئلة بحيث تعتمد Tools أيضاً على نفس بنك `mcq_questions`/`useAllMcqs` بدل قائمة صغيرة ثابتة.
-
-### 3) محتوى الجراحات والفيديوهات
-
-**النتائج الحالية:**
-- قاعدة البيانات تحتوي على **112 إجراء جراحي نشط**.
-- كل الإجراءات لديها فيديو و MCQ واحد على الأقل، لكن أغلبها يحتوي على **أقل من سؤالين لكل إجراء**.
-- توجد مؤشرات قوية على فيديوهات غير مثالية أو غير مرتبطة كفاية، مثل:
-  - فيديوهات patient guide أو animation أو shorts.
-  - فيديو “Can I get pregnant after I had my tubes removed??” مستخدم لأكثر من إجراء متعلق بالأنابيب/الحمل خارج الرحم، وهو ليس فيديو تقني جراحي مباشر.
-  - `Diagnostic Hysteroscopy`: فيديو بعنوان Patient Guide.
-  - `Septoplasty`: يظهر كمقطع ENT غير مرتبط بموضوع hysteroscopic septum؛ هذا خطأ نوعي واضح.
-  - `LEEP/Cone`: فيديو instructions وليس تقنية جراحية احترافية.
-  - بعض فيديوهات emergency أقرب لمحاضرات Nursing/NCLEX أو patient education.
-- يوجد نظام تحقق محسّن للفيديوهات في `SurgeryVideo` و`youtube-search`، لكنه يعالج العرض والبحث ولا ينظف كل البيانات الأصلية بعد.
-
-**الاستنتاج:**
-الفيديوهات تحتاج تدقيقاً يدوياً/آلياً عميقاً، واستبدال أو تعطيل الفيديو عندما لا يوجد فيديو تقني موثوق.
-
-### 4) البطاقات الخارجية والسيناريوهات والبحث
-
-**النتائج:**
-- جدول `medical_scenarios` يحتوي على **974 سيناريو**، منها **904 في قسم Q&A**.
-- كل السيناريوهات لديها synonyms حسب الفحص، وهذا جيد للبحث.
-- لكن في Q&A هناك مؤشرات ضعف كبيرة:
-  - 853 من 904 لديها `action/script` قصيرة جداً حسب معيار الطول.
-  - 364 لديها `situation` قصيرة.
-- هذا يعني أن البطاقات الخارجية ونتائج البحث قد تظهر كثيرة لكن بعض المحتوى الداخلي ليس عميقاً بما يكفي.
-
-**الاستنتاج:**
-البحث صار أشمل، لكن جودة النتائج تعتمد على اكتمال الحقول. يجب إثراء Q&A وسيناريوهات البطاقات بمحتوى عملي: core answer، differential، red flags، next step، reference.
-
-### 5) أدوات الصفحة والمحتوى السريري
-
-**النتائج:**
-- البروتوكولات: 6 فقط لكنها مكتملة بنيوياً.
-- الأدوية: 28، وهناك عنصران بملاحظات قصيرة.
-- guidelines: 4 فقط.
-- DDx: 6 فقط.
-- `home_sections` لا يحتوي بيانات نشطة، لكن الصفحة تعتمد غالباً على مكونات ثابتة وليس هذا جدولاً حرجاً حالياً.
-
-**الاستنتاج:**
-صفحة Tools تحتاج توسعة لتكون “مكتبة سريرية” لا مجرد عينات محدودة.
+### D. Home page (SAFE_MODE) ✅ Non-clinical
+- `App.tsx` short-circuits to `SafeHome` when `SAFE_MODE = true`.
+- `SafeHome` only renders 100 generic-knowledge MCQs from `safeQuestions.ts`, plus legal pages.
+- No clinical routes, no disclaimer, no bottom tab bar are mounted.
+- All clinical components (HomeHero, EmergencyStrip, etc.) are tree-shaken from the SAFE bundle because SafeHome doesn't import them.
+- ✅ Safe to submit as-is for AAB review.
 
 ---
 
-## خطة الإصلاح الشاملة
+## Part 2 — Safe Home Enhancement (non-clinical, women & motherhood lifestyle)
 
-### المرحلة 1: إنشاء نظام تدقيق محتوى آلي داخل المشروع
+Add lightweight, **entertainment-only** sections to `SafeHome` in English. Strictly NO medical terms, NO advice, NO drug names, NO procedures. Tone is lifestyle / inspiration / general culture.
 
-سيتم إضافة أدوات فحص داخلية تقرأ كل مصادر المحتوى وتنتج تقرير جودة:
+### New sections (proposed)
+1. **Daily Affirmations for Women** — rotating positive quote of the day from a static list of ~30 generic empowerment quotes.
+2. **Motherhood Wisdom** — short historical/cultural sayings about mothers from world cultures.
+3. **Self-Care Habits** — non-medical lifestyle tips (hydration reminder, journaling prompt, gratitude prompt).
+4. **Famous Women in History** — mini-card series (e.g. Marie Curie, Ada Lovelace) — pure history.
+5. **Word of the Day** — vocabulary builder unrelated to health.
+6. **Today's Reflection** — one open-ended journaling prompt.
 
-- فحص MCQ:
-  - stem كافٍ وواضح.
-  - 4 خيارات غير متكررة.
-  - answerIndex صحيح.
-  - explanation لا يقل عن معيار محدد ويفسر لماذا الإجابة صحيحة ولماذا البدائل أقل صحة عند الحاجة.
-  - reference موجود ومحدد.
-  - كشف التكرارات والتعارضات.
-  - كشف أسئلة “most common” عالية الخطورة التي تحتاج مصدر واضح.
-- فحص الجراحات:
-  - summary، indications، contraindications، preOp، steps، complications، postOp، pearls.
-  - عدد MCQs لكل إجراء.
-  - جودة الفيديو: patient/short/animation/wrong specialty/reused video/low topic match.
-- فحص السيناريوهات:
-  - طول situation/action/script.
-  - وجود synonyms.
-  - وجود red flags وnext step وreference بشكل منطقي.
-- فحص Tools:
-  - البروتوكولات والأدوية وDDx وguidelines من حيث العمق وعدد العناصر.
+All content lives in plain TS data files (no DB), no external API calls, fully offline.
 
-**المخرج:** تقرير قابل للتكرار يحدد كل العناصر الناقصة بالـ ID والسبب والأولوية.
+### UI changes
+- Convert `SafeHome` from a single quiz page into a **3-tab layout**:
+  - **Quiz** (existing 100 questions — unchanged)
+  - **Inspiration** (affirmations + motherhood wisdom + reflection)
+  - **Discover** (famous women + word of the day + self-care habits)
+- Tabs implemented with the existing shadcn `Tabs` component to keep bundle small.
+- Keep the legal acceptance gate and footer untouched.
 
-### المرحلة 2: إصلاح عاجل للأخطاء الواضحة عالية التأثير
-
-سيتم تصحيح العناصر التي ظهرت بالفعل في الفحص:
-
-- توحيد تعريف active labour أو توضيحه حسب المرجع.
-- مراجعة سؤال urinary incontinence “most common” وإعادة صياغته لتجنب الالتباس.
-- توسيع الشروحات القصيرة مثل `con-110`, `rei-101`, `urg-105`.
-- إزالة/استبدال الفيديوهات الواضح أنها غير مناسبة:
-  - patient guide.
-  - shorts.
-  - animation عندما المطلوب إجراء جراحي حقيقي.
-  - فيديوهات specialty خاطئة مثل septoplasty ENT.
-  - الفيديوهات المتكررة غير المناسبة للأنابيب/ectopic.
-- عند عدم توفر فيديو موثوق: عرض “No verified surgical technique video available” بدل تضمين فيديو غير دقيق.
-
-### المرحلة 3: توحيد مصادر الأسئلة في التطبيق
-
-- ربط MCQ في صفحة Tools بنفس مصدر `useAllMcqs` بدلاً من 8 أسئلة ثابتة.
-- إضافة فلترة topic/difficulty داخل تبويب Tools MCQ.
-- منع عرض سؤال لا يمر بمعايير الجودة الأساسية.
-- إضافة شارة مصدر السؤال: Database / Curated / AI-generated.
-
-### المرحلة 4: بناء بنك 1000 سؤال بشكل منظم وليس عشوائياً
-
-بدلاً من إضافة 1000 سؤال دفعة واحدة بدون ضبط، سيتم بناء مصفوفة تغطية:
+### Technical changes section
 
 ```text
-13 Topics × 3 Difficulties × Exam Targets
-= توزيع متوازن يصل إلى 1000 سؤال
+src/pages/SafeHome.tsx           ← refactor: wrap content in <Tabs>
+src/data/safeContent.ts          ← NEW: arrays of affirmations, wisdom, women, words, prompts
+src/components/safe/
+   ├── InspirationTab.tsx        ← NEW
+   └── DiscoverTab.tsx           ← NEW
+src/App.tsx                      ← move useLocalNotifications() into SAFE branch too
+capacitor.config.ts              ← bump APP_VERSION_CODE → 2, optionally rename appName to "Tips & Tricks Daily Quiz"
+index.html                       ← align title/description/OG to neutral wording
 ```
 
-اقتراح التوزيع:
-- Antenatal Care: 90
-- Labour & Delivery: 90
-- Postpartum & PPH: 90
-- Hypertensive Disorders: 90
-- Gestational Diabetes: 70
-- Maternal-Fetal Medicine: 90
-- Gynecologic Oncology: 90
-- REI/Infertility: 80
-- Contraception: 70
-- Urogynecology: 70
-- Benign Gynecology: 80
-- Adolescent & Menopause: 60
-- Ethics & Communication: 50
-- احتياطي مراجعة/OSCE: 70
-
-كل سؤال جديد سيكون له:
-- stem سريري واضح.
-- 4 خيارات متوازنة.
-- إجابة واحدة أفضل.
-- explanation وافٍ.
-- reference محدد.
-- topic/difficulty/exam tags.
-
-### المرحلة 5: إثراء البطاقات الخارجية والسيناريوهات
-
-- تحويل Q&A القصيرة إلى بطاقات تعليمية كاملة:
-  - Clinical question.
-  - Best answer / next step.
-  - Why.
-  - Red flags.
-  - Differentials إن لزم.
-  - Reference.
-- تحسين ترتيب البحث بحيث تظهر:
-  1. الإجابة المباشرة.
-  2. الأصول/المبدأ الأساسي.
-  3. الفروع والأنواع.
-  4. المضاعفات/الاستثناءات.
-  5. الإجراءات والفيديوهات المرتبطة.
-- إضافة “Related branches” داخل بطاقة النتيجة عندما يكون الموضوع له أنواع متعددة مثل tears, HPV, contraception, CTG, hypertensive disorders.
-
-### المرحلة 6: ترقية محتوى الجراحات
-
-- رفع كل إجراء إلى حد أدنى:
-  - 2–3 MCQs لكل إجراء.
-  - steps واضحة ومقسمة.
-  - pitfalls وdanger points.
-  - anatomy/key landmarks عند الحاجة.
-  - contraindications حقيقية لا عامة.
-- إنشاء قائمة مراجعة للفيديو:
-  - مرتبط بنفس الإجراء.
-  - تعليمي للأطباء لا للمرضى.
-  - ليس Shorts.
-  - ليس animation فقط إلا عند عدم وجود بديل وكان مناسباً للتوضيح.
-  - مصدر أكاديمي/جمعية/قناة جراحية موثوقة.
-
-### المرحلة 7: لوحة جودة داخل Control/Admin
-
-إضافة تبويب “Content Quality” في لوحة التحكم يعرض:
-- عدد الأسئلة المقبولة/الناقصة.
-- أسئلة تحتاج مراجعة.
-- فيديوهات تحتاج استبدال.
-- سيناريوهات قصيرة.
-- أدوات ناقصة.
-- زر تصدير التقرير CSV/JSON.
-
-### المرحلة 8: التحقق النهائي
-
-بعد الإصلاح:
-- تشغيل فحص TypeScript/build.
-- تشغيل سكربت جودة المحتوى.
-- تجربة صفحات:
-  - الصفحة الرئيسية والبحث.
-  - Exams simulator.
-  - Tools / MCQ.
-  - Surgery library.
-  - Scenario sheet.
-- تسليم تقرير نهائي قبل/بعد:
-  - عدد الأسئلة.
-  - عدد المشاكل المصححة.
-  - العناصر المتبقية التي تحتاج قرار طبي/مصدر خارجي.
+No edge function changes, no DB migrations, no new dependencies.
 
 ---
 
-## الملفات والجداول التي ستتأثر عند التنفيذ
+## Part 3 — Final pre-upload checklist (manual, outside the code)
 
-**ملفات التطبيق:**
-- `src/data/mcqBank.ts`
-- `src/data/mcqBankExtra.ts`
-- `src/pages/Tools.tsx`
-- `src/components/exams/ExamSimulator.tsx`
-- `src/components/tools/SurgeryLibrary.tsx`
-- `src/components/tools/SurgeryVideo.tsx`
-- `src/lib/clinicalSearch.ts`
-- `src/pages/Index.tsx`
-- `src/components/ClinicalSearchResultCard.tsx`
-- `src/components/ScenarioSheet.tsx`
-- `src/pages/Control.tsx` أو مكونات `src/components/control/*`
-
-**جداول البيانات:**
-- `mcq_questions`
-- `medical_scenarios`
-- `surgeries`
-- `tools_drugs`
-- `tools_guidelines`
-- `tools_ddx`
-- `tools_protocols`
-
-**وظائف الخلفية:**
-- `youtube-search`
-- `generate-mcq` عند الحاجة لضبط جودة توليد الأسئلة.
+1. Run `CAP_ENV=production npm run build && npx cap sync android`.
+2. Bump `versionCode` for every re-upload.
+3. In Play Console: data-safety form, content rating questionnaire, privacy URL → already at `/public/privacy.html`.
+4. Upload signed AAB from `android/app/build/outputs/bundle/release/app-release.aab`.
+5. After approval: flip `SAFE_MODE = false`, bump version, ship the medical version under the same package only if Google explicitly allows it; otherwise keep two separate apps.
 
 ---
 
-## أولوية التنفيذ المقترحة
-
-1. إصلاح الأخطاء الواضحة عالية الخطورة في الأسئلة والفيديوهات.
-2. إضافة سكربت/نظام فحص جودة المحتوى.
-3. توحيد MCQ في Tools مع بنك الأسئلة الرئيسي.
-4. توسيع الشروحات والأسئلة الحالية.
-5. بناء بنك 1000 سؤال تدريجياً بتوزيع علمي.
-6. إثراء السيناريوهات والبطاقات الخارجية.
-7. إضافة لوحة Content Quality.
-8. اختبار شامل وتسليم تقرير نهائي.
-
-هذه الخطة لا تعتمد على التخمين؛ بنيت على فحص فعلي للملفات والجداول الحالية، لكنها في وضع القراءة فقط لم تنفذ تعديلات بعد.
+Approve to proceed with the code changes in Part 2 + the metadata bumps in Part 1-C.

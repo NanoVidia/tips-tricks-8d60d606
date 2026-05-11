@@ -89,6 +89,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <NotificationsBootstrap />
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <SafeHome />
           </Suspense>
