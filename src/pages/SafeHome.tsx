@@ -123,20 +123,17 @@ export default function SafeHome() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
-          {/* Typographic monogram — refined gradient */}
+          {/* Typographic monogram — aligned with clinical blue palette */}
           <div
-            className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md ring-1 ring-white/20"
-            style={{
-              background:
-                'linear-gradient(135deg, hsl(220 70% 22%) 0%, hsl(265 60% 32%) 55%, hsl(330 65% 45%) 100%)',
-            }}
+            className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md ring-1 ring-primary/20"
+            style={{ background: 'var(--gradient-gold)' }}
           >
             <span
-              className="text-[19px] leading-none font-semibold tracking-tight text-white"
+              className="text-[19px] leading-none font-semibold tracking-tight text-primary-foreground"
               style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
               aria-hidden="true"
             >
-              T<span className="text-amber-300/90 italic">&amp;</span>T
+              T<span className="italic text-primary-foreground/70">&amp;</span>T
             </span>
           </div>
           <div className="min-w-0 flex-1">
@@ -146,8 +143,7 @@ export default function SafeHome() {
             >
               <span
                 style={{
-                  background:
-                    'linear-gradient(135deg, hsl(220 70% 22%) 0%, hsl(265 60% 32%) 55%, hsl(330 65% 45%) 100%)',
+                  background: 'var(--gradient-gold)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -155,11 +151,10 @@ export default function SafeHome() {
               >
                 Tips
               </span>{' '}
-              <span className="italic font-medium" style={{ color: 'hsl(35 85% 50%)' }}>&amp;</span>{' '}
+              <span className="italic font-medium text-accent">&amp;</span>{' '}
               <span
                 style={{
-                  background:
-                    'linear-gradient(135deg, hsl(220 70% 22%) 0%, hsl(265 60% 32%) 55%, hsl(330 65% 45%) 100%)',
+                  background: 'var(--gradient-gold)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
