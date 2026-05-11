@@ -1,8 +1,12 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { SAFE_QUESTIONS, type SafeQuestion } from "@/data/safeQuestions";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles, Heart, Compass } from "lucide-react";
 import SafeLegal from "./SafeLegal";
+
+const InspirationTab = lazy(() => import("@/components/safe/InspirationTab"));
+const DiscoverTab = lazy(() => import("@/components/safe/DiscoverTab"));
 
 const LEGAL_ACCEPTED_KEY = "safe_legal_accepted_v1";
 
