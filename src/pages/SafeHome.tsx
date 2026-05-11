@@ -123,22 +123,50 @@ export default function SafeHome() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
-          {/* Typographic monogram — bespoke, no icon */}
-          <div className="w-11 h-11 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-sm ring-1 ring-foreground/10">
+          {/* Typographic monogram — refined gradient */}
+          <div
+            className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md ring-1 ring-white/20"
+            style={{
+              background:
+                'linear-gradient(135deg, hsl(220 70% 22%) 0%, hsl(265 60% 32%) 55%, hsl(330 65% 45%) 100%)',
+            }}
+          >
             <span
-              className="text-[19px] leading-none font-semibold tracking-tight"
+              className="text-[19px] leading-none font-semibold tracking-tight text-white"
               style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
               aria-hidden="true"
             >
-              T<span className="text-background/60">&amp;</span>T
+              T<span className="text-amber-300/90 italic">&amp;</span>T
             </span>
           </div>
           <div className="min-w-0 flex-1">
             <h1
-              className="text-[20px] leading-[1.05] tracking-tight text-foreground"
+              className="text-[20px] leading-[1.05] tracking-tight"
               style={{ fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 700 }}
             >
-              Tips <span className="italic font-medium text-muted-foreground">&amp;</span> Tricks
+              <span
+                style={{
+                  background:
+                    'linear-gradient(135deg, hsl(220 70% 22%) 0%, hsl(265 60% 32%) 55%, hsl(330 65% 45%) 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Tips
+              </span>{' '}
+              <span className="italic font-medium" style={{ color: 'hsl(35 85% 50%)' }}>&amp;</span>{' '}
+              <span
+                style={{
+                  background:
+                    'linear-gradient(135deg, hsl(220 70% 22%) 0%, hsl(265 60% 32%) 55%, hsl(330 65% 45%) 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Tricks
+              </span>
             </h1>
             <p className="text-[10.5px] uppercase tracking-[0.18em] text-muted-foreground leading-tight mt-0.5 font-semibold">
               Daily Quiz · Inspiration · Discovery
