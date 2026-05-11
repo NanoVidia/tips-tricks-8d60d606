@@ -125,7 +125,7 @@ export default function SafeHome() {
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
           {/* Typographic monogram — aligned with clinical blue palette */}
           <div
-            className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md ring-1 ring-primary/20"
+            className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md ring-1 ring-primary/20 animate-logo-pulse motion-reduce:animate-none"
             style={{ background: 'var(--gradient-gold)' }}
           >
             <span
