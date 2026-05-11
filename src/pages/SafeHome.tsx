@@ -2,11 +2,13 @@ import { lazy, Suspense, useMemo, useState } from "react";
 import { SAFE_QUESTIONS, type SafeQuestion } from "@/data/safeQuestions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles, Heart, Compass } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles, Heart, Compass, GraduationCap } from "lucide-react";
 import SafeLegal from "./SafeLegal";
 
 const InspirationTab = lazy(() => import("@/components/safe/InspirationTab"));
 const DiscoverTab = lazy(() => import("@/components/safe/DiscoverTab"));
+const ExamsTab = lazy(() => import("@/components/safe/ExamsTab"));
+const CompanionCard = lazy(() => import("@/components/safe/CompanionCard"));
 
 const LEGAL_ACCEPTED_KEY = "safe_legal_accepted_v1";
 
@@ -136,11 +138,16 @@ export default function SafeHome() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-5 space-y-4 pb-32">
+        <Suspense fallback={<div className="h-32 rounded-3xl bg-muted animate-pulse" />}>
+          <CompanionCard />
+        </Suspense>
+
         <Tabs defaultValue="quiz" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="quiz" className="gap-1.5"><Sparkles className="w-3.5 h-3.5" />Quiz</TabsTrigger>
-            <TabsTrigger value="inspire" className="gap-1.5"><Heart className="w-3.5 h-3.5" />Inspire</TabsTrigger>
-            <TabsTrigger value="discover" className="gap-1.5"><Compass className="w-3.5 h-3.5" />Discover</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 h-auto">
+            <TabsTrigger value="quiz" className="gap-1 text-[11px] px-1.5 py-2 flex-col sm:flex-row sm:text-[13px]"><Sparkles className="w-3.5 h-3.5" />Quiz</TabsTrigger>
+            <TabsTrigger value="exams" className="gap-1 text-[11px] px-1.5 py-2 flex-col sm:flex-row sm:text-[13px]"><GraduationCap className="w-3.5 h-3.5" />Exams</TabsTrigger>
+            <TabsTrigger value="inspire" className="gap-1 text-[11px] px-1.5 py-2 flex-col sm:flex-row sm:text-[13px]"><Heart className="w-3.5 h-3.5" />Inspire</TabsTrigger>
+            <TabsTrigger value="discover" className="gap-1 text-[11px] px-1.5 py-2 flex-col sm:flex-row sm:text-[13px]"><Compass className="w-3.5 h-3.5" />Discover</TabsTrigger>
           </TabsList>
 
           <TabsContent value="quiz" className="space-y-4 mt-4">
@@ -226,6 +233,12 @@ export default function SafeHome() {
             <p className="text-center text-[11px] text-muted-foreground pt-2">
               For general knowledge and entertainment only.
             </p>
+          </TabsContent>
+
+          <TabsContent value="exams" className="mt-4">
+            <Suspense fallback={<div className="h-40 rounded-2xl bg-muted animate-pulse" />}>
+              <ExamsTab />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="inspire" className="mt-4">
