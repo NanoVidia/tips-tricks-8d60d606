@@ -104,12 +104,17 @@ export default {
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
+        "logo-pulse": {
+          "0%, 100%": { transform: "scale(1)", boxShadow: "0 0 0 0 hsl(var(--primary) / 0.35)" },
+          "50%": { transform: "scale(1.04)", boxShadow: "0 0 0 6px hsl(var(--primary) / 0)" },
+        },
       },
       animation: {
         // Same easing for open/close keeps motion symmetric and predictable.
         "accordion-down": "accordion-down 160ms cubic-bezier(0.22, 1, 0.36, 1)",
         "accordion-up": "accordion-up 120ms cubic-bezier(0.4, 0, 1, 1)",
         shimmer: "shimmer 1.6s infinite",
+        "logo-pulse": "logo-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },
