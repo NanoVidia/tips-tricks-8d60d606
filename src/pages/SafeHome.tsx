@@ -235,6 +235,12 @@ export default function SafeHome() {
             </p>
           </TabsContent>
 
+          <TabsContent value="exams" className="mt-4">
+            <Suspense fallback={<div className="h-40 rounded-2xl bg-muted animate-pulse" />}>
+              <ExamsTab />
+            </Suspense>
+          </TabsContent>
+
           <TabsContent value="inspire" className="mt-4">
             <Suspense fallback={<div className="h-40 rounded-2xl bg-muted animate-pulse" />}>
               <InspirationTab />
