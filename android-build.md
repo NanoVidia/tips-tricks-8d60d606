@@ -201,3 +201,26 @@ After your first AAB is uploaded:
 - [ ] Screenshots (min 2 phone screenshots, 1080×1920)
 - [ ] Feature graphic 1024×500
 - [ ] App icon 512×512
+
+---
+
+## ✅ Google Play 2025 compliance checklist
+
+- **`targetSdkVersion = 34`** (or higher) — required since Aug 2025.
+  In `android/app/build.gradle` ensure:
+  ```gradle
+  android {
+    compileSdk 34
+    defaultConfig { targetSdk 34; minSdk 23 }
+  }
+  ```
+- **Android 13+ notifications** — add to `android/app/src/main/AndroidManifest.xml`:
+  ```xml
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  ```
+- **Restore Purchases** button is wired in the app footer (`SafeHome.tsx`).
+- **Privacy / Terms / Disclaimer** are publicly accessible (no login) at
+  `/privacy.html`, `/terms.html`, and inside the in-app *Info & Legal* hub.
+- **Data Safety form** (Play Console): declare email (auth), purchase data,
+  and FCM/local notifications.
+- **Content rating**: target *Everyone* — keep SAFE_MODE on for review.
