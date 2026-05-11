@@ -122,16 +122,26 @@ export default function SafeHome() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center">
-            <Sparkles className="w-5 h-5" strokeWidth={2.5} />
+        <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
+          {/* Typographic monogram — bespoke, no icon */}
+          <div className="w-11 h-11 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-sm ring-1 ring-foreground/10">
+            <span
+              className="text-[19px] leading-none font-semibold tracking-tight"
+              style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+              aria-hidden="true"
+            >
+              T<span className="text-background/60">&amp;</span>T
+            </span>
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="font-bold text-[16px] leading-tight truncate">
-              Tips &amp; Tricks — Daily Quiz
+            <h1
+              className="text-[20px] leading-[1.05] tracking-tight text-foreground"
+              style={{ fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 700 }}
+            >
+              Tips <span className="italic font-medium text-muted-foreground">&amp;</span> Tricks
             </h1>
-          <p className="text-[11px] text-muted-foreground leading-tight">
-              Daily quiz, inspiration, and a touch of discovery
+            <p className="text-[10.5px] uppercase tracking-[0.18em] text-muted-foreground leading-tight mt-0.5 font-semibold">
+              Daily Quiz · Inspiration · Discovery
             </p>
           </div>
         </div>
