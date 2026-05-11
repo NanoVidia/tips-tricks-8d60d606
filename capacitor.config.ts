@@ -20,8 +20,8 @@ import type { CapacitorConfig } from "@capacitor/cli";
  * (see android/app/build.gradle snippet in the README) so you can manage
  * them from one place instead of editing build.gradle each time.
  */
-export const APP_VERSION_NAME = "1.0.0";
-export const APP_VERSION_CODE = 1;
+export const APP_VERSION_NAME = "1.0.1";
+export const APP_VERSION_CODE = 2;
 
 // Set CAP_ENV=production before running `npx cap sync android` to drop the
 // hot-reload server block and produce a fully offline AAB:
@@ -31,7 +31,7 @@ const isProduction = process.env.CAP_ENV === "production";
 const config: CapacitorConfig = {
   // ---- Identity ----
   appId: "app.lovable.tipstricks",
-  appName: "Tips & Tricks – OB/GYN",
+  appName: "Tips & Tricks Daily Quiz",
 
   // ---- Web build output ----
   webDir: "dist",
