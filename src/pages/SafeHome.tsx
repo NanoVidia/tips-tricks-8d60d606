@@ -291,6 +291,14 @@ export default function SafeHome() {
 
       <footer className="border-t border-border bg-card/60">
         <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+          {/* Disclaimer banner — required for store review */}
+          <div className="rounded-xl border border-amber-300/40 bg-amber-50/60 dark:bg-amber-950/20 p-3 text-[12px] leading-relaxed text-amber-900 dark:text-amber-200">
+            <strong>Disclaimer:</strong> This app provides general educational and
+            lifestyle content only. It is <strong>not</strong> medical advice,
+            diagnosis, or treatment. Always consult a qualified professional for
+            personal decisions.
+          </div>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {[
               { id: "about", label: "About" },
@@ -298,6 +306,7 @@ export default function SafeHome() {
               { id: "credits", label: "Credits & Sources" },
               { id: "changelog", label: "Changelog" },
               { id: "storage", label: "Storage Notice" },
+              { id: "privacy", label: "Privacy" },
             ].map((it) => (
               <button
                 key={it.id}
@@ -309,6 +318,28 @@ export default function SafeHome() {
               </button>
             ))}
           </div>
+
+          {/* Restore Purchases — required by Google Play for paid apps */}
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                const m = await import("@/lib/billing/store");
+                if (!m.isBillingAvailable()) {
+                  toast.info("Restore is available on the installed Android app.");
+                  return;
+                }
+                await m.restore();
+                toast.success("Purchases restored.");
+              } catch (e) {
+                toast.error("Could not restore purchases. Please try again.");
+              }
+            }}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-[13px] font-semibold hover:bg-muted transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" /> Restore Purchases
+          </button>
+
           <button
             type="button"
             onClick={() => openLegal("terms")}
