@@ -128,96 +128,118 @@ export default function SafeHome() {
             <h1 className="font-bold text-[16px] leading-tight truncate">
               Tips &amp; Tricks — Daily Quiz
             </h1>
-            <p className="text-[11px] text-muted-foreground leading-tight">
-              100 fun questions · history, language, communication, career
+          <p className="text-[11px] text-muted-foreground leading-tight">
+              Daily quiz, inspiration, and a touch of discovery
             </p>
           </div>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-5 space-y-4 pb-32">
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-2">
-          <div className="rounded-xl border border-border bg-card p-3 text-center">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Question</p>
-            <p className="text-lg font-black tabular-nums">{idx + 1}<span className="text-muted-foreground text-sm">/{SAFE_QUESTIONS.length}</span></p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-3 text-center">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Answered</p>
-            <p className="text-lg font-black tabular-nums">{answered}</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-3 text-center">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Score</p>
-            <p className="text-lg font-black tabular-nums">{score}</p>
-          </div>
-        </div>
+        <Tabs defaultValue="quiz" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="quiz" className="gap-1.5"><Sparkles className="w-3.5 h-3.5" />Quiz</TabsTrigger>
+            <TabsTrigger value="inspire" className="gap-1.5"><Heart className="w-3.5 h-3.5" />Inspire</TabsTrigger>
+            <TabsTrigger value="discover" className="gap-1.5"><Compass className="w-3.5 h-3.5" />Discover</TabsTrigger>
+          </TabsList>
 
-        {/* Question card */}
-        <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-primary mb-2">
-            Question #{q.id}
-          </p>
-          <h2 className="text-[17px] font-bold leading-snug mb-4">{q.q}</h2>
-
-          <div className="space-y-2">
-            {q.options.map((opt, i) => {
-              const isCorrect = revealed && i === q.answer;
-              const isWrongPick = revealed && picked === i && i !== q.answer;
-              const base = "w-full text-left rounded-xl border px-3 py-2.5 text-[14px] transition-colors flex items-start gap-2";
-              let cls = "border-border bg-background hover:bg-muted";
-              if (isCorrect) cls = "border-green-500 bg-green-50 dark:bg-green-950/30 text-green-900 dark:text-green-100";
-              else if (isWrongPick) cls = "border-red-500 bg-red-50 dark:bg-red-950/30 text-red-900 dark:text-red-100";
-              else if (revealed) cls = "border-border bg-background opacity-70";
-
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => choose(i)}
-                  disabled={revealed}
-                  className={`${base} ${cls}`}
-                >
-                  <span className="shrink-0 w-6 h-6 rounded-full border border-current/40 flex items-center justify-center text-[11px] font-black">
-                    {String.fromCharCode(65 + i)}
-                  </span>
-                  <span className="flex-1">{opt}</span>
-                  {isCorrect && <Check className="w-4 h-4 shrink-0 mt-0.5" />}
-                  {isWrongPick && <X className="w-4 h-4 shrink-0 mt-0.5" />}
-                </button>
-              );
-            })}
-          </div>
-
-          {revealed && q.explain && (
-            <div className="mt-4 rounded-xl bg-muted/60 border border-border p-3">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Explanation</p>
-              <p className="text-[13px] leading-relaxed">{q.explain}</p>
+          <TabsContent value="quiz" className="space-y-4 mt-4">
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-xl border border-border bg-card p-3 text-center">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Question</p>
+                <p className="text-lg font-black tabular-nums">{idx + 1}<span className="text-muted-foreground text-sm">/{SAFE_QUESTIONS.length}</span></p>
+              </div>
+              <div className="rounded-xl border border-border bg-card p-3 text-center">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Answered</p>
+                <p className="text-lg font-black tabular-nums">{answered}</p>
+              </div>
+              <div className="rounded-xl border border-border bg-card p-3 text-center">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Score</p>
+                <p className="text-lg font-black tabular-nums">{score}</p>
+              </div>
             </div>
-          )}
-        </article>
 
-        {/* Controls */}
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={prev} className="flex-1">
-            <ChevronLeft className="w-4 h-4 mr-1" /> Prev
-          </Button>
-          <Button onClick={next} className="flex-1">
-            Next <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
-        </div>
+            {/* Question card */}
+            <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-primary mb-2">
+                Question #{q.id}
+              </p>
+              <h2 className="text-[17px] font-bold leading-snug mb-4">{q.q}</h2>
 
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" onClick={shuffle} className="flex-1">
-            <Shuffle className="w-4 h-4 mr-1" /> Shuffle
-          </Button>
-          <Button variant="ghost" onClick={reset} className="flex-1">
-            <RotateCcw className="w-4 h-4 mr-1" /> Reset score
-          </Button>
-        </div>
+              <div className="space-y-2">
+                {q.options.map((opt, i) => {
+                  const isCorrect = revealed && i === q.answer;
+                  const isWrongPick = revealed && picked === i && i !== q.answer;
+                  const base = "w-full text-left rounded-xl border px-3 py-2.5 text-[14px] transition-colors flex items-start gap-2";
+                  let cls = "border-border bg-background hover:bg-muted";
+                  if (isCorrect) cls = "border-green-500 bg-green-50 dark:bg-green-950/30 text-green-900 dark:text-green-100";
+                  else if (isWrongPick) cls = "border-red-500 bg-red-50 dark:bg-red-950/30 text-red-900 dark:text-red-100";
+                  else if (revealed) cls = "border-border bg-background opacity-70";
 
-        <p className="text-center text-[11px] text-muted-foreground pt-2">
-          For general knowledge and entertainment only.
-        </p>
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => choose(i)}
+                      disabled={revealed}
+                      className={`${base} ${cls}`}
+                    >
+                      <span className="shrink-0 w-6 h-6 rounded-full border border-current/40 flex items-center justify-center text-[11px] font-black">
+                        {String.fromCharCode(65 + i)}
+                      </span>
+                      <span className="flex-1">{opt}</span>
+                      {isCorrect && <Check className="w-4 h-4 shrink-0 mt-0.5" />}
+                      {isWrongPick && <X className="w-4 h-4 shrink-0 mt-0.5" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {revealed && q.explain && (
+                <div className="mt-4 rounded-xl bg-muted/60 border border-border p-3">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Explanation</p>
+                  <p className="text-[13px] leading-relaxed">{q.explain}</p>
+                </div>
+              )}
+            </article>
+
+            {/* Controls */}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={prev} className="flex-1">
+                <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+              </Button>
+              <Button onClick={next} className="flex-1">
+                Next <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={shuffle} className="flex-1">
+                <Shuffle className="w-4 h-4 mr-1" /> Shuffle
+              </Button>
+              <Button variant="ghost" onClick={reset} className="flex-1">
+                <RotateCcw className="w-4 h-4 mr-1" /> Reset score
+              </Button>
+            </div>
+
+            <p className="text-center text-[11px] text-muted-foreground pt-2">
+              For general knowledge and entertainment only.
+            </p>
+          </TabsContent>
+
+          <TabsContent value="inspire" className="mt-4">
+            <Suspense fallback={<div className="h-40 rounded-2xl bg-muted animate-pulse" />}>
+              <InspirationTab />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="discover" className="mt-4">
+            <Suspense fallback={<div className="h-40 rounded-2xl bg-muted animate-pulse" />}>
+              <DiscoverTab />
+            </Suspense>
+          </TabsContent>
+        </Tabs>
       </main>
 
       <footer className="border-t border-border bg-card/60">
