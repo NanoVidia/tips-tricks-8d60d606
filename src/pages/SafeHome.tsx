@@ -2,9 +2,10 @@ import { lazy, Suspense, useMemo, useState } from "react";
 import { SAFE_QUESTIONS, type SafeQuestion } from "@/data/safeQuestions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles, Heart, Compass, GraduationCap, RefreshCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles, Heart, Compass, GraduationCap, RefreshCw, Bell } from "lucide-react";
 import SafeLegal from "./SafeLegal";
 import { toast } from "sonner";
+import { fireTestNotification } from "@/hooks/useLocalNotifications";
 
 const InspirationTab = lazy(() => import("@/components/safe/InspirationTab"));
 const DiscoverTab = lazy(() => import("@/components/safe/DiscoverTab"));
@@ -358,6 +359,27 @@ export default function SafeHome() {
           >
             <RefreshCw className={`w-4 h-4 ${restoring ? "animate-spin" : ""}`} />
             {restoring ? "Restoring…" : "Restore Purchases"}
+          </button>
+
+          {/* Test notification — verifies Android channel + permission on the device */}
+          <button
+            type="button"
+            onClick={async () => {
+              const tId = toast.loading("Sending a test notification…");
+              const result = await fireTestNotification();
+              if (result === "ok") {
+                toast.success("A test notification will appear in ~5 seconds.", { id: tId });
+              } else if (result === "web") {
+                toast.info("Test notifications work on the installed Android app.", { id: tId });
+              } else if (result === "denied") {
+                toast.error("Notification permission denied. Enable it in system settings.", { id: tId });
+              } else {
+                toast.error("Could not send test notification.", { id: tId });
+              }
+            }}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-[13px] font-semibold hover:bg-muted transition-colors"
+          >
+            <Bell className="w-4 h-4" /> Test Notification
           </button>
 
           <button
