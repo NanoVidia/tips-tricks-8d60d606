@@ -2,9 +2,10 @@ import { lazy, Suspense, useMemo, useState } from "react";
 import { SAFE_QUESTIONS, type SafeQuestion } from "@/data/safeQuestions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles, Heart, Compass, GraduationCap, RefreshCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, ShieldCheck, Sparkles, Heart, Compass, GraduationCap, RefreshCw, Bell } from "lucide-react";
 import SafeLegal from "./SafeLegal";
 import { toast } from "sonner";
+import { fireTestNotification } from "@/hooks/useLocalNotifications";
 
 const InspirationTab = lazy(() => import("@/components/safe/InspirationTab"));
 const DiscoverTab = lazy(() => import("@/components/safe/DiscoverTab"));
