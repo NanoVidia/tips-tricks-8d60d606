@@ -28,6 +28,7 @@ export default function SafeHome() {
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const [restoring, setRestoring] = useState(false);
 
   const acceptLegal = () => {
     try { localStorage.setItem(LEGAL_ACCEPTED_KEY, "1"); } catch { /* ignore */ }
