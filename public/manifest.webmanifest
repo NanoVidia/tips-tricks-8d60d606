@@ -1,23 +1,52 @@
 {
-  "name": "Tips & Tricks – OB/GYN Daily Knowledge Quiz",
-  "short_name": "Tips & Tricks – OB/GYN",
-  "description": "Educational OB/GYN tips, daily questions and reference summaries for academic study and exam preparation. Educational use only.",
-  "start_url": "/",
+  "name": "Tips & Tricks Daily Quiz",
+  "short_name": "Tips & Tricks",
+  "description": "A daily dose of fun trivia, inspiring quotes, vocabulary and lifestyle tips. Educational entertainment only — not professional advice.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#0ea5e9",
   "orientation": "portrait",
-  "categories": ["education", "medical", "reference"],
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "lifestyle", "entertainment"],
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daily Quiz",
+      "short_name": "Quiz",
+      "description": "Jump into today's quiz",
+      "url": "/?tab=quiz",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Inspiration",
+      "short_name": "Inspire",
+      "description": "Daily inspiring quotes",
+      "url": "/?tab=inspire",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
