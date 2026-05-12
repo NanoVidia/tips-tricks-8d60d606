@@ -22,9 +22,9 @@ const corsHeaders = {
 
 const PACKAGE_NAME = "app.lovable.tipstricks";
 const PRODUCT_TO_PLAN: Record<string, "monthly" | "yearly" | "lifetime"> = {
-  obgyn_monthly: "monthly",
-  obgyn_yearly: "yearly",
-  obgyn_lifetime: "lifetime",
+  tt_monthly: "monthly",
+  tt_yearly: "yearly",
+  tt_lifetime: "lifetime",
 };
 
 // ---- Google OAuth (same helper as verify-purchase) ----

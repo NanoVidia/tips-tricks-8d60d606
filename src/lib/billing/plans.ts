@@ -20,7 +20,7 @@ export interface Plan {
 export const PLANS: Plan[] = [
   {
     id: "monthly",
-    productId: "obgyn_monthly",
+    productId: "tt_monthly",
     price: 7.99,
     labelEn: "Monthly",
     labelAr: "شهري",
@@ -28,7 +28,7 @@ export const PLANS: Plan[] = [
   },
   {
     id: "yearly",
-    productId: "obgyn_yearly",
+    productId: "tt_yearly",
     price: 49.99,
     labelEn: "Yearly",
     labelAr: "سنوي",
@@ -38,7 +38,7 @@ export const PLANS: Plan[] = [
   },
   {
     id: "lifetime",
-    productId: "obgyn_lifetime",
+    productId: "tt_lifetime",
     price: 119.99,
     labelEn: "Lifetime",
     labelAr: "مدى الحياة",
