@@ -127,6 +127,15 @@ jobs:
           fi
           echo "✓ Keystore credentials look valid"
 
+      - name: 🔎 Print keystore entries (no secrets)
+        env:
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          echo "── Keystore entries ──"
+          keytool -list -keystore android/app/release.keystore -storepass "$KS_PASS" -v 2>/dev/null | grep -E "Alias|Entry type|Creation date" || \
+          keytool -list -keystore android/app/release.keystore -storepass "$KS_PASS" 2>/dev/null
+          echo "── Make sure ANDROID_KEY_ALIAS matches one of the aliases above ──"
+
       - name: ✍️ Inject signing config into build.gradle
         run: |
           GRADLE_FILE="android/app/build.gradle"
