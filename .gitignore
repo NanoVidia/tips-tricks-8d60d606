@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+scripts/keystore-to-secrets.sh
+
+# Local keystore output (never commit)
+keystore-secrets/
+*.keystore
+*.jks
