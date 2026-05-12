@@ -28,6 +28,7 @@ export default function SafeHome() {
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const [restoring, setRestoring] = useState(false);
 
   const acceptLegal = () => {
     try { localStorage.setItem(LEGAL_ACCEPTED_KEY, "1"); } catch { /* ignore */ }
@@ -322,22 +323,41 @@ export default function SafeHome() {
           {/* Restore Purchases — required by Google Play for paid apps */}
           <button
             type="button"
+            disabled={restoring}
             onClick={async () => {
+              if (restoring) return;
+              setRestoring(true);
+              const toastId = toast.loading("Checking with Google Play…");
               try {
                 const m = await import("@/lib/billing/store");
                 if (!m.isBillingAvailable()) {
-                  toast.info("Restore is available on the installed Android app.");
+                  toast.info("Restore is available on the installed Android app.", { id: toastId });
                   return;
                 }
+                // Snapshot entitlement before, so we can detect if anything was restored.
+                const { getAccessState } = await import("@/lib/billing/trial");
+                const before = getAccessState();
                 await m.restore();
-                toast.success("Purchases restored.");
+                // Give the async `approved` callbacks a moment to verify on the server.
+                await new Promise((r) => setTimeout(r, 1500));
+                const after = getAccessState();
+                const changed = JSON.stringify(before) !== JSON.stringify(after);
+                if (changed) {
+                  toast.success("Purchases restored successfully.", { id: toastId });
+                } else {
+                  toast.info("No previous purchases found on this account.", { id: toastId });
+                }
               } catch (e) {
-                toast.error("Could not restore purchases. Please try again.");
+                console.error("[restore]", e);
+                toast.error("Could not restore purchases. Please try again.", { id: toastId });
+              } finally {
+                setRestoring(false);
               }
             }}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-[13px] font-semibold hover:bg-muted transition-colors"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-[13px] font-semibold hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <RefreshCw className="w-4 h-4" /> Restore Purchases
+            <RefreshCw className={`w-4 h-4 ${restoring ? "animate-spin" : ""}`} />
+            {restoring ? "Restoring…" : "Restore Purchases"}
           </button>
 
           <button
