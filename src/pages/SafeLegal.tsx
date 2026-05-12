@@ -108,19 +108,22 @@ export default function SafeLegal({
           <h2 className="text-xl font-bold">Changelog</h2>
           <ul className="space-y-2 text-sm">
             <li>
-              <p className="font-semibold">v1.2 — May 2026</p>
+              <p className="font-semibold">v1.1.0 — May 12, 2026</p>
               <p className="text-muted-foreground">
-                Added Info &amp; Legal hub, FAQ, and storage notice.
+                Restore Purchases button, clearer disclaimer banner,
+                refined logo &amp; gradient, public Privacy/Terms links,
+                and Android 14+ store-compliance polish.
               </p>
             </li>
             <li>
-              <p className="font-semibold">v1.1 — May 2026</p>
+              <p className="font-semibold">v1.0.1 — May 2026</p>
               <p className="text-muted-foreground">
-                Introduced Shuffle and Reset Score controls.
+                Added Info &amp; Legal hub, FAQ, storage notice, Shuffle
+                and Reset-Score controls.
               </p>
             </li>
             <li>
-              <p className="font-semibold">v1.0 — May 2026</p>
+              <p className="font-semibold">v1.0.0 — May 2026</p>
               <p className="text-muted-foreground">
                 Initial release — 100 general-knowledge questions.
               </p>
