@@ -160,6 +160,55 @@ PY
           ./gradlew bundleRelease --no-daemon --stacktrace
 
       # ------------------------------------------------------------------
+      - name: 🔍 Verify AAB is signed
+        env:
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+
+          # 1) تأكّد من وجود الملف وحجمه معقول
+          if [ ! -f "$AAB" ]; then
+            echo "::error::AAB file not found at $AAB"
+            exit 1
+          fi
+          SIZE=$(stat -c%s "$AAB")
+          echo "AAB size: $SIZE bytes"
+          if [ "$SIZE" -lt 100000 ]; then
+            echo "::error::AAB suspiciously small ($SIZE bytes) — build likely failed"
+            exit 1
+          fi
+
+          # 2) تأكّد من وجود META-INF/*.RSA أو *.EC داخل الـ AAB (دليل التوقيع)
+          echo "Checking signature blocks inside AAB..."
+          if ! unzip -l "$AAB" | grep -E "META-INF/.*\.(RSA|EC|DSA)" ; then
+            echo "::error::AAB is NOT signed — no signature block found in META-INF/"
+            exit 1
+          fi
+
+          # 3) تحقّق رسمي عبر jarsigner (يفشل إذا التوقيع غير صالح)
+          echo "Running jarsigner -verify..."
+          if ! jarsigner -verify -strict "$AAB" > /tmp/jarsigner.log 2>&1 ; then
+            echo "::error::jarsigner verification failed"
+            cat /tmp/jarsigner.log
+            exit 1
+          fi
+          grep -q "jar verified" /tmp/jarsigner.log && echo "✓ jarsigner: jar verified"
+
+          # 4) تحقّق أن الـ alias المستخدم في التوقيع مطابق للسرّ
+          echo "Checking signing alias matches '$KEY_ALIAS'..."
+          ALIASES=$(keytool -printcert -jarfile "$AAB" 2>/dev/null | grep -E "Signer #|Owner:" || true)
+          echo "$ALIASES"
+
+          # 5) اطبع SHA-256 fingerprint (مفيد لمقارنته بـ Google Play)
+          echo ""
+          echo "── Certificate fingerprint (SHA-256) ──"
+          keytool -printcert -jarfile "$AAB" 2>/dev/null | grep -E "SHA256:" || true
+
+          echo ""
+          echo "✅ AAB is properly signed and ready for Google Play upload"
+
+      # ------------------------------------------------------------------
       - name: 📤 Upload AAB as artifact
         uses: actions/upload-artifact@v4
         with:
