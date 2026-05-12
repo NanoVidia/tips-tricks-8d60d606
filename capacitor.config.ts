@@ -35,7 +35,6 @@ const config: CapacitorConfig = {
 
   // ---- Web build output ----
   webDir: "dist",
-  bundledWebRuntime: false,
 
   // ---- Hot-reload from Lovable sandbox preview (DEV only) ----
   ...(isProduction
