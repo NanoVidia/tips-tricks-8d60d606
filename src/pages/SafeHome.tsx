@@ -335,12 +335,12 @@ export default function SafeHome() {
                   return;
                 }
                 // Snapshot entitlement before, so we can detect if anything was restored.
-                const { getEntitlement } = await import("@/lib/billing/trial");
-                const before = getEntitlement?.() ?? null;
+                const { getAccessState } = await import("@/lib/billing/trial");
+                const before = getAccessState();
                 await m.restore();
                 // Give the async `approved` callbacks a moment to verify on the server.
                 await new Promise((r) => setTimeout(r, 1500));
-                const after = getEntitlement?.() ?? null;
+                const after = getAccessState();
                 const changed = JSON.stringify(before) !== JSON.stringify(after);
                 if (changed) {
                   toast.success("Purchases restored successfully.", { id: toastId });
