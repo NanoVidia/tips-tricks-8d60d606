@@ -1,0 +1,209 @@
+name: Build Android AAB
+
+# ==============================================================================
+# Builds a signed Android App Bundle (.aab) on GitHub's free runners.
+# No Android Studio, no Java, no SDK needed on your computer.
+#
+# HOW TO USE:
+#   1. Push this file to your repo (Lovable does this automatically).
+#   2. Add 4 secrets in GitHub: Settings → Secrets and variables → Actions
+#      (instructions in the bottom of this file).
+#   3. Go to the "Actions" tab → "Build Android AAB" → "Run workflow".
+#   4. Wait ~8 minutes. Download the signed AAB from "Artifacts".
+#   5. Upload the AAB to Google Play Console.
+# ==============================================================================
+
+on:
+  workflow_dispatch:        # Manual trigger from the Actions tab
+  push:
+    tags:
+      - "v*"               # Or auto-build when you push a tag like v1.1.0
+
+jobs:
+  build:
+    name: Build signed AAB
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ------------------------------------------------------------------
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------------
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # ------------------------------------------------------------------
+      - name: ☕ Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      # ------------------------------------------------------------------
+      - name: 🤖 Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: "34.0.0"
+
+      # ------------------------------------------------------------------
+      - name: 📦 Install npm dependencies
+        run: npm ci
+
+      # ------------------------------------------------------------------
+      - name: 🏗️ Build web app (production)
+        env:
+          CAP_ENV: production
+        run: npm run build
+
+      # ------------------------------------------------------------------
+      - name: 📱 Add Android platform & sync Capacitor
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+
+      # ------------------------------------------------------------------
+      - name: 🎨 Generate Android icons & splash
+        run: |
+          if [ -f "resources/icon.png" ] && [ -f "resources/splash.png" ]; then
+            npx --yes @capacitor/assets generate --android || true
+          fi
+
+      # ------------------------------------------------------------------
+      - name: 🔢 Patch versionCode / versionName from capacitor.config.ts
+        run: |
+          VERSION_NAME=$(grep -oE 'APP_VERSION_NAME = "[^"]+"' capacitor.config.ts | sed -E 's/.*"([^"]+)".*/\1/')
+          VERSION_CODE=$(grep -oE 'APP_VERSION_CODE = [0-9]+' capacitor.config.ts | grep -oE '[0-9]+')
+          echo "Using versionName=$VERSION_NAME versionCode=$VERSION_CODE"
+          sed -i -E "s/versionCode [0-9]+/versionCode $VERSION_CODE/" android/app/build.gradle
+          sed -i -E "s/versionName \"[^\"]+\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle
+
+      # ------------------------------------------------------------------
+      - name: 🔐 Ensure required Android permissions
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          add_perm() {
+            local p="$1"
+            if ! grep -q "$p" "$MANIFEST"; then
+              sed -i "s|<application|<uses-permission android:name=\"$p\" />\n    <application|" "$MANIFEST"
+              echo "  + added $p"
+            fi
+          }
+          add_perm "android.permission.INTERNET"
+          add_perm "android.permission.POST_NOTIFICATIONS"
+          add_perm "com.android.vending.BILLING"
+
+      # ------------------------------------------------------------------
+      - name: 🔑 Decode keystore from secret
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Missing secret ANDROID_KEYSTORE_BASE64. See instructions in the workflow file."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+          echo "Keystore decoded — $(stat -c%s android/app/release.keystore) bytes"
+
+      # ------------------------------------------------------------------
+      - name: ✍️ Inject signing config into build.gradle
+        env:
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          GRADLE_FILE="android/app/build.gradle"
+          # Insert signingConfigs + reference it from buildTypes.release
+          if ! grep -q "signingConfigs" "$GRADLE_FILE"; then
+            python3 - <<'PY'
+import re, os
+path = "android/app/build.gradle"
+content = open(path).read()
+signing_block = f'''    signingConfigs {{
+        release {{
+            storeFile file("release.keystore")
+            storePassword System.getenv("KS_PASS")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASS")
+        }}
+    }}
+'''
+# Insert after the opening "android {" line
+content = re.sub(r'(android\s*\{\s*\n)', r'\1' + signing_block, content, count=1)
+# Wire release buildType to use it
+content = re.sub(
+    r'(buildTypes\s*\{\s*release\s*\{\s*\n)',
+    r'\1            signingConfig signingConfigs.release\n',
+    content, count=1,
+)
+open(path, "w").write(content)
+print("✓ signingConfigs block injected")
+PY
+          fi
+
+      # ------------------------------------------------------------------
+      - name: 📦 Build signed AAB
+        env:
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew bundleRelease --no-daemon --stacktrace
+
+      # ------------------------------------------------------------------
+      - name: 📤 Upload AAB as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+          if-no-files-found: error
+
+      # ------------------------------------------------------------------
+      - name: ✅ Summary
+        run: |
+          echo "## ✅ Build successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download \`app-release-aab\` from the **Artifacts** section above," >> $GITHUB_STEP_SUMMARY
+          echo "then upload it to **Google Play Console → Internal testing → Create release**." >> $GITHUB_STEP_SUMMARY
+
+# ==============================================================================
+# 🔐  ONE-TIME SETUP — Required GitHub Secrets
+# ==============================================================================
+# Add these in: Repo → Settings → Secrets and variables → Actions → New secret
+#
+#   ANDROID_KEYSTORE_BASE64    Your release.keystore file, encoded as base64.
+#                              Generate it once with this command on any computer:
+#
+#                                keytool -genkey -v -keystore release.keystore \
+#                                  -alias tipstricks -keyalg RSA -keysize 2048 \
+#                                  -validity 10000
+#
+#                              Then convert to base64:
+#                                Linux/Mac:  base64 -i release.keystore | pbcopy
+#                                Windows:    certutil -encode release.keystore tmp.b64
+#                                            (then copy contents of tmp.b64,
+#                                             skip the BEGIN/END lines)
+#
+#                              ⚠️  KEEP THE ORIGINAL release.keystore FILE SAFE
+#                              FOREVER — you need it for every future update.
+#                              If you lose it, you can never update the app.
+#
+#   ANDROID_KEYSTORE_PASSWORD  The "store password" you set during keytool.
+#   ANDROID_KEY_ALIAS          The alias you used (e.g. "tipstricks").
+#   ANDROID_KEY_PASSWORD       The "key password" (often same as store password).
+#
+# Don't have keytool? Install it free:
+#   - Mac:    brew install openjdk
+#   - Windows: download Java from https://adoptium.net (includes keytool)
+#   - Linux:   sudo apt install default-jdk
+# ==============================================================================
