@@ -224,34 +224,38 @@ jobs:
       - name: ✍️ Inject signing config
         run: |
           GRADLE_FILE="android/app/build.gradle"
-          if ! grep -q "signingConfigs" "$GRADLE_FILE"; then
-            python3 - <<'PY'
-            import re
-            path = "android/app/build.gradle"
-            content = open(path).read()
-            signing_block = '''    signingConfigs {
-                release {
-                    storeFile file("release.keystore")
-                    storePassword System.getenv("KS_PASS")
-                    keyAlias System.getenv("KEY_ALIAS")
-                    keyPassword System.getenv("KEY_PASS")
-                }
-            }
-            '''
-            new, n = re.subn(r'(android\s*\{\r?\n)', r'\1' + signing_block, content, count=1)
-            if n == 0:
-                raise SystemExit("Could not find 'android {' block")
-            content = new
-            new, n = re.subn(
-                r'(buildTypes\s*\{\s*\r?\n\s*release\s*\{\s*\r?\n)',
-                r'\1            signingConfig signingConfigs.release\n',
-                content, count=1,
-            )
-            if n == 0:
-                new = re.sub(r'(release\s*\{)', r'\1\n            signingConfig signingConfigs.release', content, count=1)
-            open(path, "w").write(new)
-            print("✓ signingConfigs injected")
-            PY
+          if grep -q "signingConfigs" "$GRADLE_FILE"; then
+            echo "signingConfigs already present"
+          else
+            cat > /tmp/inject_signing.py <<'PY'
+          import re
+          path = "android/app/build.gradle"
+          content = open(path).read()
+          signing_block = (
+              '    signingConfigs {\n'
+              '        release {\n'
+              '            storeFile file("release.keystore")\n'
+              '            storePassword System.getenv("KS_PASS")\n'
+              '            keyAlias System.getenv("KEY_ALIAS")\n'
+              '            keyPassword System.getenv("KEY_PASS")\n'
+              '        }\n'
+              '    }\n'
+          )
+          new, n = re.subn(r'(android\s*\{\r?\n)', r'\1' + signing_block, content, count=1)
+          if n == 0:
+              raise SystemExit("Could not find 'android {' block")
+          content = new
+          new, n = re.subn(
+              r'(buildTypes\s*\{\s*\r?\n\s*release\s*\{\s*\r?\n)',
+              r'\1            signingConfig signingConfigs.release\n',
+              content, count=1,
+          )
+          if n == 0:
+              new = re.sub(r'(release\s*\{)', r'\1\n            signingConfig signingConfigs.release', content, count=1)
+          open(path, "w").write(new)
+          print("signingConfigs injected")
+          PY
+            python3 /tmp/inject_signing.py
           fi
 
       - name: 📦 Build signed AAB
