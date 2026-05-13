@@ -1,19 +1,48 @@
 name: Build Android AAB
 
 # ==============================================================================
-# يبني ملف AAB موقّع على GitHub بدون الحاجة لأي إعداد محلي.
+# يبني ملف AAB موقّع على GitHub بدون أي إعداد محلي.
 #
 # الاستخدام:
-#   1. أضف الأسرار الأربعة (انظر أسفل هذا الملف).
-#   2. Actions → "Build Android AAB" → Run workflow.
-#   3. حمّل الـ AAB من قسم Artifacts بعد ~8 دقائق.
+#   1) Actions → "Build Android AAB" → Run workflow
+#   2) (اختياري) أدخل version_name و version_code للإصدار الجديد
+#      - إذا تركتهما فارغين سيستخدم القيم الموجودة في الكود.
+#      - عند إدخال قيم جديدة سيتم تحديث:
+#          • capacitor.config.ts   (APP_VERSION_NAME / APP_VERSION_CODE)
+#          • src/lib/appVersion.ts (المعلومات المعروضة داخل التطبيق)
+#          • android/app/build.gradle (versionName / versionCode)
+#        ويتم عمل commit تلقائي إذا فعّلت "commit_version_bump".
+#   3) حمّل الـ AAB من قسم Artifacts بعد ~8 دقائق.
+#
+# 🔐 الأسرار المطلوبة (Settings → Secrets and variables → Actions):
+#   ANDROID_KEYSTORE_BASE64    base64 من release.keystore (سطر واحد)
+#   ANDROID_KEYSTORE_PASSWORD  store password
+#   ANDROID_KEY_ALIAS          alias name
+#   ANDROID_KEY_PASSWORD       key password
 # ==============================================================================
 
 on:
   workflow_dispatch:
+    inputs:
+      version_name:
+        description: "رقم الإصدار العام مثل 1.5.0 (اتركه فارغاً للإبقاء على الحالي)"
+        required: false
+        default: ""
+      version_code:
+        description: "رقم البناء الداخلي (عدد صحيح يجب أن يزيد كل رفع) — اتركه فارغاً للإبقاء على الحالي"
+        required: false
+        default: ""
+      commit_version_bump:
+        description: "حفظ تحديث الإصدار في المستودع تلقائياً (commit + push)"
+        required: false
+        default: true
+        type: boolean
   push:
     tags:
       - "v*"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -24,8 +53,69 @@ jobs:
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🟢 Setup Node.js 20
+      # ─────────────────────────────────────────────────────────────────
+      # 1) تحديث رقم الإصدار في الملفات (قبل أي بناء) إذا أدخل المستخدم قيمة
+      # ─────────────────────────────────────────────────────────────────
+      - name: 🔢 Apply version inputs (capacitor.config.ts + appVersion.ts)
+        id: apply_version
+        env:
+          IN_VN: ${{ inputs.version_name }}
+          IN_VC: ${{ inputs.version_code }}
+        run: |
+          set -euo pipefail
+          changed=0
+
+          if [ -n "${IN_VN}" ]; then
+            echo "→ Updating versionName to '${IN_VN}'"
+            sed -i -E "s/(APP_VERSION_NAME = )\"[^\"]+\"/\1\"${IN_VN}\"/" capacitor.config.ts
+            sed -i -E "s/(APP_VERSION_NAME = )\"[^\"]+\"/\1\"${IN_VN}\"/" src/lib/appVersion.ts
+            changed=1
+          fi
+
+          if [ -n "${IN_VC}" ]; then
+            if ! [[ "${IN_VC}" =~ ^[0-9]+$ ]]; then
+              echo "::error::version_code must be an integer, got '${IN_VC}'"
+              exit 1
+            fi
+            echo "→ Updating versionCode to '${IN_VC}'"
+            sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${IN_VC}/" capacitor.config.ts
+            sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${IN_VC}/" src/lib/appVersion.ts
+            changed=1
+          fi
+
+          # القيم النهائية (سواء جديدة أو الحالية)
+          VN=$(grep -oE 'APP_VERSION_NAME = "[^"]+"' capacitor.config.ts | sed -E 's/.*"([^"]+)".*/\1/')
+          VC=$(grep -oE 'APP_VERSION_CODE = [0-9]+' capacitor.config.ts | grep -oE '[0-9]+')
+          echo "version_name=$VN" >> "$GITHUB_OUTPUT"
+          echo "version_code=$VC" >> "$GITHUB_OUTPUT"
+          echo "changed=$changed"  >> "$GITHUB_OUTPUT"
+          echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "── Final version: v$VN (build $VC) ──"
+
+      - name: 💾 Commit version bump
+        if: ${{ steps.apply_version.outputs.changed == '1' && inputs.commit_version_bump }}
+        env:
+          VN: ${{ steps.apply_version.outputs.version_name }}
+          VC: ${{ steps.apply_version.outputs.version_code }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add capacitor.config.ts src/lib/appVersion.ts
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+          else
+            git commit -m "chore(release): bump to v${VN} (build ${VC}) [skip ci]"
+            git push
+          fi
+
+      # ─────────────────────────────────────────────────────────────────
+      # 2) أدوات البناء
+      # ─────────────────────────────────────────────────────────────────
+      - name: 🟢 Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -46,12 +136,14 @@ jobs:
 
       - name: 📦 Install npm dependencies
         run: |
-          # npm ci أسرع لكنه يفشل عند أي اختلاف. نحاوله أولاً ثم نسقط لـ install.
           npm ci --no-audit --no-fund || {
             echo "::warning::npm ci failed — falling back to npm install"
             npm install --no-audit --no-fund
           }
 
+      # ─────────────────────────────────────────────────────────────────
+      # 3) بناء الويب — الإصدار محدّث مسبقاً في src/lib/appVersion.ts
+      # ─────────────────────────────────────────────────────────────────
       - name: 🏗️ Build web app (production)
         env:
           CAP_ENV: production
@@ -73,17 +165,17 @@ jobs:
             npx --yes @capacitor/assets generate --android || true
           fi
 
-      - name: 🔢 Patch versionCode / versionName
-        id: version
+      # ─────────────────────────────────────────────────────────────────
+      # 4) ضبط versionName / versionCode داخل android/app/build.gradle
+      # ─────────────────────────────────────────────────────────────────
+      - name: 🔢 Patch build.gradle versionCode / versionName
+        env:
+          VN: ${{ steps.apply_version.outputs.version_name }}
+          VC: ${{ steps.apply_version.outputs.version_code }}
         run: |
-          VERSION_NAME=$(grep -oE 'APP_VERSION_NAME = "[^"]+"' capacitor.config.ts | sed -E 's/.*"([^"]+)".*/\1/')
-          VERSION_CODE=$(grep -oE 'APP_VERSION_CODE = [0-9]+' capacitor.config.ts | grep -oE '[0-9]+')
-          echo "Using versionName=$VERSION_NAME versionCode=$VERSION_CODE"
-          sed -i -E "s/versionCode [0-9]+/versionCode $VERSION_CODE/" android/app/build.gradle
-          sed -i -E "s/versionName \"[^\"]+\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle
-          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
-          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
-          echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          sed -i -E "s/versionCode [0-9]+/versionCode ${VC}/" android/app/build.gradle
+          sed -i -E "s/versionName \"[^\"]+\"/versionName \"${VN}\"/" android/app/build.gradle
+          grep -nE "versionCode|versionName" android/app/build.gradle
 
       - name: 🔐 Ensure required Android permissions
         run: |
@@ -99,6 +191,9 @@ jobs:
           add_perm "android.permission.POST_NOTIFICATIONS"
           add_perm "com.android.vending.BILLING"
 
+      # ─────────────────────────────────────────────────────────────────
+      # 5) keystore + التوقيع
+      # ─────────────────────────────────────────────────────────────────
       - name: 🔑 Decode keystore from secret
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -111,7 +206,7 @@ jobs:
           SIZE=$(stat -c%s android/app/release.keystore)
           echo "Keystore decoded — $SIZE bytes"
           if [ "$SIZE" -lt 1000 ]; then
-            echo "::error::Decoded keystore is too small ($SIZE bytes). Secret content is likely corrupt or contains line breaks."
+            echo "::error::Decoded keystore too small ($SIZE bytes) — secret likely corrupt"
             exit 1
           fi
 
@@ -125,57 +220,53 @@ jobs:
             exit 1
           fi
           if ! keytool -list -keystore android/app/release.keystore -storepass "$KS_PASS" -alias "$KEY_ALIAS" >/dev/null 2>&1; then
-            echo "::error::Keystore password OR alias is wrong (alias '$KEY_ALIAS' not found / wrong store password)."
-            echo "Check secrets: ANDROID_KEYSTORE_PASSWORD and ANDROID_KEY_ALIAS"
+            echo "::error::Keystore password OR alias is wrong"
             exit 1
           fi
           echo "✓ Keystore credentials look valid"
 
-      - name: 🔎 Print keystore entries (no secrets)
-        env:
-          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-        run: |
-          echo "── Keystore entries ──"
-          keytool -list -keystore android/app/release.keystore -storepass "$KS_PASS" -v 2>/dev/null | grep -E "Alias|Entry type|Creation date" || \
-          keytool -list -keystore android/app/release.keystore -storepass "$KS_PASS" 2>/dev/null
-          echo "── Make sure ANDROID_KEY_ALIAS matches one of the aliases above ──"
-
       - name: ✍️ Inject signing config into build.gradle
         run: |
           GRADLE_FILE="android/app/build.gradle"
-          if ! grep -q "signingConfigs" "$GRADLE_FILE"; then
-            python3 - <<'PY'
-            import re
-            path = "android/app/build.gradle"
-            content = open(path).read()
-            signing_block = '''    signingConfigs {
-                release {
-                    storeFile file("release.keystore")
-                    storePassword System.getenv("KS_PASS")
-                    keyAlias System.getenv("KEY_ALIAS")
-                    keyPassword System.getenv("KEY_PASS")
-                }
-            }
-            '''
-            new, n = re.subn(r'(android\s*\{\r?\n)', r'\1' + signing_block, content, count=1)
-            if n == 0:
-                raise SystemExit("Could not find 'android {' block in build.gradle")
-            content = new
-            new, n = re.subn(
-                r'(buildTypes\s*\{\s*\r?\n\s*release\s*\{\s*\r?\n)',
-                r'\1            signingConfig signingConfigs.release\n',
-                content, count=1,
-            )
-            if n == 0:
-                # fallback: append signingConfig inside any release { } block
-                new = re.sub(r'(release\s*\{)', r'\1\n            signingConfig signingConfigs.release', content, count=1)
-            open(path, "w").write(new)
-            print("✓ signingConfigs injected")
-            PY
+          if grep -q "signingConfigs" "$GRADLE_FILE"; then
+            echo "signingConfigs already present"
+          else
+            cat > /tmp/inject_signing.py <<'PY'
+          import re
+          path = "android/app/build.gradle"
+          content = open(path).read()
+          signing_block = (
+              '    signingConfigs {\n'
+              '        release {\n'
+              '            storeFile file("release.keystore")\n'
+              '            storePassword System.getenv("KS_PASS")\n'
+              '            keyAlias System.getenv("KEY_ALIAS")\n'
+              '            keyPassword System.getenv("KEY_PASS")\n'
+              '        }\n'
+              '    }\n'
+          )
+          new, n = re.subn(r'(android\s*\{\r?\n)', r'\1' + signing_block, content, count=1)
+          if n == 0:
+              raise SystemExit("Could not find 'android {' block in build.gradle")
+          content = new
+          new, n = re.subn(
+              r'(buildTypes\s*\{\s*\r?\n\s*release\s*\{\s*\r?\n)',
+              r'\1            signingConfig signingConfigs.release\n',
+              content, count=1,
+          )
+          if n == 0:
+              new = re.sub(r'(release\s*\{)', r'\1\n            signingConfig signingConfigs.release', content, count=1)
+          open(path, "w").write(new)
+          print("signingConfigs injected")
+          PY
+            python3 /tmp/inject_signing.py
           fi
           echo "── build.gradle (relevant lines) ──"
-          grep -n -E "signingConfig|versionCode|versionName" "$GRADLE_FILE" || true
+          grep -nE "signingConfig|versionCode|versionName" "$GRADLE_FILE" || true
 
+      # ─────────────────────────────────────────────────────────────────
+      # 6) البناء + التحقق
+      # ─────────────────────────────────────────────────────────────────
       - name: 📦 Build signed AAB
         env:
           KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -187,42 +278,37 @@ jobs:
           ./gradlew bundleRelease --no-daemon --stacktrace
 
       - name: 🔍 Verify AAB is signed
-        env:
-          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           AAB="android/app/build/outputs/bundle/release/app-release.aab"
           if [ ! -f "$AAB" ]; then
-            echo "::error::AAB file not found at $AAB"
-            exit 1
+            echo "::error::AAB file not found at $AAB"; exit 1
           fi
           SIZE=$(stat -c%s "$AAB")
           echo "AAB size: $SIZE bytes"
           if [ "$SIZE" -lt 100000 ]; then
-            echo "::error::AAB suspiciously small ($SIZE bytes)"
-            exit 1
+            echo "::error::AAB suspiciously small ($SIZE bytes)"; exit 1
           fi
           if ! unzip -l "$AAB" | grep -E "META-INF/.*\.(RSA|EC|DSA)" ; then
-            echo "::error::AAB is NOT signed"
-            exit 1
+            echo "::error::AAB is NOT signed"; exit 1
           fi
           if ! jarsigner -verify -strict "$AAB" > /tmp/jarsigner.log 2>&1 ; then
-            echo "::error::jarsigner verification failed"
-            cat /tmp/jarsigner.log
-            exit 1
+            echo "::error::jarsigner verification failed"; cat /tmp/jarsigner.log; exit 1
           fi
           echo "✓ jarsigner verified"
           echo "── Certificate fingerprint ──"
           keytool -printcert -jarfile "$AAB" 2>/dev/null | grep -E "SHA(1|256):" || true
-          echo "✅ AAB is properly signed"
 
       - name: 📝 Rename AAB with version
         id: rename
+        env:
+          VN: ${{ steps.apply_version.outputs.version_name }}
+          VC: ${{ steps.apply_version.outputs.version_code }}
+          SHA: ${{ steps.apply_version.outputs.short_sha }}
         run: |
           SRC="android/app/build/outputs/bundle/release/app-release.aab"
           OUT_DIR="dist-aab"
           mkdir -p "$OUT_DIR"
-          NAME="tipstricks-v${{ steps.version.outputs.version_name }}-vc${{ steps.version.outputs.version_code }}-${{ steps.version.outputs.short_sha }}.aab"
+          NAME="tipstricks-v${VN}-vc${VC}-${SHA}.aab"
           cp "$SRC" "$OUT_DIR/$NAME"
           echo "aab_path=$OUT_DIR/$NAME" >> "$GITHUB_OUTPUT"
           echo "aab_name=$NAME" >> "$GITHUB_OUTPUT"
@@ -231,13 +317,20 @@ jobs:
       - name: 📤 Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tipstricks-v${{ steps.version.outputs.version_name }}-vc${{ steps.version.outputs.version_code }}
+          name: tipstricks-v${{ steps.apply_version.outputs.version_name }}-vc${{ steps.apply_version.outputs.version_code }}
           path: ${{ steps.rename.outputs.aab_path }}
           retention-days: 30
           if-no-files-found: error
           compression-level: 0
 
       - name: ✅ Summary
+        env:
+          VN: ${{ steps.apply_version.outputs.version_name }}
+          VC: ${{ steps.apply_version.outputs.version_code }}
+          SHA: ${{ steps.apply_version.outputs.short_sha }}
+          AAB_NAME: ${{ steps.rename.outputs.aab_name }}
+          BUMPED: ${{ steps.apply_version.outputs.changed }}
+          COMMITTED: ${{ inputs.commit_version_bump }}
         run: |
           {
             echo "## ✅ Build successful!"
@@ -246,18 +339,12 @@ jobs:
             echo "|---|---|"
             echo "| App | Tips & Tricks Daily Quiz |"
             echo "| Application ID | \`app.lovable.tipstricks\` |"
-            echo "| Version name | \`${{ steps.version.outputs.version_name }}\` |"
-            echo "| Version code | \`${{ steps.version.outputs.version_code }}\` |"
-            echo "| Commit | \`${{ steps.version.outputs.short_sha }}\` |"
-            echo "| Artifact file | \`${{ steps.rename.outputs.aab_name }}\` |"
+            echo "| Version name | \`${VN}\` |"
+            echo "| Version code | \`${VC}\` |"
+            echo "| Commit | \`${SHA}\` |"
+            echo "| Version bumped this run? | \`${BUMPED}\` |"
+            echo "| Auto-committed? | \`${COMMITTED}\` |"
+            echo "| Artifact file | \`${AAB_NAME}\` |"
             echo ""
-            echo "📥 حمّل الـ AAB من قسم **Artifacts** في أعلى الصفحة وارفعه إلى Google Play Console."
-          } >> $GITHUB_STEP_SUMMARY
-
-# ==============================================================================
-# 🔐 Required Secrets (Settings → Secrets and variables → Actions):
-#   ANDROID_KEYSTORE_BASE64    base64 من release.keystore (سطر واحد، بلا BEGIN/END)
-#   ANDROID_KEYSTORE_PASSWORD  store password
-#   ANDROID_KEY_ALIAS          alias name (e.g. tipstricks)
-#   ANDROID_KEY_PASSWORD       key password
-# ==============================================================================
+            echo "📥 حمّل الـ AAB من قسم **Artifacts** أعلى الصفحة وارفعه إلى Google Play Console."
+          } >> "$GITHUB_STEP_SUMMARY"
