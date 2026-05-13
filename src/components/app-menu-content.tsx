@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { FaqSection } from "@/components/FaqSection";
 import {
+  APP_BUILD_DATE,
+  APP_ID,
   APP_VERSION_NAME,
   APP_VERSION_CODE,
   APP_VERSION_LABEL,
@@ -192,6 +194,8 @@ export function MenuPageBody({
     <div className="space-y-2">
       <Row label="Version name" value={APP_VERSION_NAME} />
       <Row label="Version code" value={String(APP_VERSION_CODE)} />
+      <Row label="Build date" value={APP_BUILD_DATE} />
+      <Row label="Application ID" value={APP_ID} mono />
       <Row label="Full" value={APP_VERSION_LABEL} />
       <Row label="Mode" value={import.meta.env.MODE} />
       <Row label="Platform" value={navigator.platform || "Web"} />

@@ -13,6 +13,8 @@
  */
 export const APP_VERSION_NAME = "1.0.0";
 export const APP_VERSION_CODE = 1;
+export const APP_ID = "app.lovable.tipstricks";
+export const APP_BUILD_DATE = import.meta.env.VITE_BUILD_DATE || "N/A";
 
 /** Human-friendly label, e.g. "1.4.0 (build 4)" */
 export const APP_VERSION_LABEL = `${APP_VERSION_NAME} (build ${APP_VERSION_CODE})`;

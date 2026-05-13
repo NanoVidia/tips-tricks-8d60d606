@@ -32,6 +32,11 @@ on:
         description: "رقم البناء الداخلي (عدد صحيح يجب أن يزيد كل رفع) — اتركه فارغاً للإبقاء على الحالي"
         required: false
         default: ""
+      auto_increment_version_code:
+        description: "زيادة version_code تلقائياً (+1) إذا لم يتم إدخال قيمة يدوياً"
+        required: false
+        default: true
+        type: boolean
       commit_version_bump:
         description: "حفظ تحديث الإصدار في المستودع تلقائياً (commit + push)"
         required: false
@@ -65,6 +70,7 @@ jobs:
         env:
           IN_VN: ${{ inputs.version_name }}
           IN_VC: ${{ inputs.version_code }}
+          IN_AUTO_INC: ${{ github.event_name == 'workflow_dispatch' && inputs.auto_increment_version_code || 'false' }}
         run: |
           set -euo pipefail
           changed=0
@@ -84,6 +90,13 @@ jobs:
             echo "→ Updating versionCode to '${IN_VC}'"
             sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${IN_VC}/" capacitor.config.ts
             sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${IN_VC}/" src/lib/appVersion.ts
+            changed=1
+          elif [ "${IN_AUTO_INC}" = "true" ]; then
+            CUR_VC=$(grep -oE 'APP_VERSION_CODE = [0-9]+' capacitor.config.ts | grep -oE '[0-9]+')
+            NEXT_VC=$((CUR_VC + 1))
+            echo "→ Auto-incrementing versionCode: ${CUR_VC} -> ${NEXT_VC}"
+            sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${NEXT_VC}/" capacitor.config.ts
+            sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${NEXT_VC}/" src/lib/appVersion.ts
             changed=1
           fi
 
@@ -148,6 +161,7 @@ jobs:
         env:
           CAP_ENV: production
           NODE_ENV: production
+          VITE_BUILD_DATE: ${{ github.run_started_at }}
         run: npm run build
 
       - name: 📱 Add Android platform & sync Capacitor
@@ -194,6 +208,26 @@ jobs:
       # ─────────────────────────────────────────────────────────────────
       # 5) keystore + التوقيع
       # ─────────────────────────────────────────────────────────────────
+      - name: 🔐 Verify required Android secrets exist
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [ -z "${ANDROID_KEYSTORE_BASE64}" ] && missing+=("ANDROID_KEYSTORE_BASE64")
+          [ -z "${ANDROID_KEYSTORE_PASSWORD}" ] && missing+=("ANDROID_KEYSTORE_PASSWORD")
+          [ -z "${ANDROID_KEY_ALIAS}" ] && missing+=("ANDROID_KEY_ALIAS")
+          [ -z "${ANDROID_KEY_PASSWORD}" ] && missing+=("ANDROID_KEY_PASSWORD")
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Missing required Android secrets: ${missing[*]}"
+            echo "::error::Run 'Setup Android Signing Secrets (one-time)' workflow first."
+            exit 1
+          fi
+          echo "✓ All required Android signing secrets exist"
+
       - name: 🔑 Decode keystore from secret
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -214,9 +248,10 @@ jobs:
         env:
           KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          if [ -z "$KS_PASS" ] || [ -z "$KEY_ALIAS" ]; then
-            echo "::error::Missing ANDROID_KEYSTORE_PASSWORD or ANDROID_KEY_ALIAS secret"
+          if [ -z "$KS_PASS" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASS" ]; then
+            echo "::error::Missing keystore credentials (ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD)"
             exit 1
           fi
           if ! keytool -list -keystore android/app/release.keystore -storepass "$KS_PASS" -alias "$KEY_ALIAS" >/dev/null 2>&1; then
