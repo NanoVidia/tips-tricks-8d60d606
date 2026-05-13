@@ -32,6 +32,26 @@ warn() { echo -e "${Y}⚠${N} $*"; }
 die()  { echo -e "${R}✗ $*${N}" >&2; exit 1; }
 hr()   { echo -e "${B}────────────────────────────────────────────────────────${N}"; }
 
+# ── بانر معلومات التطبيق ────────────────────────────────────────────────────
+APP_ID=$(grep -oE 'appId:\s*"[^"]+"' capacitor.config.ts | sed -E 's/.*"([^"]+)".*/\1/')
+APP_NAME=$(grep -oE 'appName:\s*"[^"]+"' capacitor.config.ts | sed -E 's/.*"([^"]+)".*/\1/')
+V_NAME=$(grep -oE 'APP_VERSION_NAME = "[^"]+"' capacitor.config.ts | sed -E 's/.*"([^"]+)".*/\1/')
+V_CODE=$(grep -oE 'APP_VERSION_CODE = [0-9]+' capacitor.config.ts | grep -oE '[0-9]+')
+PKG_VER=$(node -p "require('./package.json').version" 2>/dev/null || echo "?")
+GIT_BR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "—")
+GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "—")
+echo -e "${B}╔══════════════════════════════════════════════════════╗${N}"
+echo -e "${B}║          Tips & Tricks — Android AAB Builder         ║${N}"
+echo -e "${B}╚══════════════════════════════════════════════════════╝${N}"
+printf "  %-16s %s\n" "App name:"      "$APP_NAME"
+printf "  %-16s %s\n" "Application ID:" "$APP_ID"
+printf "  %-16s %s\n" "Version name:"  "$V_NAME"
+printf "  %-16s %s\n" "Version code:"  "$V_CODE"
+printf "  %-16s %s\n" "package.json:"  "$PKG_VER"
+printf "  %-16s %s\n" "Git branch:"    "$GIT_BR ($GIT_SHA)"
+printf "  %-16s %s\n" "Build date:"    "$(date '+%Y-%m-%d %H:%M:%S %Z')"
+printf "  %-16s %s\n" "Working dir:"   "$ROOT"
+
 # ── 0. التحقق من المتطلبات ──────────────────────────────────────────────────
 hr; say "0/9  فحص المتطلبات…"
 command -v node    >/dev/null || die "Node.js غير مثبّت — ثبّته من https://nodejs.org"
