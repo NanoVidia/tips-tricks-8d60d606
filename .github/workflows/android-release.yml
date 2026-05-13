@@ -8,6 +8,19 @@ name: Release Android AAB
 on:
   workflow_dispatch:
     inputs:
+      version_name:
+        description: "رقم الإصدار العام (مثال: 1.5.0). اتركه فارغاً للإبقاء على الحالي."
+        required: false
+        default: ""
+      version_code:
+        description: "رقم البناء الداخلي (عدد صحيح متزايد). اتركه فارغاً للإبقاء على الحالي."
+        required: false
+        default: ""
+      commit_version_bump:
+        description: "حفظ تحديث الإصدار في المستودع تلقائياً"
+        required: false
+        default: true
+        type: boolean
       track:
         description: "مسار النشر على Google Play"
         required: true
@@ -36,6 +49,35 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: 🔢 Apply version inputs (capacitor.config.ts + appVersion.ts)
+        env:
+          IN_VN: ${{ inputs.version_name }}
+          IN_VC: ${{ inputs.version_code }}
+        run: |
+          set -euo pipefail
+          if [ -n "${IN_VN}" ]; then
+            sed -i -E "s/(APP_VERSION_NAME = )\"[^\"]+\"/\1\"${IN_VN}\"/" capacitor.config.ts
+            sed -i -E "s/(APP_VERSION_NAME = )\"[^\"]+\"/\1\"${IN_VN}\"/" src/lib/appVersion.ts
+          fi
+          if [ -n "${IN_VC}" ]; then
+            [[ "${IN_VC}" =~ ^[0-9]+$ ]] || { echo "::error::version_code must be integer"; exit 1; }
+            sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${IN_VC}/" capacitor.config.ts
+            sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${IN_VC}/" src/lib/appVersion.ts
+          fi
+
+      - name: 💾 Commit version bump
+        if: ${{ (inputs.version_name != '' || inputs.version_code != '') && inputs.commit_version_bump }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add capacitor.config.ts src/lib/appVersion.ts
+          if ! git diff --cached --quiet; then
+            VN=$(grep -oE 'APP_VERSION_NAME = "[^"]+"' capacitor.config.ts | sed -E 's/.*"([^"]+)".*/\1/')
+            VC=$(grep -oE 'APP_VERSION_CODE = [0-9]+' capacitor.config.ts | grep -oE '[0-9]+')
+            git commit -m "chore(release): bump to v${VN} (build ${VC}) [skip ci]"
+            git push
+          fi
 
       - name: 🏷️ Extract version & branch metadata
         id: meta
