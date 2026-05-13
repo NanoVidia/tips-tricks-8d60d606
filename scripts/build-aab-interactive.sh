@@ -43,31 +43,96 @@ NODE_V=$(node -v); JAVA_V=$(java -version 2>&1 | head -n1)
 ok "Node: $NODE_V"
 ok "Java: $JAVA_V"
 
-# ── 1. طلب بيانات الـ keystore ──────────────────────────────────────────────
+# ── 1. طلب بيانات الـ keystore (مع دعم ملف إعدادات) ───────────────────────
 hr; say "1/9  بيانات الـ keystore"
-DEFAULT_KS="release.keystore"
-[ -f "android/app/release.keystore" ] && DEFAULT_KS="android/app/release.keystore"
 
-read -r -p "  مسار ملف الـ keystore [${DEFAULT_KS}]: " KS_PATH
-KS_PATH="${KS_PATH:-$DEFAULT_KS}"
+# ملف الإعدادات: يتم تحميله تلقائياً إن وُجد. مسار قابل للتخصيص عبر KEYSTORE_ENV.
+CONFIG_FILE="${KEYSTORE_ENV:-.keystore.env}"
+SHOW_VALUES=0
+[[ "${1:-}" == "--show" || "${SHOW_KEYSTORE:-0}" == "1" ]] && SHOW_VALUES=1
+
+mask() {
+  # يُظهر أول وآخر حرفين فقط، الباقي ●
+  local v="$1"; local n=${#v}
+  [ "$SHOW_VALUES" = "1" ] && { echo "$v"; return; }
+  [ -z "$v" ] && { echo "(فارغ)"; return; }
+  [ "$n" -le 4 ] && { printf '%*s' "$n" '' | tr ' ' '●'; return; }
+  printf '%s%s%s' "${v:0:2}" "$(printf '%*s' $((n-4)) '' | tr ' ' '●')" "${v: -2}"
+}
+
+if [ -f "$CONFIG_FILE" ]; then
+  ok "تم العثور على ملف إعدادات: ${B}$CONFIG_FILE${N}"
+  # shellcheck disable=SC1090
+  set -a; . "$CONFIG_FILE"; set +a
+  echo "    KS_PATH   : $(mask "${KS_PATH:-}")"
+  echo "    KEY_ALIAS : $(mask "${KEY_ALIAS:-}")"
+  echo "    KS_PASS   : $(mask "${KS_PASS:-}")"
+  echo "    KEY_PASS  : $(mask "${KEY_PASS:-}")"
+  read -r -p "  استخدام هذه القيم؟ [Y/n]: " USE_CFG
+  USE_CFG="${USE_CFG:-Y}"
+  [[ "$USE_CFG" =~ ^[Nn]$ ]] && { unset KS_PATH KS_PASS KEY_ALIAS KEY_PASS; warn "تم تجاهل الملف، سيتم السؤال يدوياً."; }
+fi
+
+if [ -z "${KS_PATH:-}" ]; then
+  DEFAULT_KS="release.keystore"
+  [ -f "android/app/release.keystore" ] && DEFAULT_KS="android/app/release.keystore"
+  read -r -p "  مسار ملف الـ keystore [${DEFAULT_KS}]: " KS_PATH
+  KS_PATH="${KS_PATH:-$DEFAULT_KS}"
+fi
 [ -f "$KS_PATH" ] || die "الملف غير موجود: $KS_PATH"
 KS_ABS="$(cd "$(dirname "$KS_PATH")" && pwd)/$(basename "$KS_PATH")"
 ok "Keystore: $KS_ABS"
 
-read -r -s -p "  كلمة سر الـ keystore (store password): " KS_PASS; echo
+if [ -z "${KS_PASS:-}" ]; then
+  read -r -s -p "  كلمة سر الـ keystore (store password): " KS_PASS; echo
+fi
 [ -n "$KS_PASS" ] || die "كلمة السر فارغة"
 
-read -r -p "  اسم الـ alias: " KEY_ALIAS
+if [ -z "${KEY_ALIAS:-}" ]; then
+  read -r -p "  اسم الـ alias: " KEY_ALIAS
+fi
 [ -n "$KEY_ALIAS" ] || die "الـ alias فارغ"
 
-read -r -s -p "  كلمة سر الـ key (اضغط Enter لاستخدام نفس كلمة سر الـ keystore): " KEY_PASS; echo
-KEY_PASS="${KEY_PASS:-$KS_PASS}"
+if [ -z "${KEY_PASS:-}" ]; then
+  read -r -s -p "  كلمة سر الـ key (اضغط Enter لاستخدام نفس كلمة سر الـ keystore): " KEY_PASS; echo
+  KEY_PASS="${KEY_PASS:-$KS_PASS}"
+fi
 
 # تحقّق فوري قبل أي بناء
 say "  التحقق من الـ keystore…"
 keytool -list -keystore "$KS_ABS" -storepass "$KS_PASS" -alias "$KEY_ALIAS" >/dev/null 2>&1 \
   || die "كلمة السر أو الـ alias خطأ. شغّل: keytool -list -keystore \"$KS_ABS\" -v"
 ok "بيانات الـ keystore صحيحة"
+
+# عرض ملخّص (مخفي افتراضياً)
+echo "    ── الملخّص ── (للإظهار: --show أو SHOW_KEYSTORE=1)"
+echo "    KS_PATH   = $(mask "$KS_ABS")"
+echo "    KEY_ALIAS = $(mask "$KEY_ALIAS")"
+echo "    KS_PASS   = $(mask "$KS_PASS")"
+echo "    KEY_PASS  = $(mask "$KEY_PASS")"
+
+# عرض حفظ القيم في ملف الإعدادات
+if [ ! -f "$CONFIG_FILE" ]; then
+  read -r -p "  حفظ هذه القيم في ${CONFIG_FILE} للمرات القادمة؟ [y/N]: " SAVE_CFG
+  if [[ "${SAVE_CFG:-N}" =~ ^[Yy]$ ]]; then
+    umask 077
+    cat > "$CONFIG_FILE" <<EOF
+# Tips & Tricks — Keystore config (DO NOT COMMIT)
+# تم إنشاؤه تلقائياً بواسطة scripts/build-aab-interactive.sh
+KS_PATH="$KS_ABS"
+KS_PASS="$KS_PASS"
+KEY_ALIAS="$KEY_ALIAS"
+KEY_PASS="$KEY_PASS"
+EOF
+    chmod 600 "$CONFIG_FILE"
+    ok "تم الحفظ في $CONFIG_FILE (chmod 600)"
+    # ضمان وجوده في .gitignore
+    if [ -f .gitignore ] && ! grep -qxF "$CONFIG_FILE" .gitignore; then
+      echo "$CONFIG_FILE" >> .gitignore
+      ok "تمت إضافة $CONFIG_FILE إلى .gitignore"
+    fi
+  fi
+fi
 
 export KS_PASS KEY_ALIAS KEY_PASS
 
