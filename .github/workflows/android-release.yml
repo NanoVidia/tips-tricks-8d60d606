@@ -184,32 +184,32 @@ jobs:
           GRADLE_FILE="android/app/build.gradle"
           if ! grep -q "signingConfigs" "$GRADLE_FILE"; then
             python3 - <<'PY'
-import re
-path = "android/app/build.gradle"
-content = open(path).read()
-signing_block = '''    signingConfigs {
-        release {
-            storeFile file("release.keystore")
-            storePassword System.getenv("KS_PASS")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASS")
-        }
-    }
-'''
-new, n = re.subn(r'(android\s*\{\r?\n)', r'\1' + signing_block, content, count=1)
-if n == 0:
-    raise SystemExit("Could not find 'android {' block")
-content = new
-new, n = re.subn(
-    r'(buildTypes\s*\{\s*\r?\n\s*release\s*\{\s*\r?\n)',
-    r'\1            signingConfig signingConfigs.release\n',
-    content, count=1,
-)
-if n == 0:
-    new = re.sub(r'(release\s*\{)', r'\1\n            signingConfig signingConfigs.release', content, count=1)
-open(path, "w").write(new)
-print("✓ signingConfigs injected")
-PY
+            import re
+            path = "android/app/build.gradle"
+            content = open(path).read()
+            signing_block = '''    signingConfigs {
+                release {
+                    storeFile file("release.keystore")
+                    storePassword System.getenv("KS_PASS")
+                    keyAlias System.getenv("KEY_ALIAS")
+                    keyPassword System.getenv("KEY_PASS")
+                }
+            }
+            '''
+            new, n = re.subn(r'(android\s*\{\r?\n)', r'\1' + signing_block, content, count=1)
+            if n == 0:
+                raise SystemExit("Could not find 'android {' block")
+            content = new
+            new, n = re.subn(
+                r'(buildTypes\s*\{\s*\r?\n\s*release\s*\{\s*\r?\n)',
+                r'\1            signingConfig signingConfigs.release\n',
+                content, count=1,
+            )
+            if n == 0:
+                new = re.sub(r'(release\s*\{)', r'\1\n            signingConfig signingConfigs.release', content, count=1)
+            open(path, "w").write(new)
+            print("✓ signingConfigs injected")
+            PY
           fi
 
       - name: 📦 Build signed AAB
