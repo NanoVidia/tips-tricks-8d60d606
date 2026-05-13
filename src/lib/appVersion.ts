@@ -11,7 +11,7 @@
  * If you bump them manually, also bump the matching values in
  * capacitor.config.ts.
  */
-export const APP_VERSION_NAME = "1.0.0";
+export const APP_VERSION_NAME = "1.0.1";
 export const APP_VERSION_CODE = 1;
 export const APP_ID = "app.lovable.tipstricks";
 export const APP_BUILD_DATE = import.meta.env.VITE_BUILD_DATE || "N/A";
