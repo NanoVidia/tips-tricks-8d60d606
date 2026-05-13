@@ -11,8 +11,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { FaqSection } from "@/components/FaqSection";
+import {
+  APP_VERSION_NAME,
+  APP_VERSION_CODE,
+  APP_VERSION_LABEL,
+} from "@/lib/appVersion";
 
-export const APP_VERSION = "1.4.0";
+// Re-exported so the rest of the app keeps importing { APP_VERSION } from here.
+// Single source of truth lives in src/lib/appVersion.ts and is patched by the
+// "Build Android AAB" GitHub Actions workflow.
+export const APP_VERSION = APP_VERSION_NAME;
+export const APP_BUILD = APP_VERSION_CODE;
 export const APP_NAME = "Tips & Tricks — OB/GYN";
 
 export const MENU_PAGE_IDS = [
@@ -81,7 +90,7 @@ export function subtitleForMenuPage(id: MenuPageId) {
     faq: "Searchable answers across 7 topics",
     help: "Get assistance",
     feedback: "Help us improve",
-    version: `Build ${APP_VERSION}`,
+    version: `v${APP_VERSION_NAME} · build ${APP_VERSION_CODE}`,
     changelog: "Recent updates",
     licenses: "Third-party software",
     theme: "Light or dark",
@@ -181,8 +190,10 @@ export function MenuPageBody({
 
   if (id === "version") return (
     <div className="space-y-2">
-      <Row label="Version" value={APP_VERSION} />
-      <Row label="Build" value={import.meta.env.MODE} />
+      <Row label="Version name" value={APP_VERSION_NAME} />
+      <Row label="Version code" value={String(APP_VERSION_CODE)} />
+      <Row label="Full" value={APP_VERSION_LABEL} />
+      <Row label="Mode" value={import.meta.env.MODE} />
       <Row label="Platform" value={navigator.platform || "Web"} />
       <Row label="User agent" value={navigator.userAgent.slice(0, 40) + "…"} mono />
     </div>
