@@ -76,10 +76,10 @@ jobs:
             echo "available=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: 🟢 Setup Node.js 20
+      - name: 🟢 Setup Node.js 22 (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
       - name: ☕ Setup Java 21
