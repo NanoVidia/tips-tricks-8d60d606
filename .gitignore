@@ -28,3 +28,4 @@ scripts/keystore-to-secrets.sh
 keystore-secrets/
 *.keystore
 *.jks
+.keystore.env
