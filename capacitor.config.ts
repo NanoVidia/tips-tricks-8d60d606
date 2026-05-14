@@ -20,7 +20,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
  * (see android/app/build.gradle snippet in the README) so you can manage
  * them from one place instead of editing build.gradle each time.
  */
-export const APP_VERSION_NAME = "1.0.1";
+export const APP_VERSION_NAME = "1.0.0";
 export const APP_VERSION_CODE = 1;
 
 // Set CAP_ENV=production before running `npx cap sync android` to drop the

@@ -9,13 +9,13 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: "رقم الإصدار العام (مثال: 1.5.0). اتركه فارغاً للإبقاء على الحالي."
-        required: false
-        default: ""
+        description: "رقم الإصدار العام (إلزامي، مثال: 1.0.0)"
+        required: true
+        default: "1.0.0"
       version_code:
-        description: "رقم البناء الداخلي (عدد صحيح متزايد). اتركه فارغاً للإبقاء على الحالي."
-        required: false
-        default: ""
+        description: "رقم البناء الداخلي (إلزامي، عدد صحيح متزايد، يبدأ من 1)"
+        required: true
+        default: "1"
       commit_version_bump:
         description: "حفظ تحديث الإصدار في المستودع تلقائياً"
         required: false
