@@ -122,6 +122,7 @@ const App = () => {
               <Route path="/about" element={<About />} />
               <Route path="/menu" element={<MenuHub />} />
               <Route path="/menu/:pageId" element={<MenuPage />} />
+              <Route path="/keystore-setup" element={<KeystoreSetup />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
