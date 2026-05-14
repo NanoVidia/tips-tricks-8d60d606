@@ -53,37 +53,19 @@ jobs:
           fetch-depth: 0
 
       # ─────────────────────────────────────────────────────────────
-      # 0) Preflight — GH_REPO_ADMIN_TOKEN إلزامي لإنشاء أسرار دائمة
+      # 0) Preflight — PAT اختياري؛ يُستخدم لحفظ الأسرار دائماً إن وُجد
       # ─────────────────────────────────────────────────────────────
-      - name: 🛂 Preflight · require admin token
+      - name: 🛂 Preflight · detect admin token
         env:
           GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
         run: |
-          if [ -z "${GH_REPO_ADMIN_TOKEN:-}" ]; then
-            cat >&2 <<'MSG'
-          ════════════════════════════════════════════════════════════════
-          ❌ GH_REPO_ADMIN_TOKEN غير موجود في أسرار المستودع.
-
-          هذا الـ workflow يضمن إنشاء أسرار توقيع *دائمة* تلقائياً.
-          هذا غير ممكن بـ GITHUB_TOKEN الافتراضي — GitHub يمنعه من
-          كتابة الأسرار. يجب توفير Personal Access Token (PAT) مرّة واحدة.
-
-          خطوات الإعداد لمرة واحدة فقط:
-            1) افتح: https://github.com/settings/tokens/new
-            2) Scopes: ✅ repo   (Classic PAT)
-            3) انسخ القيمة → Repo Settings → Secrets and variables →
-               Actions → New repository secret
-                 Name : GH_REPO_ADMIN_TOKEN
-                 Value: <PAT>
-            4) شغّل Build AAB مرة أخرى.
-
-          بديل: استخدم صفحة /keystore-setup داخل التطبيق لإدخال PAT
-          ورفعه مشفّراً إلى المستودع بنقرة واحدة.
-          ════════════════════════════════════════════════════════════════
-          MSG
-            exit 1
+          if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ]; then
+            echo "HAS_ADMIN_TOKEN=true" >> $GITHUB_ENV
+            echo "✓ GH_REPO_ADMIN_TOKEN موجود — سيتم حفظ أي أسرار مولّدة بشكل دائم"
+          else
+            echo "HAS_ADMIN_TOKEN=false" >> $GITHUB_ENV
+            echo "::notice::GH_REPO_ADMIN_TOKEN غير موجود — البناء سيستمر، وفي حال توليد keystore جديد سيُرفع كـ artifact لإضافته يدوياً مرّة واحدة."
           fi
-          echo "✓ GH_REPO_ADMIN_TOKEN present (len=${#GH_REPO_ADMIN_TOKEN})"
 
       # ─────────────────────────────────────────────────────────────
       # 1) Compute version
