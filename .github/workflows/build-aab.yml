@@ -175,7 +175,7 @@ jobs:
             [ -n "${!s:-}" ] && present=$((present+1))
           done
 
-          mkdir -p out backup
+          mkdir -p out
           VALID=false
           if [ "$present" -eq 4 ]; then
             echo "Checking existing Android signing secrets consistency..."
@@ -238,6 +238,7 @@ jobs:
           echo "ANDROID_KEY_PASSWORD=$KEY_PASS"        >> $GITHUB_ENV
           echo "AUTO_GENERATED=$AUTO_GENERATED"        >> $GITHUB_ENV
 
+          mkdir -p backup
           if [ "$AUTO_GENERATED" = "true" ] && [ -f out/release.keystore ]; then
             cp out/release.keystore backup/release.keystore
           fi
@@ -280,7 +281,7 @@ jobs:
               fi
               gh auth status --hostname github.com || true
 
-              if echo "$AUTH_ERR" | grep -Eqi '(401|403|forbidden|unauthorized|resource not accessible|http 4(01|03))'; then
+              if echo "$AUTH_ERR" | grep -Eqi '(401|403|forbidden|unauthorized|resource not accessible)'; then
                 echo "::error::GH_REPO_ADMIN_TOKEN authentication is not authorized (401/403). Use a PAT with repo scope from an admin account, and confirm org policies allow secret management."
                 exit 1
               fi
@@ -293,12 +294,13 @@ jobs:
                 local secret_value="$2"
                 local attempt=1
                 while [ "$attempt" -le 3 ]; do
-                  if printf '%s' "$secret_value" | gh secret set "$secret_name" --repo "$GITHUB_REPOSITORY" --body - >out/gh-secret-set.log 2>&1; then
+                  local log_file="out/gh-secret-set-${secret_name}-${attempt}.log"
+                  if printf '%s' "$secret_value" | gh secret set "$secret_name" --repo "$GITHUB_REPOSITORY" --body - >"$log_file" 2>&1; then
                     echo "✓ persisted $secret_name (attempt $attempt)"
                     return 0
                   fi
                   echo "::warning::Failed to persist $secret_name (attempt $attempt/3)."
-                  tail -n 20 out/gh-secret-set.log || true
+                  tail -n 20 "$log_file" || true
                   sleep $((attempt * 2))
                   attempt=$((attempt + 1))
                 done
@@ -313,7 +315,10 @@ jobs:
 
               SECRET_LIST="$(gh secret list --repo "$GITHUB_REPOSITORY" --json name --jq '.[].name' 2>/dev/null || true)"
               for s in "${SECRET_NAMES[@]}"; do
-                echo "$SECRET_LIST" | grep -Fqx "$s" || OK=false
+                if ! echo "$SECRET_LIST" | grep -Fqx "$s"; then
+                  echo "::warning::Secret $s not found in repository after persistence attempt."
+                  OK=false
+                fi
               done
 
               if [ "$OK" = "true" ]; then
