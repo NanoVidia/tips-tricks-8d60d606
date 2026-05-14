@@ -3,12 +3,11 @@ name: CI
 # ==============================================================================
 # فحص آلي عند كل push/PR — typecheck + lint + tests + web build
 # سريع (~3 دقائق)، يمنع merge إذا فشل أي check.
-# بعد نجاح البناء: يجمع ملفات الأسرار (إن وُجدت) وينشئ/يحدّث أسرار المستودع تلقائياً
+# لا ينشئ أو يحدّث أسرار GitHub؛ التوقيع وإدارة keystore تتم فقط عبر build-aab.yml
 # ==============================================================================
 
 permissions:
   contents: read
-  secrets: write
 
 on:
   push:
@@ -60,24 +59,6 @@ jobs:
         run: npm run build
 
       # اجمع ملفات الأسرار الناتجة أثناء البناء (إن وُجدت) لتحميلها كـ artifact
-      - name: 🔐 Collect generated secret files
-        run: |
-          mkdir -p secrets_out || true
-          # Service account JSON (Google Play)
-          if [ -f "play/service-account.json" ]; then cp play/service-account.json secrets_out/PLAY_STORE_SERVICE_ACCOUNT_JSON.json; fi
-          # Android keystore (binary) -> encode base64
-          if [ -f "android/release.keystore" ]; then base64 android/release.keystore > secrets_out/ANDROID_KEYSTORE_BASE64.txt; fi
-          # Optional plaintext files (if build writes these)
-          if [ -f "android/keystore_password.txt" ]; then cp android/keystore_password.txt secrets_out/ANDROID_KEYSTORE_PASSWORD.txt; fi
-          if [ -f "android/key_alias.txt" ]; then cp android/key_alias.txt secrets_out/ANDROID_KEY_ALIAS.txt; fi
-          if [ -f "android/key_password.txt" ]; then cp android/key_password.txt secrets_out/ANDROID_KEY_PASSWORD.txt; fi
-
-      - name: 📦 Upload build-secrets artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-secrets
-          path: secrets_out
-
       - name: 📊 Bundle size summary
         run: |
           if [ -d "dist" ]; then
@@ -94,73 +75,3 @@ jobs:
               find dist -type f \( -name "*.js" -o -name "*.css" \) -exec du -h {} + | sort -hr | head -10 | awk '{printf "| `%s` | %s |\n", $2, $1}'
             } >> $GITHUB_STEP_SUMMARY
           fi
-
-  create-secrets:
-    name: Create / Update repository secrets (after successful build)
-    needs: quality
-    # يعمل فقط إذا نجح job البناء وعلى الفرع main — هذا يمنع PRs من forks من إنشاء أسرار
-    if: ${{ needs.quality.result == 'success' && github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-
-      - name: 📥 Download build-secrets artifact (if any)
-        uses: actions/download-artifact@v4
-        with:
-          name: build-secrets
-          path: secrets_out
-
-      - name: 🔎 Detect available secret files
-        id: detect
-        run: |
-          # Default to false
-          echo "PLAY=false" >> $GITHUB_OUTPUT
-          echo "KEYSTORE=false" >> $GITHUB_OUTPUT
-          echo "KEYSTORE_PW=false" >> $GITHUB_OUTPUT
-          echo "KEY_ALIAS=false" >> $GITHUB_OUTPUT
-          echo "KEY_PW=false" >> $GITHUB_OUTPUT
-
-          if [ -f "secrets_out/PLAY_STORE_SERVICE_ACCOUNT_JSON.json" ]; then echo "PLAY=true" >> $GITHUB_OUTPUT; fi
-          if [ -f "secrets_out/ANDROID_KEYSTORE_BASE64.txt" ]; then echo "KEYSTORE=true" >> $GITHUB_OUTPUT; fi
-          if [ -f "secrets_out/ANDROID_KEYSTORE_PASSWORD.txt" ]; then echo "KEYSTORE_PW=true" >> $GITHUB_OUTPUT; fi
-          if [ -f "secrets_out/ANDROID_KEY_ALIAS.txt" ]; then echo "KEY_ALIAS=true" >> $GITHUB_OUTPUT; fi
-          if [ -f "secrets_out/ANDROID_KEY_PASSWORD.txt" ]; then echo "KEY_PW=true" >> $GITHUB_OUTPUT; fi
-
-      - name: Create PLAY_STORE_SERVICE_ACCOUNT_JSON
-        if: ${{ steps.detect.outputs.PLAY == 'true' }}
-        uses: peter-evans/create-or-update-secret@v4
-        with:
-          secret-name: PLAY_STORE_SERVICE_ACCOUNT_JSON
-          secret-file: secrets_out/PLAY_STORE_SERVICE_ACCOUNT_JSON.json
-
-      - name: Create ANDROID_KEYSTORE_BASE64
-        if: ${{ steps.detect.outputs.KEYSTORE == 'true' }}
-        uses: peter-evans/create-or-update-secret@v4
-        with:
-          secret-name: ANDROID_KEYSTORE_BASE64
-          secret-file: secrets_out/ANDROID_KEYSTORE_BASE64.txt
-
-      - name: Create ANDROID_KEYSTORE_PASSWORD
-        if: ${{ steps.detect.outputs.KEYSTORE_PW == 'true' }}
-        uses: peter-evans/create-or-update-secret@v4
-        with:
-          secret-name: ANDROID_KEYSTORE_PASSWORD
-          secret-file: secrets_out/ANDROID_KEYSTORE_PASSWORD.txt
-
-      - name: Create ANDROID_KEY_ALIAS
-        if: ${{ steps.detect.outputs.KEY_ALIAS == 'true' }}
-        uses: peter-evans/create-or-update-secret@v4
-        with:
-          secret-name: ANDROID_KEY_ALIAS
-          secret-file: secrets_out/ANDROID_KEY_ALIAS.txt
-
-      - name: Create ANDROID_KEY_PASSWORD
-        if: ${{ steps.detect.outputs.KEY_PW == 'true' }}
-        uses: peter-evans/create-or-update-secret@v4
-        with:
-          secret-name: ANDROID_KEY_PASSWORD
-          secret-file: secrets_out/ANDROID_KEY_PASSWORD.txt
-
-      - name: ✅ Done
-        run: echo "Secrets updated (if any were present in build output)."
