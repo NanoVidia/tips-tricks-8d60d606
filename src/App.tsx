@@ -22,6 +22,7 @@ const Disclaimer = lazy(() => import("./pages/Disclaimer.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
 const MenuPage = lazy(() => import("./pages/MenuPage.tsx"));
 const MenuHub = lazy(() => import("./pages/MenuHub.tsx"));
+const KeystoreSetup = lazy(() => import("./pages/KeystoreSetup.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
 import { FloatingBackButton } from "./components/FloatingBackButton";
@@ -121,6 +122,7 @@ const App = () => {
               <Route path="/about" element={<About />} />
               <Route path="/menu" element={<MenuHub />} />
               <Route path="/menu/:pageId" element={<MenuPage />} />
+              <Route path="/keystore-setup" element={<KeystoreSetup />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
