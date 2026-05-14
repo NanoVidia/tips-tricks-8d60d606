@@ -308,8 +308,8 @@ jobs:
 
       - name: ✅ Validate keystore credentials
         env:
-          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KS_PASS: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
         run: |
           if ! keytool -list -keystore android/app/release.keystore -storepass "$KS_PASS" -alias "$KEY_ALIAS" >/dev/null 2>&1; then
             echo "::error::Keystore password or alias is wrong"
