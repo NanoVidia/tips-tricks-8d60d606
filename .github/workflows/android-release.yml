@@ -188,22 +188,16 @@ jobs:
           add_perm "android.permission.POST_NOTIFICATIONS"
           add_perm "com.android.vending.BILLING"
 
-      - name: 🔐 Verify required Android secrets exist
+      - name: 🔐 Auto-generate Android signing secrets if missing
         env:
+          GH_TOKEN: ${{ github.token }}
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
-          set -uo pipefail
-
-          declare -A SECRET_HINT=(
-            [ANDROID_KEYSTORE_BASE64]="ملف release.keystore بعد تحويله إلى Base64 (سطر واحد بدون مسافات)."
-            [ANDROID_KEYSTORE_PASSWORD]="كلمة مرور الـ keystore (storepass) المُستخدمة عند توليده."
-            [ANDROID_KEY_ALIAS]="اسم الـ alias داخل الـ keystore (مثال: tipstricks)."
-            [ANDROID_KEY_PASSWORD]="كلمة مرور المفتاح (keypass). غالباً نفس كلمة الـ keystore."
-          )
+          set -euo pipefail
 
           missing=()
           for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
@@ -213,32 +207,82 @@ jobs:
 
           if [ "${#missing[@]}" -eq 0 ]; then
             B64_LEN=${#ANDROID_KEYSTORE_BASE64}
-            if [ "$B64_LEN" -lt 1400 ]; then
-              echo "::warning::ANDROID_KEYSTORE_BASE64 length is suspiciously small ($B64_LEN chars)."
-            fi
             echo "✓ All four Android signing secrets are present (base64 length: $B64_LEN chars)"
+            echo "AUTO_GENERATED=false" >> $GITHUB_ENV
             exit 0
           fi
 
-          echo "::error::Missing ${#missing[@]} required Android signing secret(s): ${missing[*]}"
-          {
-            echo "## ❌ Android signing secrets missing"
-            echo ""
-            echo "### Missing secrets"
-            echo "| Secret | What it is |"
-            echo "|---|---|"
-            for s in "${missing[@]}"; do
-              echo "| \`$s\` | ${SECRET_HINT[$s]} |"
-            done
-            echo ""
-            echo "### How to restore"
-            echo "- **Recommended (app already on Play):** [Import Existing Android Keystore](${REPO_URL}/actions/workflows/import-keystore.yml)"
-            echo "- **First-time only:** [Setup Android Signing Secrets (one-time)](${REPO_URL}/actions/workflows/generate-keystore.yml)"
-            echo "- **Manual:** [Repository Secrets settings](${REPO_URL}/settings/secrets/actions)"
-            echo ""
-            echo "> ⚠️ Google Play rejects any AAB signed with a different keystore than the original. Use Import (not Generate) if the app is already published."
-          } >> "$GITHUB_STEP_SUMMARY"
-          exit 1
+          echo "::warning::Missing ${#missing[@]} secret(s): ${missing[*]} — generating new keystore automatically."
+
+          if [ "${#missing[@]}" -ne 4 ]; then
+            echo "::error::Partial secrets detected. Either all 4 must exist (existing app) or all 4 must be missing (first-time)."
+            echo "::error::Delete remaining secrets manually then re-run, or use Import Keystore workflow if app is on Play Store."
+            exit 1
+          fi
+
+          # Generate keystore + passwords
+          STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
+          KEY_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
+          ALIAS=tipstricks
+          mkdir -p out backup
+          keytool -genkeypair -v \
+            -keystore out/release.keystore \
+            -alias "$ALIAS" \
+            -keyalg RSA -keysize 2048 \
+            -validity 10950 \
+            -storepass "$STORE_PASS" \
+            -keypass "$KEY_PASS" \
+            -dname "CN=Tips and Tricks, OU=Mobile, O=Lovable App, L=NA, ST=NA, C=US"
+
+          KS_B64=$(base64 -w0 out/release.keystore)
+          echo "::add-mask::$STORE_PASS"
+          echo "::add-mask::$KEY_PASS"
+          echo "::add-mask::$KS_B64"
+
+          # Upload secrets
+          echo "$KS_B64"     | gh secret set ANDROID_KEYSTORE_BASE64    --body -
+          echo "$STORE_PASS" | gh secret set ANDROID_KEYSTORE_PASSWORD  --body -
+          echo "$ALIAS"      | gh secret set ANDROID_KEY_ALIAS          --body -
+          echo "$KEY_PASS"   | gh secret set ANDROID_KEY_PASSWORD       --body -
+          echo "✓ Uploaded all 4 Android signing secrets"
+
+          # Make available to subsequent steps in THIS run (secrets context won't refresh)
+          echo "ANDROID_KEYSTORE_BASE64<<EOF_KS"  >> $GITHUB_ENV
+          echo "$KS_B64"                          >> $GITHUB_ENV
+          echo "EOF_KS"                           >> $GITHUB_ENV
+          echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASS" >> $GITHUB_ENV
+          echo "ANDROID_KEY_ALIAS=$ALIAS"              >> $GITHUB_ENV
+          echo "ANDROID_KEY_PASSWORD=$KEY_PASS"        >> $GITHUB_ENV
+          echo "AUTO_GENERATED=true"                   >> $GITHUB_ENV
+
+          # Backup bundle
+          cp out/release.keystore backup/release.keystore
+          echo "$KS_B64" > backup/ANDROID_KEYSTORE_BASE64.txt
+          cat > backup/SECRETS.txt <<EOF
+          ════════════════════════════════════════════════════════════════
+          🔐 Android Signing Secrets — BACKUP (KEEP SAFE FOREVER)
+          ════════════════════════════════════════════════════════════════
+          Generated: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+          Repository: ${GITHUB_REPOSITORY}
+
+          ANDROID_KEYSTORE_BASE64   = (محتوى ANDROID_KEYSTORE_BASE64.txt)
+          ANDROID_KEYSTORE_PASSWORD = ${STORE_PASS}
+          ANDROID_KEY_ALIAS         = ${ALIAS}
+          ANDROID_KEY_PASSWORD      = ${KEY_PASS}
+
+          ⚠️  بدون هذه النسخة + بدون Play App Signing → لن تتمكن من تحديث التطبيق على Google Play أبداً.
+          ════════════════════════════════════════════════════════════════
+          EOF
+          chmod -R go-rwx backup
+
+      - name: 📦 Upload keystore backup (only when auto-generated)
+        if: env.AUTO_GENERATED == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: keystore-backup-DOWNLOAD-AND-DELETE
+          path: backup/
+          retention-days: 7
+          if-no-files-found: error
 
       - name: 🔑 Decode keystore
         env:
