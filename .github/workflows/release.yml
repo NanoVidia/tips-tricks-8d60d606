@@ -412,14 +412,161 @@ jobs:
           echo "aab=out/${BASE}.aab" >> $GITHUB_OUTPUT
           ls -la out/
 
-      - name: 🔍 Verify AAB signature
+      - name: 🔍 Verify AAB · signature match · Play compliance
         env:
           AAB: ${{ steps.collect.outputs.aab }}
+          EXPECTED_PKG: app.lovable.tipstricks
         run: |
-          unzip -l "$AAB" | grep -E "META-INF/.*\.(RSA|EC|DSA)" >/dev/null || { echo "::error::AAB unsigned"; exit 1; }
-          jarsigner -verify -strict "$AAB" >/dev/null
-          keytool -printcert -jarfile "$AAB" 2>/dev/null | grep -E "SHA(1|256):" || true
-          echo "✅ AAB signed & verified ($(stat -c%s "$AAB") bytes)"
+          set -euo pipefail
+          mkdir -p diagnostics
+          REPORT=diagnostics/06-aab-verification.txt
+          fail=0
+          warn=0
+          {
+            echo "════════════════════════════════════════════════════"
+            echo "🔍 AAB verification — $(date -u +'%Y-%m-%d %H:%M:%S') UTC"
+            echo "File: $AAB ($(stat -c%s "$AAB") bytes)"
+            echo "SHA256: $(sha256sum "$AAB" | awk '{print $1}')"
+            echo "════════════════════════════════════════════════════"
+          } | tee "$REPORT"
+
+          # ── 1) Signed (META-INF block exists) ───────────────────
+          if ! unzip -l "$AAB" | grep -E "META-INF/.*\.(RSA|EC|DSA)" >/dev/null; then
+            echo "::error::AAB is unsigned (no META-INF/*.RSA|EC|DSA)"; fail=1
+          else
+            echo "  ✓ Signature block present" | tee -a "$REPORT"
+          fi
+
+          # ── 2) jarsigner strict verify ──────────────────────────
+          if jarsigner -verify -strict "$AAB" >/tmp/js.out 2>&1; then
+            echo "  ✓ jarsigner -verify -strict OK" | tee -a "$REPORT"
+          else
+            echo "::error::jarsigner verification failed"
+            cat /tmp/js.out | tee -a "$REPORT"
+            fail=1
+          fi
+
+          # ── 3) AAB cert fingerprints ────────────────────────────
+          AAB_SHA256=$(keytool -printcert -jarfile "$AAB" 2>/dev/null | awk '/SHA256:/ {print $2; exit}')
+          AAB_SHA1=$(  keytool -printcert -jarfile "$AAB" 2>/dev/null | awk '/SHA1:/   {print $2; exit}')
+          {
+            echo ""
+            echo "AAB cert SHA1:   ${AAB_SHA1:-N/A}"
+            echo "AAB cert SHA256: ${AAB_SHA256:-N/A}"
+          } | tee -a "$REPORT"
+
+          # ── 4) Keystore cert fingerprints (must match) ──────────
+          KS=android/app/release.keystore
+          KS_SHA256=$(keytool -list -v -keystore "$KS" \
+                       -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+                       -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
+                       | awk '/SHA256:/ {print $2; exit}')
+          KS_SHA1=$(  keytool -list -v -keystore "$KS" \
+                       -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+                       -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
+                       | awk '/SHA1:/   {print $2; exit}')
+          {
+            echo "KS  cert SHA1:   ${KS_SHA1:-N/A}"
+            echo "KS  cert SHA256: ${KS_SHA256:-N/A}"
+          } | tee -a "$REPORT"
+
+          if [ -z "$AAB_SHA256" ] || [ -z "$KS_SHA256" ]; then
+            echo "::error::Could not extract one of the SHA256 fingerprints"; fail=1
+          elif [ "$AAB_SHA256" != "$KS_SHA256" ]; then
+            echo "::error::Signature MISMATCH — AAB was not signed by the configured keystore"
+            echo "  AAB: $AAB_SHA256"
+            echo "  KS : $KS_SHA256"
+            fail=1
+          else
+            echo "  ✓ AAB signed by configured keystore (SHA256 match)" | tee -a "$REPORT"
+          fi
+
+          # ── 5) Inspect AndroidManifest via bundletool ───────────
+          BT_VER=1.17.2
+          BT=/tmp/bundletool.jar
+          [ -f "$BT" ] || curl -sSL -o "$BT" \
+            "https://github.com/google/bundletool/releases/download/${BT_VER}/bundletool-all-${BT_VER}.jar"
+
+          MANIFEST=$(java -jar "$BT" dump manifest --bundle "$AAB" 2>/tmp/bt.err || true)
+          if [ -z "$MANIFEST" ]; then
+            echo "::warning::bundletool could not dump manifest"
+            cat /tmp/bt.err | tee -a "$REPORT"
+            warn=1
+          else
+            echo "$MANIFEST" > diagnostics/07-aab-manifest.xml
+            PKG=$(echo "$MANIFEST" | grep -oE 'package="[^"]+"'        | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+            VC=$( echo "$MANIFEST" | grep -oE 'versionCode="[^"]+"'    | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+            VN=$( echo "$MANIFEST" | grep -oE 'versionName="[^"]+"'    | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+            MIN=$( echo "$MANIFEST" | grep -oE 'minSdkVersion="[^"]+"'  | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+            TGT=$( echo "$MANIFEST" | grep -oE 'targetSdkVersion="[^"]+"' | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+            DBG=$( echo "$MANIFEST" | grep -oE 'debuggable="[^"]+"'    | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+            {
+              echo ""
+              echo "── Manifest ──"
+              echo "  package:        ${PKG:-?}"
+              echo "  versionCode:    ${VC:-?}"
+              echo "  versionName:    ${VN:-?}"
+              echo "  minSdkVersion:  ${MIN:-?}"
+              echo "  targetSdkVersion: ${TGT:-?}"
+              echo "  debuggable:     ${DBG:-false}"
+            } | tee -a "$REPORT"
+
+            # Play requirements
+            [ "$PKG" = "$EXPECTED_PKG" ] \
+              && echo "  ✓ package matches capacitor.config.ts" | tee -a "$REPORT" \
+              || { echo "::error::package '$PKG' != expected '$EXPECTED_PKG'"; fail=1; }
+
+            if [ -n "${TGT:-}" ] && [ "$TGT" -ge 34 ] 2>/dev/null; then
+              echo "  ✓ targetSdk $TGT meets Play minimum (34+, Aug 2024)" | tee -a "$REPORT"
+            else
+              echo "::error::targetSdk '$TGT' below Play requirement (must be ≥ 34)"; fail=1
+            fi
+
+            if [ "${DBG:-false}" = "true" ]; then
+              echo "::error::android:debuggable=true — Play rejects debuggable releases"; fail=1
+            fi
+          fi
+
+          # ── 6) Key strength (Play requires RSA ≥ 2048 / EC ≥ 256) ─
+          KEY_INFO=$(keytool -list -v -keystore "$KS" \
+                      -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+                      -alias "$ANDROID_KEY_ALIAS" 2>/dev/null)
+          ALGO=$(echo "$KEY_INFO" | awk -F': ' '/Signature algorithm name/ {print $2; exit}')
+          KSIZE=$(echo "$KEY_INFO" | awk -F': ' '/Subject Public Key Algorithm/ {print $2; exit}')
+          VALID=$(echo "$KEY_INFO" | awk -F'until: ' '/until:/ {print $2; exit}')
+          {
+            echo ""
+            echo "── Key ──"
+            echo "  algorithm: ${ALGO:-?}"
+            echo "  key size:  ${KSIZE:-?}"
+            echo "  valid until: ${VALID:-?}"
+          } | tee -a "$REPORT"
+
+          if echo "$KSIZE" | grep -qiE '2048|3072|4096'; then
+            echo "  ✓ Key size meets Play minimum (RSA ≥ 2048)" | tee -a "$REPORT"
+          else
+            echo "::warning::Could not confirm key size ≥ 2048 from '$KSIZE'"; warn=1
+          fi
+
+          # ── 7) Result ────────────────────────────────────────────
+          {
+            echo ""
+            if [ "$fail" -eq 0 ]; then
+              echo "✅ AAB passes signature + Play compliance checks (warnings: $warn)"
+            else
+              echo "❌ AAB verification FAILED"
+            fi
+          } | tee -a "$REPORT"
+
+          {
+            echo "## 🔍 AAB verification"
+            echo ""
+            echo '```'
+            cat "$REPORT"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+          [ "$fail" -eq 0 ] || exit 1
 
       - name: 📤 Upload artifacts (AAB + APK + mapping)
         uses: actions/upload-artifact@v4
