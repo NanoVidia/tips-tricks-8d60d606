@@ -1,14 +1,50 @@
-# 🔐 إعداد بناء Android المووقّع
+# 🔐 إعداد بناء Android الموقّع
 
-هذا الدليل يشرح كيفية إعداد جميع الأسرار اللازمة لبناء تطبيق Android موقّع تلقائياً عبر GitHub Actions.
+هذا الدليل يشرح المسار الصحيح لاستخراج AAB موقّع تلقائياً عبر GitHub Actions مع أقل إعداد يدوي ممكن.
 
-## المتطلبات المسبقة
+## المسار المعتمد الآن
 
-- Java JDK (إصدار 21 أو أحدث)
-- keytool (يأتي مع Java)
-- base64 utility (موجود في Linux/Mac/Git Bash)
+يوجد workflow واحد فقط مسؤول عن Android signing والبناء:
 
-## 1️⃣ إنشاء Keystore جديد
+- **Actions → Build Android AAB**
+
+ويعمل كالتالي:
+
+1. إذا كانت أسرار Android الأربعة موجودة وصحيحة → يبني AAB مباشرة.
+2. إذا كانت الأسرار غير موجودة أو غير متطابقة → يحتاج وجود `GH_REPO_ADMIN_TOKEN` مرة واحدة فقط.
+3. عند وجود `GH_REPO_ADMIN_TOKEN` → يولّد keystore جديداً، يحفظ الأسرار الأربعة تلقائياً داخل GitHub، ثم يكمل بناء AAB.
+4. بعد أول نجاح → تصبح البناءات التالية تلقائية بالكامل بنفس التوقيع.
+
+## 1️⃣ التهيئة الأولى المطلوبة مرة واحدة
+
+لأن GitHub لا يسمح للـ workflow بإنشاء Repository Secrets من نفسه بدون اعتماد إداري، يلزمك مرة واحدة فقط إضافة هذا السر:
+
+- `GH_REPO_ADMIN_TOKEN`
+
+ويجب أن يكون **Classic Personal Access Token** بصلاحية `repo`.
+
+بعد إضافته:
+
+1. افتح **Actions → Build Android AAB**
+2. اضغط **Run workflow**
+3. اترك `version_name` و `version_code` فارغين إذا أردت الزيادة التلقائية
+4. شغّل البناء
+
+في أول تشغيل ناجح سيحدث تلقائياً:
+
+- إنشاء `release.keystore`
+- إنشاء الأسرار التالية داخل المستودع:
+  - `ANDROID_KEYSTORE_BASE64`
+  - `ANDROID_KEYSTORE_PASSWORD`
+  - `ANDROID_KEY_ALIAS`
+  - `ANDROID_KEY_PASSWORD`
+- رفع نسخة احتياطية artifact باسم `keystore-backup-DOWNLOAD-AND-DELETE`
+
+> **مهم جداً:** نزّل النسخة الاحتياطية واحفظها في مكان آمن. هذا هو مفتاح تحديثات Google Play مستقبلاً.
+
+---
+
+## 2️⃣ إذا أردت إنشاء Keystore يدوياً بدلاً من التوليد التلقائي
 
 إذا لم تكن لديك keystore موجود، استخدم الأمر التالي:
 
@@ -26,7 +62,7 @@ keytool -genkey -v -keystore release.keystore -keyalg RSA \
 
 ---
 
-## 2️⃣ تحويل Keystore إلى Base64
+## 3️⃣ تحويل Keystore إلى Base64
 
 بمجرد حصولك على `release.keystore`:
 
@@ -45,7 +81,7 @@ Write-Host "تم نسخ Base64 إلى الحافظة"
 
 ---
 
-## 3️⃣ إضافة الأسرار إلى GitHub
+## 4️⃣ إضافة الأسرار إلى GitHub يدوياً
 
 1. انتقل إلى: **Settings → Secrets and variables → Actions**
 2. اضغط **New repository secret** وأضف كل سر:
@@ -57,11 +93,11 @@ Write-Host "تم نسخ Base64 إلى الحافظة"
 | `ANDROID_KEY_ALIAS` | الاسم المستعار للمفتاح (عادة `release-key`) | `release-key` |
 | `ANDROID_KEY_PASSWORD` | كلمة مرور المفتاح | `keyPassword456` |
 
-> 💡 **نصيحة:** اتركها كنسخة احتياطية آمنة في مكان محمي (مثل مدير كلمات المرور).
+> هذا المسار اليدوي لا تحتاجه إذا كنت ستستخدم `GH_REPO_ADMIN_TOKEN` وتدع workflow يقوم بالتهيئة الأولى تلقائياً.
 
 ---
 
-## 4️⃣ اختبار الإعداد
+## 5️⃣ اختبار الإعداد
 
 لاختبار إذا تم إدخال جميع الأسرار بشكل صحيح:
 
@@ -76,10 +112,13 @@ Write-Host "تم نسخ Base64 إلى الحافظة"
 
 ## 🐛 استكشاف الأخطاء الشائعة
 
+### ❌ "Missing Android signing bootstrap"
+**السبب:** الأسرار الأربعة غير موجودة أو غير متطابقة، ولا يوجد `GH_REPO_ADMIN_TOKEN` لكي ينشئها workflow تلقائياً.
+**الحل:** أضف `GH_REPO_ADMIN_TOKEN` مرة واحدة ثم أعد تشغيل `Build Android AAB`.
+
 ### ❌ "Missing secret ANDROID_KEYSTORE_BASE64"
-**السبب:** لم تضف السر في GitHub Settings
-**الحل:** تأكد من إضافة جميع الأسرار الأربعة في:
-`Settings → Secrets and variables → Actions`
+**السبب:** اخترت المسار اليدوي ولم تضف الأسرار الأربعة كلها.
+**الحل:** أضف الأسرار الأربعة يدوياً، أو استخدم `GH_REPO_ADMIN_TOKEN` ليديرها workflow تلقائياً.
 
 ### ❌ "Keystore password OR alias is wrong"
 **السبب:** البيانات في الأسرار غير متطابقة مع Keystore الفعلي
@@ -105,7 +144,7 @@ base64 -i release.keystore | wc -c  # تحقق أنه أكثر من 2000 حرف
 
 ### تحديث رقم الإصدار تلقائياً
 
-عند تشغيل الـ workflow:
+عند تشغيل workflow `Build Android AAB`:
 - أدخل **version_name** مثل: `1.5.0`
 - أدخل **version_code** مثل: `15`
 - فعّل **commit_version_bump** لحفظ التحديث تلقائياً
