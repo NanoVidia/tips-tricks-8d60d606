@@ -318,7 +318,7 @@ jobs:
 
       - name: 🔎 Print keystore entries (no secrets)
         env:
-          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KS_PASS: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           echo "── Keystore entries ──"
           keytool -list -keystore android/app/release.keystore -storepass "$KS_PASS" -v 2>/dev/null | grep -E "Alias|Entry type|Creation date" || \
