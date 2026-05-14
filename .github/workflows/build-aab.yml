@@ -166,17 +166,19 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
+
+          SECRET_NAMES=(ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD)
 
           present=0
-          for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-            [ -n "${!s}" ] && present=$((present+1))
+          for s in "${SECRET_NAMES[@]}"; do
+            [ -n "${!s:-}" ] && present=$((present+1))
           done
 
-          # تحقق فعلي من تطابق keystore + كلمات السر + alias قبل الاعتماد عليها
+          mkdir -p out backup
           VALID=false
           if [ "$present" -eq 4 ]; then
-            mkdir -p out
+            echo "Checking existing Android signing secrets consistency..."
             if echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > out/_check.keystore 2>/dev/null \
                && [ "$(stat -c%s out/_check.keystore 2>/dev/null || echo 0)" -ge 1000 ] \
                && keytool -list -keystore out/_check.keystore \
@@ -193,71 +195,136 @@ jobs:
 
           if [ "$VALID" = "true" ]; then
             echo "✓ Reusing existing permanent signing secrets (validated)"
-            { echo "ANDROID_KEYSTORE_BASE64<<E"; echo "$ANDROID_KEYSTORE_BASE64"; echo "E"; } >> $GITHUB_ENV
-            echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> $GITHUB_ENV
-            echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"                 >> $GITHUB_ENV
-            echo "ANDROID_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"           >> $GITHUB_ENV
-            echo "AUTO_GENERATED=false" >> $GITHUB_ENV
+            KS_B64="$ANDROID_KEYSTORE_BASE64"
+            STORE_PASS="$ANDROID_KEYSTORE_PASSWORD"
+            ALIAS="$ANDROID_KEY_ALIAS"
+            KEY_PASS="$ANDROID_KEY_PASSWORD"
+            echo "::add-mask::$STORE_PASS"
+            echo "::add-mask::$KEY_PASS"
+            echo "::add-mask::$KS_B64"
+            { echo "ANDROID_KEYSTORE_BASE64<<E"; echo "$KS_B64"; echo "E"; } >> $GITHUB_ENV
+            echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASS" >> $GITHUB_ENV
+            echo "ANDROID_KEY_ALIAS=$ALIAS"              >> $GITHUB_ENV
+            echo "ANDROID_KEY_PASSWORD=$KEY_PASS"        >> $GITHUB_ENV
+            echo "AUTO_GENERATED=false"                  >> $GITHUB_ENV
+            echo "PERSISTED=true"                        >> $GITHUB_ENV
             exit 0
-          fi
-
-          if [ "$present" -eq 4 ]; then
-            echo "::warning::الأسرار موجودة لكنها غير متطابقة (keystore/password/alias). سيتم توليد keystore جديد واستبدالها."
           else
-            echo "::notice::Generating new release keystore ($((4-present))/4 secrets missing)"
+            if [ "$present" -eq 4 ]; then
+              echo "::warning::All Android signing secrets exist but are inconsistent/invalid. Generating a new keystore and replacing values for this run."
+            else
+              echo "::notice::Generating new release keystore ($((4-present))/4 secrets missing)"
+            fi
+
+            STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
+            KEY_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
+            ALIAS=tipstricks
+            keytool -genkeypair -v -keystore out/release.keystore -alias "$ALIAS" \
+              -keyalg RSA -keysize 2048 -validity 10950 \
+              -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
+              -dname "CN=Tips and Tricks, OU=Mobile, O=Lovable App, L=NA, ST=NA, C=US"
+            KS_B64=$(base64 -w0 out/release.keystore)
           fi
 
-          STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
-          KEY_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
-          ALIAS=tipstricks
-          mkdir -p out backup
-          keytool -genkeypair -v -keystore out/release.keystore -alias "$ALIAS" \
-            -keyalg RSA -keysize 2048 -validity 10950 \
-            -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
-            -dname "CN=Tips and Tricks, OU=Mobile, O=Lovable App, L=NA, ST=NA, C=US"
-          KS_B64=$(base64 -w0 out/release.keystore)
+          AUTO_GENERATED=true
+          PERSISTED=false
           echo "::add-mask::$STORE_PASS"
           echo "::add-mask::$KEY_PASS"
           echo "::add-mask::$KS_B64"
-
-          PERSISTED=false
-          if [ "${HAS_ADMIN_TOKEN:-false}" = "true" ]; then
-            export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
-            # احذف أي مجموعة جزئية قبل التوليد لمنع التضارب
-            for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-              gh secret delete "$s" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
-            done
-
-            OK=true
-            echo "$KS_B64"     | gh secret set ANDROID_KEYSTORE_BASE64    --repo "$GITHUB_REPOSITORY" --body - || OK=false
-            echo "$STORE_PASS" | gh secret set ANDROID_KEYSTORE_PASSWORD  --repo "$GITHUB_REPOSITORY" --body - || OK=false
-            echo "$ALIAS"      | gh secret set ANDROID_KEY_ALIAS          --repo "$GITHUB_REPOSITORY" --body - || OK=false
-            echo "$KEY_PASS"   | gh secret set ANDROID_KEY_PASSWORD       --repo "$GITHUB_REPOSITORY" --body - || OK=false
-
-            if [ "$OK" = "true" ]; then
-              for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-                gh secret list --repo "$GITHUB_REPOSITORY" | grep -q "^$s\b" || OK=false
-              done
-            fi
-
-            if [ "$OK" = "true" ]; then
-              PERSISTED=true
-              echo "✅ All 4 signing secrets persisted permanently to repository"
-            else
-              echo "::warning::تعذّر حفظ الأسرار عبر PAT (صلاحيات؟). سيتم رفع نسخة احتياطية فقط."
-            fi
-          else
-            echo "::warning::لا يوجد PAT — لن تُحفظ الأسرار دائماً. ارفعها يدوياً من الـ artifact."
-          fi
 
           { echo "ANDROID_KEYSTORE_BASE64<<E"; echo "$KS_B64"; echo "E"; } >> $GITHUB_ENV
           echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASS" >> $GITHUB_ENV
           echo "ANDROID_KEY_ALIAS=$ALIAS"              >> $GITHUB_ENV
           echo "ANDROID_KEY_PASSWORD=$KEY_PASS"        >> $GITHUB_ENV
-          echo "AUTO_GENERATED=true"                   >> $GITHUB_ENV
-          echo "PERSISTED=$PERSISTED"                  >> $GITHUB_ENV
+          echo "AUTO_GENERATED=$AUTO_GENERATED"        >> $GITHUB_ENV
 
-          cp out/release.keystore backup/release.keystore
+          if [ "$AUTO_GENERATED" = "true" ] && [ -f out/release.keystore ]; then
+            cp out/release.keystore backup/release.keystore
+          fi
+
+          if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ] && [ "$AUTO_GENERATED" = "true" ]; then
+            echo "GH_REPO_ADMIN_TOKEN detected: attempting to persist generated secrets to repository."
+            GH_READY=true
+
+            if command -v gh >/dev/null 2>&1; then
+              echo "gh CLI found."
+            else
+              echo "::notice::gh CLI not found; attempting installation..."
+              if command -v apt-get >/dev/null 2>&1; then
+                sudo apt-get update -y && sudo apt-get install -y gh || GH_READY=false
+              else
+                GH_READY=false
+              fi
+            fi
+
+            if [ "$GH_READY" = "true" ] && ! command -v gh >/dev/null 2>&1; then
+              GH_READY=false
+            fi
+
+            if [ "$GH_READY" = "true" ]; then
+              gh --version || true
+              AUTH_ERR=""
+              if ! echo "$GH_REPO_ADMIN_TOKEN" | gh auth login --hostname github.com --with-token 2>out/gh-auth.err; then
+                AUTH_ERR="$(cat out/gh-auth.err 2>/dev/null || true)"
+                echo "::warning::gh auth login failed. Will fallback to GH_TOKEN for gh commands."
+                export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
+              fi
+
+              if ! gh auth status --hostname github.com >/dev/null 2>&1; then
+                export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
+              fi
+              gh auth status --hostname github.com || true
+
+              if echo "$AUTH_ERR" | grep -Eqi '(401|403|forbidden|unauthorized|resource not accessible|http 4(01|03))'; then
+                echo "::error::GH_REPO_ADMIN_TOKEN authentication is not authorized (401/403). Use a PAT with repo scope from an admin account, and confirm org policies allow secret management."
+                exit 1
+              fi
+
+              set_secret_with_retry() {
+                local secret_name="$1"
+                local secret_value="$2"
+                local attempt=1
+                while [ "$attempt" -le 3 ]; do
+                  if printf '%s' "$secret_value" | gh secret set "$secret_name" --repo "$GITHUB_REPOSITORY" --body - >/dev/null 2>&1; then
+                    echo "✓ persisted $secret_name (attempt $attempt)"
+                    return 0
+                  fi
+                  echo "::warning::Failed to persist $secret_name (attempt $attempt/3)."
+                  sleep $((attempt * 2))
+                  attempt=$((attempt + 1))
+                done
+                return 1
+              }
+
+              OK=true
+              set_secret_with_retry ANDROID_KEYSTORE_BASE64 "$KS_B64" || OK=false
+              set_secret_with_retry ANDROID_KEYSTORE_PASSWORD "$STORE_PASS" || OK=false
+              set_secret_with_retry ANDROID_KEY_ALIAS "$ALIAS" || OK=false
+              set_secret_with_retry ANDROID_KEY_PASSWORD "$KEY_PASS" || OK=false
+
+              SECRET_LIST="$(gh secret list --repo "$GITHUB_REPOSITORY" 2>/dev/null || true)"
+              for s in "${SECRET_NAMES[@]}"; do
+                echo "$SECRET_LIST" | awk '{print $1}' | grep -qx "$s" || OK=false
+              done
+
+              if [ "$OK" = "true" ]; then
+                PERSISTED=true
+                echo "✅ All 4 signing secrets persisted permanently to repository."
+              else
+                PERSISTED=false
+                echo "::warning::Generated keystore secrets could not be fully confirmed in repository secrets. Check PAT scope (repo), repository admin rights, and any organization secret policy restrictions."
+              fi
+            else
+              PERSISTED=false
+              echo "::warning::gh CLI is unavailable and installation failed; continuing with artifact backup only."
+            fi
+          elif [ -z "${GH_REPO_ADMIN_TOKEN:-}" ] && [ "$AUTO_GENERATED" = "true" ]; then
+            PERSISTED=false
+            echo "::notice::GH_REPO_ADMIN_TOKEN is not configured. Build continues and keystore backup artifact will be uploaded."
+          fi
+
+          echo "PERSISTED=$PERSISTED" >> $GITHUB_ENV
+
           cat > backup/SECRETS.txt <<EOF
           ⚠️ نسخة احتياطية — احفظها في خزنة آمنة (1Password / Bitwarden)
           ════════════════════════════════════════════════════
