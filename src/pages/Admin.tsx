@@ -257,7 +257,6 @@ export default function Admin() {
                           mode="single"
                           selected={date}
                           onSelect={setDate}
-                          initialFocus
                           className="p-3 pointer-events-auto"
                         />
                       </PopoverContent>
