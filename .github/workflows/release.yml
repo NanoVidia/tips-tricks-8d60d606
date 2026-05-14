@@ -183,6 +183,36 @@ jobs:
               sed -i "s|<application|<uses-permission android:name=\"android.permission.$p\" />\n    <application|" "$M"
           done
 
+      - name: 🩺 Snapshot secrets availability
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          mkdir -p diagnostics
+          F=diagnostics/01-secrets-snapshot.txt
+          {
+            echo "════════════════════════════════════════════════════"
+            echo "🩺 Secrets availability snapshot"
+            echo "Timestamp (UTC): $(date -u +'%Y-%m-%d %H:%M:%S')"
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Ref: ${GITHUB_REF} · SHA: ${GITHUB_SHA}"
+            echo "════════════════════════════════════════════════════"
+            for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD GH_REPO_ADMIN_TOKEN GOOGLE_PLAY_SERVICE_ACCOUNT_JSON TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID; do
+              v="${!s:-}"
+              if [ -z "$v" ]; then
+                printf '  ✗ %-40s MISSING\n' "$s"
+              else
+                printf '  ✓ %-40s present (len=%d)\n' "$s" "${#v}"
+              fi
+            done
+          } | tee "$F"
+
       - name: 🔐 Auto-generate Android signing secrets if missing
         env:
           GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
