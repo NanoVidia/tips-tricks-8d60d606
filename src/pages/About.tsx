@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { BookOpen, GraduationCap, ShieldCheck, Users, ArrowLeft } from "lucide-react";
+import { BookOpen, GraduationCap, ShieldCheck, Users, ArrowLeft, Package } from "lucide-react";
+import { APP_VERSION_NAME, APP_VERSION_CODE, APP_ID, APP_BUILD_DATE } from "@/lib/appVersion";
 
 export default function About() {
   return (
@@ -50,6 +51,26 @@ export default function About() {
             هذا التطبيق مرجع تعليمي في طب النساء والولادة فقط، ولا يقوم بتشخيص أو علاج أو الوقاية من أي مرض،
             ولا يُغني عن استشارة طبيب مختص. لأي مشكلة صحية شخصية يُرجى مراجعة طبيب النساء والولادة المعالج،
             وفي حالات الطوارئ اتصل بخدمات الطوارئ المحلية فوراً.
+          </p>
+        </section>
+
+        <section dir="rtl" className="rounded-2xl border border-border/60 bg-card p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Package className="w-5 h-5 text-primary" />
+            <h3 className="font-semibold">إصدار التطبيق</h3>
+          </div>
+          <dl className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-2 text-sm">
+            <dt className="text-muted-foreground">versionName</dt>
+            <dd className="font-mono font-semibold">{APP_VERSION_NAME}</dd>
+            <dt className="text-muted-foreground">versionCode</dt>
+            <dd className="font-mono font-semibold">{APP_VERSION_CODE}</dd>
+            <dt className="text-muted-foreground">Application ID</dt>
+            <dd className="font-mono text-xs break-all">{APP_ID}</dd>
+            <dt className="text-muted-foreground">Build date</dt>
+            <dd className="font-mono text-xs">{APP_BUILD_DATE}</dd>
+          </dl>
+          <p className="mt-3 text-xs text-muted-foreground">
+            استخدم هذه الأرقام لتأكيد أن نسخة AAB المثبّتة على الجهاز هي نفسها التي بنيتها من GitHub Actions.
           </p>
         </section>
 
