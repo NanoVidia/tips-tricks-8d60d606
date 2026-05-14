@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   preview:
+    if: ${{ github.actor != 'dependabot[bot]' }}
     name: Build & Compare Bundle
     runs-on: ubuntu-latest
     timeout-minutes: 12
