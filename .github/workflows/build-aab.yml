@@ -299,10 +299,75 @@ jobs:
       # ─────────────────────────────────────────────────────────────
       # 4) Sign + build
       # ─────────────────────────────────────────────────────────────
-      - name: 🔑 Decode keystore
+      - name: 🔑 Decode & pre-flight verify keystore
+        id: ks_check
+        env:
+          GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
-          [ "$(stat -c%s android/app/release.keystore)" -ge 1000 ] || { echo "::error::Keystore too small"; exit 1; }
+          set +e
+          KS=android/app/release.keystore
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KS" 2>/tmp/b64.err
+          B64_RC=$?
+          SIZE=$(stat -c%s "$KS" 2>/dev/null || echo 0)
+
+          fail() {
+            CODE="$1"; shift
+            {
+              echo "## ❌ فشل التحقق من keystore — $CODE"
+              echo ""
+              echo "$@"
+              echo ""
+              echo "### خطوات التصحيح:"
+              echo "1. افتح إعدادات المستودع → **Settings → Secrets and variables → Actions**."
+              echo "2. احذف الأسرار الأربعة:"
+              echo "   - \`ANDROID_KEYSTORE_BASE64\`"
+              echo "   - \`ANDROID_KEYSTORE_PASSWORD\`"
+              echo "   - \`ANDROID_KEY_ALIAS\`"
+              echo "   - \`ANDROID_KEY_PASSWORD\`"
+              echo "3. تأكد من إضافة \`GH_REPO_ADMIN_TOKEN\` (PAT بصلاحية \`repo\`) ليتمكن الـ workflow من حفظها دائماً."
+              echo "4. شغّل **Build AAB** مرة أخرى — سيُولِّد keystore جديداً صالحاً ويحفظه تلقائياً."
+              echo ""
+              echo "> ⚠️ ملاحظة: إذا كان لديك تطبيق منشور سابقاً على Google Play بنفس التوقيع،"
+              echo "> فاستخدم Play App Signing → Request key upgrade بدلاً من توليد keystore جديد."
+            } >> $GITHUB_STEP_SUMMARY
+            echo "::error title=Keystore validation failed ($CODE)::راجع Summary للخطوات بالعربية"
+            exit 1
+          }
+
+          [ $B64_RC -eq 0 ] || fail "BASE64_DECODE_FAILED" \
+            "قيمة \`ANDROID_KEYSTORE_BASE64\` ليست Base64 صالحاً — ربما نُسخت ناقصة أو تحوي مسافات/أسطر جديدة."
+
+          [ "$SIZE" -ge 1000 ] || fail "KEYSTORE_TOO_SMALL" \
+            "ملف keystore بعد فك Base64 حجمه ${SIZE} bytes فقط — القيمة المحفوظة في السر تالفة أو فارغة."
+
+          keytool -list -keystore "$KS" -storepass "$ANDROID_KEYSTORE_PASSWORD" >/tmp/kt.out 2>&1
+          KT_RC=$?
+          if [ $KT_RC -ne 0 ]; then
+            if grep -qiE "password was incorrect|tampered with, or password was incorrect" /tmp/kt.out; then
+              fail "WRONG_STORE_PASSWORD" \
+                "كلمة سرّ الـ keystore (\`ANDROID_KEYSTORE_PASSWORD\`) غير مطابقة للملف المحفوظ في \`ANDROID_KEYSTORE_BASE64\`."
+            else
+              fail "KEYSTORE_UNREADABLE" \
+                "تعذّر قراءة keystore. مخرجات keytool: $(head -c 400 /tmp/kt.out)"
+            fi
+          fi
+
+          grep -qi "^${ANDROID_KEY_ALIAS}," /tmp/kt.out || \
+            fail "ALIAS_NOT_FOUND" \
+              "الـ alias \`${ANDROID_KEY_ALIAS}\` غير موجود داخل keystore. الأسماء المتاحة: $(grep -iE '^[a-z0-9_-]+,' /tmp/kt.out | cut -d, -f1 | tr '\n' ' ')"
+
+          # تحقق فعلي من مطابقة key password (السبب الأشهر لـ BadPaddingException)
+          keytool -keypasswd -keystore "$KS" \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -alias "$ANDROID_KEY_ALIAS" \
+            -keypass "$ANDROID_KEY_PASSWORD" \
+            -new "$ANDROID_KEY_PASSWORD" >/tmp/kp.out 2>&1
+          if [ $? -ne 0 ]; then
+            fail "WRONG_KEY_PASSWORD" \
+              "كلمة سرّ المفتاح (\`ANDROID_KEY_PASSWORD\`) غير مطابقة للـ alias \`${ANDROID_KEY_ALIAS}\`. هذا هو سبب خطأ \`BadPaddingException: Given final block not properly padded\` أثناء توقيع AAB."
+          fi
+
+          echo "✅ keystore سليم وكل الأسرار متطابقة"
 
       - name: ✍️ Inject signing config
         run: |
@@ -318,6 +383,7 @@ jobs:
           PY
 
       - name: 🏗️ Build signed AAB
+        id: gradle_build
         env:
           KS_PASS: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
@@ -325,7 +391,60 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew bundleRelease --no-daemon --stacktrace
+          set -o pipefail
+          ./gradlew bundleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+
+      - name: 🩺 Diagnose signing failure (on error)
+        if: failure() && steps.gradle_build.conclusion == 'failure'
+        run: |
+          LOG=/tmp/gradle.log
+          [ -f "$LOG" ] || exit 0
+
+          {
+            echo "## ❌ فشل بناء AAB أثناء التوقيع"
+            echo ""
+
+            if grep -q "BadPaddingException" "$LOG"; then
+              echo "### السبب: \`BadPaddingException — Given final block not properly padded\`"
+              echo ""
+              echo "هذا الخطأ يعني أن **كلمة سرّ المفتاح (\`ANDROID_KEY_PASSWORD\`) لا تطابق** المفتاح داخل keystore."
+              echo ""
+              echo "### خطوات التصحيح (3 دقائق):"
+              echo "1. **Settings → Secrets and variables → Actions**."
+              echo "2. احذف الأسرار الأربعة:"
+              echo "   - \`ANDROID_KEYSTORE_BASE64\`"
+              echo "   - \`ANDROID_KEYSTORE_PASSWORD\`"
+              echo "   - \`ANDROID_KEY_ALIAS\`"
+              echo "   - \`ANDROID_KEY_PASSWORD\`"
+              echo "3. تأكد أن \`GH_REPO_ADMIN_TOKEN\` موجود (PAT بصلاحية \`repo\`)."
+              echo "4. شغّل **Build AAB** من جديد — سيُولِّد keystore جديداً متطابقاً ويحفظه دائماً."
+            elif grep -qE "keystore was tampered|password was incorrect" "$LOG"; then
+              echo "### السبب: كلمة سرّ keystore غير صحيحة أو الملف تالف."
+              echo ""
+              echo "احذف الأسرار الأربعة من إعدادات المستودع وشغّل البناء مرة أخرى لتوليدها تلقائياً."
+            elif grep -q "Keystore file .* not found" "$LOG"; then
+              echo "### السبب: ملف keystore لم يُكتب على القرص — مشكلة في فك Base64."
+              echo ""
+              echo "تحقق من قيمة \`ANDROID_KEYSTORE_BASE64\` في إعدادات الأسرار."
+            elif grep -qE "alias .* does not exist|Alias .* does not exist" "$LOG"; then
+              echo "### السبب: قيمة \`ANDROID_KEY_ALIAS\` لا تطابق ما هو محفوظ داخل keystore."
+              echo ""
+              echo "احذف الأسرار الأربعة وأعد التشغيل — سيُولِّد alias جديداً (\`tipstricks\`) ويحفظه."
+            else
+              echo "### آخر 40 سطراً من سجل Gradle:"
+              echo '```'
+              tail -n 40 "$LOG"
+              echo '```'
+              echo ""
+              echo "إن لم يكن السبب واضحاً، احذف الأسرار الأربعة وأعد التشغيل."
+            fi
+
+            echo ""
+            echo "> ⚠️ إن كان التطبيق منشوراً سابقاً على Google Play بنفس التوقيع،"
+            echo "> فلا تولّد keystore جديداً — استخدم **Play App Signing → Request key upgrade**."
+          } >> $GITHUB_STEP_SUMMARY
+
+          echo "::error title=AAB signing failed::راجع Summary للخطوات التصحيحية بالعربية"
 
       - name: 🏷️ Collect AAB
         id: collect
