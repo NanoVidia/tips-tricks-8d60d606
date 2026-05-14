@@ -195,8 +195,13 @@ jobs:
         run: |
           set -euo pipefail
           missing=()
+          present=()
           for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-            [ -z "${!s}" ] && missing+=("$s")
+            if [ -z "${!s}" ]; then
+              missing+=("$s")
+            else
+              present+=("$s")
+            fi
           done
 
           if [ "${#missing[@]}" -eq 0 ]; then
@@ -210,8 +215,10 @@ jobs:
           fi
 
           if [ "${#missing[@]}" -ne 4 ]; then
-            echo "::error::Partial secrets: ${missing[*]}. Delete remaining secrets or use Keystore Management workflow"
-            exit 1
+            echo "::warning::Partial Android signing secrets detected. Deleting existing subset before regeneration: ${present[*]}"
+            for s in "${present[@]}"; do
+              gh secret delete "$s"
+            done
           fi
 
           echo "::warning::No keystore secrets found — generating new keystore"
