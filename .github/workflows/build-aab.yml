@@ -270,8 +270,7 @@ jobs:
             if [ "$GH_READY" = "true" ]; then
               gh --version || true
               AUTH_ERR=""
-              if ! echo "$GH_REPO_ADMIN_TOKEN" | gh auth login --hostname github.com --with-token 2>out/gh-auth.err; then
-                AUTH_ERR="$(cat out/gh-auth.err 2>/dev/null || true)"
+              if ! AUTH_ERR="$(echo "$GH_REPO_ADMIN_TOKEN" | gh auth login --hostname github.com --with-token 2>&1 >/dev/null)"; then
                 echo "::warning::gh auth login failed. Will fallback to GH_TOKEN for gh commands. ${AUTH_ERR}"
                 export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
               fi
@@ -295,7 +294,7 @@ jobs:
                 local attempt=1
                 while [ "$attempt" -le 3 ]; do
                   local log_file="out/gh-secret-set-${secret_name}-${attempt}.log"
-                  if printf '%s' "$secret_value" | gh secret set "$secret_name" --repo "$GITHUB_REPOSITORY" --body - >"$log_file" 2>&1; then
+                  if printf '%s' "$secret_value" | gh secret set "$secret_name" --repo "$GITHUB_REPOSITORY" --body - >/dev/null 2>"$log_file"; then
                     echo "✓ persisted $secret_name (attempt $attempt)"
                     return 0
                   fi
