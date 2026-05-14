@@ -161,6 +161,56 @@ jobs:
           [ -d "android" ] || npx cap add android
           npx cap sync android
 
+      - name: 🛡️ Verify production CAP_ENV applied (no dev server.url leak)
+        env:
+          CAP_ENV: production
+        run: |
+          set -euo pipefail
+          mkdir -p diagnostics
+          REPORT=diagnostics/00-cap-env-verify.txt
+          CAP_JSON=android/app/src/main/assets/capacitor.config.json
+
+          {
+            echo "── $(date -u +'%Y-%m-%d %H:%M:%S') UTC ──"
+            echo "Resolved CAP_ENV: ${CAP_ENV}"
+            echo "Source file: $CAP_JSON"
+          } | tee "$REPORT"
+
+          if [ ! -f "$CAP_JSON" ]; then
+            echo "::error::$CAP_JSON not produced by 'npx cap sync'"
+            exit 1
+          fi
+
+          cat "$CAP_JSON" | tee -a "$REPORT"
+
+          # 1) appId
+          PKG=$(node -e "console.log(require('./'+process.argv[1]).appId)" "$CAP_JSON")
+          if [ "$PKG" != "app.lovable.tipstricks" ]; then
+            echo "::error::appId mismatch in synced config: '$PKG' != 'app.lovable.tipstricks'"
+            exit 1
+          fi
+          echo "  ✓ appId = $PKG" | tee -a "$REPORT"
+
+          # 2) لا يجب أن يكون هناك server.url في الإنتاج
+          HAS_URL=$(node -e "const c=require('./'+process.argv[1]); console.log(c.server&&c.server.url?'yes':'no')" "$CAP_JSON")
+          if [ "$HAS_URL" = "yes" ]; then
+            URL=$(node -e "console.log(require('./'+process.argv[1]).server.url)" "$CAP_JSON")
+            echo "::error::PRODUCTION LEAK — capacitor.config.json contains server.url='$URL' (يجب حذفه عند CAP_ENV=production)"
+            echo "  ✗ server.url = $URL" >> "$REPORT"
+            exit 1
+          fi
+          echo "  ✓ no server.url (production hardened)" | tee -a "$REPORT"
+
+          # 3) cleartext يجب أن يكون false/غير موجود
+          CT=$(node -e "const c=require('./'+process.argv[1]); console.log(c.server&&c.server.cleartext===true?'yes':'no')" "$CAP_JSON")
+          if [ "$CT" = "yes" ]; then
+            echo "::error::server.cleartext=true في إنتاج — يسمح بـ HTTP غير آمن"
+            exit 1
+          fi
+          echo "  ✓ no cleartext HTTP" | tee -a "$REPORT"
+
+          echo "✅ CAP_ENV=production applied correctly" | tee -a "$REPORT"
+
       - name: 🎨 Generate icons & splash
         run: |
           if [ -f "resources/icon.png" ] && [ -f "resources/splash.png" ]; then
