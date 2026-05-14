@@ -9,9 +9,9 @@ import {
 
 describe("app version metadata", () => {
   it("uses initial app version values", () => {
-    expect(APP_VERSION_NAME).toBe("1.0.1");
+    expect(APP_VERSION_NAME).toBe("1.0.0");
     expect(APP_VERSION_CODE).toBe(1);
-    expect(APP_VERSION_LABEL).toBe("1.0.1 (build 1)");
+    expect(APP_VERSION_LABEL).toBe("1.0.0 (build 1)");
   });
 
   it("exposes app id and build date for version info screen", () => {
