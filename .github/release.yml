@@ -1,0 +1,19 @@
+changelog:
+  exclude:
+    labels: [ignore-for-release, automated]
+    authors: [dependabot, github-actions]
+  categories:
+    - title: ✨ ميزات جديدة
+      labels: [feature, feat, enhancement]
+    - title: 🐛 إصلاحات
+      labels: [fix, bug]
+    - title: ⚡ تحسينات الأداء
+      labels: [performance, perf]
+    - title: 🔒 الأمان
+      labels: [security]
+    - title: 🔧 الصيانة
+      labels: [chore, refactor, docs]
+    - title: 📦 التبعيات
+      labels: [dependencies]
+    - title: 📋 تغييرات أخرى
+      labels: ["*"]
