@@ -1,0 +1,9 @@
+# تحمي الملفات الحساسة من التعديل بدون مراجعتك
+* @AhmadFatlawi
+
+.github/                @AhmadFatlawi
+android/                @AhmadFatlawi
+capacitor.config.ts     @AhmadFatlawi
+src/lib/appVersion.ts   @AhmadFatlawi
+package.json            @AhmadFatlawi
+package-lock.json       @AhmadFatlawi
