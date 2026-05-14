@@ -115,7 +115,9 @@ jobs:
           cmdline-tools-version: "11076708"
 
       - name: 📦 npm install
-        run: npm ci --no-audit --no-fund --legacy-peer-deps
+        run: |
+          npm ci --no-audit --no-fund --legacy-peer-deps \
+            || npm install --no-audit --no-fund --legacy-peer-deps
 
       - name: 🏗️ Web build
         env:
