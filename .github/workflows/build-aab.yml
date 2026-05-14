@@ -258,6 +258,7 @@ jobs:
                 fi
               else
                 GH_READY=false
+                echo "::warning::gh CLI is missing and apt-get is unavailable, so automatic gh installation cannot be performed on this runner."
               fi
             fi
 
@@ -283,6 +284,9 @@ jobs:
                 echo "::error::GH_REPO_ADMIN_TOKEN authentication is not authorized (401/403). Use a PAT with repo scope from an admin account, and confirm org policies allow secret management."
                 exit 1
               fi
+              if [ -n "$AUTH_ERR" ]; then
+                echo "::warning::gh auth login returned a non-401/403 error; continuing with GH_TOKEN fallback. ${AUTH_ERR}"
+              fi
 
               set_secret_with_retry() {
                 local secret_name="$1"
@@ -307,9 +311,9 @@ jobs:
               set_secret_with_retry ANDROID_KEY_ALIAS "$ALIAS" || OK=false
               set_secret_with_retry ANDROID_KEY_PASSWORD "$KEY_PASS" || OK=false
 
-              SECRET_LIST="$(gh secret list --repo "$GITHUB_REPOSITORY" 2>/dev/null || true)"
+              SECRET_LIST="$(gh secret list --repo "$GITHUB_REPOSITORY" --json name --jq '.[].name' 2>/dev/null || true)"
               for s in "${SECRET_NAMES[@]}"; do
-                echo "$SECRET_LIST" | awk '{print $1}' | grep -Fqx "$s" || OK=false
+                echo "$SECRET_LIST" | grep -Fqx "$s" || OK=false
               done
 
               if [ "$OK" = "true" ]; then
