@@ -36,7 +36,7 @@
 ### الإعداد لأول مرة (عند غياب أسرار Android)
 - Actions → **Keystore Management** → Run workflow
 - اترك `mode` على القيمة الافتراضية `generate`
-- حمّل artifact: `keystore-backup-DOWNLOAD-AND-DELETE` واحفظه بمكان آمن
+- حمِّل artifact: `keystore-backup-DOWNLOAD-AND-DELETE` واحفظه بمكان آمن
 
 ### التحقق من سلامة keystore الحالي
 - mode=`verify` — يطبع SHA-1/SHA-256 fingerprints
