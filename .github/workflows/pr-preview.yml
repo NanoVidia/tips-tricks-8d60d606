@@ -1,0 +1,97 @@
+name: PR Preview
+
+# ==============================================================================
+# لكل PR: بناء الـ web + رفع artifact + تعليق بحجم الـ bundle مقارنة بـ main.
+# ==============================================================================
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Build & Compare Bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: 📥 Checkout PR
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: 📦 Install (PR)
+        run: npm ci --no-audit --no-fund
+
+      - name: 🏗️ Build (PR)
+        env:
+          NODE_ENV: production
+        run: npm run build
+
+      - name: 📏 Measure PR bundle
+        id: pr_size
+        run: |
+          PR_BYTES=$(du -sb dist | cut -f1)
+          PR_HUMAN=$(du -sh dist | cut -f1)
+          echo "bytes=$PR_BYTES"  >> $GITHUB_OUTPUT
+          echo "human=$PR_HUMAN" >> $GITHUB_OUTPUT
+          mv dist /tmp/pr-dist
+
+      - name: 📥 Checkout main (baseline)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: false
+          path: __baseline
+
+      - name: 🏗️ Build baseline (main)
+        working-directory: __baseline
+        run: |
+          npm ci --no-audit --no-fund
+          NODE_ENV=production npm run build
+
+      - name: 📏 Measure baseline & comment
+        env:
+          PR_BYTES: ${{ steps.pr_size.outputs.bytes }}
+          PR_HUMAN: ${{ steps.pr_size.outputs.human }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          BASE_BYTES=$(du -sb __baseline/dist | cut -f1)
+          BASE_HUMAN=$(du -sh __baseline/dist | cut -f1)
+          DIFF=$(( PR_BYTES - BASE_BYTES ))
+          PCT=$(awk "BEGIN { printf \"%.2f\", ($DIFF / $BASE_BYTES) * 100 }")
+          ICON="🟢"
+          [ "$DIFF" -gt 0 ] && ICON="🟡"
+          awk "BEGIN { exit !($PCT > 10) }" && ICON="🔴"
+
+          BODY=$(cat <<EOF
+          ### 📦 Bundle Size Report $ICON
+
+          | Metric | Main | This PR | Δ |
+          |--------|------|---------|---|
+          | Total  | \`$BASE_HUMAN\` | \`$PR_HUMAN\` | **${PCT}%** |
+
+          $( [ "${ICON}" = "🔴" ] && echo "> ⚠️ زيادة > 10% — راجع الحزم المضافة" || echo "> ✅ ضمن الحدود المقبولة" )
+          EOF
+          )
+          gh pr comment "$PR_NUM" --repo "$REPO" --body "$BODY"
+
+      - name: 📤 Upload PR build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-pr-${{ github.event.pull_request.number }}
+          path: /tmp/pr-dist
+          retention-days: 14
