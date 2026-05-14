@@ -183,6 +183,36 @@ jobs:
               sed -i "s|<application|<uses-permission android:name=\"android.permission.$p\" />\n    <application|" "$M"
           done
 
+      - name: 🩺 Snapshot secrets availability
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          mkdir -p diagnostics
+          F=diagnostics/01-secrets-snapshot.txt
+          {
+            echo "════════════════════════════════════════════════════"
+            echo "🩺 Secrets availability snapshot"
+            echo "Timestamp (UTC): $(date -u +'%Y-%m-%d %H:%M:%S')"
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Ref: ${GITHUB_REF} · SHA: ${GITHUB_SHA}"
+            echo "════════════════════════════════════════════════════"
+            for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD GH_REPO_ADMIN_TOKEN GOOGLE_PLAY_SERVICE_ACCOUNT_JSON TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID; do
+              v="${!s:-}"
+              if [ -z "$v" ]; then
+                printf '  ✗ %-40s MISSING\n' "$s"
+              else
+                printf '  ✓ %-40s present (len=%d)\n' "$s" "${#v}"
+              fi
+            done
+          } | tee "$F"
+
       - name: 🔐 Auto-generate Android signing secrets if missing
         env:
           GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
@@ -478,3 +508,94 @@ jobs:
           MSG="${ICON} *Release v${VN}* (build ${VC})%0A%0AStatus: \`${STATUS}\`%0A[فتح Run](${RUN})"
           curl -s "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
             -d chat_id="$TG_CHAT" -d parse_mode=Markdown -d text="$MSG" >/dev/null || true
+
+      - name: 🧾 Collect failure diagnostics
+        if: failure()
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set +e
+          mkdir -p diagnostics
+          TS() { date -u +'%Y-%m-%d %H:%M:%S'; }
+
+          # 1) Final secrets snapshot (in case it changed mid-run)
+          {
+            echo "════════════════════════════════════════════════════"
+            echo "🩺 Final secrets snapshot — $(TS) UTC"
+            echo "════════════════════════════════════════════════════"
+            for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD GH_REPO_ADMIN_TOKEN GOOGLE_PLAY_SERVICE_ACCOUNT_JSON; do
+              v="${!s:-}"
+              if [ -z "$v" ]; then printf '  ✗ %-40s MISSING\n' "$s"
+              else                 printf '  ✓ %-40s present (len=%d)\n' "$s" "${#v}"; fi
+            done
+          } > diagnostics/02-secrets-final.txt
+
+          # 2) Keystore inspection (if file exists)
+          KS=android/app/release.keystore
+          {
+            echo "════════════════════════════════════════════════════"
+            echo "🔑 Keystore inspection — $(TS) UTC"
+            echo "════════════════════════════════════════════════════"
+            if [ -f "$KS" ]; then
+              echo "File: $KS"
+              echo "Size: $(stat -c%s "$KS") bytes"
+              echo "SHA256: $(sha256sum "$KS" | awk '{print $1}')"
+              echo "── keytool -list ──"
+              keytool -list -keystore "$KS" -storepass "${ANDROID_KEYSTORE_PASSWORD:-}" 2>&1 | head -40
+              echo "── keytool -list -v alias ──"
+              keytool -list -v -keystore "$KS" \
+                -storepass "${ANDROID_KEYSTORE_PASSWORD:-}" \
+                -alias "${ANDROID_KEY_ALIAS:-}" 2>&1 | grep -E "Alias|Owner|Issuer|Valid|SHA1|SHA256|Entry type" | head -30
+            else
+              echo "✗ Keystore file not present at $KS"
+            fi
+          } > diagnostics/03-keystore.txt
+
+          # 3) Validation logs left in /tmp by earlier steps
+          for f in /tmp/ks.txt /tmp/ks.err /tmp/key.txt /tmp/key.err /tmp/kp.err; do
+            [ -f "$f" ] && cp "$f" "diagnostics/tmp-$(basename "$f")" 2>/dev/null
+          done
+
+          # 4) Environment + tool versions
+          {
+            echo "── $(TS) UTC ──"
+            echo "Runner: $RUNNER_OS / $RUNNER_ARCH"
+            echo "Node:   $(node --version 2>&1)"
+            echo "npm:    $(npm --version 2>&1)"
+            echo "Java:   $(java -version 2>&1 | head -1)"
+            echo "keytool present: $(command -v keytool || echo no)"
+            echo "Android SDK: ${ANDROID_HOME:-unset}"
+            echo "Gradle wrapper: $([ -f android/gradlew ] && echo yes || echo no)"
+          } > diagnostics/04-environment.txt
+
+          # 5) Gradle build report (if any)
+          GR=android/app/build/reports
+          [ -d "$GR" ] && cp -r "$GR" diagnostics/gradle-reports 2>/dev/null
+          GO=android/app/build/outputs
+          [ -d "$GO" ] && find "$GO" -maxdepth 4 -type f > diagnostics/05-gradle-outputs.txt 2>/dev/null
+
+          # 6) Job summary
+          {
+            echo "## ❌ Release failed — diagnostics attached"
+            echo ""
+            echo "تم إرفاق artifact باسم \`release-diagnostics\` يحتوي على:"
+            echo "- لقطتين لتوفر الأسرار (بداية الـ run + اللقطة النهائية)"
+            echo "- فحص الـ keystore (الحجم/البصمات/التواريخ) إن وُجد"
+            echo "- سجلات keytool من خطوة التحقق"
+            echo "- بيئة التشغيل (Node/Java/SDK)"
+            echo "- تقارير Gradle ومخرجات البناء (إن وُجدت)"
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Upload diagnostics artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-diagnostics
+          path: diagnostics/
+          retention-days: 14
+          if-no-files-found: warn
