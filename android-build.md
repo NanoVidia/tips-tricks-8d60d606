@@ -19,7 +19,7 @@
 Edit **`capacitor.config.ts`** at the project root:
 
 ```ts
-export const APP_VERSION_NAME = "1.1.0";
+export const APP_VERSION_NAME = "1.0.0";
 export const APP_VERSION_CODE = 1;   // increment by 1 for EVERY Play upload
 ```
 
@@ -52,8 +52,8 @@ keep:
 
 ```gradle
 applicationId "app.lovable.tipstricks"
-versionCode 3            // ← bump this manually each release
-versionName "1.1.0"      // ← bump this manually each release
+versionCode 1            // ← bump this manually each release
+versionName "1.0.0"      // ← bump this manually each release
 minSdkVersion 23
 targetSdkVersion 34
 ```
