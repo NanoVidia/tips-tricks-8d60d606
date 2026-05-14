@@ -46,7 +46,7 @@ fi
 
 # توليد kلمات مرور قوية
 STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
-KEY_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
+KEY_PASS="$STORE_PASS"
 ALIAS=tipstricks
 
 mkdir -p secrets-backup
@@ -58,6 +58,7 @@ echo "🔐 جاري توليد keystore جديد (صالح 30 سنة)..."
 keytool -genkeypair -v \
   -keystore "$KS" \
   -alias "$ALIAS" \
+  -storetype JKS \
   -keyalg RSA -keysize 2048 -validity 10950 \
   -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
   -dname "CN=Tips and Tricks, OU=Mobile, O=Lovable App, L=NA, ST=NA, C=US" >/dev/null

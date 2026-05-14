@@ -191,6 +191,9 @@ jobs:
           build-tools: "35.0.0"
           cmdline-tools-version: "11076708"
 
+      - name: ✅ Ensure keystore validator is executable
+        run: chmod +x scripts/validate-android-keystore.sh
+
       - name: 📦 npm install
         run: |
           npm ci --no-audit --no-fund --legacy-peer-deps \
@@ -240,14 +243,11 @@ jobs:
           if [ "$present" -eq 4 ]; then
             mkdir -p out
             if echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > out/_check.keystore 2>/dev/null \
-               && [ "$(stat -c%s out/_check.keystore 2>/dev/null || echo 0)" -ge 1000 ] \
-               && keytool -list -keystore out/_check.keystore \
-                    -storepass "$ANDROID_KEYSTORE_PASSWORD" >/dev/null 2>&1 \
-               && keytool -keypasswd -keystore out/_check.keystore \
-                    -storepass "$ANDROID_KEYSTORE_PASSWORD" \
-                    -alias "$ANDROID_KEY_ALIAS" \
-                    -keypass "$ANDROID_KEY_PASSWORD" \
-                    -new "$ANDROID_KEY_PASSWORD" >/dev/null 2>&1; then
+               && scripts/validate-android-keystore.sh \
+                    out/_check.keystore \
+                    "$ANDROID_KEYSTORE_PASSWORD" \
+                    "$ANDROID_KEY_ALIAS" \
+                    "$ANDROID_KEY_PASSWORD" >/tmp/keystore-validate.out 2>&1; then
               VALID=true
             fi
             rm -f out/_check.keystore
@@ -270,10 +270,11 @@ jobs:
           fi
 
           STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
-          KEY_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
+          KEY_PASS="$STORE_PASS"
           ALIAS=tipstricks
           mkdir -p out backup
           keytool -genkeypair -v -keystore out/release.keystore -alias "$ALIAS" \
+            -storetype JKS \
             -keyalg RSA -keysize 2048 -validity 10950 \
             -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
             -dname "CN=Tips and Tricks, OU=Mobile, O=Lovable App, L=NA, ST=NA, C=US"
@@ -366,10 +367,14 @@ jobs:
         env:
           GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
         run: |
-          set +e
+          set -euo pipefail
           KS=android/app/release.keystore
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KS" 2>/tmp/b64.err
-          B64_RC=$?
+          mkdir -p android/app
+          if ! echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KS" 2>/tmp/b64.err; then
+            B64_RC=1
+          else
+            B64_RC=0
+          fi
           SIZE=$(stat -c%s "$KS" 2>/dev/null || echo 0)
 
           fail() {
@@ -402,41 +407,35 @@ jobs:
           [ "$SIZE" -ge 1000 ] || fail "KEYSTORE_TOO_SMALL" \
             "ملف keystore بعد فك Base64 حجمه ${SIZE} bytes فقط — القيمة المحفوظة في السر تالفة أو فارغة."
 
-          keytool -list -keystore "$KS" -storepass "$ANDROID_KEYSTORE_PASSWORD" >/tmp/kt.out 2>&1
-          KT_RC=$?
-          if [ $KT_RC -ne 0 ]; then
-            if grep -qiE "password was incorrect|tampered with, or password was incorrect" /tmp/kt.out; then
-              fail "WRONG_STORE_PASSWORD" \
-                "كلمة سرّ الـ keystore (\`ANDROID_KEYSTORE_PASSWORD\`) غير مطابقة للملف المحفوظ في \`ANDROID_KEYSTORE_BASE64\`."
-            else
-              fail "KEYSTORE_UNREADABLE" \
-                "تعذّر قراءة keystore. مخرجات keytool: $(head -c 400 /tmp/kt.out)"
-            fi
-          fi
+          if ! VALIDATION_OUTPUT=$(scripts/validate-android-keystore.sh \
+            "$KS" \
+            "$ANDROID_KEYSTORE_PASSWORD" \
+            "$ANDROID_KEY_ALIAS" \
+            "$ANDROID_KEY_PASSWORD" 2>&1); then
+            CODE=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^ERROR_CODE=/{print $2; exit}')
+            MSG=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^ERROR_MESSAGE=/{print substr($0, index($0,"=")+1); exit}')
+            CODE=${CODE:-KEYSTORE_VALIDATION_FAILED}
 
-          grep -qi "^${ANDROID_KEY_ALIAS}," /tmp/kt.out || \
-            fail "ALIAS_NOT_FOUND" \
-              "الـ alias \`${ANDROID_KEY_ALIAS}\` غير موجود داخل keystore. الأسماء المتاحة: $(grep -iE '^[a-z0-9_-]+,' /tmp/kt.out | cut -d, -f1 | tr '\n' ' ')"
-
-          # تحقق فعلي من مطابقة key password (السبب الأشهر لـ BadPaddingException)
-          keytool -keypasswd -keystore "$KS" \
-            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
-            -alias "$ANDROID_KEY_ALIAS" \
-            -keypass "$ANDROID_KEY_PASSWORD" \
-            -new "$ANDROID_KEY_PASSWORD" >/tmp/kp.out 2>&1
-          if [ $? -ne 0 ]; then
-            fail "WRONG_KEY_PASSWORD" \
-              "كلمة سرّ المفتاح (\`ANDROID_KEY_PASSWORD\`) غير مطابقة للـ alias \`${ANDROID_KEY_ALIAS}\`. هذا هو سبب خطأ \`BadPaddingException: Given final block not properly padded\` أثناء توقيع AAB."
+            case "$CODE" in
+              WRONG_STORE_PASSWORD)
+                fail "$CODE" "كلمة سرّ الـ keystore (\`ANDROID_KEYSTORE_PASSWORD\`) غير مطابقة للملف المحفوظ في \`ANDROID_KEYSTORE_BASE64\`." ;;
+              ALIAS_NOT_FOUND)
+                fail "$CODE" "الـ alias \`${ANDROID_KEY_ALIAS}\` غير موجود داخل keystore. تحقّق من قيمة \`ANDROID_KEY_ALIAS\` أو احذف الأسرار الأربعة ليُعاد توليدها." ;;
+              WRONG_KEY_PASSWORD)
+                fail "$CODE" "كلمة سرّ المفتاح (\`ANDROID_KEY_PASSWORD\`) غير مطابقة للـ alias \`${ANDROID_KEY_ALIAS}\`. هذا هو سبب خطأ \`BadPaddingException: Given final block not properly padded\` أثناء توقيع AAB." ;;
+              KEYSTORE_TOO_SMALL)
+                fail "$CODE" "ملف keystore بعد فك Base64 حجمه ${SIZE} bytes فقط — القيمة المحفوظة في السر تالفة أو فارغة." ;;
+              *)
+                fail "$CODE" "${MSG:-تعذّر التحقق من تطابق keystore والأسرار.}"
+                ;;
+            esac
           fi
 
           echo "✅ keystore سليم وكل الأسرار متطابقة"
 
           # ─── تحقق بصمة SHA-256 لمنع استبدال keystore عن طريق الخطأ ───
           FP_FILE="android/keystore.sha256"
-          CUR_FP=$(keytool -list -v -keystore "$KS" \
-                     -storepass "$ANDROID_KEYSTORE_PASSWORD" \
-                     -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
-                   | grep -oE 'SHA256:[ ]*[0-9A-F:]+' | head -n1 | sed 's/SHA256:[ ]*//')
+          CUR_FP=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^KEYSTORE_SHA256=/{print $2; exit}')
           echo "🔎 SHA-256 الحالية: $CUR_FP"
 
           if [ -f "$FP_FILE" ]; then
@@ -514,7 +513,7 @@ jobs:
         env:
           KS_PASS: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
           KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
-          KEYSTORE_PATH: release.keystore
+          KEYSTORE_PATH: app/release.keystore
           KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
           KEY_PASS: ${{ env.ANDROID_KEY_PASSWORD }}
           KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
