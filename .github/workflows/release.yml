@@ -253,7 +253,7 @@ jobs:
 
       - name: 📦 Upload keystore backup (auto-generated)
         if: env.AUTO_GENERATED == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: keystore-backup-DOWNLOAD-AND-DELETE
           path: backup/
@@ -320,7 +320,7 @@ jobs:
           echo "✅ AAB signed & verified ($(stat -c%s "$AAB") bytes)"
 
       - name: 📤 Upload artifacts (AAB + APK + mapping)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.collect.outputs.base }}
           path: out/
