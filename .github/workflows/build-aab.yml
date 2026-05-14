@@ -68,6 +68,68 @@ jobs:
           fi
 
       # ─────────────────────────────────────────────────────────────
+      # 0.5) Strict check — تأكد من وجود الأسرار الأربعة قبل البدء
+      # ─────────────────────────────────────────────────────────────
+      - name: 🔎 Verify required signing secrets exist
+        env:
+          ANDROID_KEYSTORE_BASE64:   ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS:         ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD:      ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GH_REPO_ADMIN_TOKEN:       ${{ secrets.GH_REPO_ADMIN_TOKEN }}
+        run: |
+          MISSING=()
+          [ -n "${ANDROID_KEYSTORE_BASE64:-}" ]   || MISSING+=("ANDROID_KEYSTORE_BASE64")
+          [ -n "${ANDROID_KEYSTORE_PASSWORD:-}" ] || MISSING+=("ANDROID_KEYSTORE_PASSWORD")
+          [ -n "${ANDROID_KEY_ALIAS:-}" ]         || MISSING+=("ANDROID_KEY_ALIAS")
+          [ -n "${ANDROID_KEY_PASSWORD:-}" ]      || MISSING+=("ANDROID_KEY_PASSWORD")
+
+          if [ ${#MISSING[@]} -eq 0 ]; then
+            echo "✅ كل أسرار التوقيع الأربعة موجودة — متابعة البناء"
+            echo "## ✅ أسرار التوقيع" >> $GITHUB_STEP_SUMMARY
+            echo "كل الأسرار الأربعة موجودة في إعدادات المستودع." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          # إذا كان GH_REPO_ADMIN_TOKEN موجوداً، اسمح بالاستمرار ليُولّد keystore جديداً تلقائياً
+          if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ]; then
+            echo "::warning::الأسرار التالية مفقودة لكن GH_REPO_ADMIN_TOKEN موجود → سيتم توليد keystore جديد وحفظ الأسرار تلقائياً: ${MISSING[*]}"
+            {
+              echo "## ⚠️ أسرار مفقودة — سيتم توليدها تلقائياً"
+              echo ""
+              echo "الأسرار غير الموجودة:"
+              for s in "${MISSING[@]}"; do echo "- \`$s\`"; done
+              echo ""
+              echo "سيُولّد الـ workflow keystore جديداً ويحفظ الأسرار الأربعة دائماً عبر \`GH_REPO_ADMIN_TOKEN\`."
+            } >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          # وقف البناء — لا أسرار ولا token لتوليدها
+          {
+            echo "## ❌ تعذّر بدء البناء — أسرار التوقيع مفقودة"
+            echo ""
+            echo "الأسرار التالية غير موجودة في **Settings → Secrets and variables → Actions**:"
+            for s in "${MISSING[@]}"; do echo "- \`$s\`"; done
+            echo ""
+            echo "### الحلول المتاحة:"
+            echo "**(أ) لديك keystore جاهز** — أضف الأسرار الأربعة يدوياً:"
+            echo "  1. \`ANDROID_KEYSTORE_BASE64\` = ناتج \`base64 -w0 release.keystore\`"
+            echo "  2. \`ANDROID_KEYSTORE_PASSWORD\` = كلمة سرّ الـ keystore"
+            echo "  3. \`ANDROID_KEY_ALIAS\` = اسم الـ alias (مثلاً \`tipstricks\`)"
+            echo "  4. \`ANDROID_KEY_PASSWORD\` = كلمة سرّ الـ key"
+            echo ""
+            echo "**(ب) دع الـ workflow يولّدها تلقائياً** — أضف \`GH_REPO_ADMIN_TOKEN\`:"
+            echo "  1. أنشئ Classic PAT بصلاحية \`repo\` من https://github.com/settings/tokens/new"
+            echo "  2. أضفه باسم \`GH_REPO_ADMIN_TOKEN\` في أسرار المستودع"
+            echo "  3. شغّل **Build AAB** مرة أخرى — سيُولّد keystore ويحفظ الأسرار الأربعة دائماً"
+            echo ""
+            echo "> ⚠️ إن كان التطبيق منشوراً سابقاً على Google Play بنفس التوقيع، استخدم الخيار (أ) فقط بنفس الـ keystore الأصلي."
+          } >> $GITHUB_STEP_SUMMARY
+          echo "::error title=Missing signing secrets::${MISSING[*]} — راجع Summary للتفاصيل"
+          exit 1
+
+      # ─────────────────────────────────────────────────────────────
       # 1) Compute version
       # ─────────────────────────────────────────────────────────────
       - name: 🔢 Compute version
