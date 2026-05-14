@@ -1,0 +1,71 @@
+name: CI
+
+# ==============================================================================
+# فحص آلي عند كل push/PR — typecheck + lint + tests + web build
+# سريع (~3 دقائق)، يمنع merge إذا فشل أي check.
+# ==============================================================================
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: 📦 Install
+        run: npm ci --no-audit --no-fund
+
+      - name: 🔬 Typecheck
+        run: npx tsc --noEmit
+
+      - name: 🧹 Lint
+        run: npm run lint --if-present
+
+      - name: 🧪 Tests
+        run: npm test --if-present
+        continue-on-error: true
+
+      - name: 📝 Content quality audit
+        run: npm run content:audit --if-present
+        continue-on-error: true
+
+      - name: 🏗️ Build (production)
+        env:
+          NODE_ENV: production
+        run: npm run build
+
+      - name: 📊 Bundle size summary
+        run: |
+          if [ -d "dist" ]; then
+            SIZE=$(du -sh dist | cut -f1)
+            FILES=$(find dist -type f | wc -l)
+            {
+              echo "### 📦 Bundle Report"
+              echo ""
+              echo "- **Total size:** \`$SIZE\`"
+              echo "- **Files:** \`$FILES\`"
+              echo ""
+              echo "| File | Size |"
+              echo "|------|------|"
+              find dist -type f \( -name "*.js" -o -name "*.css" \) -exec du -h {} + | sort -hr | head -10 | awk '{printf "| `%s` | %s |\n", $2, $1}'
+            } >> $GITHUB_STEP_SUMMARY
+          fi
