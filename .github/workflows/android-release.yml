@@ -187,6 +187,58 @@ jobs:
           add_perm "android.permission.POST_NOTIFICATIONS"
           add_perm "com.android.vending.BILLING"
 
+      - name: 🔐 Verify required Android secrets exist
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          set -uo pipefail
+
+          declare -A SECRET_HINT=(
+            [ANDROID_KEYSTORE_BASE64]="ملف release.keystore بعد تحويله إلى Base64 (سطر واحد بدون مسافات)."
+            [ANDROID_KEYSTORE_PASSWORD]="كلمة مرور الـ keystore (storepass) المُستخدمة عند توليده."
+            [ANDROID_KEY_ALIAS]="اسم الـ alias داخل الـ keystore (مثال: tipstricks)."
+            [ANDROID_KEY_PASSWORD]="كلمة مرور المفتاح (keypass). غالباً نفس كلمة الـ keystore."
+          )
+
+          missing=()
+          for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            val="${!s}"
+            [ -z "$val" ] && missing+=("$s")
+          done
+
+          if [ "${#missing[@]}" -eq 0 ]; then
+            B64_LEN=${#ANDROID_KEYSTORE_BASE64}
+            if [ "$B64_LEN" -lt 1400 ]; then
+              echo "::warning::ANDROID_KEYSTORE_BASE64 length is suspiciously small ($B64_LEN chars)."
+            fi
+            echo "✓ All four Android signing secrets are present (base64 length: $B64_LEN chars)"
+            exit 0
+          fi
+
+          echo "::error::Missing ${#missing[@]} required Android signing secret(s): ${missing[*]}"
+          {
+            echo "## ❌ Android signing secrets missing"
+            echo ""
+            echo "### Missing secrets"
+            echo "| Secret | What it is |"
+            echo "|---|---|"
+            for s in "${missing[@]}"; do
+              echo "| \`$s\` | ${SECRET_HINT[$s]} |"
+            done
+            echo ""
+            echo "### How to restore"
+            echo "- **Recommended (app already on Play):** [Import Existing Android Keystore](${REPO_URL}/actions/workflows/import-keystore.yml)"
+            echo "- **First-time only:** [Setup Android Signing Secrets (one-time)](${REPO_URL}/actions/workflows/generate-keystore.yml)"
+            echo "- **Manual:** [Repository Secrets settings](${REPO_URL}/settings/secrets/actions)"
+            echo ""
+            echo "> ⚠️ Google Play rejects any AAB signed with a different keystore than the original. Use Import (not Generate) if the app is already published."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
       - name: 🔑 Decode keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
