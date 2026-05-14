@@ -512,7 +512,7 @@ jobs:
         env:
           KS_PASS: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
           KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
-          KEYSTORE_PATH: release.keystore
+          KEYSTORE_PATH: app/release.keystore
           KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
           KEY_PASS: ${{ env.ANDROID_KEY_PASSWORD }}
           KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
