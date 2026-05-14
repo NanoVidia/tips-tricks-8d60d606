@@ -1,88 +1,143 @@
+## الوضع الحالي
 
-# AAB Readiness Audit + Safe Home Enhancement
+عندك 4 workflows:
 
-## Part 1 — Infrastructure Audit (read-only findings)
+- `android-build.yml` — بناء AAB (debug-style، تكرار للـ release)
+- `android-release.yml` — بناء AAB موقّع + توليد keystore تلقائي + GitHub Release ✅ ممتاز
+- `generate-keystore.yml` — توليد keystore لمرة واحدة (مكرر مع release)
+- `import-keystore.yml` — استيراد keystore موجود
 
-### A. Notifications ✅ Mostly ready
-- `useLocalNotifications` hook syncs from `scheduled_notifications` table to Capacitor `LocalNotifications` plugin on every focus/online event.
-- Permission flow (`checkPermissions` → `requestPermissions`) implemented correctly.
-- Cancels previous schedules to avoid duplicates, supports `none/daily/weekly` repeats.
-- Icon (`ic_stat_icon`) declared in `capacitor.config.ts`.
-- ⚠ Issue: `useLocalNotifications` is mounted **only inside `NotificationsBootstrap`** which lives **inside the non-SAFE branch** of `App.tsx`. In `SAFE_MODE = true` the hook never runs → no notifications scheduled on the released AAB.
-- ⚠ The `scheduled_notifications` table needs at least one active row for testing.
+**المشكلة:** تكرار + لا يوجد CI تلقائي + لا يوجد رفع لـ Google Play + لا يوجد فحص جودة + إدارة الإصدار يدوية بحتة.
 
-### B. Payments / Google Play Billing ✅ Solid pipeline
-- `initStore()` registers products at boot, listens for `approved`, server-verifies via `verify-purchase` edge function, then calls `p.finish()`.
-- `check-access` edge function reconciles entitlement every 5 min + on focus (via `useAccess`).
-- RTDN webhook `play-rtdn-webhook` handles renewals/cancellations.
-- Admin **Billing Monitor** exposes purchase events.
-- ⚠ Same SAFE_MODE issue: Paywall, AccessGate, billing init are all behind the non-safe branch. In SAFE_MODE the AAB ships **with no IAP UI exposed**, which is fine for first launch but means the in-app product IDs won't show in Play Console "active in app" until SAFE_MODE is turned off.
-- ⚠ `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` secret is set — verify it has Play Developer API access enabled.
+يظهر هذا الخطأ
 
-### C. App version metadata ⚠ Needs bump before upload
-- `capacitor.config.ts` exports `APP_VERSION_NAME = "1.0.0"` and `APP_VERSION_CODE = 1`.
-- Confirm the Gradle hook in `android/app/build.gradle` actually reads these (mentioned in README, must be present in the local Android project).
-- For every Play upload, `versionCode` MUST increment.
-- `appId: app.lovable.tipstricks` ✅ stable.
-- App display name `Tips & Tricks – OB/GYN` — Google may flag the "OB/GYN" suffix as medical positioning during the SAFE_MODE submission. Recommend a neutral display name for v1.0.0 (e.g. **"Tips & Tricks Daily Quiz"**), then change it after the medical version is approved separately.
-- `index.html` `<title>`, meta description, OG tags still mention "OB/GYN" → align with the safe submission.
+Run if [ ! -d "android" ]; then
 
-### D. Home page (SAFE_MODE) ✅ Non-clinical
-- `App.tsx` short-circuits to `SafeHome` when `SAFE_MODE = true`.
-- `SafeHome` only renders 100 generic-knowledge MCQs from `safeQuestions.ts`, plus legal pages.
-- No clinical routes, no disclaimer, no bottom tab bar are mounted.
-- All clinical components (HomeHero, EmergencyStrip, etc.) are tree-shaken from the SAFE bundle because SafeHome doesn't import them.
-- ✅ Safe to submit as-is for AAB review.
+  if [ ! -d "android" ]; then
 
----
+    npx cap add android
 
-## Part 2 — Safe Home Enhancement (non-clinical, women & motherhood lifestyle)
+  fi
 
-Add lightweight, **entertainment-only** sections to `SafeHome` in English. Strictly NO medical terms, NO advice, NO drug names, NO procedures. Tone is lifestyle / inspiration / general culture.
+  npx cap sync android
 
-### New sections (proposed)
-1. **Daily Affirmations for Women** — rotating positive quote of the day from a static list of ~30 generic empowerment quotes.
-2. **Motherhood Wisdom** — short historical/cultural sayings about mothers from world cultures.
-3. **Self-Care Habits** — non-medical lifestyle tips (hydration reminder, journaling prompt, gratitude prompt).
-4. **Famous Women in History** — mini-card series (e.g. Marie Curie, Ada Lovelace) — pure history.
-5. **Word of the Day** — vocabulary builder unrelated to health.
-6. **Today's Reflection** — one open-ended journaling prompt.
+  shell: /usr/bin/bash -e {0}
 
-All content lives in plain TS data files (no DB), no external API calls, fully offline.
+  env:
 
-### UI changes
-- Convert `SafeHome` from a single quiz page into a **3-tab layout**:
-  - **Quiz** (existing 100 questions — unchanged)
-  - **Inspiration** (affirmations + motherhood wisdom + reflection)
-  - **Discover** (famous women + word of the day + self-care habits)
-- Tabs implemented with the existing shadcn `Tabs` component to keep bundle small.
-- Keep the legal acceptance gate and footer untouched.
+    JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.10-7/x64
 
-### Technical changes section
+    JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.10-7/x64
 
-```text
-src/pages/SafeHome.tsx           ← refactor: wrap content in <Tabs>
-src/data/safeContent.ts          ← NEW: arrays of affirmations, wisdom, women, words, prompts
-src/components/safe/
-   ├── InspirationTab.tsx        ← NEW
-   └── DiscoverTab.tsx           ← NEW
-src/App.tsx                      ← move useLocalNotifications() into SAFE branch too
-capacitor.config.ts              ← bump APP_VERSION_CODE → 2, optionally rename appName to "Tips & Tricks Daily Quiz"
-index.html                       ← align title/description/OG to neutral wording
-```
+    ANDROID_HOME: /usr/local/lib/android/sdk
 
-No edge function changes, no DB migrations, no new dependencies.
+    ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
+    CAP_ENV: production
+
+[fatal] The Capacitor CLI requires NodeJS >=22.0.0
+
+        Please install the latest LTS version.
+
+Error: Process completed with exit code 1.
 
 ---
 
-## Part 3 — Final pre-upload checklist (manual, outside the code)
+## المنظومة المقترحة (6 workflows متكاملة)
 
-1. Run `CAP_ENV=production npm run build && npx cap sync android`.
-2. Bump `versionCode` for every re-upload.
-3. In Play Console: data-safety form, content rating questionnaire, privacy URL → already at `/public/privacy.html`.
-4. Upload signed AAB from `android/app/build/outputs/bundle/release/app-release.aab`.
-5. After approval: flip `SAFE_MODE = false`, bump version, ship the medical version under the same package only if Google explicitly allows it; otherwise keep two separate apps.
+### 1. `ci.yml` — فحص آلي عند كل Push/PR
+
+يعمل تلقائياً على كل commit و PR. سريع (~3 دقائق).
+
+- TypeScript typecheck + ESLint + Vitest
+- بناء Vite للتأكد من سلامة الـ web build
+- تقرير `content-quality-report.mjs` الموجود عندك
+- يمنع merge إذا فشل (status check)
+
+### 2. `pr-preview.yml` — معاينة لكل PR
+
+- بناء الـ web ورفعه كـ artifact
+- تعليق تلقائي على الـ PR بحجم الـ bundle ومقارنته بالـ main
+- اكتشاف زيادات حجم > 10% تلقائياً
+
+### 3. `release.yml` — الإصدار الرسمي (يستبدل android-release.yml الحالي)
+
+نسخة محسّنة من الموجود، مع إضافات:
+
+- **إدارة إصدار ذكية:** خيار `bump`: `patch`/`minor`/`major`/`manual` بدل إدخال يدوي فقط
+- **Auto-increment لـ versionCode** بحيث لا يمكن أن يقل عن الموجود في الـ tags السابقة
+- **Changelog تلقائي** من الـ commits (Conventional Commits)
+- **Multi-artifact:** AAB + APK + mapping.txt (لـ ProGuard) + source-map للـ web
+- **توقيع keystore تلقائي** (موجود)
+- **رفع تلقائي لـ Google Play** عبر `r0adkll/upload-google-play` (track: internal/alpha/beta/production)
+- **إنشاء GitHub Release** مع AAB + changelog + screenshots
+- **إشعار Telegram/Discord** (اختياري عبر webhook secret)
+
+### 4. `nightly.yml` — بناء يومي تجريبي
+
+كل ليلة 02:00 UTC من فرع `main`:
+
+- بناء AAB بـ versionCode = `<base> + run_number`
+- رفع كـ pre-release تلقائي
+- يُحذف بعد 14 يوم
+
+### 5. `keystore-management.yml` — إدارة الـ keystore (يستبدل generate + import)
+
+workflow واحد بـ 3 أوضاع عبر `mode` input:
+
+- `generate` — توليد جديد (للمشاريع الجديدة فقط)
+- `import` — استيراد keystore موجود (لاستعادة بعد فقدان الأسرار)
+- `verify` — التحقق من صحة الأسرار الموجودة + طباعة fingerprints (SHA-1/SHA-256)
+
+### 6. `security-audit.yml` — فحص أمني أسبوعي
+
+كل أحد:
+
+- `npm audit` للـ dependencies
+- TruffleHog لاكتشاف أي secrets مسرّبة في الـ git history
+- Snyk أو CodeQL للكود
+- يفتح Issue تلقائياً لو وجد high/critical
 
 ---
 
-Approve to proceed with the code changes in Part 2 + the metadata bumps in Part 1-C.
+## ملفات داعمة
+
+- `.github/CODEOWNERS` — حمايتك كصاحب على الملفات الحساسة
+- `.github/dependabot.yml` — تحديث dependencies أسبوعياً
+- `.github/release.yml` — تصنيف الـ Changelog حسب labels
+- `.github/workflows/README.md` — توثيق عربي شامل لكل workflow
+
+---
+
+## الأسرار المطلوبة في GitHub
+
+
+| السر                                      | الغرض               | إلزامي               |
+| ----------------------------------------- | ------------------- | -------------------- |
+| `ANDROID_KEYSTORE_BASE64`                 | توقيع AAB           | ✅ (يُولَّد تلقائياً) |
+| `ANDROID_KEYSTORE_PASSWORD`               | "                   | ✅                    |
+| `ANDROID_KEY_ALIAS`                       | "                   | ✅                    |
+| `ANDROID_KEY_PASSWORD`                    | "                   | ✅                    |
+| `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`        | رفع لـ Play Console | اختياري              |
+| `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | إشعارات             | اختياري              |
+
+
+---
+
+## خطوات الحذف/التنظيف
+
+سأحذف:
+
+- `android-build.yml` (مكرر — وظيفته داخل release.yml)
+- `generate-keystore.yml` + `import-keystore.yml` (مدمجان في keystore-management.yml)
+
+---
+
+## السؤال قبل التنفيذ
+
+1. **رفع Google Play تلقائي:** هل عندك Service Account من Google Play Console؟ (إن لا، أتركه disabled افتراضياً ويمكنك تفعيله لاحقاً)
+2. **إشعارات:** Telegram أم Discord أم بدون؟
+3. **Conventional Commits:** هل تلتزم بصيغة `feat:`/`fix:`/`chore:`؟ (يحدد جودة الـ changelog التلقائي)
+4. **Dependabot:** هل تريد PRs تلقائية أسبوعية لتحديث الحزم؟
+
+أجب على الأربعة (أو قل "كلها نعم" / "كلها لا") وأبدأ التنفيذ فوراً.
