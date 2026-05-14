@@ -1,41 +1,24 @@
-name: Build AAB
-
-# ==============================================================================
-# 🏗️  Build signed Android App Bundle (AAB) — Ideal workflow
-# ------------------------------------------------------------------------------
-# • يدوي فقط (workflow_dispatch).
-# • أدخل version_name و version_code، أو اتركهما فارغين لتزايد تلقائي.
-# • يولّد keystore جديداً تلقائياً إن لم تكن أسرار التوقيع موجودة،
-#   ويحفظها داخل GitHub Secrets إذا كان GH_REPO_ADMIN_TOKEN متاحاً
-#   (وإلا فنسخة احتياطية في artifact لمرّة واحدة).
-# • يبني AAB موقّع، يتحقق منه، ويرفعه كـ artifact + GitHub Release.
-#
-# الأسرار:
-#   ✅ ANDROID_KEYSTORE_BASE64 / _PASSWORD / _ALIAS / ANDROID_KEY_PASSWORD
-#      → تُولَّد تلقائياً عند أول تشغيل إن لم تكن موجودة.
-#   ⚪ GH_REPO_ADMIN_TOKEN — اختياري، لحفظ الأسرار المولَّدة في المستودع.
-# ==============================================================================
+name: Build Android AAB
 
 on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: "رقم الإصدار العام (مثل 1.2.0). فارغ = ترقية patch تلقائية."
+        description: "رقم الإصدار الظاهر للمستخدمين. فارغ = زيادة patch تلقائياً"
         required: false
         default: ""
       version_code:
-        description: "versionCode الداخلي. فارغ = current + 1."
+        description: "رقم البناء الداخلي. فارغ = current + 1"
         required: false
         default: ""
       create_release:
-        description: "إنشاء GitHub Release بالـ AAB"
+        description: "إنشاء GitHub Release مع ملف الـ AAB"
         type: boolean
         required: true
         default: true
 
 permissions:
   contents: write
-  actions: read
 
 concurrency:
   group: build-aab
@@ -45,93 +28,14 @@ jobs:
   build:
     name: Build · Sign · Verify
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
+
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ─────────────────────────────────────────────────────────────
-      # 0) Preflight — PAT اختياري؛ يُستخدم لحفظ الأسرار دائماً إن وُجد
-      # ─────────────────────────────────────────────────────────────
-      - name: 🛂 Preflight · detect admin token
-        env:
-          GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
-        run: |
-          if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ]; then
-            echo "HAS_ADMIN_TOKEN=true" >> $GITHUB_ENV
-            echo "✓ GH_REPO_ADMIN_TOKEN موجود — سيتم حفظ أي أسرار مولّدة بشكل دائم"
-          else
-            echo "HAS_ADMIN_TOKEN=false" >> $GITHUB_ENV
-            echo "::notice::GH_REPO_ADMIN_TOKEN غير موجود — البناء سيستمر، وفي حال توليد keystore جديد سيُرفع كـ artifact لإضافته يدوياً مرّة واحدة."
-          fi
-
-      # ─────────────────────────────────────────────────────────────
-      # 0.5) Strict check — تأكد من وجود الأسرار الأربعة قبل البدء
-      # ─────────────────────────────────────────────────────────────
-      - name: 🔎 Verify required signing secrets exist
-        env:
-          ANDROID_KEYSTORE_BASE64:   ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS:         ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD:      ${{ secrets.ANDROID_KEY_PASSWORD }}
-          GH_REPO_ADMIN_TOKEN:       ${{ secrets.GH_REPO_ADMIN_TOKEN }}
-        run: |
-          MISSING=()
-          [ -n "${ANDROID_KEYSTORE_BASE64:-}" ]   || MISSING+=("ANDROID_KEYSTORE_BASE64")
-          [ -n "${ANDROID_KEYSTORE_PASSWORD:-}" ] || MISSING+=("ANDROID_KEYSTORE_PASSWORD")
-          [ -n "${ANDROID_KEY_ALIAS:-}" ]         || MISSING+=("ANDROID_KEY_ALIAS")
-          [ -n "${ANDROID_KEY_PASSWORD:-}" ]      || MISSING+=("ANDROID_KEY_PASSWORD")
-
-          if [ ${#MISSING[@]} -eq 0 ]; then
-            echo "✅ كل أسرار التوقيع الأربعة موجودة — متابعة البناء"
-            echo "## ✅ أسرار التوقيع" >> $GITHUB_STEP_SUMMARY
-            echo "كل الأسرار الأربعة موجودة في إعدادات المستودع." >> $GITHUB_STEP_SUMMARY
-            exit 0
-          fi
-
-          # إذا كان GH_REPO_ADMIN_TOKEN موجوداً، اسمح بالاستمرار ليُولّد keystore جديداً تلقائياً
-          if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ]; then
-            echo "::warning::الأسرار التالية مفقودة لكن GH_REPO_ADMIN_TOKEN موجود → سيتم توليد keystore جديد وحفظ الأسرار تلقائياً: ${MISSING[*]}"
-            {
-              echo "## ⚠️ أسرار مفقودة — سيتم توليدها تلقائياً"
-              echo ""
-              echo "الأسرار غير الموجودة:"
-              for s in "${MISSING[@]}"; do echo "- \`$s\`"; done
-              echo ""
-              echo "سيُولّد الـ workflow keystore جديداً ويحفظ الأسرار الأربعة دائماً عبر \`GH_REPO_ADMIN_TOKEN\`."
-            } >> $GITHUB_STEP_SUMMARY
-            exit 0
-          fi
-
-          # وقف البناء — لا أسرار ولا token لتوليدها
-          {
-            echo "## ❌ تعذّر بدء البناء — أسرار التوقيع مفقودة"
-            echo ""
-            echo "الأسرار التالية غير موجودة في **Settings → Secrets and variables → Actions**:"
-            for s in "${MISSING[@]}"; do echo "- \`$s\`"; done
-            echo ""
-            echo "### الحلول المتاحة:"
-            echo "**(أ) لديك keystore جاهز** — أضف الأسرار الأربعة يدوياً:"
-            echo "  1. \`ANDROID_KEYSTORE_BASE64\` = ناتج \`base64 -w0 release.keystore\`"
-            echo "  2. \`ANDROID_KEYSTORE_PASSWORD\` = كلمة سرّ الـ keystore"
-            echo "  3. \`ANDROID_KEY_ALIAS\` = اسم الـ alias (مثلاً \`tipstricks\`)"
-            echo "  4. \`ANDROID_KEY_PASSWORD\` = كلمة سرّ الـ key"
-            echo ""
-            echo "**(ب) دع الـ workflow يولّدها تلقائياً** — أضف \`GH_REPO_ADMIN_TOKEN\`:"
-            echo "  1. أنشئ Classic PAT بصلاحية \`repo\` من https://github.com/settings/tokens/new"
-            echo "  2. أضفه باسم \`GH_REPO_ADMIN_TOKEN\` في أسرار المستودع"
-            echo "  3. شغّل **Build AAB** مرة أخرى — سيُولّد keystore ويحفظ الأسرار الأربعة دائماً"
-            echo ""
-            echo "> ⚠️ إن كان التطبيق منشوراً سابقاً على Google Play بنفس التوقيع، استخدم الخيار (أ) فقط بنفس الـ keystore الأصلي."
-          } >> $GITHUB_STEP_SUMMARY
-          echo "::error title=Missing signing secrets::${MISSING[*]} — راجع Summary للتفاصيل"
-          exit 1
-
-      # ─────────────────────────────────────────────────────────────
-      # 1) Compute version
-      # ─────────────────────────────────────────────────────────────
       - name: 🔢 Compute version
         id: ver
         env:
@@ -146,7 +50,7 @@ jobs:
             VN="$IN_VN"
           else
             IFS=. read -r MA MI PA <<< "$CUR_VN"
-            VN="${MA}.${MI}.$((PA+1))"
+            VN="${MA}.${MI}.$((PA + 1))"
           fi
 
           if [ -n "$IN_VC" ]; then
@@ -155,22 +59,23 @@ jobs:
             VC=$((CUR_VC + 1))
           fi
 
-          echo "version_name=$VN" >> $GITHUB_OUTPUT
-          echo "version_code=$VC" >> $GITHUB_OUTPUT
-          echo "tag_name=v${VN}+${VC}" >> $GITHUB_OUTPUT
-          echo "── Building v${VN} (build ${VC}) ──"
+          echo "version_name=$VN" >> "$GITHUB_OUTPUT"
+          echo "version_code=$VC" >> "$GITHUB_OUTPUT"
+          echo "tag_name=v${VN}+${VC}" >> "$GITHUB_OUTPUT"
 
       - name: ✏️ Apply version to source
         env:
           VN: ${{ steps.ver.outputs.version_name }}
           VC: ${{ steps.ver.outputs.version_code }}
         run: |
+          set -euo pipefail
           sed -i -E "s/(APP_VERSION_NAME = )\"[^\"]+\"/\1\"${VN}\"/" capacitor.config.ts src/lib/appVersion.ts
-          sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${VC}/"          capacitor.config.ts src/lib/appVersion.ts
+          sed -i -E "s/(APP_VERSION_CODE = )[0-9]+/\1${VC}/" capacitor.config.ts src/lib/appVersion.ts
 
       - name: 💾 Commit version bump
         run: |
-          git config user.name  "github-actions[bot]"
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add capacitor.config.ts src/lib/appVersion.ts
           git diff --cached --quiet || {
@@ -178,38 +83,52 @@ jobs:
             git push
           }
 
-      # ─────────────────────────────────────────────────────────────
-      # 2) Toolchain
-      # ─────────────────────────────────────────────────────────────
-      - uses: actions/setup-node@v4
-        with: { node-version: "22", cache: "npm" }
-      - uses: actions/setup-java@v4
-        with: { distribution: "temurin", java-version: "21" }
-      - uses: android-actions/setup-android@v3
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: 🤖 Setup Android SDK
+        uses: android-actions/setup-android@v3
         with:
           api-level: 35
           build-tools: "35.0.0"
           cmdline-tools-version: "11076708"
 
-      - name: ✅ Ensure keystore validator is executable
-        run: chmod +x scripts/validate-android-keystore.sh
+      - name: 🧰 Preflight tools
+        run: |
+          set -euo pipefail
+          command -v gh >/dev/null
+          command -v keytool >/dev/null
+          command -v jarsigner >/dev/null
+          chmod +x scripts/validate-android-keystore.sh
 
-      - name: 📦 npm install
+      - name: 📦 Install dependencies
         run: |
           npm ci --no-audit --no-fund --legacy-peer-deps \
             || npm install --no-audit --no-fund --legacy-peer-deps
 
-      - name: 🏗️ Web build
+      - name: 🏗️ Build web app
         env:
           CAP_ENV: production
           NODE_ENV: production
         run: npm run build
 
-      - name: 📱 Capacitor sync
+      - name: 📱 Prepare Android platform
         env:
           CAP_ENV: production
         run: |
-          [ -d "android" ] || npx cap add android
+          set -euo pipefail
+          if [ ! -f "android/app/build.gradle" ]; then
+            npx cap add android
+          fi
           npx cap sync android
 
       - name: 🔢 Patch Gradle version
@@ -217,13 +136,11 @@ jobs:
           VN: ${{ steps.ver.outputs.version_name }}
           VC: ${{ steps.ver.outputs.version_code }}
         run: |
-          sed -i -E "s/versionCode [0-9]+/versionCode $VC/"          android/app/build.gradle
-          sed -i -E "s/versionName \"[^\"]+\"/versionName \"$VN\"/"  android/app/build.gradle
+          set -euo pipefail
+          sed -i -E "s/versionCode [0-9]+/versionCode $VC/" android/app/build.gradle
+          sed -i -E "s/versionName \"[^\"]+\"/versionName \"$VN\"/" android/app/build.gradle
 
-      # ─────────────────────────────────────────────────────────────
-      # 3) Ensure permanent signing secrets (auto-generate + persist)
-      # ─────────────────────────────────────────────────────────────
-      - name: 🔐 Ensure permanent signing secrets
+      - name: 🔐 Ensure Android signing secrets
         env:
           GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -233,125 +150,108 @@ jobs:
         run: |
           set -euo pipefail
 
-          present=0
+          missing=0
           for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-            [ -n "${!s}" ] && present=$((present+1))
+            [ -n "${!s:-}" ] || missing=$((missing + 1))
           done
 
-          # تحقق فعلي من تطابق keystore + كلمات السر + alias قبل الاعتماد عليها
           VALID=false
-          if [ "$present" -eq 4 ]; then
+          if [ "$missing" -eq 0 ]; then
             mkdir -p out
-            if echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > out/_check.keystore 2>/dev/null \
-               && scripts/validate-android-keystore.sh \
-                    out/_check.keystore \
-                    "$ANDROID_KEYSTORE_PASSWORD" \
-                    "$ANDROID_KEY_ALIAS" \
-                    "$ANDROID_KEY_PASSWORD" >/tmp/keystore-validate.out 2>&1; then
+            if echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > out/existing.keystore 2>/dev/null \
+              && scripts/validate-android-keystore.sh out/existing.keystore "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_ALIAS" "$ANDROID_KEY_PASSWORD" >/tmp/keystore-check.log 2>&1; then
               VALID=true
             fi
-            rm -f out/_check.keystore
+            rm -f out/existing.keystore
           fi
 
           if [ "$VALID" = "true" ]; then
-            echo "✓ Reusing existing permanent signing secrets (validated)"
-            { echo "ANDROID_KEYSTORE_BASE64<<E"; echo "$ANDROID_KEYSTORE_BASE64"; echo "E"; } >> $GITHUB_ENV
-            echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> $GITHUB_ENV
-            echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"                 >> $GITHUB_ENV
-            echo "ANDROID_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"           >> $GITHUB_ENV
-            echo "AUTO_GENERATED=false" >> $GITHUB_ENV
+            {
+              echo "ANDROID_KEYSTORE_BASE64<<EOF_SECRET"
+              echo "$ANDROID_KEYSTORE_BASE64"
+              echo "EOF_SECRET"
+            } >> "$GITHUB_ENV"
+            echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
+            echo "ANDROID_KEY_PASSWORD=$ANDROID_KEY_PASSWORD" >> "$GITHUB_ENV"
+            echo "AUTO_GENERATED=false" >> "$GITHUB_ENV"
+            {
+              echo "## ✅ Android signing جاهز"
+              echo ""
+              echo "تم التحقق من keystore الحالي واستكمال البناء به."
+            } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
-          if [ "$present" -eq 4 ]; then
-            echo "::warning::الأسرار موجودة لكنها غير متطابقة (keystore/password/alias). سيتم توليد keystore جديد واستبدالها."
-          else
-            echo "::notice::Generating new release keystore ($((4-present))/4 secrets missing)"
+          if [ -z "${GH_REPO_ADMIN_TOKEN:-}" ]; then
+            {
+              echo "## ❌ تعذّر إكمال Android signing تلقائياً"
+              echo ""
+              echo "الأسرار الأربعة غير موجودة أو غير متطابقة، وGitHub لا يسمح للـ workflow بإنشاء Repository Secrets من نفسه بدون توكن إداري صريح."
+              echo ""
+              echo "### المطلوب مرة واحدة فقط"
+              echo "1. أنشئ Classic PAT من GitHub بصلاحية \`repo\`."
+              echo "2. أضفه في Secrets باسم \`GH_REPO_ADMIN_TOKEN\`."
+              echo "3. شغّل هذا الـ workflow مرة أخرى — عندها سيُولّد keystore جديداً ويحفظ الأسرار الأربعة تلقائياً لكل البناءات القادمة."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Missing Android signing bootstrap::GH_REPO_ADMIN_TOKEN is required once to create repository secrets automatically"
+            exit 1
           fi
 
           STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
           KEY_PASS="$STORE_PASS"
-          ALIAS=tipstricks
+          ALIAS="tipstricks"
+
           mkdir -p out backup
-          keytool -genkeypair -v -keystore out/release.keystore -alias "$ALIAS" \
+          keytool -genkeypair -v \
+            -keystore out/release.keystore \
+            -alias "$ALIAS" \
             -storetype JKS \
-            -keyalg RSA -keysize 2048 -validity 10950 \
-            -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
-            -dname "CN=Tips and Tricks, OU=Mobile, O=Lovable App, L=NA, ST=NA, C=US"
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10950 \
+            -storepass "$STORE_PASS" \
+            -keypass "$KEY_PASS" \
+            -dname "CN=Tips and Tricks, OU=Mobile, O=Lovable App, L=NA, ST=NA, C=US" >/dev/null
+
           KS_B64=$(base64 -w0 out/release.keystore)
+          echo "::add-mask::$KS_B64"
           echo "::add-mask::$STORE_PASS"
           echo "::add-mask::$KEY_PASS"
-          echo "::add-mask::$KS_B64"
 
-          PERSISTED=false
-          if [ "${HAS_ADMIN_TOKEN:-false}" = "true" ]; then
-            export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
-            # احذف أي مجموعة جزئية قبل التوليد لمنع التضارب
-            for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-              gh secret delete "$s" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
-            done
-
-            OK=true
-            echo "$KS_B64"     | gh secret set ANDROID_KEYSTORE_BASE64    --repo "$GITHUB_REPOSITORY" --body - || OK=false
-            echo "$STORE_PASS" | gh secret set ANDROID_KEYSTORE_PASSWORD  --repo "$GITHUB_REPOSITORY" --body - || OK=false
-            echo "$ALIAS"      | gh secret set ANDROID_KEY_ALIAS          --repo "$GITHUB_REPOSITORY" --body - || OK=false
-            echo "$KEY_PASS"   | gh secret set ANDROID_KEY_PASSWORD       --repo "$GITHUB_REPOSITORY" --body - || OK=false
-
-            if [ "$OK" = "true" ]; then
-              for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-                gh secret list --repo "$GITHUB_REPOSITORY" | grep -q "^$s\b" || OK=false
-              done
-            fi
-
-            if [ "$OK" = "true" ]; then
-              PERSISTED=true
-              echo "✅ All 4 signing secrets persisted permanently to repository"
-            else
-              echo "::warning::تعذّر حفظ الأسرار عبر PAT (صلاحيات؟). سيتم رفع نسخة احتياطية فقط."
-            fi
-          else
-            echo "::warning::لا يوجد PAT — لن تُحفظ الأسرار دائماً. ارفعها يدوياً من الـ artifact."
-          fi
-
-          { echo "ANDROID_KEYSTORE_BASE64<<E"; echo "$KS_B64"; echo "E"; } >> $GITHUB_ENV
-          echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASS" >> $GITHUB_ENV
-          echo "ANDROID_KEY_ALIAS=$ALIAS"              >> $GITHUB_ENV
-          echo "ANDROID_KEY_PASSWORD=$KEY_PASS"        >> $GITHUB_ENV
-          echo "AUTO_GENERATED=true"                   >> $GITHUB_ENV
-          echo "PERSISTED=$PERSISTED"                  >> $GITHUB_ENV
-
-          cp out/release.keystore backup/release.keystore
-          cat > backup/SECRETS.txt <<EOF
-          ⚠️ نسخة احتياطية — احفظها في خزنة آمنة (1Password / Bitwarden)
-          ════════════════════════════════════════════════════
-          ANDROID_KEYSTORE_PASSWORD = ${STORE_PASS}
-          ANDROID_KEY_ALIAS         = ${ALIAS}
-          ANDROID_KEY_PASSWORD      = ${KEY_PASS}
-          ════════════════════════════════════════════════════
-          PERSISTED to GitHub Secrets: ${PERSISTED}
-
-          إن كانت PERSISTED=false، أضف الأسرار الأربعة يدوياً:
-            Repo Settings → Secrets and variables → Actions → New repository secret
-              ANDROID_KEYSTORE_BASE64   = (محتوى release.keystore بعد base64 -w0)
-              ANDROID_KEYSTORE_PASSWORD = أعلاه
-              ANDROID_KEY_ALIAS         = tipstricks
-              ANDROID_KEY_PASSWORD      = أعلاه
-          EOF
+          export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
+          echo "$KS_B64" | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$GITHUB_REPOSITORY" --body -
+          echo "$STORE_PASS" | gh secret set ANDROID_KEYSTORE_PASSWORD --repo "$GITHUB_REPOSITORY" --body -
+          echo "$ALIAS" | gh secret set ANDROID_KEY_ALIAS --repo "$GITHUB_REPOSITORY" --body -
+          echo "$KEY_PASS" | gh secret set ANDROID_KEY_PASSWORD --repo "$GITHUB_REPOSITORY" --body -
 
           {
-            if [ "$PERSISTED" = "true" ]; then
-              echo "## 🔐 Permanent signing secrets created"
-              echo ""
-              echo "تم توليد keystore جديد وحفظ الأسرار الأربعة دائماً في المستودع."
-              echo "كل البناءات القادمة ستستخدم نفس التوقيع — جاهز لـ Google Play."
-            else
-              echo "## ⚠️ Keystore generated (NOT yet persisted as secrets)"
-              echo ""
-              echo "حمّل artifact \`keystore-backup-DOWNLOAD-AND-DELETE\` وأضف الأسرار الأربعة يدوياً في إعدادات المستودع لتثبيت التوقيع لكل البناءات القادمة."
-            fi
-          } >> $GITHUB_STEP_SUMMARY
+            echo "ANDROID_KEYSTORE_BASE64<<EOF_SECRET"
+            echo "$KS_B64"
+            echo "EOF_SECRET"
+          } >> "$GITHUB_ENV"
+          echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASS" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_ALIAS=$ALIAS" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_PASSWORD=$KEY_PASS" >> "$GITHUB_ENV"
+          echo "AUTO_GENERATED=true" >> "$GITHUB_ENV"
 
-      - name: 📦 Upload keystore backup (one-time)
+          cp out/release.keystore backup/release.keystore
+          cat > backup/SECRETS.txt <<TXT
+          Android signing backup
+          ======================
+          ANDROID_KEYSTORE_PASSWORD=${STORE_PASS}
+          ANDROID_KEY_ALIAS=${ALIAS}
+          ANDROID_KEY_PASSWORD=${KEY_PASS}
+          TXT
+
+          {
+            echo "## ✅ تم إنشاء Android signing تلقائياً"
+            echo ""
+            echo "تم توليد keystore جديد وحفظ الأسرار الأربعة داخل المستودع."
+            echo "نزّل artifact الاحتياطي واحفظه في مكان آمن لأن هذا هو مفتاح تحديثات Google Play المستقبلية."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 📦 Upload keystore backup
         if: env.AUTO_GENERATED == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -359,163 +259,60 @@ jobs:
           path: backup/
           retention-days: 7
 
-      # ─────────────────────────────────────────────────────────────
-      # 4) Sign + build
-      # ─────────────────────────────────────────────────────────────
-      - name: 🔑 Decode & pre-flight verify keystore
-        id: ks_check
-        env:
-          GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
+      - name: 🔑 Decode keystore
         run: |
           set -euo pipefail
-          KS=android/app/release.keystore
           mkdir -p android/app
-          if ! echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KS" 2>/tmp/b64.err; then
-            B64_RC=1
-          else
-            B64_RC=0
-          fi
-          SIZE=$(stat -c%s "$KS" 2>/dev/null || echo 0)
-
-          fail() {
-            CODE="$1"; shift
-            {
-              echo "## ❌ فشل التحقق من keystore — $CODE"
-              echo ""
-              echo "$@"
-              echo ""
-              echo "### خطوات التصحيح:"
-              echo "1. افتح إعدادات المستودع → **Settings → Secrets and variables → Actions**."
-              echo "2. احذف الأسرار الأربعة:"
-              echo "   - \`ANDROID_KEYSTORE_BASE64\`"
-              echo "   - \`ANDROID_KEYSTORE_PASSWORD\`"
-              echo "   - \`ANDROID_KEY_ALIAS\`"
-              echo "   - \`ANDROID_KEY_PASSWORD\`"
-              echo "3. تأكد من إضافة \`GH_REPO_ADMIN_TOKEN\` (PAT بصلاحية \`repo\`) ليتمكن الـ workflow من حفظها دائماً."
-              echo "4. شغّل **Build AAB** مرة أخرى — سيُولِّد keystore جديداً صالحاً ويحفظه تلقائياً."
-              echo ""
-              echo "> ⚠️ ملاحظة: إذا كان لديك تطبيق منشور سابقاً على Google Play بنفس التوقيع،"
-              echo "> فاستخدم Play App Signing → Request key upgrade بدلاً من توليد keystore جديد."
-            } >> $GITHUB_STEP_SUMMARY
-            echo "::error title=Keystore validation failed ($CODE)::راجع Summary للخطوات بالعربية"
-            exit 1
-          }
-
-          [ $B64_RC -eq 0 ] || fail "BASE64_DECODE_FAILED" \
-            "قيمة \`ANDROID_KEYSTORE_BASE64\` ليست Base64 صالحاً — ربما نُسخت ناقصة أو تحوي مسافات/أسطر جديدة."
-
-          [ "$SIZE" -ge 1000 ] || fail "KEYSTORE_TOO_SMALL" \
-            "ملف keystore بعد فك Base64 حجمه ${SIZE} bytes فقط — القيمة المحفوظة في السر تالفة أو فارغة."
-
-          if ! VALIDATION_OUTPUT=$(scripts/validate-android-keystore.sh \
-            "$KS" \
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+          scripts/validate-android-keystore.sh \
+            android/app/release.keystore \
             "$ANDROID_KEYSTORE_PASSWORD" \
             "$ANDROID_KEY_ALIAS" \
-            "$ANDROID_KEY_PASSWORD" 2>&1); then
-            CODE=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^ERROR_CODE=/{print $2; exit}')
-            MSG=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^ERROR_MESSAGE=/{print substr($0, index($0,"=")+1); exit}')
-            CODE=${CODE:-KEYSTORE_VALIDATION_FAILED}
-
-            case "$CODE" in
-              WRONG_STORE_PASSWORD)
-                fail "$CODE" "كلمة سرّ الـ keystore (\`ANDROID_KEYSTORE_PASSWORD\`) غير مطابقة للملف المحفوظ في \`ANDROID_KEYSTORE_BASE64\`." ;;
-              ALIAS_NOT_FOUND)
-                fail "$CODE" "الـ alias \`${ANDROID_KEY_ALIAS}\` غير موجود داخل keystore. تحقّق من قيمة \`ANDROID_KEY_ALIAS\` أو احذف الأسرار الأربعة ليُعاد توليدها." ;;
-              WRONG_KEY_PASSWORD)
-                fail "$CODE" "كلمة سرّ المفتاح (\`ANDROID_KEY_PASSWORD\`) غير مطابقة للـ alias \`${ANDROID_KEY_ALIAS}\`. هذا هو سبب خطأ \`BadPaddingException: Given final block not properly padded\` أثناء توقيع AAB." ;;
-              KEYSTORE_TOO_SMALL)
-                fail "$CODE" "ملف keystore بعد فك Base64 حجمه ${SIZE} bytes فقط — القيمة المحفوظة في السر تالفة أو فارغة." ;;
-              *)
-                fail "$CODE" "${MSG:-تعذّر التحقق من تطابق keystore والأسرار.}"
-                ;;
-            esac
-          fi
-
-          echo "✅ keystore سليم وكل الأسرار متطابقة"
-
-          # ─── تحقق بصمة SHA-256 لمنع استبدال keystore عن طريق الخطأ ───
-          FP_FILE="android/keystore.sha256"
-          CUR_FP=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^KEYSTORE_SHA256=/{print $2; exit}')
-          echo "🔎 SHA-256 الحالية: $CUR_FP"
-
-          if [ -f "$FP_FILE" ]; then
-            EXPECTED_FP=$(grep -oE '[0-9A-F:]{95,}' "$FP_FILE" | head -n1)
-            if [ -z "$EXPECTED_FP" ]; then
-              echo "::warning::ملف $FP_FILE موجود لكنه لا يحتوي بصمة صالحة — سيتم تحديثه."
-              echo "$CUR_FP" > "$FP_FILE"
-            elif [ "$CUR_FP" = "$EXPECTED_FP" ]; then
-              echo "✅ بصمة SHA-256 مطابقة للقيمة المحفوظة — keystore أصلي"
-            else
-              {
-                echo "## 🛑 تنبيه أمني — بصمة keystore تغيّرت!"
-                echo ""
-                echo "**البصمة المتوقّعة (المحفوظة في \`$FP_FILE\`):**"
-                echo "\`\`\`"; echo "$EXPECTED_FP"; echo "\`\`\`"
-                echo "**البصمة الحالية (من \`ANDROID_KEYSTORE_BASE64\`):**"
-                echo "\`\`\`"; echo "$CUR_FP"; echo "\`\`\`"
-                echo ""
-                echo "### معنى هذا:"
-                echo "تمّ استبدال الـ keystore بآخر مختلف. **إذا كان التطبيق منشوراً على Google Play بالبصمة المتوقّعة، فإن أي AAB بهذه البصمة الجديدة سيُرفض من Google Play.**"
-                echo ""
-                echo "### الحلول:"
-                echo "1. **إن كان الاستبدال غير مقصود** → أعد الـ keystore الأصلي:"
-                echo "   - احذف \`ANDROID_KEYSTORE_BASE64\` و\`ANDROID_KEYSTORE_PASSWORD\` و\`ANDROID_KEY_ALIAS\` و\`ANDROID_KEY_PASSWORD\`"
-                echo "   - أعد رفع قيم الـ keystore الأصلي."
-                echo "2. **إن كان الاستبدال مقصوداً** (تطبيق جديد أو Play Key Upgrade):"
-                echo "   - عدّل الملف \`$FP_FILE\` ليحتوي البصمة الجديدة:"
-                echo "     \`\`\`"
-                echo "     $CUR_FP"
-                echo "     \`\`\`"
-                echo "   - ثم commit + push وأعد تشغيل البناء."
-              } >> $GITHUB_STEP_SUMMARY
-              echo "::error title=Keystore SHA-256 mismatch::راجع Summary"
-              exit 1
-            fi
-          else
-            # أول تشغيل — احفظ البصمة الحالية كمرجع للمرات القادمة
-            echo "$CUR_FP" > "$FP_FILE"
-            echo "📝 لا توجد بصمة محفوظة — تم حفظ البصمة الحالية في $FP_FILE"
-            if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ]; then
-              git config user.name  "github-actions[bot]"
-              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-              git add "$FP_FILE"
-              git diff --cached --quiet || {
-                git commit -m "chore(android): pin keystore SHA-256 fingerprint [skip ci]"
-                git push || echo "::warning::تعذّر دفع بصمة keystore — أضفها يدوياً في $FP_FILE"
-              }
-              {
-                echo "## 📌 تم تثبيت بصمة keystore"
-                echo ""
-                echo "تمّ حفظ بصمة SHA-256 الحالية في \`$FP_FILE\` كمرجع. أي تغيير مستقبلي للـ keystore سيُكتشف ويوقف البناء."
-                echo ""
-                echo "**البصمة المثبّتة:** \`$CUR_FP\`"
-              } >> $GITHUB_STEP_SUMMARY
-            else
-              echo "::warning::GH_REPO_ADMIN_TOKEN غير موجود — لم يتم commit ملف البصمة. أضفه يدوياً."
-            fi
-          fi
+            "$ANDROID_KEY_PASSWORD"
 
       - name: ✍️ Inject signing config
         run: |
-          F=android/app/build.gradle
-          grep -q "signingConfigs" "$F" && exit 0
+          set -euo pipefail
           python3 - <<'PY'
           import re
-          p="android/app/build.gradle"; c=open(p).read()
-          sc='    signingConfigs {\n        release {\n            storeFile file(System.getenv("KEYSTORE_PATH") ?: "release.keystore")\n            storePassword System.getenv("KS_PASS") ?: System.getenv("KEYSTORE_PASSWORD")\n            keyAlias System.getenv("KEY_ALIAS") ?: "tipstricks"\n            keyPassword System.getenv("KEY_PASS") ?: System.getenv("KEY_PASSWORD")\n        }\n    }\n'
-          c,_=re.subn(r'(android\s*\{\r?\n)', r'\1'+sc, c, 1)
-          c,_=re.subn(r'(buildTypes\s*\{\s*\r?\n\s*release\s*\{\s*\r?\n)', r'\1            signingConfig signingConfigs.release\n', c, 1)
-          open(p,"w").write(c)
+          path = 'android/app/build.gradle'
+          with open(path, 'r', encoding='utf-8') as f:
+              content = f.read()
+
+          if 'signingConfigs {' not in content:
+              block = '''    signingConfigs {
+                  release {
+                      storeFile file(System.getenv("KEYSTORE_PATH") ?: "release.keystore")
+                      storePassword System.getenv("KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("KEY_ALIAS") ?: "tipstricks"
+                      keyPassword System.getenv("KEY_PASSWORD")
+                  }
+              }
+          '''
+              content, n = re.subn(r'(android\s*\{\s*\n)', r'\1' + block, content, count=1)
+              if n == 0:
+                  raise SystemExit('Could not find android block in android/app/build.gradle')
+
+          if 'signingConfig signingConfigs.release' not in content:
+              content, n = re.subn(
+                  r'(buildTypes\s*\{\s*\n\s*release\s*\{\s*\n)',
+                  r'\1            signingConfig signingConfigs.release\n',
+                  content,
+                  count=1,
+              )
+              if n == 0:
+                  raise SystemExit('Could not inject signingConfig into release buildType')
+
+          with open(path, 'w', encoding='utf-8') as f:
+              f.write(content)
           PY
 
       - name: 🏗️ Build signed AAB
         id: gradle_build
         env:
-          KS_PASS: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
-          KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
           KEYSTORE_PATH: app/release.keystore
+          KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
-          KEY_PASS: ${{ env.ANDROID_KEY_PASSWORD }}
           KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
@@ -523,57 +320,19 @@ jobs:
           set -o pipefail
           ./gradlew bundleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
 
-      - name: 🩺 Diagnose signing failure (on error)
+      - name: 🩺 Diagnose Gradle failure
         if: failure() && steps.gradle_build.conclusion == 'failure'
         run: |
           LOG=/tmp/gradle.log
           [ -f "$LOG" ] || exit 0
-
           {
-            echo "## ❌ فشل بناء AAB أثناء التوقيع"
+            echo "## ❌ فشل بناء Android AAB"
             echo ""
-
-            if grep -q "BadPaddingException" "$LOG"; then
-              echo "### السبب: \`BadPaddingException — Given final block not properly padded\`"
-              echo ""
-              echo "هذا الخطأ يعني أن **كلمة سرّ المفتاح (\`ANDROID_KEY_PASSWORD\`) لا تطابق** المفتاح داخل keystore."
-              echo ""
-              echo "### خطوات التصحيح (3 دقائق):"
-              echo "1. **Settings → Secrets and variables → Actions**."
-              echo "2. احذف الأسرار الأربعة:"
-              echo "   - \`ANDROID_KEYSTORE_BASE64\`"
-              echo "   - \`ANDROID_KEYSTORE_PASSWORD\`"
-              echo "   - \`ANDROID_KEY_ALIAS\`"
-              echo "   - \`ANDROID_KEY_PASSWORD\`"
-              echo "3. تأكد أن \`GH_REPO_ADMIN_TOKEN\` موجود (PAT بصلاحية \`repo\`)."
-              echo "4. شغّل **Build AAB** من جديد — سيُولِّد keystore جديداً متطابقاً ويحفظه دائماً."
-            elif grep -qE "keystore was tampered|password was incorrect" "$LOG"; then
-              echo "### السبب: كلمة سرّ keystore غير صحيحة أو الملف تالف."
-              echo ""
-              echo "احذف الأسرار الأربعة من إعدادات المستودع وشغّل البناء مرة أخرى لتوليدها تلقائياً."
-            elif grep -q "Keystore file .* not found" "$LOG"; then
-              echo "### السبب: ملف keystore لم يُكتب على القرص — مشكلة في فك Base64."
-              echo ""
-              echo "تحقق من قيمة \`ANDROID_KEYSTORE_BASE64\` في إعدادات الأسرار."
-            elif grep -qE "alias .* does not exist|Alias .* does not exist" "$LOG"; then
-              echo "### السبب: قيمة \`ANDROID_KEY_ALIAS\` لا تطابق ما هو محفوظ داخل keystore."
-              echo ""
-              echo "احذف الأسرار الأربعة وأعد التشغيل — سيُولِّد alias جديداً (\`tipstricks\`) ويحفظه."
-            else
-              echo "### آخر 40 سطراً من سجل Gradle:"
-              echo '```'
-              tail -n 40 "$LOG"
-              echo '```'
-              echo ""
-              echo "إن لم يكن السبب واضحاً، احذف الأسرار الأربعة وأعد التشغيل."
-            fi
-
-            echo ""
-            echo "> ⚠️ إن كان التطبيق منشوراً سابقاً على Google Play بنفس التوقيع،"
-            echo "> فلا تولّد keystore جديداً — استخدم **Play App Signing → Request key upgrade**."
-          } >> $GITHUB_STEP_SUMMARY
-
-          echo "::error title=AAB signing failed::راجع Summary للخطوات التصحيحية بالعربية"
+            echo "### آخر 50 سطراً من السجل"
+            echo '```'
+            tail -n 50 "$LOG"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: 🏷️ Collect AAB
         id: collect
@@ -581,16 +340,14 @@ jobs:
           VN: ${{ steps.ver.outputs.version_name }}
           VC: ${{ steps.ver.outputs.version_code }}
         run: |
+          set -euo pipefail
           BASE="tipstricks-v${VN}-vc${VC}"
           mkdir -p dist-out
           cp android/app/build/outputs/bundle/release/app-release.aab "dist-out/${BASE}.aab"
-          echo "base=$BASE" >> $GITHUB_OUTPUT
-          echo "aab=dist-out/${BASE}.aab" >> $GITHUB_OUTPUT
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          echo "aab=dist-out/${BASE}.aab" >> "$GITHUB_OUTPUT"
 
-      # ─────────────────────────────────────────────────────────────
-      # 5) Verify signature + Play compliance
-      # ─────────────────────────────────────────────────────────────
-      - name: 🔍 Verify AAB
+      - name: 🔍 Verify AAB signature
         env:
           AAB: ${{ steps.collect.outputs.aab }}
         run: |
@@ -598,23 +355,26 @@ jobs:
           jarsigner -verify -strict "$AAB" >/dev/null
           AAB_SHA=$(keytool -printcert -jarfile "$AAB" 2>/dev/null | awk '/SHA256:/ {print $2; exit}')
           KS_SHA=$(keytool -list -v -keystore android/app/release.keystore \
-                    -storepass "$ANDROID_KEYSTORE_PASSWORD" \
-                    -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
-                    | awk '/SHA256:/ {print $2; exit}')
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -alias "$ANDROID_KEY_ALIAS" 2>/dev/null | awk '/SHA256:/ {print $2; exit}')
           [ "$AAB_SHA" = "$KS_SHA" ] || { echo "::error::Signature mismatch"; exit 1; }
-          echo "✅ AAB signed correctly (SHA256: $AAB_SHA)"
 
-      - name: 📤 Upload AAB
+          {
+            echo "## ✅ AAB جاهز"
+            echo ""
+            echo "- Version: \`${{ steps.ver.outputs.version_name }}\`"
+            echo "- Build: \`${{ steps.ver.outputs.version_code }}\`"
+            echo "- SHA-256: \`${AAB_SHA}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 📤 Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.collect.outputs.base }}
           path: dist-out/
           retention-days: 90
 
-      # ─────────────────────────────────────────────────────────────
-      # 6) GitHub Release (optional)
-      # ─────────────────────────────────────────────────────────────
-      - name: 🚀 GitHub Release
+      - name: 🚀 Create GitHub Release
         if: ${{ inputs.create_release }}
         uses: softprops/action-gh-release@v2
         with:

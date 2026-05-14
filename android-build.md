@@ -1,7 +1,6 @@
 # Android Build Guide — AAB for Google Play
 
-> Complete walkthrough to produce a signed `.aab` ready for Google Play upload,
-> with Google Play Billing fully wired for the in-app subscriptions.
+> المسار الموصى به الآن هو **GitHub Actions → Build Android AAB**. هذا الملف يبقى مرجعاً تقنياً للمسار المحلي فقط عند الحاجة.
 
 ---
 
@@ -22,6 +21,19 @@ Edit **`capacitor.config.ts`** at the project root:
 export const APP_VERSION_NAME = "1.0.0";
 export const APP_VERSION_CODE = 1;   // increment by 1 for EVERY Play upload
 ```
+
+---
+
+## 🛠️ Preferred path
+
+إذا كنت تعمل عبر GitHub فقط ولا تريد إعداداً محلياً، استخدم:
+
+1. أضف `GH_REPO_ADMIN_TOKEN` مرة واحدة في GitHub Secrets.
+2. شغّل workflow **Build Android AAB**.
+3. في أول تشغيل سيُنشئ keystore ويحفظ أسرار Android تلقائياً.
+4. بعد ذلك تصبح كل البناءات التالية تلقائية بنفس التوقيع.
+
+> لماذا ما زال هذا الملف موجوداً؟ فقط كمرجع لو أردت لاحقاً البناء محلياً أو مراجعة تفاصيل Gradle/Capacitor.
 
 ---
 

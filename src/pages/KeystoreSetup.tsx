@@ -16,13 +16,13 @@ import sodium from "libsodium-wrappers";
 // تتيح لك:
 //   1) لصق GitHub Personal Access Token مرة واحدة (لا يُحفظ على القرص)
 //   2) رفعه كـ GH_REPO_ADMIN_TOKEN داخل أسرار المستودع (مشفّراً عبر libsodium)
-//   3) تشغيل workflow "Keystore Management" بوضع generate بنقرة واحدة
+//   3) تشغيل workflow "Build Android AAB" بنقرة واحدة ليولّد keystore عند الحاجة
 //   4) متابعة آخر تشغيل والذهاب إليه مباشرة
 // ============================================================================
 
 const DEFAULT_OWNER = "";
 const DEFAULT_REPO = "";
-const WORKFLOW_FILE = "keystore-management.yml";
+const WORKFLOW_FILE = "build-aab.yml";
 const SECRET_NAME = "GH_REPO_ADMIN_TOKEN";
 
 const LS_KEY = "keystore-setup-config";
@@ -67,13 +67,13 @@ async function uploadSecretToRepo(owner: string, repo: string, token: string, se
   }
 }
 
-async function dispatchWorkflow(owner: string, repo: string, token: string, mode: string) {
+async function dispatchWorkflow(owner: string, repo: string, token: string) {
   const res = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
     {
       method: "POST",
       headers: { ...ghHeaders(token), "Content-Type": "application/json" },
-      body: JSON.stringify({ ref: "main", inputs: { mode } }),
+      body: JSON.stringify({ ref: "main", inputs: {} }),
     }
   );
   if (!res.ok && res.status !== 204) {
@@ -126,8 +126,8 @@ export default function KeystoreSetup() {
         toast.success(`تم رفع ${SECRET_NAME} إلى أسرار المستودع`);
       }
       setBusy("run");
-      await dispatchWorkflow(cfg.owner.trim(), cfg.repo.trim(), token.trim(), "generate");
-      toast.success("تم تشغيل Keystore Management — راقب التقدم بالأسفل");
+      await dispatchWorkflow(cfg.owner.trim(), cfg.repo.trim(), token.trim());
+      toast.success("تم تشغيل Build Android AAB — راقب التقدم بالأسفل");
       setTimeout(() => handleRefresh(), 3000);
     } catch (e: any) {
       toast.error(e?.message ?? "فشل غير متوقع");
@@ -161,7 +161,7 @@ export default function KeystoreSetup() {
           إعداد Keystore بنقرة واحدة
         </h1>
         <p className="text-sm text-muted-foreground">
-          أدخل GitHub Personal Access Token لمرة واحدة، احفظه كسرّ دائم في المستودع، ثم شغّل توليد keystore تلقائياً.
+          أدخل GitHub Personal Access Token لمرة واحدة، احفظه كسرّ دائم في المستودع، ثم شغّل بناء AAB بحيث يتم توليد keystore تلقائياً عند الحاجة.
         </p>
       </header>
 
@@ -241,7 +241,7 @@ export default function KeystoreSetup() {
             />
             <span className="text-muted-foreground leading-relaxed">
               احفظ التوكن كسرّ دائم باسم <code className="bg-muted px-1 rounded">GH_REPO_ADMIN_TOKEN</code> داخل
-              المستودع (مطلوب لكي تستطيع كل البناءات القادمة حفظ أسرار التوقيع تلقائياً).
+              المستودع (مطلوب مرة واحدة فقط لكي يستطيع workflow إنشاء أسرار التوقيع تلقائياً في GitHub).
             </span>
           </label>
         </CardContent>
@@ -306,10 +306,10 @@ export default function KeystoreSetup() {
 
       <Alert>
         <AlertDescription className="text-xs leading-relaxed">
-          بعد نجاح التشغيل: ستجد artifact باسم{" "}
+          بعد نجاح التشغيل لأول مرة: ستجد artifact باسم{" "}
           <code className="bg-muted px-1 rounded">keystore-backup-DOWNLOAD-AND-DELETE</code> داخل صفحة الـ run —
           نزّله واحفظه في خزنة آمنة (1Password / Bitwarden). كل البناءات القادمة من workflow{" "}
-          <code className="bg-muted px-1 rounded">Release</code> ستستخدم نفس التوقيع تلقائياً.
+          <code className="bg-muted px-1 rounded">Build Android AAB</code> ستستخدم نفس التوقيع تلقائياً.
         </AlertDescription>
       </Alert>
     </div>
