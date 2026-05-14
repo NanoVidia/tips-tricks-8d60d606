@@ -376,7 +376,7 @@ jobs:
           python3 - <<'PY'
           import re
           p="android/app/build.gradle"; c=open(p).read()
-          sc='    signingConfigs {\n        release {\n            storeFile file("release.keystore")\n            storePassword System.getenv("KS_PASS")\n            keyAlias System.getenv("KEY_ALIAS")\n            keyPassword System.getenv("KEY_PASS")\n        }\n    }\n'
+          sc='    signingConfigs {\n        release {\n            storeFile file(System.getenv("KEYSTORE_PATH") ?: "release.keystore")\n            storePassword System.getenv("KS_PASS") ?: System.getenv("KEYSTORE_PASSWORD")\n            keyAlias System.getenv("KEY_ALIAS") ?: "tipstricks"\n            keyPassword System.getenv("KEY_PASS") ?: System.getenv("KEY_PASSWORD")\n        }\n    }\n'
           c,_=re.subn(r'(android\s*\{\r?\n)', r'\1'+sc, c, 1)
           c,_=re.subn(r'(buildTypes\s*\{\s*\r?\n\s*release\s*\{\s*\r?\n)', r'\1            signingConfig signingConfigs.release\n', c, 1)
           open(p,"w").write(c)
@@ -386,8 +386,11 @@ jobs:
         id: gradle_build
         env:
           KS_PASS: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
+          KEYSTORE_PATH: release.keystore
           KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
           KEY_PASS: ${{ env.ANDROID_KEY_PASSWORD }}
+          KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
           chmod +x gradlew
