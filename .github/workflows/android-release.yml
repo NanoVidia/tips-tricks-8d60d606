@@ -364,9 +364,9 @@ jobs:
 
       - name: 📦 Build signed AAB
         env:
-          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KS_PASS: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ env.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
           chmod +x gradlew
