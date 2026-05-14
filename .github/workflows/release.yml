@@ -307,8 +307,49 @@ jobs:
           echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
           [ "$(stat -c%s android/app/release.keystore)" -ge 1000 ] || { echo "::error::Keystore too small"; exit 1; }
 
-      - name: ✅ Validate keystore
-        run: keytool -list -keystore android/app/release.keystore -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null
+      - name: ✅ Validate keystore (integrity + alias + password)
+        run: |
+          set -euo pipefail
+          KS=android/app/release.keystore
+          echo "── Keystore file: $(stat -c%s "$KS") bytes ──"
+
+          # 1) Integrity + store password
+          if ! keytool -list -keystore "$KS" -storepass "$ANDROID_KEYSTORE_PASSWORD" >/tmp/ks.txt 2>/tmp/ks.err; then
+            echo "::error::Keystore integrity check failed (wrong store password or corrupt file)"
+            cat /tmp/ks.err
+            exit 1
+          fi
+
+          # 2) Alias presence (case-insensitive — keytool lowercases aliases)
+          ALIAS_LC=$(echo "$ANDROID_KEY_ALIAS" | tr '[:upper:]' '[:lower:]')
+          if ! grep -iq "^${ALIAS_LC}," /tmp/ks.txt; then
+            echo "::error::Alias '$ANDROID_KEY_ALIAS' not found in keystore"
+            echo "Available aliases:"
+            grep -E "PrivateKeyEntry|TrustedCertEntry" /tmp/ks.txt || cat /tmp/ks.txt
+            exit 1
+          fi
+
+          # 3) Key password works (try to read the key entry)
+          if ! keytool -list -v -keystore "$KS" \
+                -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+                -alias "$ANDROID_KEY_ALIAS" >/tmp/key.txt 2>/tmp/key.err; then
+            echo "::error::Cannot read alias '$ANDROID_KEY_ALIAS' (wrong store password)"
+            cat /tmp/key.err
+            exit 1
+          fi
+          if ! keytool -keypasswd -keystore "$KS" \
+                -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+                -alias "$ANDROID_KEY_ALIAS" \
+                -keypass "$ANDROID_KEY_PASSWORD" \
+                -new "$ANDROID_KEY_PASSWORD" 2>/tmp/kp.err; then
+            echo "::error::Key password for alias '$ANDROID_KEY_ALIAS' is invalid"
+            cat /tmp/kp.err
+            exit 1
+          fi
+
+          # 4) Surface fingerprints + validity for logs
+          grep -E "Alias name|Creation date|Entry type|Valid from|SHA1:|SHA256:" /tmp/key.txt || true
+          echo "✅ Keystore valid · alias '$ANDROID_KEY_ALIAS' present · passwords correct"
 
       - name: ✍️ Inject signing config
         run: |
