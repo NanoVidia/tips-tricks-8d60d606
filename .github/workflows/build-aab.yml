@@ -53,6 +53,39 @@ jobs:
           fetch-depth: 0
 
       # ─────────────────────────────────────────────────────────────
+      # 0) Preflight — GH_REPO_ADMIN_TOKEN إلزامي لإنشاء أسرار دائمة
+      # ─────────────────────────────────────────────────────────────
+      - name: 🛂 Preflight · require admin token
+        env:
+          GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
+        run: |
+          if [ -z "${GH_REPO_ADMIN_TOKEN:-}" ]; then
+            cat >&2 <<'MSG'
+          ════════════════════════════════════════════════════════════════
+          ❌ GH_REPO_ADMIN_TOKEN غير موجود في أسرار المستودع.
+
+          هذا الـ workflow يضمن إنشاء أسرار توقيع *دائمة* تلقائياً.
+          هذا غير ممكن بـ GITHUB_TOKEN الافتراضي — GitHub يمنعه من
+          كتابة الأسرار. يجب توفير Personal Access Token (PAT) مرّة واحدة.
+
+          خطوات الإعداد لمرة واحدة فقط:
+            1) افتح: https://github.com/settings/tokens/new
+            2) Scopes: ✅ repo   (Classic PAT)
+            3) انسخ القيمة → Repo Settings → Secrets and variables →
+               Actions → New repository secret
+                 Name : GH_REPO_ADMIN_TOKEN
+                 Value: <PAT>
+            4) شغّل Build AAB مرة أخرى.
+
+          بديل: استخدم صفحة /keystore-setup داخل التطبيق لإدخال PAT
+          ورفعه مشفّراً إلى المستودع بنقرة واحدة.
+          ════════════════════════════════════════════════════════════════
+          MSG
+            exit 1
+          fi
+          echo "✓ GH_REPO_ADMIN_TOKEN present (len=${#GH_REPO_ADMIN_TOKEN})"
+
+      # ─────────────────────────────────────────────────────────────
       # 1) Compute version
       # ─────────────────────────────────────────────────────────────
       - name: 🔢 Compute version
@@ -141,9 +174,9 @@ jobs:
           sed -i -E "s/versionName \"[^\"]+\"/versionName \"$VN\"/"  android/app/build.gradle
 
       # ─────────────────────────────────────────────────────────────
-      # 3) Auto-generate signing secrets if missing
+      # 3) Ensure permanent signing secrets (auto-generate + persist)
       # ─────────────────────────────────────────────────────────────
-      - name: 🔐 Ensure signing secrets
+      - name: 🔐 Ensure permanent signing secrets
         env:
           GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -152,13 +185,15 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          missing=0
+          export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
+
+          present=0
           for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-            [ -z "${!s}" ] && missing=$((missing+1))
+            [ -n "${!s}" ] && present=$((present+1))
           done
 
-          if [ "$missing" -eq 0 ]; then
-            echo "✓ All signing secrets present"
+          if [ "$present" -eq 4 ]; then
+            echo "✓ Reusing existing permanent signing secrets"
             { echo "ANDROID_KEYSTORE_BASE64<<E"; echo "$ANDROID_KEYSTORE_BASE64"; echo "E"; } >> $GITHUB_ENV
             echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> $GITHUB_ENV
             echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"                 >> $GITHUB_ENV
@@ -167,7 +202,13 @@ jobs:
             exit 0
           fi
 
-          echo "::warning::Generating new release keystore ($missing secrets missing)"
+          echo "::notice::Generating new permanent release keystore ($((4-present))/4 secrets missing)"
+
+          # احذف أي مجموعة جزئية قبل التوليد لمنع التضارب
+          for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            gh secret delete "$s" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
+          done
+
           STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
           KEY_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
           ALIAS=tipstricks
@@ -181,19 +222,18 @@ jobs:
           echo "::add-mask::$KEY_PASS"
           echo "::add-mask::$KS_B64"
 
-          if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ]; then
-            export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
-            for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-              gh secret delete "$s" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
-            done
-            echo "$KS_B64"     | gh secret set ANDROID_KEYSTORE_BASE64    --repo "$GITHUB_REPOSITORY" --body -
-            echo "$STORE_PASS" | gh secret set ANDROID_KEYSTORE_PASSWORD  --repo "$GITHUB_REPOSITORY" --body -
-            echo "$ALIAS"      | gh secret set ANDROID_KEY_ALIAS          --repo "$GITHUB_REPOSITORY" --body -
-            echo "$KEY_PASS"   | gh secret set ANDROID_KEY_PASSWORD       --repo "$GITHUB_REPOSITORY" --body -
-            echo "✅ Saved to repository secrets"
-          else
-            echo "::warning::GH_REPO_ADMIN_TOKEN not set — keystore kept only as artifact for this run"
-          fi
+          # احفظ كأسرار دائمة — يفشل الـ step إن لم تُكتب الأربعة بنجاح
+          echo "$KS_B64"     | gh secret set ANDROID_KEYSTORE_BASE64    --repo "$GITHUB_REPOSITORY" --body -
+          echo "$STORE_PASS" | gh secret set ANDROID_KEYSTORE_PASSWORD  --repo "$GITHUB_REPOSITORY" --body -
+          echo "$ALIAS"      | gh secret set ANDROID_KEY_ALIAS          --repo "$GITHUB_REPOSITORY" --body -
+          echo "$KEY_PASS"   | gh secret set ANDROID_KEY_PASSWORD       --repo "$GITHUB_REPOSITORY" --body -
+
+          # تحقق فعلي أن GitHub قبلها
+          for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            gh secret list --repo "$GITHUB_REPOSITORY" | grep -q "^$s\b" \
+              || { echo "::error::Failed to persist secret $s"; exit 1; }
+          done
+          echo "✅ All 4 signing secrets persisted permanently to repository"
 
           { echo "ANDROID_KEYSTORE_BASE64<<E"; echo "$KS_B64"; echo "E"; } >> $GITHUB_ENV
           echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASS" >> $GITHUB_ENV
@@ -203,12 +243,23 @@ jobs:
 
           cp out/release.keystore backup/release.keystore
           cat > backup/SECRETS.txt <<EOF
+          ⚠️ نسخة احتياطية — احفظها في خزنة آمنة (1Password / Bitwarden)
+          ════════════════════════════════════════════════════
           ANDROID_KEYSTORE_PASSWORD = ${STORE_PASS}
           ANDROID_KEY_ALIAS         = ${ALIAS}
           ANDROID_KEY_PASSWORD      = ${KEY_PASS}
+          ════════════════════════════════════════════════════
+          الأسرار محفوظة بالفعل في GitHub Secrets — هذه النسخة فقط لاستعادة محلية.
           EOF
 
-      - name: 📦 Upload keystore backup
+          {
+            echo "## 🔐 Permanent signing secrets created"
+            echo ""
+            echo "تم توليد keystore جديد وحفظ الأسرار الأربعة دائماً في المستودع."
+            echo "كل البناءات القادمة ستستخدم نفس التوقيع — جاهز لـ Google Play."
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: 📦 Upload keystore backup (one-time)
         if: env.AUTO_GENERATED == 'true'
         uses: actions/upload-artifact@v4
         with:
