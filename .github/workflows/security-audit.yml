@@ -1,0 +1,82 @@
+name: Security Audit
+
+# ==============================================================================
+# فحص أمني أسبوعي — npm audit + secrets leak scan + CodeQL.
+# يفتح Issue تلقائياً عند اكتشاف high/critical.
+# ==============================================================================
+
+on:
+  schedule:
+    - cron: "0 6 * * 0"   # كل أحد 06:00 UTC
+  workflow_dispatch:
+  pull_request:
+    paths: [package.json, package-lock.json, .github/workflows/security-audit.yml]
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  npm_audit:
+    name: npm audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: "npm" }
+      - run: npm ci --no-audit --no-fund
+      - id: audit
+        run: |
+          set +e
+          npm audit --audit-level=high --json > audit.json
+          CODE=$?
+          HIGH=$(jq '.metadata.vulnerabilities.high // 0' audit.json)
+          CRIT=$(jq '.metadata.vulnerabilities.critical // 0' audit.json)
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+          echo "crit=$CRIT" >> $GITHUB_OUTPUT
+          {
+            echo "## 🔒 npm audit"
+            echo ""
+            echo "- High: **$HIGH**"
+            echo "- Critical: **$CRIT**"
+            echo ""
+            jq -r '.vulnerabilities | to_entries[]? | "- `\(.key)` — \(.value.severity)"' audit.json | head -30
+          } >> $GITHUB_STEP_SUMMARY
+          exit 0
+
+      - name: 🚨 Open issue on critical/high
+        if: github.event_name == 'schedule' && (steps.audit.outputs.crit != '0' || steps.audit.outputs.high != '0')
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh issue create \
+            --title "🔒 Security: ${{ steps.audit.outputs.crit }} critical, ${{ steps.audit.outputs.high }} high vulnerabilities" \
+            --label "security,dependencies" \
+            --body "اكتشف فحص npm audit الأسبوعي ثغرات خطيرة. شغّل \`npm audit fix\` محلياً أو راجع [Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+
+  secrets_scan:
+    name: TruffleHog secrets scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified
+
+  codeql:
+    name: CodeQL analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: javascript-typescript }
+      - uses: github/codeql-action/analyze@v3
+        with: { category: "/language:javascript-typescript" }
