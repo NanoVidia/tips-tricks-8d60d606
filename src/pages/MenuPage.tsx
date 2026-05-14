@@ -20,12 +20,7 @@ export default function MenuPage() {
   const location = useLocation();
   const { get, all } = useAppSettings();
   const settingsMap = useMemo(() => ((all as Record<string, any>) || {}), [all]);
-
-  if (!isMenuPageId(pageId)) {
-    return <Navigate to="/" replace />;
-  }
-
-  const currentPage = pageId as MenuPageId;
+  const currentPage = isMenuPageId(pageId) ? (pageId as MenuPageId) : null;
   const state = (location.state as LocationState | null) ?? null;
   const [dark, setDark] = useState(() => {
     if (typeof state?.dark === "boolean") return state.dark;
@@ -35,6 +30,10 @@ export default function MenuPage() {
   useEffect(() => {
     setDark(document.documentElement.classList.contains("dark"));
   }, [currentPage]);
+
+  if (!currentPage) {
+    return <Navigate to="/" replace />;
+  }
 
   const toggleDark = () => {
     setDark((prev) => {

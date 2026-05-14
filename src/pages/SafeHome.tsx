@@ -36,9 +36,10 @@ export default function SafeHome() {
     setAccepted(true);
   };
   const openLegal = (section?: string) => setView({ name: "legal", section });
-  if (view.name === "legal") return <SafeLegal onBack={() => setView({ name: "quiz" })} initialSection={view.section} />;
 
   const q: SafeQuestion = useMemo(() => SAFE_QUESTIONS[order[idx]], [order, idx]);
+
+  if (view.name === "legal") return <SafeLegal onBack={() => setView({ name: "quiz" })} initialSection={view.section} />;
 
 
   const choose = (i: number) => {
