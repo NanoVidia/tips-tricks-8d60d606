@@ -413,17 +413,37 @@ jobs:
           VC: ${{ steps.meta.outputs.version_code }}
           BRANCH: ${{ steps.meta.outputs.branch }}
           AAB: ${{ steps.meta.outputs.aab_filename }}
+          ARTIFACT_NAME: ${{ steps.meta.outputs.artifact_name }}
+          TAG: ${{ steps.meta.outputs.tag_name }}
           TRACK: ${{ inputs.track }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
+          ARTIFACT_URL="${REPO_URL}/actions/runs/${GITHUB_RUN_ID}#artifacts"
+          RELEASE_URL="${REPO_URL}/releases/tag/${TAG}"
+          LATEST_URL="${REPO_URL}/releases/latest"
           {
-            echo "## 🎉 Release ready"
+            echo "## 🎉 Release ready — v${VN} (build ${VC})"
             echo ""
+            echo "### 📥 تنزيل ملف AAB"
+            echo ""
+            echo "| الطريقة | الرابط |"
+            echo "|---|---|"
+            echo "| ⬇️ **Artifact (هذا الـ run)** | [\`${ARTIFACT_NAME}.aab\`](${ARTIFACT_URL}) |"
+            echo "| 🏷️ **GitHub Release (رابط ثابت)** | [${TAG}](${RELEASE_URL}) |"
+            echo "| 🆕 **آخر إصدار دائماً** | [Latest Release](${LATEST_URL}) |"
+            echo ""
+            echo "> الـ Artifact يبقى 90 يوماً. الـ Release رابط دائم."
+            echo ""
+            echo "### 📋 معلومات البناء"
             echo "| | |"
             echo "|---|---|"
             echo "| Version    | **v${VN}** (code ${VC}) |"
             echo "| Branch     | \`${BRANCH}\` |"
             echo "| Artifact   | \`${AAB}\` |"
             echo "| Play track | \`${TRACK:-none}\` |"
+            echo ""
+            echo "### 🚀 الخطوة التالية"
+            echo "نزّل الـ AAB ثم ارفعه إلى [Google Play Console](https://play.google.com/console) → التطبيق → **Production / Internal testing** → **Create new release**."
           } >> $GITHUB_STEP_SUMMARY
 
 # ==============================================================================
