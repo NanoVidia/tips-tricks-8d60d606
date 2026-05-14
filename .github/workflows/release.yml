@@ -61,6 +61,42 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      - name: ✅ Preflight — verify Android signing secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            [ -z "${!s}" ] && missing+=("$s")
+          done
+          total=4
+          found=$((total - ${#missing[@]}))
+          echo "── Secrets check: ${found}/${total} present ──"
+          if [ "${#missing[@]}" -eq 0 ]; then
+            echo "✅ All 4 Android signing secrets are configured."
+            exit 0
+          fi
+          echo ""
+          echo "❌ Build aborted — missing required secrets:"
+          for s in "${missing[@]}"; do echo "   • $s"; done
+          echo ""
+          echo "🛠️  How to fix:"
+          echo "   1) Run the 'Keystore Management' workflow with action=generate"
+          echo "      (Actions → Keystore Management → Run workflow)"
+          echo "   2) Or add them manually in:"
+          echo "      Settings → Secrets and variables → Actions"
+          echo ""
+          echo "Required secrets:"
+          echo "   • ANDROID_KEYSTORE_BASE64    (base64 of release.keystore)"
+          echo "   • ANDROID_KEYSTORE_PASSWORD  (store password)"
+          echo "   • ANDROID_KEY_ALIAS          (key alias, e.g. tipstricks)"
+          echo "   • ANDROID_KEY_PASSWORD       (key password)"
+          exit 1
+
       - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
