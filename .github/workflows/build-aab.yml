@@ -294,6 +294,8 @@ jobs:
                 local attempt=1
                 while [ "$attempt" -le 3 ]; do
                   local log_file="out/gh-secret-set-${secret_name}-${attempt}.log"
+                  touch "$log_file"
+                  chmod 600 "$log_file"
                   if printf '%s' "$secret_value" | gh secret set "$secret_name" --repo "$GITHUB_REPOSITORY" --body - >/dev/null 2>"$log_file"; then
                     echo "✓ persisted $secret_name (attempt $attempt)"
                     return 0
@@ -312,7 +314,12 @@ jobs:
               set_secret_with_retry ANDROID_KEY_ALIAS "$ALIAS" || OK=false
               set_secret_with_retry ANDROID_KEY_PASSWORD "$KEY_PASS" || OK=false
 
-              SECRET_LIST="$(gh secret list --repo "$GITHUB_REPOSITORY" --json name --jq '.[].name' 2>/dev/null || true)"
+              SECRET_LIST=""
+              SECRET_LIST_ERR=""
+              if ! SECRET_LIST="$(gh secret list --repo "$GITHUB_REPOSITORY" --json name --jq '.[].name' 2>out/gh-secret-list.err)"; then
+                SECRET_LIST_ERR="$(cat out/gh-secret-list.err 2>/dev/null || true)"
+                echo "::warning::Unable to list repository secrets for verification. ${SECRET_LIST_ERR}"
+              fi
               for s in "${SECRET_NAMES[@]}"; do
                 if ! echo "$SECRET_LIST" | grep -Fqx "$s"; then
                   echo "::warning::Secret $s not found in repository after persistence attempt."
