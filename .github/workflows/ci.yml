@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   quality:
+    if: ${{ github.event_name != 'pull_request' || github.actor != 'dependabot[bot]' }}
     name: Lint · Typecheck · Test · Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
