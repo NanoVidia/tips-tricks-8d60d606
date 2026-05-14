@@ -126,7 +126,7 @@ export default function KeystoreSetup() {
         toast.success(`تم رفع ${SECRET_NAME} إلى أسرار المستودع`);
       }
       setBusy("run");
-        await dispatchWorkflow(cfg.owner.trim(), cfg.repo.trim(), token.trim());
+      await dispatchWorkflow(cfg.owner.trim(), cfg.repo.trim(), token.trim());
       toast.success("تم تشغيل Build Android AAB — راقب التقدم بالأسفل");
       setTimeout(() => handleRefresh(), 3000);
     } catch (e: any) {
