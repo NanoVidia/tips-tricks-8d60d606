@@ -214,19 +214,106 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
+
+          declare -A SECRET_HINT=(
+            [ANDROID_KEYSTORE_BASE64]="ملف release.keystore بعد تحويله إلى Base64 (سطر واحد بدون مسافات)."
+            [ANDROID_KEYSTORE_PASSWORD]="كلمة مرور الـ keystore (storepass) المُستخدمة عند توليده."
+            [ANDROID_KEY_ALIAS]="اسم الـ alias داخل الـ keystore (مثال: tipstricks)."
+            [ANDROID_KEY_PASSWORD]="كلمة مرور المفتاح (keypass). غالباً نفس كلمة الـ keystore."
+          )
+
           missing=()
-          [ -z "${ANDROID_KEYSTORE_BASE64}" ] && missing+=("ANDROID_KEYSTORE_BASE64")
-          [ -z "${ANDROID_KEYSTORE_PASSWORD}" ] && missing+=("ANDROID_KEYSTORE_PASSWORD")
-          [ -z "${ANDROID_KEY_ALIAS}" ] && missing+=("ANDROID_KEY_ALIAS")
-          [ -z "${ANDROID_KEY_PASSWORD}" ] && missing+=("ANDROID_KEY_PASSWORD")
-          if [ "${#missing[@]}" -gt 0 ]; then
-            echo "::error::Missing required Android secrets: ${missing[*]}"
-            echo "::error::Run 'Setup Android Signing Secrets (one-time)' workflow first."
-            exit 1
+          for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            val="${!s}"
+            if [ -z "$val" ]; then
+              missing+=("$s")
+            fi
+          done
+
+          if [ "${#missing[@]}" -eq 0 ]; then
+            # تحقق إضافي: طول Base64 يجب أن يكون معقولاً (>= 1400 = ~1KB keystore)
+            B64_LEN=${#ANDROID_KEYSTORE_BASE64}
+            if [ "$B64_LEN" -lt 1400 ]; then
+              echo "::warning::ANDROID_KEYSTORE_BASE64 length is suspiciously small ($B64_LEN chars). The keystore may be corrupted."
+            fi
+            echo "✓ All four Android signing secrets are present (base64 length: $B64_LEN chars)"
+            {
+              echo "## ✅ Android signing secrets verified"
+              echo ""
+              echo "| Secret | Status |"
+              echo "|---|---|"
+              echo "| \`ANDROID_KEYSTORE_BASE64\` | present ($B64_LEN chars) |"
+              echo "| \`ANDROID_KEYSTORE_PASSWORD\` | present |"
+              echo "| \`ANDROID_KEY_ALIAS\` | present |"
+              echo "| \`ANDROID_KEY_PASSWORD\` | present |"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
-          echo "✓ All required Android signing secrets exist"
+
+          # ─── المفقودة: اعرض إرشادات تفصيلية ───
+          echo "::error::Missing ${#missing[@]} required Android signing secret(s): ${missing[*]}"
+
+          {
+            echo "## ❌ Android signing secrets missing"
+            echo ""
+            echo "The build cannot continue without all four signing secrets."
+            echo ""
+            echo "### Missing secrets"
+            echo ""
+            echo "| Secret | What it is |"
+            echo "|---|---|"
+            for s in "${missing[@]}"; do
+              echo "| \`$s\` | ${SECRET_HINT[$s]} |"
+            done
+            echo ""
+            echo "### How to restore — pick ONE of the options below"
+            echo ""
+            echo "#### Option A — Import an existing keystore (recommended if the app is already on Google Play)"
+            echo ""
+            echo "If you have the original \`release.keystore\` file backed up somewhere safe:"
+            echo ""
+            echo "1. Convert it to Base64 on your machine:"
+            echo "   - **macOS:** \`base64 -i release.keystore | tr -d '\\n' | pbcopy\`"
+            echo "   - **Linux:** \`base64 -w0 release.keystore | xclip -selection clipboard\`"
+            echo "   - **Windows PowerShell:** \`[Convert]::ToBase64String([IO.File]::ReadAllBytes('release.keystore')) | Set-Clipboard\`"
+            echo "2. Open [**Import Existing Android Keystore**](${REPO_URL}/actions/workflows/import-keystore.yml) → **Run workflow**."
+            echo "3. Paste the Base64, the keystore password, and the alias. Press Run."
+            echo "4. Re-run this build."
+            echo ""
+            echo "> ⚠️ **Critical:** Google Play rejects any AAB signed with a different keystore than the original. If the app is already published, you MUST use Option A."
+            echo ""
+            echo "#### Option B — Generate a brand new keystore (only for first-time / unpublished apps)"
+            echo ""
+            echo "1. Open [**Setup Android Signing Secrets (one-time)**](${REPO_URL}/actions/workflows/generate-keystore.yml) → **Run workflow**."
+            echo "2. Wait ~30 seconds. The four secrets will be uploaded to this repo automatically."
+            echo "3. Re-run this build."
+            echo ""
+            echo "#### Option C — Add the secrets manually"
+            echo ""
+            echo "Go to [**Settings → Secrets and variables → Actions**](${REPO_URL}/settings/secrets/actions) and add each missing secret with the values from your password manager / backup."
+            echo ""
+            echo "### Where the secrets live"
+            echo ""
+            echo "These secrets are stored **inside this GitHub repository**, not in Lovable. When you move the project to a new repository, they do **not** transfer — you must re-import them using Option A above."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo ""
+          echo "──────────────────────────────────────────────────────────────"
+          echo " 🔧 RESTORE INSTRUCTIONS (full details in the job summary tab)"
+          echo "──────────────────────────────────────────────────────────────"
+          echo " Recommended: Run the 'Import Existing Android Keystore' workflow"
+          echo "   → ${REPO_URL}/actions/workflows/import-keystore.yml"
+          echo ""
+          echo " First-time only: Run 'Setup Android Signing Secrets (one-time)'"
+          echo "   → ${REPO_URL}/actions/workflows/generate-keystore.yml"
+          echo ""
+          echo " Manual: Add secrets in repo settings"
+          echo "   → ${REPO_URL}/settings/secrets/actions"
+          echo "──────────────────────────────────────────────────────────────"
+          exit 1
 
       - name: 🔑 Decode keystore from secret
         env:
