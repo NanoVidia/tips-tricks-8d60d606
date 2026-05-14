@@ -173,8 +173,26 @@ jobs:
             [ -n "${!s}" ] && present=$((present+1))
           done
 
+          # تحقق فعلي من تطابق keystore + كلمات السر + alias قبل الاعتماد عليها
+          VALID=false
           if [ "$present" -eq 4 ]; then
-            echo "✓ Reusing existing permanent signing secrets"
+            mkdir -p out
+            if echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > out/_check.keystore 2>/dev/null \
+               && [ "$(stat -c%s out/_check.keystore 2>/dev/null || echo 0)" -ge 1000 ] \
+               && keytool -list -keystore out/_check.keystore \
+                    -storepass "$ANDROID_KEYSTORE_PASSWORD" >/dev/null 2>&1 \
+               && keytool -keypasswd -keystore out/_check.keystore \
+                    -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+                    -alias "$ANDROID_KEY_ALIAS" \
+                    -keypass "$ANDROID_KEY_PASSWORD" \
+                    -new "$ANDROID_KEY_PASSWORD" >/dev/null 2>&1; then
+              VALID=true
+            fi
+            rm -f out/_check.keystore
+          fi
+
+          if [ "$VALID" = "true" ]; then
+            echo "✓ Reusing existing permanent signing secrets (validated)"
             { echo "ANDROID_KEYSTORE_BASE64<<E"; echo "$ANDROID_KEYSTORE_BASE64"; echo "E"; } >> $GITHUB_ENV
             echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> $GITHUB_ENV
             echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"                 >> $GITHUB_ENV
@@ -183,7 +201,11 @@ jobs:
             exit 0
           fi
 
-          echo "::notice::Generating new release keystore ($((4-present))/4 secrets missing)"
+          if [ "$present" -eq 4 ]; then
+            echo "::warning::الأسرار موجودة لكنها غير متطابقة (keystore/password/alias). سيتم توليد keystore جديد واستبدالها."
+          else
+            echo "::notice::Generating new release keystore ($((4-present))/4 secrets missing)"
+          fi
 
           STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
           KEY_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
