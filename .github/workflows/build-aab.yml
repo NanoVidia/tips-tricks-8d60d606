@@ -166,7 +166,7 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          set -uo pipefail
+          set -euo pipefail
 
           SECRET_NAMES=(ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD)
 
@@ -251,7 +251,11 @@ jobs:
             else
               echo "::notice::gh CLI not found; attempting installation..."
               if command -v apt-get >/dev/null 2>&1; then
-                sudo apt-get update -y && sudo apt-get install -y gh || GH_READY=false
+                if ! (sudo apt-get update -y && sudo apt-get install -y gh) >out/gh-install.log 2>&1; then
+                  GH_READY=false
+                  echo "::warning::Failed to install gh CLI. Details:"
+                  tail -n 40 out/gh-install.log || true
+                fi
               else
                 GH_READY=false
               fi
@@ -266,7 +270,7 @@ jobs:
               AUTH_ERR=""
               if ! echo "$GH_REPO_ADMIN_TOKEN" | gh auth login --hostname github.com --with-token 2>out/gh-auth.err; then
                 AUTH_ERR="$(cat out/gh-auth.err 2>/dev/null || true)"
-                echo "::warning::gh auth login failed. Will fallback to GH_TOKEN for gh commands."
+                echo "::warning::gh auth login failed. Will fallback to GH_TOKEN for gh commands. ${AUTH_ERR}"
                 export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
               fi
 
@@ -285,11 +289,12 @@ jobs:
                 local secret_value="$2"
                 local attempt=1
                 while [ "$attempt" -le 3 ]; do
-                  if printf '%s' "$secret_value" | gh secret set "$secret_name" --repo "$GITHUB_REPOSITORY" --body - >/dev/null 2>&1; then
+                  if printf '%s' "$secret_value" | gh secret set "$secret_name" --repo "$GITHUB_REPOSITORY" --body - >out/gh-secret-set.log 2>&1; then
                     echo "✓ persisted $secret_name (attempt $attempt)"
                     return 0
                   fi
                   echo "::warning::Failed to persist $secret_name (attempt $attempt/3)."
+                  tail -n 20 out/gh-secret-set.log || true
                   sleep $((attempt * 2))
                   attempt=$((attempt + 1))
                 done
@@ -304,7 +309,7 @@ jobs:
 
               SECRET_LIST="$(gh secret list --repo "$GITHUB_REPOSITORY" 2>/dev/null || true)"
               for s in "${SECRET_NAMES[@]}"; do
-                echo "$SECRET_LIST" | awk '{print $1}' | grep -qx "$s" || OK=false
+                echo "$SECRET_LIST" | awk '{print $1}' | grep -Fqx "$s" || OK=false
               done
 
               if [ "$OK" = "true" ]; then
