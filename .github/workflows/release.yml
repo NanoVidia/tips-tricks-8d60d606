@@ -599,3 +599,81 @@ jobs:
           path: diagnostics/
           retention-days: 14
           if-no-files-found: warn
+
+      - name: 🟢 Collect success diagnostics (lightweight)
+        if: success()
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GH_REPO_ADMIN_TOKEN: ${{ secrets.GH_REPO_ADMIN_TOKEN }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          VN: ${{ steps.ver.outputs.version_name }}
+          VC: ${{ steps.ver.outputs.version_code }}
+          AAB: ${{ steps.collect.outputs.aab }}
+        run: |
+          set +e
+          mkdir -p diagnostics-success
+          TS() { date -u +'%Y-%m-%d %H:%M:%S'; }
+
+          # 1) Secrets snapshot (counts/lengths only — no keytool)
+          {
+            echo "════════════════════════════════════════════════════"
+            echo "✅ Success snapshot — $(TS) UTC"
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Version: v${VN} (build ${VC})"
+            echo "Ref: ${GITHUB_REF} · SHA: ${GITHUB_SHA}"
+            echo "════════════════════════════════════════════════════"
+            for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD GH_REPO_ADMIN_TOKEN GOOGLE_PLAY_SERVICE_ACCOUNT_JSON; do
+              v="${!s:-}"
+              if [ -z "$v" ]; then printf '  ✗ %-40s MISSING\n' "$s"
+              else                 printf '  ✓ %-40s present (len=%d)\n' "$s" "${#v}"; fi
+            done
+            echo ""
+            echo "Auto-generated this run: ${AUTO_GENERATED:-false}"
+            echo "Keystore persisted:      ${KEYSTORE_PERSISTED:-false}"
+          } > diagnostics-success/01-secrets-snapshot.txt
+
+          # 2) Keystore meta (size + sha256 only — no keytool, no passwords)
+          KS=android/app/release.keystore
+          {
+            echo "── $(TS) UTC ──"
+            if [ -f "$KS" ]; then
+              echo "keystore.size:   $(stat -c%s "$KS") bytes"
+              echo "keystore.sha256: $(sha256sum "$KS" | awk '{print $1}')"
+            else
+              echo "keystore: not present at $KS"
+            fi
+          } > diagnostics-success/02-keystore-meta.txt
+
+          # 3) AAB meta
+          {
+            echo "── $(TS) UTC ──"
+            if [ -n "${AAB:-}" ] && [ -f "$AAB" ]; then
+              echo "aab.path:   $AAB"
+              echo "aab.size:   $(stat -c%s "$AAB") bytes"
+              echo "aab.sha256: $(sha256sum "$AAB" | awk '{print $1}')"
+            else
+              echo "aab: not found"
+            fi
+          } > diagnostics-success/03-aab-meta.txt
+
+          # 4) Environment
+          {
+            echo "── $(TS) UTC ──"
+            echo "Runner: $RUNNER_OS / $RUNNER_ARCH"
+            echo "Node:   $(node --version 2>&1)"
+            echo "npm:    $(npm --version 2>&1)"
+            echo "Java:   $(java -version 2>&1 | head -1)"
+            echo "Android SDK: ${ANDROID_HOME:-unset}"
+          } > diagnostics-success/04-environment.txt
+
+      - name: 📤 Upload success diagnostics
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-diagnostics-success-v${{ steps.ver.outputs.version_name }}-${{ steps.ver.outputs.version_code }}
+          path: diagnostics-success/
+          retention-days: 30
+          if-no-files-found: warn
