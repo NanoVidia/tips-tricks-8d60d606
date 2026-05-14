@@ -22,6 +22,7 @@ const Disclaimer = lazy(() => import("./pages/Disclaimer.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
 const MenuPage = lazy(() => import("./pages/MenuPage.tsx"));
 const MenuHub = lazy(() => import("./pages/MenuHub.tsx"));
+const KeystoreSetup = lazy(() => import("./pages/KeystoreSetup.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
 import { FloatingBackButton } from "./components/FloatingBackButton";
