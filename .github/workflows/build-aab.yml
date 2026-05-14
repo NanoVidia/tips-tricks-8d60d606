@@ -431,6 +431,71 @@ jobs:
 
           echo "✅ keystore سليم وكل الأسرار متطابقة"
 
+          # ─── تحقق بصمة SHA-256 لمنع استبدال keystore عن طريق الخطأ ───
+          FP_FILE="android/keystore.sha256"
+          CUR_FP=$(keytool -list -v -keystore "$KS" \
+                     -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+                     -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
+                   | grep -oE 'SHA256:[ ]*[0-9A-F:]+' | head -n1 | sed 's/SHA256:[ ]*//')
+          echo "🔎 SHA-256 الحالية: $CUR_FP"
+
+          if [ -f "$FP_FILE" ]; then
+            EXPECTED_FP=$(grep -oE '[0-9A-F:]{95,}' "$FP_FILE" | head -n1)
+            if [ -z "$EXPECTED_FP" ]; then
+              echo "::warning::ملف $FP_FILE موجود لكنه لا يحتوي بصمة صالحة — سيتم تحديثه."
+              echo "$CUR_FP" > "$FP_FILE"
+            elif [ "$CUR_FP" = "$EXPECTED_FP" ]; then
+              echo "✅ بصمة SHA-256 مطابقة للقيمة المحفوظة — keystore أصلي"
+            else
+              {
+                echo "## 🛑 تنبيه أمني — بصمة keystore تغيّرت!"
+                echo ""
+                echo "**البصمة المتوقّعة (المحفوظة في \`$FP_FILE\`):**"
+                echo "\`\`\`"; echo "$EXPECTED_FP"; echo "\`\`\`"
+                echo "**البصمة الحالية (من \`ANDROID_KEYSTORE_BASE64\`):**"
+                echo "\`\`\`"; echo "$CUR_FP"; echo "\`\`\`"
+                echo ""
+                echo "### معنى هذا:"
+                echo "تمّ استبدال الـ keystore بآخر مختلف. **إذا كان التطبيق منشوراً على Google Play بالبصمة المتوقّعة، فإن أي AAB بهذه البصمة الجديدة سيُرفض من Google Play.**"
+                echo ""
+                echo "### الحلول:"
+                echo "1. **إن كان الاستبدال غير مقصود** → أعد الـ keystore الأصلي:"
+                echo "   - احذف \`ANDROID_KEYSTORE_BASE64\` و\`ANDROID_KEYSTORE_PASSWORD\` و\`ANDROID_KEY_ALIAS\` و\`ANDROID_KEY_PASSWORD\`"
+                echo "   - أعد رفع قيم الـ keystore الأصلي."
+                echo "2. **إن كان الاستبدال مقصوداً** (تطبيق جديد أو Play Key Upgrade):"
+                echo "   - عدّل الملف \`$FP_FILE\` ليحتوي البصمة الجديدة:"
+                echo "     \`\`\`"
+                echo "     $CUR_FP"
+                echo "     \`\`\`"
+                echo "   - ثم commit + push وأعد تشغيل البناء."
+              } >> $GITHUB_STEP_SUMMARY
+              echo "::error title=Keystore SHA-256 mismatch::راجع Summary"
+              exit 1
+            fi
+          else
+            # أول تشغيل — احفظ البصمة الحالية كمرجع للمرات القادمة
+            echo "$CUR_FP" > "$FP_FILE"
+            echo "📝 لا توجد بصمة محفوظة — تم حفظ البصمة الحالية في $FP_FILE"
+            if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ]; then
+              git config user.name  "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git add "$FP_FILE"
+              git diff --cached --quiet || {
+                git commit -m "chore(android): pin keystore SHA-256 fingerprint [skip ci]"
+                git push || echo "::warning::تعذّر دفع بصمة keystore — أضفها يدوياً في $FP_FILE"
+              }
+              {
+                echo "## 📌 تم تثبيت بصمة keystore"
+                echo ""
+                echo "تمّ حفظ بصمة SHA-256 الحالية في \`$FP_FILE\` كمرجع. أي تغيير مستقبلي للـ keystore سيُكتشف ويوقف البناء."
+                echo ""
+                echo "**البصمة المثبّتة:** \`$CUR_FP\`"
+              } >> $GITHUB_STEP_SUMMARY
+            else
+              echo "::warning::GH_REPO_ADMIN_TOKEN غير موجود — لم يتم commit ملف البصمة. أضفه يدوياً."
+            fi
+          fi
+
       - name: ✍️ Inject signing config
         run: |
           F=android/app/build.gradle
