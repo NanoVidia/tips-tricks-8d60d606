@@ -310,7 +310,7 @@ jobs:
       - name: 🏗️ Build signed AAB
         id: gradle_build
         env:
-          KEYSTORE_PATH: app/release.keystore
+          KEYSTORE_PATH: release.keystore
           KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
