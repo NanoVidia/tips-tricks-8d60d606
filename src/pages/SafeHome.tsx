@@ -143,11 +143,11 @@ export default function SafeHome() {
               aria-hidden="true"
             />
             <span
-              className="relative text-[18px] leading-none font-bold tracking-[-0.02em] text-primary-foreground select-none"
-              style={{ fontFamily: '"Playfair Display", Georgia, serif', textShadow: '0 1px 0 hsl(var(--primary) / 0.25)' }}
+              className="relative text-[15px] leading-none font-bold tracking-[-0.01em] text-primary-foreground select-none flex items-baseline"
+              style={{ fontFamily: '"Playfair Display", Georgia, serif', textShadow: '0 1px 0 hsl(var(--primary) / 0.3)' }}
               aria-hidden="true"
             >
-              T<span className="italic font-normal text-primary-foreground/65 mx-[1px]">&amp;</span>T
+              T<span className="italic font-semibold text-primary-foreground/85 mx-[2px] text-[12px] relative -top-[1px]">&amp;</span>T
             </span>
           </div>
           <div className="min-w-0 flex-1">
