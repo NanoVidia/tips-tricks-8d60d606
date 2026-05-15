@@ -417,12 +417,35 @@ jobs:
           AAB: ${{ steps.collect.outputs.aab }}
         run: |
           set -euo pipefail
-          jarsigner -verify -strict "$AAB" >/dev/null
-          AAB_SHA=$(keytool -printcert -jarfile "$AAB" 2>/dev/null | awk '/SHA256:/ {print $2; exit}')
+
+          # jarsigner -verify بدون -strict: الـ AAB يحتوي مدخلات meta لا تُوقَّع (مثل BundleConfig.pb)
+          # و-strict يحوّل ذلك إلى exit code 4 رغم أن التوقيع سليم. نعتمد على "jar verified" بدلاً من ذلك.
+          VERIFY_OUT=$(jarsigner -verify -verbose:summary "$AAB" 2>&1 || true)
+          echo "$VERIFY_OUT" | tail -n 30
+          if ! echo "$VERIFY_OUT" | grep -q "jar verified"; then
+            echo "::error title=AAB signature invalid::jarsigner did not report 'jar verified'"
+            echo "$VERIFY_OUT" | tail -n 60
+            exit 1
+          fi
+
+          # قارن بصمة SHA-256 لشهادة الموقّع داخل الـ AAB مع شهادة keystore
+          AAB_SHA=$(keytool -printcert -jarfile "$AAB" 2>/dev/null \
+            | awk '/SHA256:/ {gsub(/[[:space:]]/,"",$2); print toupper($2); exit}')
           KS_SHA=$(keytool -list -v -keystore android/app/release.keystore \
             -storepass "$ANDROID_KEYSTORE_PASSWORD" \
-            -alias "$ANDROID_KEY_ALIAS" 2>/dev/null | awk '/SHA256:/ {print $2; exit}')
-          [ "$AAB_SHA" = "$KS_SHA" ] || { echo "::error::Signature mismatch"; exit 1; }
+            -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
+            | awk '/SHA256:/ {gsub(/[[:space:]]/,"",$2); print toupper($2); exit}')
+
+          if [ -z "$AAB_SHA" ] || [ -z "$KS_SHA" ]; then
+            echo "::error title=Fingerprint extraction failed::AAB_SHA='$AAB_SHA' KS_SHA='$KS_SHA'"
+            exit 1
+          fi
+          if [ "$AAB_SHA" != "$KS_SHA" ]; then
+            echo "::error title=Signature mismatch::AAB signed with a different key than the keystore"
+            echo "AAB:      $AAB_SHA"
+            echo "Keystore: $KS_SHA"
+            exit 1
+          fi
 
           {
             echo "## ✅ AAB جاهز"
