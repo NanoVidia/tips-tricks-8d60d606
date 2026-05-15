@@ -70,11 +70,14 @@ const config: CapacitorConfig = {
       iconColor: "#0ea5e9",
     },
     SplashScreen: {
-      launchShowDuration: 600,
+      launchShowDuration: 0,
+      launchAutoHide: true,
       backgroundColor: "#ffffff",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
+      splashFullScreen: false,
+      splashImmersive: false,
     },
   },
 };
