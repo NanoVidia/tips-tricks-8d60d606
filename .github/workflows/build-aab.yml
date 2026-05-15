@@ -183,19 +183,22 @@ jobs:
             exit 0
           fi
 
-          if [ -z "${GH_REPO_ADMIN_TOKEN:-}" ]; then
+          if [ -n "${GH_REPO_ADMIN_TOKEN:-}" ]; then
+            PERSIST_SECRETS=true
+          else
+            PERSIST_SECRETS=false
             {
-              echo "## ❌ تعذّر إكمال Android signing تلقائياً"
+              echo "## ℹ️ First-release bootstrap mode"
               echo ""
-              echo "الأسرار الأربعة غير موجودة أو غير متطابقة، وGitHub لا يسمح للـ workflow بإنشاء Repository Secrets من نفسه بدون توكن إداري صريح."
+              echo "لا توجد أسرار توقيع جاهزة، ولا يوجد \`GH_REPO_ADMIN_TOKEN\` لحفظها تلقائياً داخل GitHub Secrets."
+              echo "سيتم **إكمال هذا البناء الآن** عبر توليد keystore جديد واستخدامه مباشرة، مع رفع نسخة احتياطية كـ artifact."
               echo ""
-              echo "### المطلوب مرة واحدة فقط"
-              echo "1. أنشئ Classic PAT من GitHub بصلاحية \`repo\`."
-              echo "2. أضفه في Secrets باسم \`GH_REPO_ADMIN_TOKEN\`."
-              echo "3. شغّل هذا الـ workflow مرة أخرى — عندها سيُولّد keystore جديداً ويحفظ الأسرار الأربعة تلقائياً لكل البناءات القادمة."
+              echo "### بعد انتهاء البناء"
+              echo "1. نزّل artifact باسم \`keystore-backup-DOWNLOAD-AND-DELETE\`."
+              echo "2. احفظ ملف \`release.keystore\` وبياناته في مكان آمن جداً."
+              echo "3. أضف الأسرار الأربعة يدوياً، أو أضف \`GH_REPO_ADMIN_TOKEN\` لتفعيل الحفظ التلقائي من البناء القادم."
             } >> "$GITHUB_STEP_SUMMARY"
-            echo "::error title=Missing Android signing bootstrap::GH_REPO_ADMIN_TOKEN is required once to create repository secrets automatically"
-            exit 1
+            echo "::notice title=Android signing bootstrap::Proceeding with a generated keystore for this run; repository secrets will not be persisted automatically"
           fi
 
           STORE_PASS=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-20)
@@ -219,11 +222,13 @@ jobs:
           echo "::add-mask::$STORE_PASS"
           echo "::add-mask::$KEY_PASS"
 
-          export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
-          echo "$KS_B64" | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$GITHUB_REPOSITORY" --body -
-          echo "$STORE_PASS" | gh secret set ANDROID_KEYSTORE_PASSWORD --repo "$GITHUB_REPOSITORY" --body -
-          echo "$ALIAS" | gh secret set ANDROID_KEY_ALIAS --repo "$GITHUB_REPOSITORY" --body -
-          echo "$KEY_PASS" | gh secret set ANDROID_KEY_PASSWORD --repo "$GITHUB_REPOSITORY" --body -
+          if [ "$PERSIST_SECRETS" = "true" ]; then
+            export GH_TOKEN="$GH_REPO_ADMIN_TOKEN"
+            echo "$KS_B64" | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$GITHUB_REPOSITORY" --body -
+            echo "$STORE_PASS" | gh secret set ANDROID_KEYSTORE_PASSWORD --repo "$GITHUB_REPOSITORY" --body -
+            echo "$ALIAS" | gh secret set ANDROID_KEY_ALIAS --repo "$GITHUB_REPOSITORY" --body -
+            echo "$KEY_PASS" | gh secret set ANDROID_KEY_PASSWORD --repo "$GITHUB_REPOSITORY" --body -
+          fi
 
           {
             echo "ANDROID_KEYSTORE_BASE64<<EOF_SECRET"
@@ -234,6 +239,7 @@ jobs:
           echo "ANDROID_KEY_ALIAS=$ALIAS" >> "$GITHUB_ENV"
           echo "ANDROID_KEY_PASSWORD=$KEY_PASS" >> "$GITHUB_ENV"
           echo "AUTO_GENERATED=true" >> "$GITHUB_ENV"
+          echo "SECRETS_PERSISTED=$PERSIST_SECRETS" >> "$GITHUB_ENV"
 
           cp out/release.keystore backup/release.keystore
           cat > backup/SECRETS.txt <<TXT
@@ -244,12 +250,21 @@ jobs:
           ANDROID_KEY_PASSWORD=${KEY_PASS}
           TXT
 
-          {
-            echo "## ✅ تم إنشاء Android signing تلقائياً"
-            echo ""
-            echo "تم توليد keystore جديد وحفظ الأسرار الأربعة داخل المستودع."
-            echo "نزّل artifact الاحتياطي واحفظه في مكان آمن لأن هذا هو مفتاح تحديثات Google Play المستقبلية."
-          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$PERSIST_SECRETS" = "true" ]; then
+            {
+              echo "## ✅ تم إنشاء Android signing تلقائياً"
+              echo ""
+              echo "تم توليد keystore جديد وحفظ الأسرار الأربعة داخل المستودع."
+              echo "نزّل artifact الاحتياطي واحفظه في مكان آمن لأن هذا هو مفتاح تحديثات Google Play المستقبلية."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "## ✅ تم إنشاء Android signing لهذا البناء"
+              echo ""
+              echo "تم توليد keystore جديد واستخدامه لإخراج أول AAB بنجاح، لكن **لم** يتم حفظ الأسرار داخل المستودع تلقائياً."
+              echo "نزّل artifact الاحتياطي واحفظه في مكان آمن، ثم أضف الأسرار الأربعة يدوياً قبل أي إصدار لاحق حتى تستخدم نفس المفتاح."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: 📦 Upload keystore backup
         if: env.AUTO_GENERATED == 'true'
