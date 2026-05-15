@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, RotateCcw, Check, X, Shuffle, FileText, Shie
 import SafeLegal from "./SafeLegal";
 import { toast } from "sonner";
 import { fireTestNotification } from "@/hooks/useLocalNotifications";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 
 const InspirationTab = lazy(() => import("@/components/safe/InspirationTab"));
 const DiscoverTab = lazy(() => import("@/components/safe/DiscoverTab"));
@@ -38,6 +39,12 @@ export default function SafeHome() {
   const openLegal = (section?: string) => setView({ name: "legal", section });
 
   const q: SafeQuestion = useMemo(() => SAFE_QUESTIONS[order[idx]], [order, idx]);
+
+  const { pullDistance, refreshing, threshold } = usePullToRefresh(async () => {
+    setOrder([...SAFE_QUESTIONS.keys()].sort(() => Math.random() - 0.5));
+    setIdx(0); setPicked(null); setRevealed(false);
+    toast.success("Refreshed");
+  });
 
   if (view.name === "legal") return <SafeLegal onBack={() => setView({ name: "quiz" })} initialSection={view.section} />;
 
@@ -124,7 +131,12 @@ export default function SafeHome() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground" style={{ transform: `translateY(${pullDistance}px)`, transition: pullDistance === 0 ? 'transform 0.3s ease' : 'none' }}>
+      {(pullDistance > 0 || refreshing) && (
+        <div className="fixed top-0 left-0 right-0 flex items-center justify-center pointer-events-none z-50" style={{ height: pullDistance || 40 }}>
+          <RefreshCw className={`w-5 h-5 text-primary ${refreshing ? 'animate-spin' : ''}`} style={{ transform: `rotate(${pullDistance * 4}deg)`, opacity: Math.min(pullDistance / threshold, 1) }} />
+        </div>
+      )}
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
           {/* Logo mark — 44×44 grid, 12% corner radius (iOS spec), dual-ring bezel, optical T&T monogram */}
