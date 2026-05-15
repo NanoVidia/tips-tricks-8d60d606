@@ -8,10 +8,19 @@ import {
 } from "@/lib/appVersion";
 
 describe("app version metadata", () => {
-  it("uses initial app version values", () => {
-    expect(APP_VERSION_NAME).toBe("1.0.0");
-    expect(APP_VERSION_CODE).toBe(1);
-    expect(APP_VERSION_LABEL).toBe("1.0.0 (build 1)");
+  it("exposes a valid semver version and positive build code", () => {
+    // القيم تتغير مع كل بناء عبر workflow `Build Android AAB`،
+    // لذا نتحقق من الشكل لا من قيمة محددة.
+    expect(APP_VERSION_NAME).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(APP_VERSION_CODE).toBeGreaterThanOrEqual(1);
+    expect(Number.isInteger(APP_VERSION_CODE)).toBe(true);
+    expect(APP_VERSION_LABEL).toBe(`${APP_VERSION_NAME} (build ${APP_VERSION_CODE})`);
+  });
+
+  it("keeps capacitor.config.ts and appVersion.ts in sync", async () => {
+    const cap = await import("../../capacitor.config");
+    expect(cap.APP_VERSION_NAME).toBe(APP_VERSION_NAME);
+    expect(cap.APP_VERSION_CODE).toBe(APP_VERSION_CODE);
   });
 
   it("exposes app id and build date for version info screen", () => {
