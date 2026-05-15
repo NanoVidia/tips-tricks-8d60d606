@@ -333,7 +333,7 @@ jobs:
           cd android
           chmod +x gradlew
           set -o pipefail
-          ./gradlew bundleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+          ./gradlew bundleRelease assembleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
 
       - name: 🩺 Diagnose Gradle failure
         if: failure() && steps.gradle_build.conclusion == 'failure'
