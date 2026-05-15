@@ -901,7 +901,47 @@ export default function Index() {
             <HomeSkeleton />
           ) : (
           <>
-            {/* Desktop-only ⌘K hint — hidden on mobile to avoid duplicating the main search bar */}
+            {/* Editorial purpose strip — signals "peer notes & guidance for
+                OB/GYN specialists" without medical-tool framing. Decorative
+                only; no clinical claims. */}
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05, duration: 0.35 }}
+              className="relative mt-4 overflow-hidden rounded-2xl border border-sky-200/70 dark:border-sky-800/50 bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50/70 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-indigo-950/40 px-3.5 py-3 shadow-[0_6px_20px_-10px_rgba(59,130,246,0.35)]"
+              role="note"
+              aria-label="About this app"
+            >
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 rounded-full bg-gradient-to-br from-sky-300/35 to-indigo-400/25 blur-2xl"
+              />
+              <div className="relative flex items-start gap-3">
+                <div className="shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-md">
+                  <BookOpen className="w-4 h-4" strokeWidth={2.5} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/70 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-700/60 text-[9px] font-bold uppercase tracking-[0.14em] text-sky-700 dark:text-sky-300">
+                      <GraduationCap className="w-2.5 h-2.5" strokeWidth={2.8} />
+                      Peer Notes
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/70 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-700/60 text-[9px] font-bold uppercase tracking-[0.14em] text-indigo-700 dark:text-indigo-300">
+                      <Sparkles className="w-2.5 h-2.5" strokeWidth={2.8} />
+                      Women's Health Reference
+                    </span>
+                  </div>
+                  <p className="mt-1.5 font-editorial text-[15px] leading-tight font-bold text-foreground">
+                    Tips & guidance for OB/GYN specialists
+                  </p>
+                  <p className="mt-0.5 text-[11.5px] leading-snug text-muted-foreground">
+                    A curated reference of practical notes, daily tips, and field guidance shared between specialists — for educational reading only.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+
             <motion.button
               type="button"
               onClick={() => setPaletteOpen(true)}
