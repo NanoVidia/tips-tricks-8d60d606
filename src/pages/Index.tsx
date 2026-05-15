@@ -441,10 +441,14 @@ export default function Index() {
         className={`sticky top-0 z-20 px-4 sm:px-5 backdrop-blur-md transition-all duration-300 overflow-hidden
           bg-gradient-to-b from-sky-50 via-blue-50/80 to-indigo-100/70
           dark:from-sky-950/60 dark:via-blue-950/50 dark:to-indigo-950/60
-          shadow-[0_18px_40px_-22px_rgba(29,78,168,0.45)]
-          dark:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.7)]
-          ${scrolled ? "rounded-b-[40px] pb-5" : "rounded-bl-[50%] rounded-br-[50%] pb-12"}`}
-        style={{ paddingTop: `calc(env(safe-area-inset-top) + ${scrolled ? "0.5rem" : "1rem"})` }}
+          shadow-[0_22px_44px_-22px_rgba(29,78,168,0.55)]
+          dark:shadow-[0_22px_44px_-22px_rgba(0,0,0,0.75)]
+          ${scrolled ? "pb-5" : "pb-14"}`}
+        style={{
+          paddingTop: `calc(env(safe-area-inset-top) + ${scrolled ? "0.5rem" : "1rem"})`,
+          borderBottomLeftRadius: scrolled ? "32px" : "50% 56px",
+          borderBottomRightRadius: scrolled ? "32px" : "50% 56px",
+        }}
       >
         {/* Decorative ambient glows */}
         <div
