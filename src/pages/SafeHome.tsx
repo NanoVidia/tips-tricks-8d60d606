@@ -40,7 +40,7 @@ export default function SafeHome() {
 
   const q: SafeQuestion = useMemo(() => SAFE_QUESTIONS[order[idx]], [order, idx]);
 
-  const { pullDistance, refreshing, threshold } = usePullToRefresh(async () => {
+  const { pullDistance, refreshing, state, threshold } = usePullToRefresh(async () => {
     // إعادة تحميل كاملة لجلب آخر نسخة OTA من Lovable
     try {
       if ("caches" in window) {
@@ -52,6 +52,12 @@ export default function SafeHome() {
     // نعطي وقتاً قصيراً قبل إخفاء المؤشر (الصفحة ستُعاد تحميلها)
     await new Promise((r) => setTimeout(r, 1500));
   });
+
+  const pullProgress = Math.min(pullDistance / threshold, 1);
+  const pullLabel =
+    state === "refreshing" ? "Refreshing…" :
+    state === "ready" ? "Release to refresh" :
+    "Pull to refresh";
 
   if (view.name === "legal") return <SafeLegal onBack={() => setView({ name: "quiz" })} initialSection={view.section} />;
 
@@ -138,10 +144,63 @@ export default function SafeHome() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground" style={{ transform: `translateY(${pullDistance}px)`, transition: pullDistance === 0 ? 'transform 0.3s ease' : 'none' }}>
+    <div
+      className="min-h-screen bg-background text-foreground"
+      style={{
+        transform: `translate3d(0, ${pullDistance}px, 0)`,
+        transition: pullDistance === 0 || refreshing ? "transform 380ms cubic-bezier(0.22, 1, 0.36, 1)" : "none",
+        willChange: "transform",
+      }}
+    >
       {(pullDistance > 0 || refreshing) && (
-        <div className="fixed top-0 left-0 right-0 flex items-center justify-center pointer-events-none z-50" style={{ height: pullDistance || 40 }}>
-          <RefreshCw className={`w-5 h-5 text-primary ${refreshing ? 'animate-spin' : ''}`} style={{ transform: `rotate(${pullDistance * 4}deg)`, opacity: Math.min(pullDistance / threshold, 1) }} />
+        <div
+          className="fixed left-0 right-0 flex items-start justify-center pointer-events-none z-50"
+          style={{
+            top: 0,
+            height: Math.max(pullDistance, 56),
+            paddingTop: "max(env(safe-area-inset-top, 0px), 8px)",
+          }}
+          aria-hidden="true"
+        >
+          <div
+            className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-card/95 backdrop-blur-md border border-border shadow-lg transition-all duration-200"
+            style={{
+              opacity: Math.min(pullProgress * 1.4, 1),
+              transform: `scale(${0.85 + pullProgress * 0.15})`,
+            }}
+          >
+            <div className="relative w-5 h-5 flex items-center justify-center">
+              {refreshing ? (
+                <RefreshCw className="w-4 h-4 text-primary animate-spin" />
+              ) : (
+                <>
+                  {/* حلقة تقدّم دائرية تمتلئ مع السحب */}
+                  <svg className="absolute inset-0 w-5 h-5 -rotate-90" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="8" fill="none" stroke="hsl(var(--muted))" strokeWidth="2" />
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="8"
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 8}
+                      strokeDashoffset={2 * Math.PI * 8 * (1 - pullProgress)}
+                      style={{ transition: "stroke-dashoffset 80ms linear" }}
+                    />
+                  </svg>
+                  <RefreshCw
+                    className={`w-2.5 h-2.5 ${state === "ready" ? "text-primary" : "text-muted-foreground"}`}
+                    style={{ transform: `rotate(${pullProgress * 180}deg)`, transition: "transform 80ms linear" }}
+                  />
+                </>
+              )}
+            </div>
+            <span className={`text-[12px] font-semibold tabular-nums ${state === "ready" || refreshing ? "text-primary" : "text-muted-foreground"}`}>
+              {pullLabel}
+            </span>
+          </div>
         </div>
       )}
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
