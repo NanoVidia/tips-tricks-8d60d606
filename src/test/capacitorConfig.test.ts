@@ -78,11 +78,11 @@ describe("capacitor.config.ts · فصل CAP_ENV", () => {
     expect(prod.android?.webContentsDebuggingEnabled).toBe(false);
   });
 
-  it("CAP_ENV بقيم غير صحيحة (Production كبير، prod مختصر) تُعامل كتطوير — لا تسريب hot-reload في AAB", async () => {
+  it("CAP_ENV بقيم غير صحيحة (Production كبير، prod مختصر) تُعامل كتطوير", async () => {
     // الكود يقارن صراحة بـ "production" (case-sensitive) — أي قيمة أخرى = development
     const wrong1 = await loadConfig("Production");
     const wrong2 = await loadConfig("prod");
-    expect(wrong1.server?.url).toBeDefined();
-    expect(wrong2.server?.url).toBeDefined();
+    expect(wrong1.server?.url).toMatch(/lovableproject\.com/);
+    expect(wrong2.server?.url).toMatch(/lovableproject\.com/);
   });
 });
