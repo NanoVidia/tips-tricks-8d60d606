@@ -437,8 +437,8 @@ export default function Index() {
       />
 
       <header
-        className={`sticky top-0 z-20 px-4 sm:px-5 bg-card/95 backdrop-blur-md header-fade transition-all duration-200 ${
-          scrolled ? "pb-3" : "pb-4"
+        className={`sticky top-0 z-20 px-4 sm:px-5 bg-card/95 backdrop-blur-md header-fade transition-all duration-200 rounded-b-[28px] ${
+          scrolled ? "pb-5" : "pb-7"
         }`}
         style={{ paddingTop: `calc(env(safe-area-inset-top) + ${scrolled ? "0.5rem" : "0.75rem"})` }}
       >
