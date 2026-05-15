@@ -203,62 +203,94 @@ export default function SafeHome() {
           </div>
         </div>
       )}
-      <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
-          {/* Logo mark — 44×44 grid, 12% corner radius (iOS spec), dual-ring bezel, optical T&T monogram */}
+      <header
+        className="sticky top-0 z-10 overflow-hidden backdrop-blur-md transition-all duration-300
+          bg-gradient-to-b from-sky-50 via-blue-50/80 to-indigo-100/70
+          dark:from-sky-950/60 dark:via-blue-950/50 dark:to-indigo-950/60
+          shadow-[0_22px_44px_-22px_rgba(29,78,168,0.55)]
+          dark:shadow-[0_22px_44px_-22px_rgba(0,0,0,0.75)] pb-12"
+        style={{
+          paddingTop: "calc(env(safe-area-inset-top) + 1rem)",
+          borderBottomLeftRadius: "50% 56px",
+          borderBottomRightRadius: "50% 56px",
+        }}
+      >
+        {/* Decorative ambient glows */}
+        <div aria-hidden="true" className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-[420px] h-[260px] rounded-full bg-gradient-to-br from-sky-300/40 via-blue-300/30 to-indigo-400/25 blur-3xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-10 -left-12 w-40 h-40 rounded-full bg-rose-300/25 dark:bg-rose-500/15 blur-3xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-16 -right-14 w-44 h-44 rounded-full bg-indigo-300/30 dark:bg-indigo-500/15 blur-3xl" />
+        {/* Subtle dot grid */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.06]"
+          style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
+            backgroundSize: "16px 16px",
+          }}
+        />
+
+        <div className="relative max-w-2xl mx-auto px-4 flex flex-col items-center text-center">
+          {/* Logo medallion with halo */}
           <div
-            className="relative w-11 h-11 rounded-[10px] flex items-center justify-center shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.35),inset_0_1px_0_hsl(0_0%_100%/0.18)] ring-1 ring-primary/30 animate-logo-pulse motion-reduce:animate-none overflow-hidden"
-            style={{ background: 'var(--gradient-gold)' }}
+            className="relative w-16 h-16 rounded-[28%] flex items-center justify-center overflow-hidden
+              shadow-[0_12px_32px_-8px_hsl(var(--primary)/0.5)]
+              ring-[3px] ring-white/70 dark:ring-white/10"
+            style={{ background: "var(--gradient-gold)" }}
             role="img"
             aria-label="Tips & Tricks logo"
           >
-            {/* Inner hairline bezel — 1px inset, 8px radius (44 - 2*2 = 40, r=8) */}
-            <span className="absolute inset-[2px] rounded-[8px] ring-1 ring-primary-foreground/15 pointer-events-none" aria-hidden="true" />
-            {/* Top-light highlight — Apple/Material elevation cue */}
+            <span className="absolute inset-[3px] rounded-[24%] ring-1 ring-primary-foreground/15 pointer-events-none" aria-hidden="true" />
             <span
-              className="absolute inset-x-0 top-0 h-1/2 rounded-t-[10px] pointer-events-none"
-              style={{ background: 'linear-gradient(180deg, hsl(0 0% 100% / 0.22), transparent)' }}
               aria-hidden="true"
+              className="absolute inset-x-0 top-0 h-1/2 rounded-t-[28%] pointer-events-none"
+              style={{ background: "linear-gradient(180deg, hsl(0 0% 100% / 0.30), transparent)" }}
             />
             <span
-              className="relative text-[15px] leading-none font-bold tracking-[-0.01em] text-primary-foreground select-none flex items-baseline"
-              style={{ fontFamily: '"Playfair Display", Georgia, serif', textShadow: '0 1px 0 hsl(var(--primary) / 0.3)' }}
+              className="relative text-[22px] leading-none font-bold tracking-[-0.01em] text-primary-foreground select-none flex items-baseline"
+              style={{ fontFamily: '"Playfair Display", Georgia, serif', textShadow: "0 1px 0 hsl(var(--primary) / 0.3)" }}
               aria-hidden="true"
             >
-              T<span className="italic font-semibold text-primary-foreground/85 mx-[2px] text-[12px] relative -top-[1px]">&amp;</span>T
+              T<span className="italic font-semibold text-primary-foreground/85 mx-[2px] text-[16px] relative -top-[1px]">&amp;</span>T
             </span>
           </div>
-          <div className="min-w-0 flex-1">
-            <h1
-              className="text-[20px] leading-[1.05] tracking-tight"
-              style={{ fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 700 }}
+
+          {/* Wordmark */}
+          <h1
+            className="mt-3 text-[30px] sm:text-[34px] leading-[1.05] tracking-tight"
+            style={{ fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 700 }}
+          >
+            <span
+              style={{
+                background: "var(--gradient-gold)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
             >
-              <span
-                style={{
-                  background: 'var(--gradient-gold)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Tips
-              </span>{' '}
-              <span className="italic font-medium text-accent">&amp;</span>{' '}
-              <span
-                style={{
-                  background: 'var(--gradient-gold)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Tricks
-              </span>
-            </h1>
-            <p className="text-[10.5px] uppercase tracking-[0.18em] text-muted-foreground leading-tight mt-0.5 font-semibold">
-              Daily Quiz · Inspiration · Discovery
-            </p>
-          </div>
+              Tips
+            </span>{" "}
+            <span className="italic font-medium text-accent">&amp;</span>{" "}
+            <span
+              style={{
+                background: "var(--gradient-gold)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Tricks
+            </span>
+          </h1>
+
+          {/* Subtitle pill */}
+          <span className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-slate-900/40 border border-white/70 dark:border-white/10 text-[9.5px] font-bold uppercase tracking-[0.22em] text-primary dark:text-sky-300 shadow-sm backdrop-blur-md">
+            <Sparkles className="w-2.5 h-2.5" strokeWidth={2.8} />
+            Daily Quiz · Inspiration · Discovery
+            <Sparkles className="w-2.5 h-2.5" strokeWidth={2.8} />
+          </span>
+
+          {/* Hairline accent */}
+          <span aria-hidden="true" className="mt-3 h-[2px] w-16 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
         </div>
       </header>
 
