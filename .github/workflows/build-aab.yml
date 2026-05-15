@@ -333,7 +333,7 @@ jobs:
           cd android
           chmod +x gradlew
           set -o pipefail
-          ./gradlew bundleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
+          ./gradlew bundleRelease assembleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
 
       - name: 🩺 Diagnose Gradle failure
         if: failure() && steps.gradle_build.conclusion == 'failure'
@@ -424,8 +424,24 @@ jobs:
           BASE="tipstricks-v${VN}-vc${VC}"
           mkdir -p dist-out
           cp android/app/build/outputs/bundle/release/app-release.aab "dist-out/${BASE}.aab"
+
+          # APK: AGP قد يخرج app-release.apk أو app-release-unsigned.apk حسب الإعدادات
+          APK_SRC=""
+          for cand in \
+            android/app/build/outputs/apk/release/app-release.apk \
+            android/app/build/outputs/apk/release/app-release-signed.apk; do
+            [ -f "$cand" ] && APK_SRC="$cand" && break
+          done
+          if [ -z "$APK_SRC" ]; then
+            echo "::error title=APK missing::لم يتم العثور على APK موقّع في android/app/build/outputs/apk/release/"
+            ls -la android/app/build/outputs/apk/release/ || true
+            exit 1
+          fi
+          cp "$APK_SRC" "dist-out/${BASE}.apk"
+
           echo "base=$BASE" >> "$GITHUB_OUTPUT"
           echo "aab=dist-out/${BASE}.aab" >> "$GITHUB_OUTPUT"
+          echo "apk=dist-out/${BASE}.apk" >> "$GITHUB_OUTPUT"
 
       - name: 🔍 Verify AAB signature
         env:
