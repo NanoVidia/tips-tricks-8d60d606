@@ -924,7 +924,7 @@ export default function Index() {
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/70 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-700/60 text-[9px] font-bold uppercase tracking-[0.14em] text-sky-700 dark:text-sky-300">
                       <GraduationCap className="w-2.5 h-2.5" strokeWidth={2.8} />
-                      Peer Notes
+                      Study Notes
                     </span>
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/70 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-700/60 text-[9px] font-bold uppercase tracking-[0.14em] text-indigo-700 dark:text-indigo-300">
                       <Sparkles className="w-2.5 h-2.5" strokeWidth={2.8} />
@@ -935,8 +935,9 @@ export default function Index() {
                     Tips & guidance for OB/GYN specialists
                   </p>
                   <p className="mt-0.5 text-[11.5px] leading-snug text-muted-foreground">
-                    A curated reference of practical notes, daily tips, and field guidance shared between specialists — for educational reading only.
+                    A curated educational reference of practical notes, daily tips, and field guidance — for personal reading only.
                   </p>
+
                 </div>
               </div>
             </motion.div>
