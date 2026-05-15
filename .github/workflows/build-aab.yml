@@ -488,6 +488,11 @@ jobs:
             exit 1
           fi
 
+          # طبّع البصمات: احذف ':' لأن apksigner يطبعها بدون فواصل بينما keytool يطبعها مع ':'
+          KS_SHA=$(echo "$KS_SHA" | tr -d ':')
+          AAB_SHA=$(echo "$AAB_SHA" | tr -d ':')
+          APK_SHA=$(echo "$APK_SHA" | tr -d ':')
+
           echo "Keystore SHA-256: $KS_SHA"
           echo "AAB      SHA-256: $AAB_SHA"
           echo "APK      SHA-256: $APK_SHA"
