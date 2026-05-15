@@ -50,7 +50,7 @@ export default function CompanionCard() {
   const phaseLabel = phase === "in" ? "Breathe in" : phase === "out" ? "Breathe out" : "Hold";
 
   return (
-    <section className="rounded-3xl overflow-hidden border border-border bg-gradient-to-br from-sky-50 via-indigo-50 to-purple-50 dark:from-sky-950/40 dark:via-indigo-950/30 dark:to-purple-950/30 shadow-sm">
+    <section className="rounded-3xl overflow-hidden border border-orange-200 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100/60 dark:from-orange-950/30 dark:via-amber-950/20 dark:to-orange-950/30 dark:border-orange-900/40 shadow-sm">
       <div className="p-4 flex items-start gap-3">
         <div className="shrink-0">
           <AIRobot size={64} />
