@@ -20,31 +20,34 @@ import type { CapacitorConfig } from "@capacitor/cli";
  * (see android/app/build.gradle snippet in the README) so you can manage
  * them from one place instead of editing build.gradle each time.
  */
-export const APP_VERSION_NAME = "1.0.1";
-export const APP_VERSION_CODE = 2;
+export const APP_VERSION_NAME = "1.0.2";
+export const APP_VERSION_CODE = 3;
 
-// Set CAP_ENV=production before running `npx cap sync android` to drop the
-// hot-reload server block and produce a fully offline AAB:
-//   CAP_ENV=production npm run build && npx cap sync android
+// 🌐 OTA Updates — APK يُحمّل دائماً من رابط النشر المباشر
+// أي تحديث تنشره من Lovable (Publish → Update) يظهر فوراً للمستخدمين
+// بدون الحاجة لبناء APK جديد. العيب: التطبيق يحتاج إنترنت للعمل.
+//
+// CAP_ENV=production  → يحمّل من https://tips-tricks.lovable.app (OTA)
+// CAP_ENV=development → يحمّل من sandbox preview (hot-reload أثناء التطوير)
 const isProduction = process.env.CAP_ENV === "production";
+
+const PROD_URL = "https://tips-tricks.lovable.app";
+const DEV_URL = "https://f15d3c7d-05d9-49cb-9278-ed7124c335f7.lovableproject.com?forceHideBadge=true";
 
 const config: CapacitorConfig = {
   // ---- Identity ----
   appId: "app.lovable.tipstricks",
   appName: "Tips & Tricks Daily Quiz",
 
-  // ---- Web build output ----
+  // ---- Web build output (fallback إذا فشل تحميل OTA) ----
   webDir: "dist",
 
-  // ---- Hot-reload from Lovable sandbox preview (DEV only) ----
-  ...(isProduction
-    ? {}
-    : {
-        server: {
-          url: "https://f15d3c7d-05d9-49cb-9278-ed7124c335f7.lovableproject.com?forceHideBadge=true",
-          cleartext: true,
-        },
-      }),
+  // ---- OTA / hot-reload server ----
+  server: {
+    url: isProduction ? PROD_URL : DEV_URL,
+    cleartext: !isProduction,
+    androidScheme: "https",
+  },
 
   // ---- Android tuning ----
   android: {
