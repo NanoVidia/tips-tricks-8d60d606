@@ -127,17 +127,27 @@ export default function SafeHome() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
-          {/* Typographic monogram — aligned with clinical blue palette */}
+          {/* Logo mark — 44×44 grid, 12% corner radius (iOS spec), dual-ring bezel, optical T&T monogram */}
           <div
-            className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md ring-1 ring-primary/20 animate-logo-pulse motion-reduce:animate-none"
+            className="relative w-11 h-11 rounded-[10px] flex items-center justify-center shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.35),inset_0_1px_0_hsl(0_0%_100%/0.18)] ring-1 ring-primary/30 animate-logo-pulse motion-reduce:animate-none overflow-hidden"
             style={{ background: 'var(--gradient-gold)' }}
+            role="img"
+            aria-label="Tips & Tricks logo"
           >
+            {/* Inner hairline bezel — 1px inset, 8px radius (44 - 2*2 = 40, r=8) */}
+            <span className="absolute inset-[2px] rounded-[8px] ring-1 ring-primary-foreground/15 pointer-events-none" aria-hidden="true" />
+            {/* Top-light highlight — Apple/Material elevation cue */}
             <span
-              className="text-[19px] leading-none font-semibold tracking-tight text-primary-foreground"
-              style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+              className="absolute inset-x-0 top-0 h-1/2 rounded-t-[10px] pointer-events-none"
+              style={{ background: 'linear-gradient(180deg, hsl(0 0% 100% / 0.22), transparent)' }}
+              aria-hidden="true"
+            />
+            <span
+              className="relative text-[18px] leading-none font-bold tracking-[-0.02em] text-primary-foreground select-none"
+              style={{ fontFamily: '"Playfair Display", Georgia, serif', textShadow: '0 1px 0 hsl(var(--primary) / 0.25)' }}
               aria-hidden="true"
             >
-              T<span className="italic text-primary-foreground/70">&amp;</span>T
+              T<span className="italic font-normal text-primary-foreground/65 mx-[1px]">&amp;</span>T
             </span>
           </div>
           <div className="min-w-0 flex-1">
