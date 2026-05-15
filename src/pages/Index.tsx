@@ -438,52 +438,118 @@ export default function Index() {
       />
 
       <header
-        className={`sticky top-0 z-20 px-4 sm:px-5 bg-card/95 backdrop-blur-md header-fade transition-all duration-200 rounded-b-[28px] ${
-          scrolled ? "pb-5" : "pb-7"
-        }`}
-        style={{ paddingTop: `calc(env(safe-area-inset-top) + ${scrolled ? "0.5rem" : "0.75rem"})` }}
+        className={`sticky top-0 z-20 px-4 sm:px-5 backdrop-blur-md transition-all duration-300 overflow-hidden
+          bg-gradient-to-b from-sky-50 via-blue-50/80 to-indigo-100/70
+          dark:from-sky-950/60 dark:via-blue-950/50 dark:to-indigo-950/60
+          shadow-[0_18px_40px_-22px_rgba(29,78,168,0.45)]
+          dark:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.7)]
+          ${scrolled ? "rounded-b-[40px] pb-5" : "rounded-bl-[50%] rounded-br-[50%] pb-12"}`}
+        style={{ paddingTop: `calc(env(safe-area-inset-top) + ${scrolled ? "0.5rem" : "1rem"})` }}
       >
+        {/* Decorative ambient glows */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-[420px] h-[260px] rounded-full bg-gradient-to-br from-sky-300/40 via-blue-300/30 to-indigo-400/25 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-10 -left-12 w-40 h-40 rounded-full bg-rose-300/25 dark:bg-rose-500/15 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-16 -right-14 w-44 h-44 rounded-full bg-indigo-300/30 dark:bg-indigo-500/15 blur-3xl"
+        />
+        {/* Subtle grid texture for editorial depth */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
+            backgroundSize: "16px 16px",
+          }}
+        />
+
         <div className="relative max-w-lg mx-auto">
-          {/* App bar — title + actions (native style) */}
-          <div className="flex items-center justify-between gap-3 mb-3">
+          {/* Top-right dark mode toggle (floats over the dome) */}
+          <div className="absolute top-0 end-0 z-10">
             <button
-              type="button"
-              onClick={() => {
-                setActiveTab(null);
-                setSearch("");
-                setSuggestOpen(false);
-                setSearchFocused(false);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              aria-label="Go to home"
-              className="min-w-0 flex-1 flex items-center gap-2 text-start cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-80 transition-opacity"
+              onClick={toggleDark}
+              className="p-2 rounded-full bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border border-white/60 dark:border-white/10 hover:bg-white/80 dark:hover:bg-slate-900/60 active:scale-95 transition-all shadow-sm"
+              aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             >
-              <span className="relative inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-600 text-white shrink-0 shadow-sm" aria-label="Obstetrics & Gynecology">
-                <Baby className="w-4 h-4" strokeWidth={2.5} />
-                <span className="absolute -bottom-1 -end-1 w-3.5 h-3.5 rounded-full bg-card border border-border/60 flex items-center justify-center shadow-sm">
-                  <Stethoscope className="w-2 h-2 text-rose-500" strokeWidth={3} />
-                </span>
-              </span>
-              <div className="min-w-0 flex flex-col">
-                <h1 className="font-bold tracking-tight leading-tight text-foreground text-[22px] sm:text-[24px] truncate">
-                  {logoText.trim() || "OB/GYN Reference"}
-                </h1>
-                <span className="inline-flex items-center gap-0.5 mt-0.5 px-1 py-0 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60 text-rose-600 dark:text-rose-300 text-[8px] font-semibold uppercase tracking-wider w-fit">
-                  <Baby className="w-2 h-2" strokeWidth={2.5} />
-                  OB/GYN
-                </span>
-              </div>
+              {dark ? <Sun className="w-4 h-4 text-foreground" /> : <Moon className="w-4 h-4 text-foreground" />}
             </button>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={toggleDark}
-                className="p-2 rounded-full hover:bg-muted active:scale-95 transition-all"
-                aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                {dark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
-              </button>
-            </div>
           </div>
+
+          {/* Centered brand — logo + wordmark inside the dome */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab(null);
+              setSearch("");
+              setSuggestOpen(false);
+              setSearchFocused(false);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            aria-label="Go to home"
+            className={`group relative w-full flex flex-col items-center justify-center text-center cursor-pointer rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:opacity-90 transition-all ${
+              scrolled ? "mb-3" : "mb-5 mt-1"
+            }`}
+          >
+            {/* Logo medallion with halo */}
+            <span
+              className={`relative inline-flex items-center justify-center rounded-[28%] bg-gradient-to-br from-rose-400 via-pink-500 to-rose-600 text-white shrink-0 transition-all duration-300
+                shadow-[0_10px_30px_-8px_rgba(244,63,94,0.55)]
+                ring-[3px] ring-white/70 dark:ring-white/10
+                ${scrolled ? "w-10 h-10" : "w-16 h-16"}`}
+              aria-label="Obstetrics & Gynecology"
+            >
+              {/* Inner glossy highlight */}
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 rounded-[28%] bg-gradient-to-b from-white/30 via-white/0 to-transparent"
+              />
+              <Baby className={scrolled ? "w-5 h-5" : "w-8 h-8"} strokeWidth={2.4} />
+              <span
+                className={`absolute -bottom-1 -end-1 rounded-full bg-card border border-border/70 flex items-center justify-center shadow-md ${
+                  scrolled ? "w-4 h-4" : "w-6 h-6"
+                }`}
+              >
+                <Stethoscope
+                  className={scrolled ? "w-2 h-2 text-rose-500" : "w-3 h-3 text-rose-500"}
+                  strokeWidth={3}
+                />
+              </span>
+            </span>
+
+            {/* Wordmark */}
+            <h1
+              className={`font-editorial font-bold tracking-tight text-foreground transition-all duration-300 ${
+                scrolled ? "mt-2 text-[18px]" : "mt-3 text-[28px] sm:text-[32px]"
+              }`}
+            >
+              <span className="bg-gradient-to-r from-indigo-700 via-blue-700 to-sky-700 dark:from-indigo-300 dark:via-blue-300 dark:to-sky-300 bg-clip-text text-transparent">
+                {logoText.trim() || "OB/GYN Reference"}
+              </span>
+            </h1>
+
+            {!scrolled && (
+              <span className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/70 dark:bg-slate-900/40 border border-white/70 dark:border-white/10 text-[9.5px] font-bold uppercase tracking-[0.22em] text-rose-600 dark:text-rose-300 shadow-sm backdrop-blur-md">
+                <Baby className="w-2.5 h-2.5" strokeWidth={2.8} />
+                OB / GYN Reference
+                <Sparkles className="w-2.5 h-2.5" strokeWidth={2.8} />
+              </span>
+            )}
+
+            {/* Hairline underline accent */}
+            {!scrolled && (
+              <span
+                aria-hidden="true"
+                className="mt-3 h-[2px] w-16 rounded-full bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent"
+              />
+            )}
+          </button>
 
           {/* Search bar with auto-suggest */}
           <motion.div
