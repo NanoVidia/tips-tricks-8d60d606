@@ -1,6 +1,6 @@
 // Minimal service worker — caches the app shell for offline use
 // Bump CACHE name on every release to force old caches to be deleted on activate.
-const CACHE = "obgyn-tools-2026-05-04-v1";
+const CACHE = "obgyn-tools-2026-05-15-v2";
 const ASSETS = ["/", "/tools", "/index.html"];
 
 self.addEventListener("install", (e) => {
