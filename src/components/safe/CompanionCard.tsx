@@ -50,16 +50,20 @@ export default function CompanionCard() {
   const phaseLabel = phase === "in" ? "Breathe in" : phase === "out" ? "Breathe out" : "Hold";
 
   return (
-    <section className="rounded-3xl overflow-hidden border-[1.5px] border-orange-300/70 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100/60 dark:from-orange-950/30 dark:via-amber-950/20 dark:to-orange-950/30 dark:border-orange-700/50 shadow-[0_4px_14px_-4px_rgba(251,146,60,0.25)] dark:shadow-[0_4px_14px_-4px_rgba(251,146,60,0.15)]">
-      <div className="p-4 flex items-start gap-3">
+    <section className="relative rounded-3xl overflow-hidden border-[1.5px] border-sky-300/60 bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-100/60 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-indigo-950/40 dark:border-sky-700/50 shadow-[0_8px_24px_-8px_rgba(59,130,246,0.28)] dark:shadow-[0_8px_24px_-8px_rgba(59,130,246,0.18)]">
+      {/* Decorative glow accents */}
+      <div aria-hidden="true" className="pointer-events-none absolute -top-12 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-sky-300/40 to-indigo-400/30 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -bottom-16 -left-10 w-44 h-44 rounded-full bg-gradient-to-tr from-blue-300/30 to-cyan-300/30 blur-3xl" />
+
+      <div className="relative p-4 flex items-start gap-3">
         <div className="shrink-0">
           <AIRobot size={64} />
         </div>
         <div className="flex-1 min-w-0 pt-1">
-          <p className="text-[10.5px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+          <p className="font-editorial text-[22px] sm:text-[24px] leading-tight font-bold bg-gradient-to-r from-indigo-700 via-blue-600 to-sky-600 dark:from-indigo-300 dark:via-blue-300 dark:to-sky-300 bg-clip-text text-transparent">
             Daily Companion
           </p>
-          <p className="text-[13.5px] leading-snug text-foreground mt-1">
+          <p className="text-[13.5px] leading-snug text-foreground/90 mt-1.5">
             {COMPANION_TIPS[tipIdx]}
           </p>
           <button
