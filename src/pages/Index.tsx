@@ -464,11 +464,11 @@ export default function Index() {
                 </span>
               </span>
               <div className="min-w-0 flex flex-col">
-                <h1 className="font-bold tracking-tight leading-tight text-foreground text-[17px] truncate">
+                <h1 className="font-bold tracking-tight leading-tight text-foreground text-[22px] sm:text-[24px] truncate">
                   {logoText.trim() || "OB/GYN Reference"}
                 </h1>
-                <span className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60 text-rose-600 dark:text-rose-300 text-[10px] font-semibold uppercase tracking-wider w-fit">
-                  <Baby className="w-2.5 h-2.5" strokeWidth={2.5} />
+                <span className="inline-flex items-center gap-0.5 mt-0.5 px-1 py-0 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-800/60 text-rose-600 dark:text-rose-300 text-[8px] font-semibold uppercase tracking-wider w-fit">
+                  <Baby className="w-2 h-2" strokeWidth={2.5} />
                   OB/GYN
                 </span>
               </div>
