@@ -443,50 +443,79 @@ jobs:
           echo "aab=dist-out/${BASE}.aab" >> "$GITHUB_OUTPUT"
           echo "apk=dist-out/${BASE}.apk" >> "$GITHUB_OUTPUT"
 
-      - name: 🔍 Verify AAB signature
+      - name: 🔍 Verify AAB + APK signatures match keystore
         env:
           AAB: ${{ steps.collect.outputs.aab }}
+          APK: ${{ steps.collect.outputs.apk }}
         run: |
           set -euo pipefail
 
-          # ملاحظة: لا نستخدم jarsigner -verify على AAB لأن AGP الحديث + Play Core ينتجان
-          # مدخلات (kotlin builtins، properties، MANIFEST.MF) تظهر بشكل مختلف عبر JarInputStream
-          # فيختفي سطر "jar verified" رغم سلامة التوقيع. نعتمد على فحصين موثوقين بدلاً من ذلك:
-          #   1) وجود ملفات توقيع داخل META-INF
-          #   2) تطابق بصمة SHA-256 لشهادة الـ AAB مع شهادة keystore (برهان رياضي)
+          # نعتمد على فحصين موثوقين:
+          #   1) وجود ملفات توقيع داخل META-INF (للـ AAB)
+          #   2) تطابق بصمة SHA-256 لشهادة الموقّع في AAB + APK + keystore (برهان رياضي)
 
-          # 1) تأكد أن الـ AAB يحتوي فعلاً على ملفات توقيع
+          # --- 1) AAB يحتوي فعلاً على signature block ---
           if ! unzip -l "$AAB" | grep -qE 'META-INF/.*\.(RSA|DSA|EC)$'; then
             echo "::error title=AAB unsigned::no signature block (META-INF/*.RSA) found inside AAB"
             unzip -l "$AAB" | grep -i META-INF || true
             exit 1
           fi
 
-          # 2) قارن بصمة SHA-256 لشهادة الموقّع داخل الـ AAB مع شهادة keystore
-          AAB_SHA=$(keytool -printcert -jarfile "$AAB" 2>/dev/null \
-            | awk '/SHA256:/ {gsub(/[[:space:]]/,"",$2); print toupper($2); exit}')
+          # --- 2a) بصمة keystore المرجعية ---
           KS_SHA=$(keytool -list -v -keystore android/app/release.keystore \
             -storepass "$ANDROID_KEYSTORE_PASSWORD" \
             -alias "$ANDROID_KEY_ALIAS" 2>/dev/null \
             | awk '/SHA256:/ {gsub(/[[:space:]]/,"",$2); print toupper($2); exit}')
 
-          if [ -z "$AAB_SHA" ] || [ -z "$KS_SHA" ]; then
-            echo "::error title=Fingerprint extraction failed::AAB_SHA='$AAB_SHA' KS_SHA='$KS_SHA'"
+          # --- 2b) بصمة شهادة AAB ---
+          AAB_SHA=$(keytool -printcert -jarfile "$AAB" 2>/dev/null \
+            | awk '/SHA256:/ {gsub(/[[:space:]]/,"",$2); print toupper($2); exit}')
+
+          # --- 2c) بصمة شهادة APK — جرّب apksigner أولاً (يدعم v2/v3/v4) ثم keytool fallback ---
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1 || true)
+          APK_SHA=""
+          if [ -n "$APKSIGNER" ]; then
+            APK_SHA=$("$APKSIGNER" verify --print-certs "$APK" 2>/dev/null \
+              | awk '/SHA-256 digest:/ {gsub(/[[:space:]]/,"",$NF); print toupper($NF); exit}')
+          fi
+          if [ -z "$APK_SHA" ]; then
+            APK_SHA=$(keytool -printcert -jarfile "$APK" 2>/dev/null \
+              | awk '/SHA256:/ {gsub(/[[:space:]]/,"",$2); print toupper($2); exit}')
+          fi
+
+          if [ -z "$KS_SHA" ] || [ -z "$AAB_SHA" ] || [ -z "$APK_SHA" ]; then
+            echo "::error title=Fingerprint extraction failed::KS='$KS_SHA' AAB='$AAB_SHA' APK='$APK_SHA'"
             exit 1
           fi
+
+          echo "Keystore SHA-256: $KS_SHA"
+          echo "AAB      SHA-256: $AAB_SHA"
+          echo "APK      SHA-256: $APK_SHA"
+
           if [ "$AAB_SHA" != "$KS_SHA" ]; then
-            echo "::error title=Signature mismatch::AAB signed with a different key than the keystore"
-            echo "AAB:      $AAB_SHA"
-            echo "Keystore: $KS_SHA"
+            echo "::error title=AAB signature mismatch::AAB signed with a different key than the keystore"
+            exit 1
+          fi
+          if [ "$APK_SHA" != "$KS_SHA" ]; then
+            echo "::error title=APK signature mismatch::APK signed with a different key than the keystore"
+            exit 1
+          fi
+          if [ "$AAB_SHA" != "$APK_SHA" ]; then
+            echo "::error title=AAB/APK fingerprint divergence::AAB and APK have different signing certs"
             exit 1
           fi
 
           {
-            echo "## ✅ AAB جاهز"
+            echo "## ✅ AAB + APK جاهزان وموقّعان بنفس الـ keystore"
             echo ""
-            echo "- Version: \`${{ steps.ver.outputs.version_name }}\`"
-            echo "- Build: \`${{ steps.ver.outputs.version_code }}\`"
-            echo "- SHA-256: \`${AAB_SHA}\`"
+            echo "- Version: \`${{ steps.ver.outputs.version_name }}\` (build \`${{ steps.ver.outputs.version_code }}\`)"
+            echo "- SHA-256 (موحّدة): \`${KS_SHA}\`"
+            echo ""
+            echo "| Artifact | SHA-256 |"
+            echo "|---|---|"
+            echo "| Keystore | \`${KS_SHA}\` |"
+            echo "| AAB | \`${AAB_SHA}\` |"
+            echo "| APK | \`${APK_SHA}\` |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: 📤 Upload AAB artifact
