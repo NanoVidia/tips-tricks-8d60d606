@@ -38,10 +38,10 @@ describe("capacitor.config.ts · فصل CAP_ENV", () => {
     else process.env.CAP_ENV = originalEnv;
   });
 
-  it("الإنتاج: لا يحتوي على server.url ولا cleartext (AAB مغلق على dist/)", async () => {
+  it("الإنتاج: server.url يشير إلى رابط النشر المباشر (OTA)", async () => {
     const cfg = await loadConfig("production");
-    expect(cfg.server?.url).toBeUndefined();
-    expect(cfg.server?.cleartext).toBeFalsy();
+    expect(cfg.server?.url).toBe("https://tips-tricks.lovable.app");
+    expect(cfg.server?.cleartext).toBe(false);
   });
 
   it("التطوير: يحتوي على server.url لـ sandbox مع cleartext=true", async () => {
@@ -51,9 +51,9 @@ describe("capacitor.config.ts · فصل CAP_ENV", () => {
     expect(cfg.server?.cleartext).toBe(true);
   });
 
-  it("بدون CAP_ENV (افتراضي): يُعامل كتطوير ويحتفظ بـ server.url", async () => {
+  it("بدون CAP_ENV (افتراضي): يُعامل كتطوير ويحتفظ بـ server.url للـ sandbox", async () => {
     const cfg = await loadConfig(undefined);
-    expect(cfg.server?.url).toBeDefined();
+    expect(cfg.server?.url).toMatch(/lovableproject\.com/);
   });
 
   it("appId ثابت في كلا الوضعين ويطابق APP_ID", async () => {
@@ -78,11 +78,11 @@ describe("capacitor.config.ts · فصل CAP_ENV", () => {
     expect(prod.android?.webContentsDebuggingEnabled).toBe(false);
   });
 
-  it("CAP_ENV بقيم غير صحيحة (Production كبير، prod مختصر) تُعامل كتطوير — لا تسريب hot-reload في AAB", async () => {
+  it("CAP_ENV بقيم غير صحيحة (Production كبير، prod مختصر) تُعامل كتطوير", async () => {
     // الكود يقارن صراحة بـ "production" (case-sensitive) — أي قيمة أخرى = development
     const wrong1 = await loadConfig("Production");
     const wrong2 = await loadConfig("prod");
-    expect(wrong1.server?.url).toBeDefined();
-    expect(wrong2.server?.url).toBeDefined();
+    expect(wrong1.server?.url).toMatch(/lovableproject\.com/);
+    expect(wrong2.server?.url).toMatch(/lovableproject\.com/);
   });
 });
