@@ -20,8 +20,8 @@ import type { CapacitorConfig } from "@capacitor/cli";
  * (see android/app/build.gradle snippet in the README) so you can manage
  * them from one place instead of editing build.gradle each time.
  */
-export const APP_VERSION_NAME = "1.0.3";
-export const APP_VERSION_CODE = 4;
+export const APP_VERSION_NAME = "1.0.4";
+export const APP_VERSION_CODE = 5;
 
 // 🌐 OTA Updates — APK يُحمّل دائماً من رابط النشر المباشر
 // أي تحديث تنشره من Lovable (Publish → Update) يظهر فوراً للمستخدمين

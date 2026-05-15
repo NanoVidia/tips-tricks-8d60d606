@@ -41,9 +41,16 @@ export default function SafeHome() {
   const q: SafeQuestion = useMemo(() => SAFE_QUESTIONS[order[idx]], [order, idx]);
 
   const { pullDistance, refreshing, threshold } = usePullToRefresh(async () => {
-    setOrder([...SAFE_QUESTIONS.keys()].sort(() => Math.random() - 0.5));
-    setIdx(0); setPicked(null); setRevealed(false);
-    toast.success("Refreshed");
+    // إعادة تحميل كاملة لجلب آخر نسخة OTA من Lovable
+    try {
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch { /* ignore */ }
+    window.location.reload();
+    // نعطي وقتاً قصيراً قبل إخفاء المؤشر (الصفحة ستُعاد تحميلها)
+    await new Promise((r) => setTimeout(r, 1500));
   });
 
   if (view.name === "legal") return <SafeLegal onBack={() => setView({ name: "quiz" })} initialSection={view.section} />;
