@@ -324,15 +324,80 @@ jobs:
         if: failure() && steps.gradle_build.conclusion == 'failure'
         run: |
           LOG=/tmp/gradle.log
-          [ -f "$LOG" ] || exit 0
+          [ -f "$LOG" ] || { echo "::error::no gradle log captured"; exit 0; }
+
+          # ── 1) استخرج كتلة "What went wrong" ──────────────────────────────
+          WHY=$(awk '
+            /^\* What went wrong:/ {flag=1; next}
+            /^\* Try:/ {flag=0}
+            flag {print}
+          ' "$LOG" | sed '/^$/d' | head -n 40)
+
+          # ── 2) استخرج أول task فشل ────────────────────────────────────────
+          FAILED_TASK=$(grep -oE '> Task :[^ ]+ FAILED' "$LOG" | head -n1 | sed 's/> Task //; s/ FAILED//')
+
+          # ── 3) صنّف السبب الأرجح ──────────────────────────────────────────
+          CAUSE="غير معروف — راجع السجل أدناه"
+          HINT=""
+          if grep -qiE "keystore was tampered with|password was incorrect|wrong password" "$LOG"; then
+            CAUSE="🔐 كلمة سر keystore أو key خاطئة"
+            HINT="تحقق من ANDROID_KEYSTORE_PASSWORD و ANDROID_KEY_PASSWORD في Secrets."
+          elif grep -qiE "Keystore file .* not found|No such file.*keystore|storeFile.*does not exist" "$LOG"; then
+            CAUSE="📂 ملف keystore غير موجود في المسار المتوقع"
+            HINT="KEYSTORE_PATH = 'release.keystore' ويجب أن يكون داخل android/app/."
+          elif grep -qiE "Alias .* does not exist|Cannot recover key" "$LOG"; then
+            CAUSE="🏷️ الـ alias غير موجود داخل keystore"
+            HINT="تحقق من ANDROID_KEY_ALIAS — يجب أن يطابق ما داخل keystore (افتراضياً tipstricks)."
+          elif grep -qiE "Could not resolve|Could not download|Could not GET|Connection.*timed out" "$LOG"; then
+            CAUSE="🌐 فشل تنزيل اعتمادية من الشبكة"
+            HINT="مشكلة عابرة — أعد تشغيل الـ workflow."
+          elif grep -qiE "SDK location not found|ANDROID_HOME|ANDROID_SDK_ROOT" "$LOG"; then
+            CAUSE="📱 Android SDK غير مهيّأ"
+            HINT="راجع خطوة Setup Android SDK."
+          elif grep -qiE "Java heap space|OutOfMemoryError" "$LOG"; then
+            CAUSE="💾 نفاد ذاكرة JVM"
+            HINT="ارفع org.gradle.jvmargs في android/gradle.properties."
+          elif grep -qiE "Unsupported class file major version|invalid source release|requires Java" "$LOG"; then
+            CAUSE="☕ عدم توافق إصدار Java/Gradle"
+            HINT="JDK 21 مفعّل حالياً — قد تحتاج تحديث Android Gradle Plugin."
+          elif grep -qiE "minSdk|compileSdk|targetSdk" "$LOG" | grep -qi "error"; then
+            CAUSE="🎯 مشكلة في إعدادات SDK versions"
+          elif grep -qiE "Manifest merger failed|AAPT|resource.*not found" "$LOG"; then
+            CAUSE="📦 فشل دمج الـ manifest أو موارد Android"
+          fi
+
+          # ── 4) اكتب التقرير في Job Summary ────────────────────────────────
           {
             echo "## ❌ فشل بناء Android AAB"
             echo ""
-            echo "### آخر 50 سطراً من السجل"
+            echo "### 🎯 السبب الأرجح"
+            echo "**${CAUSE}**"
+            [ -n "$HINT" ] && { echo ""; echo "> 💡 ${HINT}"; }
+            echo ""
+            if [ -n "$FAILED_TASK" ]; then
+              echo "### ⚙️ Task الذي فشل"
+              echo '```'
+              echo "$FAILED_TASK"
+              echo '```'
+              echo ""
+            fi
+            if [ -n "$WHY" ]; then
+              echo "### 🔍 What went wrong (من Gradle)"
+              echo '```'
+              echo "$WHY"
+              echo '```'
+              echo ""
+            fi
+            echo "### 📜 آخر 80 سطراً من السجل"
             echo '```'
-            tail -n 50 "$LOG"
+            tail -n 80 "$LOG"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+          # ── 5) اطبع نفس التشخيص في Annotations حتى يظهر بأعلى الـ run ─────
+          echo "::error title=Gradle build failed::${CAUSE}"
+          [ -n "$FAILED_TASK" ] && echo "::error title=Failed task::${FAILED_TASK}"
+          [ -n "$HINT" ] && echo "::notice title=Hint::${HINT}"
 
       - name: 🏷️ Collect AAB
         id: collect
