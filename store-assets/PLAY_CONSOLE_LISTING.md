@@ -21,32 +21,47 @@ Copy-paste these fields directly into the Google Play Console.
 ## Short description (max 80 chars)
 
 ```
-Daily quiz, fresh trivia, inspiring quotes & lifestyle tips — learn 5 min/day.
+Daily learning & coaching tips for OB/GYN and fertility professionals.
 ```
 
 ## Full description (max 4000 chars)
 
 ```
-Tips & Tricks is the calm, beautiful daily-knowledge app that helps you learn
-something new in 5 minutes a day — without the noise.
+Tips & Tricks delivers daily learning and coaching tips designed for
+qualified professionals in obstetrics, gynecology and fertility care.
+
+Think of it as your pocket-sized professional-development companion — a calm,
+distraction-free space where you sharpen knowledge, test yourself and get
+quick coaching prompts you can use during training, study sessions or between
+clinic visits.
 
 Every day brings a fresh mix of:
 
 🧠  DAILY QUIZ
-A hand-curated set of 100+ general-knowledge questions across science, history,
-language, geography and culture. Tap an answer, get an instant explanation, and
-track your streak.
+Short self-assessment questions with instant explanations to reinforce key
+concepts and track your learning streak.
 
 ✨  INSPIRATION
-A daily dose of timeless quotes and short reflections to start your day with
-clarity and intention.
+Daily reflections and motivational prompts tailored for professionals in
+women's health and fertility practice.
 
-🎓  EXAMS
-Quick self-assessment sets for exam prep, vocabulary and reasoning practice.
+🎓  STUDY SETS
+Curated quick-review packs for exam prep, board review and ongoing
+professional education.
 
 🌍  DISCOVER
-Bite-sized facts and lifestyle tips you can use the same day — from focus
-techniques to sleep hygiene to language hacks.
+Bite-sized reference notes, career-coaching tips and practice pearls you can
+read in under five minutes.
+
+WHAT IT IS NOT
+• Not a medical device, diagnostic aid or treatment planner.
+• Not a source of patient-care instructions or clinical-decision support.
+• Not intended for use by patients or the general public.
+
+WHO IT'S FOR
+Adult professionals and trainees in women's health — including residents,
+fellows, consultants, educators and exam candidates who want a lightweight,
+daily learning resource.
 
 WHY YOU'LL LIKE IT
 • Beautifully simple, distraction-free design
@@ -55,18 +70,16 @@ WHY YOU'LL LIKE IT
 • Optional gentle reminders so you never miss a day
 • Restore Purchases supported (Google Play Billing)
 
-WHO IT'S FOR
-Anyone who loves learning — students, teachers, lifelong learners, curious
-minds, and anyone who wants a calmer alternative to social-media scrolling.
-
 PRIVACY-FIRST
 Your quiz progress stays on your device. We don't sell your data. We don't run
 ads. The app collects only what's needed for sign-in and purchases.
 
 DISCLAIMER
-This app provides general educational and lifestyle content only. It is NOT
-medical, legal or financial advice. Always consult a qualified professional
-for personal decisions.
+This app provides general professional-education and coaching content only.
+It is NOT medical, legal or financial advice. Nothing here replaces formal
+training, institutional protocols or consultation with a qualified specialist.
+Always rely on your clinical judgment and local guidelines for real-world
+decisions.
 
 Have feedback? We read every email — write to us anytime.
 ```
