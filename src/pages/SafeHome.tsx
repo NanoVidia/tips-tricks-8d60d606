@@ -233,7 +233,7 @@ export default function SafeHome() {
         <div className="relative max-w-2xl mx-auto px-4 flex flex-col items-center text-center">
           {/* Logo — transparent shield, sized for mobile while preserving aspect ratio */}
           <div
-            className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center"
+            className="relative w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center"
             role="img"
             aria-label="Tips & Tricks logo"
           >
