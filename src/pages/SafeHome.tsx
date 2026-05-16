@@ -7,6 +7,7 @@ import SafeLegal from "./SafeLegal";
 import { toast } from "sonner";
 import { fireTestNotification } from "@/hooks/useLocalNotifications";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import logoImg from "@/assets/logo-tips-tricks.png";
 
 const InspirationTab = lazy(() => import("@/components/safe/InspirationTab"));
 const DiscoverTab = lazy(() => import("@/components/safe/DiscoverTab"));
@@ -230,28 +231,24 @@ export default function SafeHome() {
         />
 
         <div className="relative max-w-2xl mx-auto px-4 flex flex-col items-center text-center">
-          {/* Logo medallion with halo */}
+          {/* Logo — transparent shield, sized for mobile while preserving aspect ratio */}
           <div
-            className="relative w-16 h-16 rounded-[28%] flex items-center justify-center overflow-hidden
-              shadow-[0_12px_32px_-8px_hsl(var(--primary)/0.5)]
-              ring-[3px] ring-white/70 dark:ring-white/10"
-            style={{ background: "var(--gradient-gold)" }}
+            className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center"
             role="img"
             aria-label="Tips & Tricks logo"
           >
-            <span className="absolute inset-[3px] rounded-[24%] ring-1 ring-primary-foreground/15 pointer-events-none" aria-hidden="true" />
             <span
               aria-hidden="true"
-              className="absolute inset-x-0 top-0 h-1/2 rounded-t-[28%] pointer-events-none"
-              style={{ background: "linear-gradient(180deg, hsl(0 0% 100% / 0.30), transparent)" }}
+              className="absolute inset-0 rounded-full blur-2xl bg-gradient-to-br from-sky-300/40 via-indigo-300/30 to-violet-300/30 dark:from-sky-500/20 dark:via-indigo-500/20 dark:to-violet-500/20"
             />
-            <span
-              className="relative text-[22px] leading-none font-bold tracking-[-0.01em] text-primary-foreground select-none flex items-baseline"
-              style={{ fontFamily: '"Playfair Display", Georgia, serif', textShadow: "0 1px 0 hsl(var(--primary) / 0.3)" }}
-              aria-hidden="true"
-            >
-              T<span className="italic font-semibold text-primary-foreground/85 mx-[2px] text-[16px] relative -top-[1px]">&amp;</span>T
-            </span>
+            <img
+              src={logoImg}
+              alt="Tips & Tricks"
+              width={96}
+              height={96}
+              className="relative w-full h-full object-contain drop-shadow-[0_8px_18px_rgba(79,70,229,0.35)] select-none"
+              draggable={false}
+            />
           </div>
 
           {/* Wordmark */}
