@@ -209,11 +209,12 @@ export default function SafeHome() {
           bg-gradient-to-b from-sky-50 via-blue-50/80 to-indigo-100/70
           dark:from-sky-950/60 dark:via-blue-950/50 dark:to-indigo-950/60
           shadow-[0_22px_44px_-22px_rgba(29,78,168,0.55)]
-          dark:shadow-[0_22px_44px_-22px_rgba(0,0,0,0.75)] pb-12"
+          dark:shadow-[0_22px_44px_-22px_rgba(0,0,0,0.75)]
+          pb-6 sm:pb-10"
         style={{
-          paddingTop: "calc(env(safe-area-inset-top) + 1rem)",
-          borderBottomLeftRadius: "50% 56px",
-          borderBottomRightRadius: "50% 56px",
+          paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)",
+          borderBottomLeftRadius: "50% clamp(28px, 6vw, 56px)",
+          borderBottomRightRadius: "50% clamp(28px, 6vw, 56px)",
         }}
       >
         {/* Decorative ambient glows */}
