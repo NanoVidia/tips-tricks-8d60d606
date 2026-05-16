@@ -292,7 +292,10 @@ export default function SafeHome() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-5 space-y-4 pb-32">
+      <main
+        className="max-w-2xl mx-auto px-4 pt-5 sm:pt-6 space-y-4"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 7.5rem)" }}
+      >
         <Suspense fallback={<div className="h-32 rounded-3xl bg-muted animate-pulse" />}>
           <CompanionCard />
         </Suspense>
