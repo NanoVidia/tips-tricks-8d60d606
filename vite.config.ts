@@ -31,6 +31,10 @@ export default defineConfig(({ mode }) => {
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
         globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
+        // Some MCQ/surgery data chunks are large (~5MB). Don't precache them —
+        // they're hashed and will be cached on demand via runtimeCaching below.
+        globIgnores: ["**/assets/useSurgeries-*.js", "**/assets/mcqBank*-*.js"],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB ceiling for precache
         runtimeCaching: [
           // HTML navigations — always try network first, fall back to cache
           {
