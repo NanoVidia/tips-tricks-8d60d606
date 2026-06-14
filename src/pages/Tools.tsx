@@ -307,9 +307,7 @@ export default function Tools() {
   }, [mcqs]);
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.getRegistration().then((r) => setOfflineReady(!!r));
-    }
+    import("@/lib/pwa").then((m) => m.isOfflineReady().then(setOfflineReady));
   }, []);
 
   const enableOffline = async () => {
@@ -318,9 +316,19 @@ export default function Tools() {
       return;
     }
     try {
-      await navigator.serviceWorker.register("/sw.js");
-      setOfflineReady(true);
-      toast({ title: "Offline mode enabled", description: "App will work without internet on next visit." });
+      const { registerServiceWorker, isOfflineReady } = await import("@/lib/pwa");
+      registerServiceWorker();
+      // Give the worker a moment to install before reporting status.
+      setTimeout(async () => {
+        const ready = await isOfflineReady();
+        setOfflineReady(ready);
+        toast({
+          title: ready ? "Offline mode enabled" : "Activating…",
+          description: ready
+            ? "App will work without internet on next visit."
+            : "Offline cache is being prepared in the background.",
+        });
+      }, 600);
     } catch (e) {
       toast({ title: "Failed", description: "Could not enable offline mode." });
     }
