@@ -60,11 +60,15 @@ const App = () => {
     // Auto-detect low-end devices (Android mid-range) and enable performance mode.
     import("./lib/perfMode").then((m) => m.applyPerformanceMode());
 
-    // Initialize Google Play Billing on native Android. Safe no-op on web.
-    // Doing this at boot ensures product prices are loaded before the user
-    // opens the paywall, so the native Google Play sheet appears instantly.
-    import("./lib/billing/store").then((m) => {
-      m.initStore().catch((err) => console.warn("[billing] init failed", err));
+    // Defer non-critical work (billing init, etc.) until the main thread is idle —
+    // keeps cold-start fast on mobile by not blocking first paint.
+    const idle: (cb: () => void) => void =
+      (window as any).requestIdleCallback?.bind(window) ??
+      ((cb: () => void) => setTimeout(cb, 1200));
+    idle(() => {
+      import("./lib/billing/store").then((m) => {
+        m.initStore().catch((err) => console.warn("[billing] init failed", err));
+      });
     });
   }, []);
 
