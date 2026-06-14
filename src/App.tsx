@@ -31,6 +31,7 @@ import { GlobalTrialBanner } from "./components/GlobalTrialBanner";
 import { AutoPaywall } from "./components/AutoPaywall";
 import { useTrialExpiryNotification } from "./hooks/useTrialExpiryNotification";
 import { useNativeBootstrap } from "./hooks/useNativeBootstrap";
+import { useNotificationTapHandler } from "./hooks/useNotificationTapHandler";
 import { SAFE_MODE } from "./lib/safeMode";
 const SafeHome = lazy(() => import("./pages/SafeHome.tsx"));
 
@@ -38,6 +39,12 @@ function NotificationsBootstrap() {
   useLocalNotifications();
   useTrialExpiryNotification();
   useNativeBootstrap();
+  return null;
+}
+
+/** Mounted inside <BrowserRouter> so it can call useNavigate. */
+function RouterNotificationBridge() {
+  useNotificationTapHandler();
   return null;
 }
 
