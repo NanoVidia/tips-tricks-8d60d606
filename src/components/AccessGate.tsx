@@ -65,21 +65,3 @@ export function AccessGate({ children, featureLabel = "هذا القسم" }: Acc
     </div>
   );
 }
-
-// unused helper retained for reference
-function _UnusedTrialBanner({ daysLeft, onUpgrade }: { daysLeft: number; onUpgrade: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onUpgrade}
-      className="w-full flex items-center justify-between gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-y border-amber-500/30 text-[12px] font-medium"
-      dir="rtl"
-    >
-      <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
-        <Crown className="w-3.5 h-3.5" />
-        تنتهي تجربتك خلال {daysLeft} {daysLeft === 1 ? "يوم" : "أيام"}
-      </span>
-      <span className="text-primary font-bold">اشترك الآن ←</span>
-    </button>
-  );
-}
