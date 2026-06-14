@@ -111,7 +111,10 @@ export default defineConfig(({ mode }) => {
     build: {
       target: "es2020",
       cssCodeSplit: true,
-      sourcemap: false,
+      // 'hidden' emits .map files but strips the //# sourceMappingURL comment,
+      // so production stack traces stay debuggable (upload maps to Sentry later)
+      // without exposing source to end users.
+      sourcemap: "hidden",
       minify: "esbuild",
       chunkSizeWarningLimit: 800,
       rollupOptions: {
