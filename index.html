@@ -70,6 +70,79 @@
   </head>
 
   <body style="background-color: #f6f9fc; margin: 0;">
+    <!-- ⚡ Instant branded splash — paints before React loads, fades out on mount -->
+    <style>
+      #app-splash {
+        position: fixed; inset: 0; z-index: 2147483647;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #eef2ff 0%, #f6f9fc 45%, #fdf4ff 100%);
+        font-family: 'Playfair Display', Georgia, serif;
+        transition: opacity 280ms ease-out;
+        -webkit-user-select: none; user-select: none;
+      }
+      #app-splash.is-hidden { opacity: 0; pointer-events: none; }
+      #app-splash .splash-title {
+        font-size: clamp(26px, 7vw, 44px);
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-align: center;
+        line-height: 1.15;
+        background: linear-gradient(
+          100deg,
+          #6366f1 0%,
+          #6366f1 38%,
+          #ffffff 50%,
+          #6366f1 62%,
+          #6366f1 100%
+        );
+        background-size: 250% 100%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        animation:
+          splash-rise 520ms cubic-bezier(.2,.7,.2,1) both,
+          splash-shine 2.8s ease-in-out 380ms infinite;
+        text-shadow: 0 2px 24px rgba(99,102,241,.18);
+      }
+      @keyframes splash-rise {
+        from { opacity: 0; transform: translateY(14px) scale(.96); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      @keyframes splash-shine {
+        0%   { background-position: 180% 0; }
+        100% { background-position: -80% 0; }
+      }
+      @media (prefers-color-scheme: dark) {
+        #app-splash { background: linear-gradient(135deg, #0f172a 0%, #141414 50%, #1e1b4b 100%); }
+      }
+    </style>
+    <div id="app-splash" aria-hidden="true">
+      <div class="splash-title">OBGYN TIPS &amp; TRICKS</div>
+    </div>
+    <script>
+      (function () {
+        function hide() {
+          var el = document.getElementById('app-splash');
+          if (!el) return;
+          el.classList.add('is-hidden');
+          setTimeout(function () { el && el.parentNode && el.parentNode.removeChild(el); }, 320);
+        }
+        // Hide as soon as React paints something into #root, or after a hard cap
+        var root = document.getElementById('root');
+        var hidden = false;
+        function safeHide() { if (hidden) return; hidden = true; hide(); }
+        if (root && 'MutationObserver' in window) {
+          var mo = new MutationObserver(function () {
+            if (root.childElementCount > 0) { mo.disconnect(); requestAnimationFrame(safeHide); }
+          });
+          mo.observe(root, { childList: true });
+        }
+        // Hard cap so splash never lingers
+        setTimeout(safeHide, 1500);
+      })();
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
