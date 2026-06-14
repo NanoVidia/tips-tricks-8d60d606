@@ -242,6 +242,16 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                   </span>
                 </div>
 
+                <div className="flex items-center justify-center gap-3 mt-3 text-[11px]">
+                  <button type="button" onClick={handleManage} className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline">
+                    إدارة الاشتراك
+                  </button>
+                  <span className="text-muted-foreground/40">•</span>
+                  <a href="/terms" className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline">الشروط</a>
+                  <span className="text-muted-foreground/40">•</span>
+                  <a href="/privacy" className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline">الخصوصية</a>
+                </div>
+
                 <p className="text-[10.5px] text-muted-foreground/80 text-center leading-relaxed mt-4">
                   يتم التجديد تلقائياً ما لم يتم الإلغاء قبل 24 ساعة من نهاية الفترة.
                   يمكنك الإلغاء في أي وقت من إعدادات Google Play.
