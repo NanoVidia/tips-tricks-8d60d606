@@ -1,160 +1,145 @@
-# مراجعة شاملة لرحلة الدفع — مستخدم بلا حساب
+# فجوات على مستوى APK لا يمكن إصلاحها بـ OTA — قبل v5
 
-## الرحلة الحالية (ما يحدث فعلاً)
+> القاعدة: أي شيء يعيش في `android/` أو `capacitor.config.ts` أو `package.json` (plugins) أو الأصول الأصلية (drawable, mipmap) — لا تستفيد من تحديث Lovable المباشر. يحتاج بناء AAB جديد ورفع للـ Play Console.
 
-```text
-اليوم 0  → تثبيت APK → فتح التطبيق
-          → initStore() يسجّل المنتجات من Google Play
-          → restore() تلقائي صامت (لا يوجد شيء — جديد)
-          → دخول الأدوات → AccessGate يفحص localStorage
-          → startTrialIfNeeded() يكتب obgyn_trial_started_at = now
-          → status: trial, daysLeft: 7, وصول كامل
+## الحالة الحاضرة
 
-اليوم 5  → AccessGate يعرض شريطاً علوياً: "تنتهي تجربتك خلال N أيام"
-          → الضغط يفتح Paywall
+- `cordova-plugin-purchase` غير مُثبَّت في `package.json` رغم استخدامه في `src/lib/billing/store.ts` — يحتاج إضافته الآن وإلا الشراء لن يعمل على الجهاز
+- `@capacitor/app`, `@capacitor/status-bar`, `@capacitor/splash-screen` غير مُثبّتة
+- مجلد `android/` غير موجود في المستودع (يُولَّد بـ `npx cap add android`) لذا أي ملف أصلي مطلوب يجب توثيقه ليُضاف بعد التوليد
+- `smallIcon: "ic_stat_icon"` في إعداد LocalNotifications يشير إلى drawable غير موجود → الإشعارات لن تظهر إطلاقاً على Android 5+
 
-اليوم 7  → getAccessState() → hasAccess=false, status="expired"
-          → AccessGate يستبدل الصفحة بشاشة قفل + زر "عرض خطط الاشتراك"
-          → Paywall → اختيار خطة → handlePurchase()
-          → CdvPurchase.store.order() → ورقة Google Play الرسمية
-          → الدفع → callback `approved` → rememberPurchaseToken()
-          → verify-purchase (edge) → Google Play API → upsert subscriptions
-          → grantEntitlement() → p.finish() (ACK)
-          → AccessGate ينعكس فوراً → hasAccess=true, status="paid"
+## الفجوات المرتّبة بالخطورة
 
-بعد ذلك  → كل cold start: restore() صامت يعيد إطلاق approved لأي اشتراك
-          → كل focus/visibility: useAccess يسأل check-access بـ tokens المحفوظة
-          → RTDN webhook يحدّث DB عند التجديد/الإلغاء/الاسترداد
-```
+### 🔴 قاطعة — تعطل ميزات أساسية في v5 إذا لم تُحل
 
-## الفجوات والمخاطر المكتشفة
+**1. `cordova-plugin-purchase` غير مُثبَّت**
 
-### 🔴 حرجة — توقف الرحلة أو تكسر صامتة
+- ملف `store.ts` يستدعي `window.CdvPurchase` لكن الحزمة ليست في `dependencies`
+- بدون التثبيت + `cap sync` → كل عمليات الشراء تفشل صامتاً → الـ Paywall لن يفتح ورقة Google Play
+- الحل: `npm i cordova-plugin-purchase`
 
-**1. عدم تطابق قيم enum بين DB و RTDN webhook**
-- DB `subscription_status` = `{trial, active, expired, cancelled, on_hold, paused, refunded}` (cancelled بحرفين l)
-- الكود يرسل `"canceled"` (حرف l واحد) → upsert يفشل صامتاً → الإلغاءات لا تُسجَّل
-- الكود يرسل `"pending"` لأي notification غير معروف → غير موجود في enum → فشل
-- الكود يرسل `"active"` بدل `"on_hold"` للحالة 5 (ON_HOLD) — يمنح وصولاً وهمياً لمستخدم متوقف عن الدفع
+**2. أيقونة الإشعارات `ic_stat_icon` مفقودة**
 
-**2. حلقة لانهائية في restore عند الاشتراك الملغى**
-- `restore()` → plugin يطلق `approved` لكل token مملوك سابقاً (حتى المنتهية)
-- `verifyOnServer` يرجع `valid: false` → throw → `p.finish()` لا يُستدعى
-- في الإقلاع التالي يتكرر نفس الشيء → Google يستمر بإعادة التسليم بلا نهاية + بطارية + شبكة
+- بدون drawable أبيض شفاف بهذا الاسم → نظام Android يرفض عرض الإشعار (لا أيقونة = لا إشعار)
+- إشعار "تنتهي تجربتك غداً" + الإشعارات اليومية كلها لن تظهر
+- الحل: توليد PNG أبيض شفاف بأحجام mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi ووضعها في `android/app/src/main/res/drawable-*`، أو استخدام `@capacitor/assets`
 
-**3. شاشة "انتهت التجربة" بلا قياس زمن آمن**
-- مدة التجربة محفوظة فقط في `localStorage` بدون مرجع خادم
-- مسح بيانات التطبيق (Settings → Apps → Clear data) يصفر العدّاد → تجربة لا نهائية
-- تغيير ساعة الجهاز للوراء يُمدِّد التجربة
-- بدون حساب لا توجد طريقة كاملة لمنع ذلك، لكن يمكن تخفيفه بربط بداية التجربة بـ `device_id` على الخادم
+**3. أيقونة التطبيق وشاشة البداية الافتراضية**
 
-### 🟡 متوسطة — UX سيئة لكن لا تعطّل الرحلة
+- بدون `@capacitor/assets` ومصدر أيقونة → APK يخرج بأيقونة Capacitor البيضاء الافتراضية
+- لا شاشة splash مع شعار — مجرد شاشة بيضاء
+- الحل: إنشاء `resources/icon.png` (1024×1024) و `resources/splash.png` (2732×2732) + تثبيت `@capacitor/assets` وتشغيل `npx capacitor-assets generate`
 
-**4. شريط التحذير يظهر فقط داخل المسارات المحمية**
-- المستخدم الذي يفتح فقط الصفحة الرئيسية في اليوم 6 لا يرى أي تذكير
-- لا يكتشف أن تجربته على وشك الانتهاء حتى يضغط على أداة
+**4. لا fallback عند تعذُّر تحميل OTA**
 
-**5. رسالة "تمت استعادة المشتريات" مضللة**
-- `handleRestore` في Paywall يعرض النجاح فور انتهاء `restorePurchases()` بغضّ النظر هل وُجدت مشتريات أم لا
-- `approved` callback يأتي بعدها بشكل غير متزامن
-- المستخدم يرى "تمت الاستعادة" ثم يبقى مقفلاً → ارتباك
+- `server.url = https://tips-tricks.lovable.app` → إذا فشلت الشبكة أو سقط دومين lovable.app → شاشة بيضاء أبدية
+- `webDir: "dist"` لا يُستخدم عندما `server.url` مضبوط
+- الحل: إما طبقة Service Worker للأصول الأساسية، أو شاشة خطأ Native عبر `@capacitor/app` تكتشف فشل التحميل وتعرض زر "إعادة المحاولة"
 
-**6. لا يوجد إشعار محلي قبل انتهاء التجربة**
-- `useLocalNotifications` يقرأ فقط من `scheduled_notifications` (إشعارات إدارية عامة)
-- لا إشعار خاص "تنتهي تجربتك غداً" مرتبط بتاريخ تثبيت المستخدم
+**5. ProGuard / R8 يكسر `cordova-plugin-purchase**`
 
-**7. لا يفتح Paywall تلقائياً يوم انتهاء التجربة**
-- المستخدم الذي يفتح فقط الصفحة الرئيسية يوم 7 لا يرى أي تنبيه
+- إصدار release يُفعِّل R8 افتراضياً → reflection داخل الـ plugin تُمسح → الشراء يفشل بـ `ClassNotFoundException`
+- الحل: قواعد `-keep class com.google.android.gms.** { *; }` و `-keep class com.cordova.plugin.purchase.** { *; }` في `android/app/proguard-rules.pro`
 
-**8. الصفحة الرئيسية تعرض "Daily MCQ" لكنه ضمن `LOCKED_FEATURES`**
-- تناقض: قائمة الميزات المجانية تذكر "حالة سؤال اليوم"، لكن `daily_mcq` في القائمة المقفلة
+### 🟡 مهمة — رفض من Play أو تجربة سيئة
 
-### 🟢 منخفضة — تحسينات للمتانة
+**6. Target SDK 35 إلزامي**
 
-**9. RTDN بلا تحقق OIDC** — أي شخص يعرف URL يمكنه إرسال إشعار مزيف. لكن webhook يعيد الاستعلام من Google API بـ purchase_token → الرفض الفعلي يأتي من Google → الخطر منخفض، فقط يُلوّث `purchase_events`.
+- Google يرفض رفع APK جديد بـ `targetSdk < 35` من أغسطس 2025
+- يجب التأكد بعد `cap add android` أن `android/variables.gradle` يحدد `targetSdkVersion = 35`
 
-**10. اعتماد كامل على `cordova-plugin-purchase`** — لم يُختبر على جهاز حقيقي مع Capacitor 8.
+**7. `android:allowBackup="true"` افتراضي**
 
----
+- localStorage (بما فيه `obgyn_trial_started_at`) يُنسخ احتياطياً لـ Google Drive → يمكن استعادته على جهاز جديد لتمديد التجربة
+- الحل: إضافة `android:allowBackup="false"` أو ملف `backup_rules.xml` يستثني تلك المفاتيح في AndroidManifest.xml
 
-## خطة الإصلاح
+**8. شاشة splash تُغلق قبل تحميل التطبيق**
 
-### المرحلة 1 — إصلاحات حرجة (يجب قبل v5)
+- بدون `SplashScreen` plugin مضبوط بـ `launchAutoHide: false` → فلاش شاشة بيضاء بين splash و تحميل lovable.app (3-5 ثوانٍ على شبكة بطيئة)
+- الحل: تثبيت `@capacitor/splash-screen` + استدعاء `SplashScreen.hide()` بعد `window.load`
 
-**1.1 محاذاة قيم enum في RTDN webhook**
-ملف: `supabase/functions/play-rtdn-webhook/index.ts`
-- تغيير `"canceled"` → `"cancelled"`
-- إضافة حالات `on_hold`, `paused`, `refunded` بشكل صحيح
-- استبدال fallback `"pending"` بـ `"active"` للحالات غير المعروفة مع log تحذير
-- تطبيق نفس المعالجة في `verify-purchase` لكي تستخدم `"cancelled"` بدل `"expired"` عند `purchaseState=1`
+**9. Status bar غير مضبوط — Android 15 edge-to-edge**
 
-**1.2 إنهاء معاملات Google Play دائماً + grant فقط عند valid**
-ملف: `src/lib/billing/store.ts` — في `approved` callback:
-- استدعاء `p.finish()` دائماً (ACK لـ Google) سواء صحّت أم لم تصحّ
-- استدعاء `grantEntitlement()` فقط عند `result.ok === true`
-- في حالة فشل الشبكة (لا رد من السيرفر): لا تنادِ `p.finish()` (Play سيعيد المحاولة) — تمييز خطأ الشبكة عن رفض السيرفر
+- Android 15 يفرض edge-to-edge → المحتوى يختفي خلف status bar إذا لم يُضبط `viewport-fit=cover` (موجود ✓) + StatusBar plugin
+- الحل: `@capacitor/status-bar` مع `style: 'DARK'` + `overlaysWebView: false`
 
-**1.3 تتبع التجربة على الخادم بـ device_id**
-- جدول `trial_starts` موجود بالفعل — استخدامه
-- عند أول استدعاء لـ `getAccessState()` بعد `startTrialIfNeeded()`: إرسال `deviceId` لـ edge function جديدة `start-trial` (أو إعادة استخدام `check-access` مع field إضافي)
-- الخادم: إن وُجد row للـ deviceId يعيد `trialStartedAt` الأصلي → الجهاز يحدّث `localStorage`
-- يحمي ضدّ مسح البيانات وتلاعب الساعة
-- `check-access` يقبل deviceId ويُرجِع `trialEndsAt` رسمي
+**10. زر الرجوع الصلب على Android يخرج من التطبيق فوراً**
 
-### المرحلة 2 — تحسينات UX قبل v5
+- بدون handler عبر `@capacitor/app` `backButton` listener → ضغطة واحدة من الصفحة الرئيسية = خروج بلا تأكيد
+- الحل: تثبيت `@capacitor/app` + handler يطلب تأكيد "اضغط مرة ثانية للخروج"
 
-**2.1 شريط تحذير عالمي**
-- نقل `TrialBanner` من داخل `AccessGate` إلى مكون عالمي مُركّب في `App.tsx` فوق `<Routes>`
-- يظهر في كل الصفحات (بما فيها الرئيسية) عندما `daysLeft ≤ 3`
+**11. RECEIVE_BOOT_COMPLETED للإشعارات المجدولة**
 
-**2.2 إصلاح رسالة الاستعادة**
-- `handleRestore` ينتظر حدث `entitlement-changed` لمدة 5 ثوانٍ
-- إذا وصل → toast "تمت استعادة اشتراكك"
-- إذا لم يصل → toast "لم يتم العثور على مشتريات مرتبطة بحساب Google Play هذا"
+- بدون هذا الإذن، إعادة تشغيل الجهاز يلغي كل الإشعارات المجدولة محلياً
+- `@capacitor/local-notifications` لا يضيفه افتراضياً
+- الحل: إضافته يدوياً في AndroidManifest.xml بعد `cap add android`
 
-**2.3 إشعار محلي "تنتهي تجربتك غداً"**
-- في `App.tsx` أو hook جديد: عند توفر Capacitor، جدولة إشعار محلي مرة واحدة عند `trialEndsAt - 24h`
-- نص: "بقي يوم واحد على انتهاء تجربتك المجانية"
-- يلغى تلقائياً عند الاشتراك
+**12. عدم تطابق إصدار التطبيق**
 
-**2.4 فتح Paywall تلقائياً عند انتهاء التجربة (مرة واحدة)**
-- في `App.tsx`: إذا `status === "expired"` ولم يُفتح Paywall بعد في هذه الجلسة → فتحه تلقائياً
-- علامة في sessionStorage لمنع التكرار خلال الجلسة
+- `package.json`: `1.0.0` بينما `capacitor.config.ts`: `1.0.4 / code 5`
+- لا يكسر شيئاً لكن يربك التتبع. مزامنة الاثنين
 
-**2.5 إصلاح تناقض Daily MCQ**
-- حذف `daily_mcq` من `LOCKED_FEATURES` (لأنه على الصفحة الرئيسية المجانية)، أو
-- إزالة "حالة سؤال اليوم" من نص الميزات المجانية في Paywall و AccessGate
+### 🟢 لطيفة — تحسينات بعد v5
 
-### المرحلة 3 — متانة (اختياري لاحقاً)
+**13. Deep link لاستلام إشعارات الإلغاء من Google Play** — اختياري
+**14. WebView WebRTC/Camera permissions** — لا نحتاجها الآن
+**15. App Bundle (AAB) optimization** — تلقائي
 
-**3.1 OIDC verification في RTDN**
-- التحقق من `Authorization: Bearer <OIDC token>` + `aud` + `email` ضد Service Account المرتبط بـ Pub/Sub topic
-- يمنع تلويث `purchase_events` بإشعارات مزيفة
+## ما يمكن تأجيله بأمان لـ OTA لاحقاً
 
-**3.2 توحيد productId mapping**
-- نقل `PRODUCT_TO_PLAN` إلى ملف مشترك (`_shared/products.ts`) بدل تكراره في 3 functions
+- نصوص واجهة المستخدم
+- إصلاحات منطق Paywall/AccessGate
+- محتوى الأدوات والاختبارات
+- ألوان وأنماط
+- إصلاحات Edge Functions (تنزل فوراً)
+- منطق RTDN webhook (سيرفر)
 
 ---
 
-## الملفات المتأثرة
+## خطة العمل المقترحة قبل بناء v5
+
+**المرحلة A — تثبيت الحزم الناقصة (Lovable يقوم بها):**
 
 ```text
-supabase/functions/play-rtdn-webhook/index.ts   (إصلاح enum + جميع الحالات)
-supabase/functions/verify-purchase/index.ts     (status="cancelled" بدل "expired")
-supabase/functions/check-access/index.ts        (قبول deviceId + trialEndsAt)
-supabase/functions/start-trial/index.ts         (جديد — تسجيل بداية التجربة)
-src/lib/billing/store.ts                        (دائماً p.finish + تمييز net error)
-src/lib/billing/trial.ts                        (مزامنة trialStartedAt مع الخادم)
-src/hooks/useAccess.ts                          (إرسال deviceId)
-src/components/Paywall.tsx                      (إصلاح handleRestore)
-src/components/AccessGate.tsx                   (نقل TrialBanner خارجاً)
-src/App.tsx                                     (TrialBanner عالمي + إشعار محلي + auto-open Paywall)
-src/lib/billing/plans.ts                        (إزالة daily_mcq من LOCKED أو من الميزات المجانية)
+npm i cordova-plugin-purchase
+npm i @capacitor/app @capacitor/status-bar @capacitor/splash-screen
+npm i -D @capacitor/assets
 ```
 
-## ما لن أغيّره
+**المرحلة B — تعديلات `capacitor.config.ts`:**
 
-- بنية الـ Paywall نفسها (الـ UI الحالي جيد)
-- جدول `subscriptions` (تم بالفعل قبول user_id الاختياري + فهرس على purchase_token)
-- منطق `verify-purchase` نفسه (الـ flow صحيح)
-- منطق `restorePurchases()` (سلوك المكتبة، لا نتحكم به)
+- إضافة `SplashScreen` config (`launchAutoHide: false`, مدة 2s, شعار مركزي)
+- إضافة `StatusBar` config
+- مزامنة `package.json.version` مع `APP_VERSION_NAME`
+
+**المرحلة C — كود يضاف داخل التطبيق (Lovable):**
+
+- استدعاء `SplashScreen.hide()` بعد تحميل التطبيق
+- handler لـ hardware back button
+- استدعاء `StatusBar.setStyle()` على البوت
+
+**المرحلة D — أصول وملفات أصلية (تتم على جهازك بعد git pull):**
+
+- وضع `resources/icon.png` و `resources/splash.png` ثم `npx capacitor-assets generate`
+- توليد `ic_stat_icon` لكل drawable-*
+- إنشاء `android/app/proguard-rules.pro` بقواعد cordova-plugin-purchase
+- تعديل AndroidManifest.xml: `allowBackup="false"`, `RECEIVE_BOOT_COMPLETED`, `targetSdk=35`
+- توقيع AAB بالـ keystore (صفحة KeystoreSetup موجودة)
+
+**المرحلة E — رفع للـ Play Console:**
+
+- ملء Data Safety form
+- إضافة Privacy Policy URL (موجود `/privacy`)
+- ربط Pub/Sub topic بـ RTDN webhook URL
+- تفعيل المنتجات الثلاثة tt_monthly / tt_yearly / tt_lifetime
+
+---
+
+## ما أحتاج قرارك فيه
+
+1. هل تريد أن أنفّذ **المراحل A + B + C كاملة الآن** (تثبيت الحزم + كود التطبيق)؟
+2. هل تملك ملف أيقونة عالي الدقة (1024×1024) لاستخدامه في توليد الأيقونات والـ splash؟ أم أولّد واحدة افتراضية بشعار «Tips & Tricks»؟
+3. للمرحلة D (الملفات الأصلية): سأكتب لك دليلاً تفصيلياً تنفّذه على جهازك بعد `npx cap add android`، لأن مجلد `android/` يُولَّد محلياً وليس في المستودع. موافق؟
+
+لكن لا اريد سبلاش
