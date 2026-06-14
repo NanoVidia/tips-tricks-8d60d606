@@ -5,4 +5,4 @@
 // classified as a medical app.
 //
 // To return to the full clinical app, flip SAFE_MODE to false.
-export const SAFE_MODE = false;
+export const SAFE_MODE = true;
