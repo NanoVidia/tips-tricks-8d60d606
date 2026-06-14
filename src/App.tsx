@@ -135,6 +135,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <NotificationsBootstrap />
+          <RouterNotificationBridge />
           <GlobalTrialBanner />
           <AutoPaywall />
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
