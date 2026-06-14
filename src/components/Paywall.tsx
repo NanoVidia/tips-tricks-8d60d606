@@ -74,10 +74,14 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
       if (native) {
         const { purchase } = await import("@/lib/billing/store");
         await purchase(selected);
-      } else {
-        await new Promise((r) => setTimeout(r, 600));
+      } else if (import.meta.env.DEV) {
+        // Developer preview ONLY — never reached in production builds.
+        await new Promise((r) => setTimeout(r, 400));
         grantEntitlement(selected);
-        toast.success("تم تفعيل الاشتراك (وضع المعاينة)");
+        toast.success("تم تفعيل الاشتراك (وضع المعاينة فقط)");
+      } else {
+        toast.error("الشراء متاح فقط داخل تطبيق Google Play.");
+        return;
       }
       onOpenChange(false);
       setStep("plans");
@@ -87,6 +91,10 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
     } finally {
       setBusy(false);
     }
+  }
+
+  function handleManage() {
+    import("@/lib/billing/device").then((m) => m.openManageSubscription());
   }
 
   async function handleRestore() {
