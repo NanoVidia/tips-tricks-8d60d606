@@ -144,6 +144,8 @@ Deno.serve(async (req) => {
     let autoRenewing = false;
     let raw: unknown = null;
 
+    let isPending = false;
+
     if (plan === "lifetime") {
       const resp = await fetchProduct(productId, purchaseToken, accessToken);
       raw = resp.body;
@@ -156,6 +158,7 @@ Deno.serve(async (req) => {
       // purchaseState: 0 = purchased, 1 = canceled, 2 = pending
       const state = (resp.body as any).purchaseState;
       valid = state === 0;
+      isPending = state === 2;
       orderId = (resp.body as any).orderId ?? null;
       if (valid && (resp.body as any).acknowledgementState === 0) {
         await acknowledgeProduct(productId, purchaseToken, accessToken).catch(() => {});
@@ -171,7 +174,8 @@ Deno.serve(async (req) => {
       }
       const b = resp.body as any;
       const expiryMs = b.expiryTimeMillis ? parseInt(b.expiryTimeMillis, 10) : 0;
-      // paymentState: 1 = received, 2 = free trial, 3 = pending deferred upgrade, 0 = pending
+      // paymentState: 0 = pending, 1 = received, 2 = free trial, 3 = pending deferred upgrade
+      isPending = b.paymentState === 0 || b.paymentState === 3;
       valid = expiryMs > Date.now() && (b.paymentState === 1 || b.paymentState === 2);
       expiresAt = expiryMs ? new Date(expiryMs).toISOString() : null;
       orderId = b.orderId ?? null;
@@ -183,7 +187,7 @@ Deno.serve(async (req) => {
 
     // Persist subscription keyed on purchase_token (works with or without user).
     // Status must match DB enum: {trial, active, expired, cancelled, on_hold, paused, refunded}
-    const status = valid ? "active" : "expired";
+    const status = valid ? "active" : isPending ? "trial" : "expired";
     const subRow = {
       user_id: userId, // nullable — anonymous device-bound purchases supported
       plan,
@@ -206,13 +210,13 @@ Deno.serve(async (req) => {
       product_id: productId,
       purchase_token: purchaseToken,
       order_id: orderId,
-      raw_payload: { ...(raw as object), deviceId: deviceId ?? null },
+      raw_payload: { ...(raw as object), deviceId: deviceId ?? null, pending: isPending },
       processed: true,
     });
 
     return new Response(
-      JSON.stringify({ ok: valid, plan, expiresAt, autoRenewing, orderId }),
-      { status: valid ? 200 : 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({ ok: valid, pending: isPending && !valid, plan, expiresAt, autoRenewing, orderId }),
+      { status: valid ? 200 : isPending ? 202 : 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
     console.error("verify-purchase error", e);

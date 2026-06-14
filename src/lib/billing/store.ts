@@ -87,6 +87,7 @@ async function verifyOnServer(productId: string, purchaseToken: string) {
     body: { productId, purchaseToken, deviceId: getDeviceId() },
   });
   if (error) throw error;
+  if (data?.pending) throw new Error("pending");
   if (!data?.ok) throw new Error("server-verification-failed");
   return data as { ok: true; plan: PlanId; expiresAt: string | null };
 }
@@ -134,10 +135,13 @@ export async function initStore(): Promise<void> {
         p.finish();
       } catch (err) {
         const msg = (err as Error)?.message ?? String(err);
-        // Distinguish hard rejection (server reachable, Google said invalid)
-        // from transient network failure (retry on next launch).
+        const isPending = msg.includes("pending");
         const isServerRejection = msg.includes("server-verification-failed");
-        if (isServerRejection) {
+        if (isPending) {
+          // Payment pending (e.g. bank confirmation) — DO NOT finish().
+          // Google Play will re-deliver once payment clears.
+          console.info("[billing] purchase pending, awaiting confirmation", token);
+        } else if (isServerRejection) {
           // Subscription is expired/cancelled — finish() so Play stops re-delivering
           // forever. We do NOT grant entitlement. RTDN will keep DB in sync.
           console.warn("[billing] purchase rejected by server, acknowledging anyway", token);
