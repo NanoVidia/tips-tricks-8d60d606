@@ -119,18 +119,33 @@ export async function initStore(): Promise<void> {
     );
 
     store.when().approved(async (p) => {
+      const token =
+        p.transaction?.purchaseToken ?? p.transaction?.nativePurchase?.purchaseToken;
+      if (!token) {
+        console.error("[billing] approved without purchaseToken");
+        return;
+      }
+      rememberPurchaseToken(p.id, token);
+
       try {
-        const token =
-          p.transaction?.purchaseToken ?? p.transaction?.nativePurchase?.purchaseToken;
-        if (!token) throw new Error("missing-purchase-token");
-        rememberPurchaseToken(p.id, token);
         const result = await verifyOnServer(p.id, token);
+        // Server confirmed: grant entitlement and ACK with Google Play.
         grantEntitlement(result.plan);
-        p.finish(); // acknowledges with Google Play
+        p.finish();
       } catch (err) {
-        // Do NOT call finish() — Play will retry on next launch and
-        // the RTDN webhook keeps a server-side record either way.
-        console.error("[billing] server verification failed", err);
+        const msg = (err as Error)?.message ?? String(err);
+        // Distinguish hard rejection (server reachable, Google said invalid)
+        // from transient network failure (retry on next launch).
+        const isServerRejection = msg.includes("server-verification-failed");
+        if (isServerRejection) {
+          // Subscription is expired/cancelled — finish() so Play stops re-delivering
+          // forever. We do NOT grant entitlement. RTDN will keep DB in sync.
+          console.warn("[billing] purchase rejected by server, acknowledging anyway", token);
+          try { p.finish(); } catch { /* ignore */ }
+        } else {
+          // Network/transport error — leave un-finished so Play retries next launch.
+          console.error("[billing] verification network error, will retry", err);
+        }
       }
     });
 

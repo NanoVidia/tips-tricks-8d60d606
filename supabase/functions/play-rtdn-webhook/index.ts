@@ -65,29 +65,34 @@ async function getGoogleAccessToken(): Promise<string> {
 }
 
 // notificationType reference: https://developer.android.com/google/play/billing/rtdn-reference
-function statusFromSubNotificationType(t: number): "active" | "expired" | "canceled" | "pending" | "paused" {
+// IMPORTANT: returned values MUST match DB enum subscription_status:
+//   {trial, active, expired, cancelled, on_hold, paused, refunded}
+type SubStatus = "active" | "expired" | "cancelled" | "on_hold" | "paused" | "refunded";
+function statusFromSubNotificationType(t: number): SubStatus {
   switch (t) {
     case 1: // RECOVERED
     case 2: // RENEWED
     case 4: // PURCHASED
     case 7: // RESTARTED
-      return "active";
-    case 3: // CANCELED (still active until expiry)
-      return "canceled";
-    case 5: // ON_HOLD
-    case 6: // IN_GRACE_PERIOD
     case 8: // PRICE_CHANGE_CONFIRMED
+    case 9: // DEFERRED
+      return "active";
+    case 3: // CANCELED (still active until expiry — user opted out of renewal)
+      return "cancelled";
+    case 5: // ON_HOLD (payment failed, retrying — entitlement revoked)
+      return "on_hold";
+    case 6: // IN_GRACE_PERIOD (payment failed, still has access)
       return "active";
     case 10: // PAUSED
     case 11: // PAUSE_SCHEDULE_CHANGED
       return "paused";
-    case 12: // REVOKED
+    case 12: // REVOKED (refund issued)
+      return "refunded";
     case 13: // EXPIRED
       return "expired";
-    case 9: // DEFERRED
-      return "active";
     default:
-      return "pending";
+      console.warn("RTDN unknown notificationType", t);
+      return "active";
   }
 }
 
@@ -163,7 +168,8 @@ Deno.serve(async (req) => {
         console.error("RTDN one-time fetch failed", r.status, body);
         return new Response("ok", { status: 200, headers: corsHeaders });
       }
-      const status = notificationType === 2 || body.purchaseState === 1 ? "expired" : "active";
+      // ONE_TIME_PRODUCT notificationType: 1=PURCHASED, 2=CANCELED/refunded
+      const status: SubStatus = notificationType === 2 ? "refunded" : body.purchaseState === 1 ? "cancelled" : "active";
       await supabase.from("subscriptions").upsert({
         purchase_token: purchaseToken,
         plan: "lifetime",

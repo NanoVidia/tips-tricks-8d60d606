@@ -21,15 +21,8 @@ export function AccessGate({ children, featureLabel = "هذا القسم" }: Acc
   const [paywallOpen, setPaywallOpen] = useState(false);
 
   if (access.hasAccess) {
-    return (
-      <>
-        {access.status === "trial" && access.daysLeft <= 3 && (
-          <TrialBanner daysLeft={access.daysLeft} onUpgrade={() => setPaywallOpen(true)} />
-        )}
-        {children}
-        <Paywall open={paywallOpen} onOpenChange={setPaywallOpen} />
-      </>
-    );
+    // Global banner lives in App.tsx so it's visible on every page.
+    return <>{children}</>;
   }
 
   return (
@@ -73,7 +66,8 @@ export function AccessGate({ children, featureLabel = "هذا القسم" }: Acc
   );
 }
 
-function TrialBanner({ daysLeft, onUpgrade }: { daysLeft: number; onUpgrade: () => void }) {
+// unused helper retained for reference
+function _UnusedTrialBanner({ daysLeft, onUpgrade }: { daysLeft: number; onUpgrade: () => void }) {
   return (
     <button
       type="button"
