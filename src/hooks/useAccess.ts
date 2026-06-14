@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAccessState, type AccessState } from "@/lib/billing/trial";
+import { getAccessState, grantEntitlement, type AccessState } from "@/lib/billing/trial";
+import { getRememberedTokens } from "@/lib/billing/device";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ServerAccess {
@@ -37,11 +38,13 @@ export function useAccess(): AccessState {
     window.addEventListener("focus", refresh);
     window.addEventListener("storage", refresh);
     window.addEventListener("entitlement-changed", refresh);
+    document.addEventListener("visibilitychange", refresh);
     const id = window.setInterval(refresh, 60_000);
     return () => {
       window.removeEventListener("focus", refresh);
       window.removeEventListener("storage", refresh);
       window.removeEventListener("entitlement-changed", refresh);
+      document.removeEventListener("visibilitychange", refresh);
       window.clearInterval(id);
     };
   }, []);
@@ -53,13 +56,19 @@ export function useAccess(): AccessState {
     async function pullFromServer() {
       try {
         const { data: session } = await supabase.auth.getSession();
-        if (!session.session) return; // anonymous → keep local trial
+        const tokens = getRememberedTokens().map((t) => t.purchaseToken);
 
-        const { data, error } = await supabase.functions.invoke<ServerAccess>("check-access");
+        // Nothing to ask the server about — fall back to local trial.
+        if (!session.session && tokens.length === 0) return;
+
+        const { data, error } = await supabase.functions.invoke<ServerAccess>("check-access", {
+          body: tokens.length > 0 ? { purchaseTokens: tokens } : {},
+        });
         if (error || !data || cancelled) return;
 
         if (data.hasAccess && data.plan) {
-          // Server says paid → activate full access.
+          // Mirror locally so offline boots still unlock instantly.
+          grantEntitlement(data.plan);
           setState({
             hasAccess: true,
             status: "paid",
@@ -68,12 +77,8 @@ export function useAccess(): AccessState {
             paidPlan: data.plan,
           });
         } else if (data.status === "expired" || data.status === "no-subscription") {
-          // Server says no access → revoke locally and fall back to trial check.
-          // We keep the local trial timer intact (don't clobber it on every poll),
-          // but if local says paid based on stale localStorage, downgrade.
           setState((prev) => {
             if (prev.status === "paid") {
-              // Server revoked — clear local entitlement.
               localStorage.removeItem("obgyn_entitlement");
               localStorage.removeItem("obgyn_entitlement_expires_at");
               return getAccessState();
@@ -82,7 +87,6 @@ export function useAccess(): AccessState {
           });
         }
       } catch (err) {
-        // Network / function error → silently keep local state.
         console.warn("[access] server check failed", err);
       }
     }
@@ -90,11 +94,13 @@ export function useAccess(): AccessState {
     pullFromServer();
     const onFocus = () => pullFromServer();
     window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
     const id = window.setInterval(pullFromServer, 5 * 60_000);
 
     return () => {
       cancelled = true;
       window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
       window.clearInterval(id);
     };
   }, []);

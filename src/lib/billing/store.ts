@@ -19,6 +19,7 @@
 
 import { PLANS, type PlanId } from "./plans";
 import { grantEntitlement } from "./trial";
+import { getDeviceId, rememberPurchaseToken } from "./device";
 import { supabase } from "@/integrations/supabase/client";
 
 type ApprovedPayload = {
@@ -83,7 +84,7 @@ export function isBillingAvailable(): boolean {
 
 async function verifyOnServer(productId: string, purchaseToken: string) {
   const { data, error } = await supabase.functions.invoke("verify-purchase", {
-    body: { productId, purchaseToken },
+    body: { productId, purchaseToken, deviceId: getDeviceId() },
   });
   if (error) throw error;
   if (!data?.ok) throw new Error("server-verification-failed");
@@ -122,6 +123,7 @@ export async function initStore(): Promise<void> {
         const token =
           p.transaction?.purchaseToken ?? p.transaction?.nativePurchase?.purchaseToken;
         if (!token) throw new Error("missing-purchase-token");
+        rememberPurchaseToken(p.id, token);
         const result = await verifyOnServer(p.id, token);
         grantEntitlement(result.plan);
         p.finish(); // acknowledges with Google Play

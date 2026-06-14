@@ -140,26 +140,17 @@ Deno.serve(async (req) => {
       const expiryMs = body.expiryTimeMillis ? parseInt(body.expiryTimeMillis, 10) : 0;
       const status = statusFromSubNotificationType(notificationType);
 
-      // Locate user by purchase_token
-      const { data: existing } = await supabase
-        .from("subscriptions")
-        .select("user_id")
-        .eq("purchase_token", purchaseToken)
-        .maybeSingle();
-
-      if (existing?.user_id) {
-        await supabase.from("subscriptions").update({
-          plan,
-          status,
-          product_id: subscriptionId,
-          order_id: body.orderId ?? null,
-          auto_renewing: !!body.autoRenewing,
-          current_period_end: expiryMs ? new Date(expiryMs).toISOString() : null,
-          last_verified_at: new Date().toISOString(),
-        }).eq("user_id", existing.user_id);
-      } else {
-        console.warn("RTDN: no subscription row for token", purchaseToken);
-      }
+      // Upsert by purchase_token (works for anonymous device-bound purchases).
+      await supabase.from("subscriptions").upsert({
+        purchase_token: purchaseToken,
+        plan,
+        status,
+        product_id: subscriptionId,
+        order_id: body.orderId ?? null,
+        auto_renewing: !!body.autoRenewing,
+        current_period_end: expiryMs ? new Date(expiryMs).toISOString() : null,
+        last_verified_at: new Date().toISOString(),
+      }, { onConflict: "purchase_token" });
     }
 
     // ---- One-time products (lifetime) ----
@@ -172,22 +163,15 @@ Deno.serve(async (req) => {
         console.error("RTDN one-time fetch failed", r.status, body);
         return new Response("ok", { status: 200, headers: corsHeaders });
       }
-      // notificationType: 1=PURCHASED, 2=CANCELED
       const status = notificationType === 2 || body.purchaseState === 1 ? "expired" : "active";
-      const { data: existing } = await supabase
-        .from("subscriptions")
-        .select("user_id")
-        .eq("purchase_token", purchaseToken)
-        .maybeSingle();
-      if (existing?.user_id) {
-        await supabase.from("subscriptions").update({
-          plan: "lifetime",
-          status,
-          product_id: sku,
-          order_id: body.orderId ?? null,
-          last_verified_at: new Date().toISOString(),
-        }).eq("user_id", existing.user_id);
-      }
+      await supabase.from("subscriptions").upsert({
+        purchase_token: purchaseToken,
+        plan: "lifetime",
+        status,
+        product_id: sku,
+        order_id: body.orderId ?? null,
+        last_verified_at: new Date().toISOString(),
+      }, { onConflict: "purchase_token" });
     }
 
     // Mark event as processed
