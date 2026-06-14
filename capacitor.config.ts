@@ -23,15 +23,11 @@ import type { CapacitorConfig } from "@capacitor/cli";
 export const APP_VERSION_NAME = "1.0.5";
 export const APP_VERSION_CODE = 5;
 
-// 🌐 OTA Updates — APK يُحمّل دائماً من رابط النشر المباشر
-// أي تحديث تنشره من Lovable (Publish → Update) يظهر فوراً للمستخدمين
-// بدون الحاجة لبناء APK جديد. العيب: التطبيق يحتاج إنترنت للعمل.
-//
-// CAP_ENV=production  → يحمّل من https://tips-tricks.lovable.app (OTA)
-// CAP_ENV=development → يحمّل من sandbox preview (hot-reload أثناء التطوير)
-const isProduction = process.env.CAP_ENV === "production";
+// 📦 Bundled mode — التطبيق يحمّل من ملفات APK المحلية (dist) ويعمل بدون إنترنت
+// لتفعيل OTA من رابط Lovable أثناء التطوير فقط: CAP_ENV=development
+// في الإنتاج (APK المنشور على Play) يحمّل دائماً من البناء المحلي.
+const isDevelopment = process.env.CAP_ENV === "development";
 
-const PROD_URL = "https://tips-tricks.lovable.app";
 const DEV_URL = "https://f15d3c7d-05d9-49cb-9278-ed7124c335f7.lovableproject.com?forceHideBadge=true";
 
 const config: CapacitorConfig = {
@@ -39,15 +35,19 @@ const config: CapacitorConfig = {
   appId: "app.lovable.tipstricks",
   appName: "Tips & Tricks Daily Quiz",
 
-  // ---- Web build output (fallback إذا فشل تحميل OTA) ----
+  // ---- Web build output ----
   webDir: "dist",
 
-  // ---- OTA / hot-reload server ----
-  server: {
-    url: isProduction ? PROD_URL : DEV_URL,
-    cleartext: !isProduction,
-    androidScheme: "https",
-  },
+  // ---- Server: في الإنتاج undefined → يحمّل من dist محلياً ----
+  server: isDevelopment
+    ? {
+        url: DEV_URL,
+        cleartext: true,
+        androidScheme: "https",
+      }
+    : {
+        androidScheme: "https",
+      },
 
   // ---- Android tuning ----
   android: {
