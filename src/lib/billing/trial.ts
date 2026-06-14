@@ -25,6 +25,8 @@ export interface AccessState {
   daysLeft: number;
   trialEndsAt: string | null;
   paidPlan: "monthly" | "yearly" | "lifetime" | null;
+  /** True until the first server reconciliation completes (or its timeout). */
+  loading?: boolean;
 }
 
 function startTrialIfNeeded(): number {

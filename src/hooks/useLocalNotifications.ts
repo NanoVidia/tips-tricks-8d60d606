@@ -63,8 +63,13 @@ export function useLocalNotifications() {
             return;
           }
           // User just granted — clear the "denied" flag so future rejections
-          // show the toast again.
+          // show the toast again, and notify other hooks (e.g. trial-expiry
+          // notification scheduler) so they can retry.
           localStorage.removeItem(DENIED_TOAST_KEY);
+          window.dispatchEvent(new Event("notif-permission-granted"));
+        } else {
+          // Already granted previously — still emit once so late mounts retry.
+          window.dispatchEvent(new Event("notif-permission-granted"));
         }
 
         // 2. Make sure the high-importance Android channel exists.

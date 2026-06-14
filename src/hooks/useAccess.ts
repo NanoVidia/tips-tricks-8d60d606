@@ -11,6 +11,8 @@ interface ServerAccess {
   trialEndsAt?: string | null;
 }
 
+const LOADING_TIMEOUT_MS = 1500;
+
 /**
  * React hook returning the current entitlement state.
  *
@@ -23,17 +25,21 @@ interface ServerAccess {
  *
  * The server check runs on mount, on focus, and every 5 min. A successful
  * server response overrides the local view.
+ *
+ * `state.loading` is true on cold boot until the first server response (or
+ * a short timeout). Consumers (e.g. `AccessGate`) use it to avoid flashing
+ * the "expired" lock screen at paid users during the first 1.5 seconds.
  */
 export function useAccess(): AccessState {
-  const [state, setState] = useState<AccessState>(() => getAccessState());
+  const [state, setState] = useState<AccessState>(() => ({ ...getAccessState(), loading: true }));
 
   // Local refresh (trial countdown, entitlement events).
   useEffect(() => {
     const refresh = () => setState((prev) => {
       const next = getAccessState();
       // Preserve a stronger server-granted "paid" state if local is weaker.
-      if (prev.status === "paid" && next.status !== "paid") return prev;
-      return next;
+      if (prev.status === "paid" && next.status !== "paid") return { ...prev };
+      return { ...next, loading: prev.loading };
     });
     window.addEventListener("focus", refresh);
     window.addEventListener("storage", refresh);
@@ -52,6 +58,11 @@ export function useAccess(): AccessState {
   // Server reconciliation — authoritative when user is logged in.
   useEffect(() => {
     let cancelled = false;
+    const finishLoading = () =>
+      setState((prev) => (prev.loading ? { ...prev, loading: false } : prev));
+
+    // Hard timeout so consumers don't wait forever on no network / anon users.
+    const timeoutId = window.setTimeout(finishLoading, LOADING_TIMEOUT_MS);
 
     async function pullFromServer() {
       try {
@@ -59,12 +70,19 @@ export function useAccess(): AccessState {
         const tokens = getRememberedTokens().map((t) => t.purchaseToken);
 
         // Nothing to ask the server about — fall back to local trial.
-        if (!session.session && tokens.length === 0) return;
+        if (!session.session && tokens.length === 0) {
+          finishLoading();
+          return;
+        }
 
         const { data, error } = await supabase.functions.invoke<ServerAccess>("check-access", {
           body: tokens.length > 0 ? { purchaseTokens: tokens } : {},
         });
-        if (error || !data || cancelled) return;
+        if (cancelled) return;
+        if (error || !data) {
+          finishLoading();
+          return;
+        }
 
         if (data.hasAccess && data.plan) {
           // Mirror locally so offline boots still unlock instantly.
@@ -75,19 +93,23 @@ export function useAccess(): AccessState {
             daysLeft: data.plan === "lifetime" ? 9999 : 0,
             trialEndsAt: null,
             paidPlan: data.plan,
+            loading: false,
           });
         } else if (data.status === "expired" || data.status === "no-subscription") {
           setState((prev) => {
             if (prev.status === "paid") {
               localStorage.removeItem("obgyn_entitlement");
               localStorage.removeItem("obgyn_entitlement_expires_at");
-              return getAccessState();
+              return { ...getAccessState(), loading: false };
             }
-            return prev;
+            return { ...prev, loading: false };
           });
+        } else {
+          finishLoading();
         }
       } catch (err) {
         console.warn("[access] server check failed", err);
+        finishLoading();
       }
     }
 
@@ -99,6 +121,7 @@ export function useAccess(): AccessState {
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timeoutId);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onFocus);
       window.clearInterval(id);

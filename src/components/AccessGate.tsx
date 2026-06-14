@@ -1,5 +1,5 @@
-import { ReactNode, useState } from "react";
-import { Lock, Crown, Sparkles } from "lucide-react";
+import { ReactNode, useEffect, useState } from "react";
+import { Lock, Crown, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Paywall } from "./Paywall";
 import { useAccess } from "@/hooks/useAccess";
@@ -15,14 +15,33 @@ interface AccessGateProps {
  * Wraps any locked area. While the trial is active or the user is paid, the
  * children render normally. Otherwise a full-page lock screen is shown with a
  * single CTA to open the Paywall.
+ *
+ * While the server access check is still pending on cold boot we render a
+ * quiet spinner instead of flashing the "expired" screen at paid users.
  */
 export function AccessGate({ children, featureLabel = "هذا القسم" }: AccessGateProps) {
   const access = useAccess();
   const [paywallOpen, setPaywallOpen] = useState(false);
 
+  // If the user becomes paid (purchase / restore) while the paywall is open,
+  // close it immediately so they aren't staring at a sales sheet.
+  useEffect(() => {
+    if (access.status === "paid" && paywallOpen) setPaywallOpen(false);
+  }, [access.status, paywallOpen]);
+
   if (access.hasAccess) {
-    // Global banner lives in App.tsx so it's visible on every page.
     return <>{children}</>;
+  }
+
+  // Avoid flashing the lock screen during the brief server reconciliation
+  // window on cold boot — paid users would otherwise see "انتهت التجربة"
+  // for a fraction of a second.
+  if (access.loading) {
+    return (
+      <div className="min-h-[calc(100vh-120px)] flex items-center justify-center" dir="rtl">
+        <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+      </div>
+    );
   }
 
   return (

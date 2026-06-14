@@ -7,12 +7,16 @@ const NOTIF_ID = 9_999_001; // unique id outside scheduled_notifications range
 /**
  * Schedules a single local notification 24h before the trial ends.
  * No-op on web. Cancels itself when the user subscribes.
+ *
+ * Re-runs whenever the entitlement changes or the user finally grants the
+ * notification permission (event emitted by `useLocalNotifications`), so a
+ * late grant still results in a scheduled reminder.
  */
 export function useTrialExpiryNotification() {
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
+    async function trySchedule() {
       try {
         const { Capacitor } = await import("@capacitor/core").catch(() => ({ Capacitor: null as any }));
         if (!Capacitor?.isNativePlatform?.()) return;
@@ -60,8 +64,17 @@ export function useTrialExpiryNotification() {
       } catch (err) {
         console.warn("[trial-notif] failed", err);
       }
-    })();
+    }
 
-    return () => { cancelled = true; };
+    trySchedule();
+    const onRetry = () => trySchedule();
+    window.addEventListener("notif-permission-granted", onRetry);
+    window.addEventListener("entitlement-changed", onRetry);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("notif-permission-granted", onRetry);
+      window.removeEventListener("entitlement-changed", onRetry);
+    };
   }, []);
 }
