@@ -18,6 +18,9 @@ import { Button } from "@/components/ui/button";
 import { PLANS, type PlanId, TRIAL_DAYS } from "@/lib/billing/plans";
 import { grantEntitlement } from "@/lib/billing/trial";
 import { getLivePrice, isBillingAvailable } from "@/lib/billing/store";
+import { getRememberedTokens } from "@/lib/billing/device";
+import { supabase } from "@/integrations/supabase/client";
+import { useAccess } from "@/hooks/useAccess";
 import { toast } from "sonner";
 
 interface PaywallProps {
