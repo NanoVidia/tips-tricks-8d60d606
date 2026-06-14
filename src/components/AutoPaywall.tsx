@@ -14,6 +14,12 @@ export function AutoPaywall() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    // Deep link from notification tap: ?paywall=1 forces the sheet open.
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("paywall") === "1") {
+      setOpen(true);
+      return;
+    }
     if (access.status !== "expired") return;
     if (sessionStorage.getItem(SESSION_KEY) === "1") return;
     sessionStorage.setItem(SESSION_KEY, "1");

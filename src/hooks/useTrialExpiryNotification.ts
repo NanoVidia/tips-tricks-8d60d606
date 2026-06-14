@@ -52,6 +52,7 @@ export function useTrialExpiryNotification() {
               schedule: { at: new Date(fireAt), allowWhileIdle: true },
               channelId: "tips_tricks_default",
               smallIcon: "ic_stat_icon",
+              extra: { route: "/?paywall=1" },
             },
           ],
         });
