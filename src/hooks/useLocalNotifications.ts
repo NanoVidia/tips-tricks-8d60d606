@@ -1,5 +1,8 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+const DENIED_TOAST_KEY = "obgyn_notif_denied_toast_shown";
 
 /**
  * Pulls active notifications from Lovable Cloud and schedules them locally
