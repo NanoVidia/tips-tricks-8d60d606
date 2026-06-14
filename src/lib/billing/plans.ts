@@ -50,6 +50,7 @@ export const PLANS: Plan[] = [
 export const FREE_FEATURES = ["case_of_the_day", "ai_assistant"] as const;
 
 // Features locked behind the paywall after the 7-day trial.
+// NOTE: `daily_mcq` / case-of-the-day stays FREE — it's the home-page hook.
 export const LOCKED_FEATURES = [
   "mcq_bank",
   "exams",
@@ -57,7 +58,6 @@ export const LOCKED_FEATURES = [
   "surgery_library",
   "tools",
   "calculators",
-  "daily_mcq",
 ] as const;
 
 export type FreeFeature = (typeof FREE_FEATURES)[number];

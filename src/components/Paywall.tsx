@@ -99,13 +99,27 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
 
   async function handleRestore() {
     setBusy(true);
+    // Listen for entitlement-changed for up to 5s after restore() — the
+    // approved callback fires asynchronously when Google Play replays
+    // owned purchases.
+    let gotEntitlement = false;
+    const onEntitlement = () => { gotEntitlement = true; };
+    window.addEventListener("entitlement-changed", onEntitlement);
     try {
       const { restore } = await import("@/lib/billing/store");
       await restore();
-      toast.success("تمت استعادة المشتريات");
+      // Wait up to 5s for verify-purchase + grantEntitlement to fire.
+      await new Promise((r) => setTimeout(r, 5000));
+      if (gotEntitlement) {
+        toast.success("تمت استعادة اشتراكك بنجاح");
+        onOpenChange(false);
+      } else {
+        toast.info("لم يتم العثور على اشتراك مرتبط بحساب Google Play هذا");
+      }
     } catch {
-      toast.error("لا توجد مشتريات سابقة لاستعادتها");
+      toast.error("تعذّر الاتصال بـ Google Play. حاول لاحقاً.");
     } finally {
+      window.removeEventListener("entitlement-changed", onEntitlement);
       setBusy(false);
     }
   }

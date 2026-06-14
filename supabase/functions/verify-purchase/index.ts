@@ -182,6 +182,7 @@ Deno.serve(async (req) => {
     }
 
     // Persist subscription keyed on purchase_token (works with or without user).
+    // Status must match DB enum: {trial, active, expired, cancelled, on_hold, paused, refunded}
     const status = valid ? "active" : "expired";
     const subRow = {
       user_id: userId, // nullable — anonymous device-bound purchases supported

@@ -27,11 +27,15 @@ import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
 import { FloatingBackButton } from "./components/FloatingBackButton";
 import { AccessGate } from "./components/AccessGate";
+import { GlobalTrialBanner } from "./components/GlobalTrialBanner";
+import { AutoPaywall } from "./components/AutoPaywall";
+import { useTrialExpiryNotification } from "./hooks/useTrialExpiryNotification";
 import { SAFE_MODE } from "./lib/safeMode";
 const SafeHome = lazy(() => import("./pages/SafeHome.tsx"));
 
 function NotificationsBootstrap() {
   useLocalNotifications();
+  useTrialExpiryNotification();
   return null;
 }
 
@@ -66,6 +70,10 @@ const App = () => {
       (window as any).requestIdleCallback?.bind(window) ??
       ((cb: () => void) => setTimeout(cb, 1200));
     idle(() => {
+      // Server-side trial reconciliation — prevents trial reset by clearing
+      // app data or rolling back the device clock.
+      import("./lib/billing/trial").then((m) => m.syncTrialWithServer().catch(() => {}));
+
       import("./lib/billing/store").then((m) => {
         m.initStore()
           .then(() => {
@@ -118,6 +126,8 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <NotificationsBootstrap />
+          <GlobalTrialBanner />
+          <AutoPaywall />
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <Routes>
               <Route path="/" element={<Index />} />
