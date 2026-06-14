@@ -225,7 +225,7 @@ Deno.serve(async (req) => {
             auto_renewing: autoRenewing,
             last_verified_at: new Date().toISOString(),
           })
-          .eq("user_id", userId);
+          .eq("id", sub.id);
       }
     }
   }
