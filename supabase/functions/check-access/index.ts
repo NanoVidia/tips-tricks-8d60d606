@@ -132,9 +132,32 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
-  // Anonymous → fall back to local trial. Client uses this to short-circuit.
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  // Resolve lookup: either authenticated user, or anonymous device with
+  // a remembered set of purchase tokens from Google Play.
+  let userId: string | null = null;
   const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData } = await supabase.auth.getClaims(token);
+    if (claimsData?.claims?.sub) userId = claimsData.claims.sub as string;
+  }
+
+  let purchaseTokens: string[] = [];
+  if (req.method === "POST") {
+    try {
+      const body = await req.json().catch(() => ({}));
+      if (Array.isArray(body?.purchaseTokens)) {
+        purchaseTokens = body.purchaseTokens.filter((t: unknown) => typeof t === "string");
+      }
+    } catch { /* ignore */ }
+  }
+
+  if (!userId && purchaseTokens.length === 0) {
     return json({
       hasAccess: false,
       status: "anonymous",
@@ -144,30 +167,28 @@ Deno.serve(async (req) => {
     });
   }
 
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
-
-  // Validate JWT — uses signing-keys (verify_jwt = false in config).
-  const token = authHeader.replace("Bearer ", "");
-  const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims(token);
-  if (claimsErr || !claimsData?.claims?.sub) {
-    return json({ error: "unauthorized" }, 401);
+  // 1) Read DB row(s)
+  let query = supabase.from("subscriptions").select("*");
+  if (userId && purchaseTokens.length > 0) {
+    query = query.or(`user_id.eq.${userId},purchase_token.in.(${purchaseTokens.map((t) => `"${t}"`).join(",")})`);
+  } else if (userId) {
+    query = query.eq("user_id", userId);
+  } else {
+    query = query.in("purchase_token", purchaseTokens);
   }
-  const userId = claimsData.claims.sub as string;
-
-  // 1) Read DB row
-  const { data: sub, error: subErr } = await supabase
-    .from("subscriptions")
-    .select("*")
-    .eq("user_id", userId)
-    .maybeSingle();
-
+  const { data: subs, error: subErr } = await query;
   if (subErr) {
     console.error("subscriptions select error", subErr);
     return json({ error: "internal" }, 500);
   }
+  // Pick the strongest row (lifetime > active subscription with longest expiry)
+  const sub = (subs ?? []).sort((a, b) => {
+    if (a.plan === "lifetime" && a.status === "active") return -1;
+    if (b.plan === "lifetime" && b.status === "active") return 1;
+    const ax = a.current_period_end ? new Date(a.current_period_end).getTime() : 0;
+    const bx = b.current_period_end ? new Date(b.current_period_end).getTime() : 0;
+    return bx - ax;
+  })[0] ?? null;
 
   if (!sub) {
     return json({

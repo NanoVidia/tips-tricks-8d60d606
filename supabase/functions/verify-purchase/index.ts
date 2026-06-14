@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
   );
 
   try {
-    const { productId, purchaseToken } = await req.json();
+    const { productId, purchaseToken, deviceId } = await req.json();
     if (!productId || !purchaseToken || typeof productId !== "string" || typeof purchaseToken !== "string") {
       return new Response(JSON.stringify({ error: "bad-request", detail: "productId & purchaseToken required" }), {
         status: 400,
@@ -181,44 +181,33 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Persist if user is authenticated
-    if (userId) {
-      const status = valid ? "active" : "expired";
-      const { error } = await supabase.from("subscriptions").upsert(
-        {
-          user_id: userId,
-          plan,
-          status,
-          purchase_token: purchaseToken,
-          product_id: productId,
-          order_id: orderId,
-          auto_renewing: autoRenewing,
-          current_period_end: expiresAt,
-          last_verified_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" },
-      );
-      if (error) console.error("subscriptions upsert failed", error);
+    // Persist subscription keyed on purchase_token (works with or without user).
+    const status = valid ? "active" : "expired";
+    const subRow = {
+      user_id: userId, // nullable — anonymous device-bound purchases supported
+      plan,
+      status,
+      purchase_token: purchaseToken,
+      product_id: productId,
+      order_id: orderId,
+      auto_renewing: autoRenewing,
+      current_period_end: expiresAt,
+      last_verified_at: new Date().toISOString(),
+    };
+    const { error: upsertErr } = await supabase
+      .from("subscriptions")
+      .upsert(subRow, { onConflict: "purchase_token" });
+    if (upsertErr) console.error("subscriptions upsert failed", upsertErr);
 
-      await supabase.from("purchase_events").insert({
-        user_id: userId,
-        event_type: "client_verify",
-        product_id: productId,
-        purchase_token: purchaseToken,
-        order_id: orderId,
-        raw_payload: raw as object,
-        processed: true,
-      });
-    } else {
-      await supabase.from("purchase_events").insert({
-        event_type: "client_verify_anon",
-        product_id: productId,
-        purchase_token: purchaseToken,
-        order_id: orderId,
-        raw_payload: raw as object,
-        processed: true,
-      });
-    }
+    await supabase.from("purchase_events").insert({
+      user_id: userId,
+      event_type: userId ? "client_verify" : "client_verify_anon",
+      product_id: productId,
+      purchase_token: purchaseToken,
+      order_id: orderId,
+      raw_payload: { ...(raw as object), deviceId: deviceId ?? null },
+      processed: true,
+    });
 
     return new Response(
       JSON.stringify({ ok: valid, plan, expiresAt, autoRenewing, orderId }),
