@@ -352,27 +352,98 @@ function BugForm({ supportEmail }: { supportEmail: string }) {
 }
 
 function NotificationsPanel() {
-  const [granted, setGranted] = useState(typeof Notification !== "undefined" && Notification.permission === "granted");
+  const [native, setNative] = useState(false);
+  const [granted, setGranted] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [testing, setTesting] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { Capacitor } = await import("@capacitor/core").catch(() => ({ Capacitor: null as any }));
+        const isNative = !!Capacitor?.isNativePlatform?.();
+        setNative(isNative);
+        if (isNative) {
+          const { LocalNotifications } = await import("@capacitor/local-notifications");
+          const perm = await LocalNotifications.checkPermissions();
+          setGranted(perm.display === "granted");
+        } else {
+          setGranted(typeof Notification !== "undefined" && Notification.permission === "granted");
+        }
+      } catch {
+        /* noop */
+      }
+    })();
+  }, []);
 
   const request = async () => {
-    if (typeof Notification === "undefined") {
-      toast.error("Not supported");
-      return;
+    setBusy(true);
+    try {
+      if (native) {
+        const { LocalNotifications } = await import("@capacitor/local-notifications");
+        const req = await LocalNotifications.requestPermissions();
+        const ok = req.display === "granted";
+        setGranted(ok);
+        if (ok) {
+          toast.success("تم تفعيل الإشعارات");
+        } else {
+          toast.message("التذكيرات معطّلة", {
+            description: "افتح إعدادات النظام → الإشعارات → فعّل التطبيق.",
+          });
+        }
+      } else {
+        if (typeof Notification === "undefined") {
+          toast.error("غير مدعوم على هذا المتصفح");
+          return;
+        }
+        const result = await Notification.requestPermission();
+        setGranted(result === "granted");
+        if (result === "granted") toast.success("تم تفعيل الإشعارات");
+      }
+    } finally {
+      setBusy(false);
     }
+  };
 
-    const result = await Notification.requestPermission();
-    setGranted(result === "granted");
-    if (result === "granted") toast.success("Notifications enabled");
+  const sendTest = async () => {
+    setTesting(true);
+    try {
+      const result = await fireTestNotification();
+      if (result === "ok") {
+        toast.success("سيصلك إشعار اختباري خلال 5 ثوانٍ");
+      } else if (result === "denied") {
+        toast.error("الإشعارات مرفوضة — فعّلها من إعدادات النظام");
+      } else if (result === "web") {
+        toast.info("اختبار الإشعارات يعمل فقط داخل تطبيق الجوال");
+      } else {
+        toast.error("تعذّر إرسال الإشعار الاختباري");
+      }
+    } finally {
+      setTesting(false);
+    }
   };
 
   return (
-    <>
-      <p className="text-xs text-muted-foreground">Get reminders for new case-of-the-day and updates.</p>
-      <Button onClick={request} disabled={granted} className="w-full">
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">
+        احصل على تذكيرات يومية وإشعارات حالة سؤال اليوم وتحديثات هامة.
+      </p>
+      <Button onClick={request} disabled={granted || busy} className="w-full">
         <Bell className="mr-2 h-4 w-4" />
-        {granted ? "Enabled" : "Enable Notifications"}
+        {granted ? "الإشعارات مفعّلة" : busy ? "جارٍ…" : "تفعيل الإشعارات"}
       </Button>
-    </>
+      {native && (
+        <Button onClick={sendTest} disabled={testing} variant="outline" className="w-full">
+          <BellRing className="mr-2 h-4 w-4" />
+          {testing ? "جارٍ الإرسال…" : "إرسال إشعار اختباري"}
+        </Button>
+      )}
+      {!native && (
+        <p className="text-[11px] text-muted-foreground/80 text-center">
+          الاختبار الكامل للإشعارات متاح داخل تطبيق الجوال فقط.
+        </p>
+      )}
+    </div>
   );
 }
 
