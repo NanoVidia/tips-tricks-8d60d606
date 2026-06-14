@@ -167,3 +167,57 @@ cd android
 7. إلغاء الاشتراك من Play Store → التحقق أن RTDN webhook حدّث `status: cancelled`
 
 تم.
+
+---
+
+## 11. إلغاء سبلاش Android الافتراضية (Android 12+)
+
+النظام يفرض شاشة افتتاح دنيا، لكن يمكن جعلها **فورية بلا وميض** بحيث ينتقل المستخدم مباشرة لواجهة التطبيق.
+
+### `android/app/src/main/res/values/styles.xml`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar"/>
+
+  <!-- Launch theme: لا أيقونة متحركة، لا تأخير، خلفية بيضاء = خلفية التطبيق -->
+  <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+    <item name="windowSplashScreenBackground">@android:color/white</item>
+    <item name="windowSplashScreenAnimationDuration">0</item>
+    <item name="windowSplashScreenAnimatedIcon">@null</item>
+    <item name="postSplashScreenTheme">@style/AppTheme</item>
+  </style>
+</resources>
+```
+
+> **ملاحظة**: على Android 11 وأقدم، Theme.SplashScreen compat library تعرض الـ `windowBackground` فقط — لا حاجة لإجراء إضافي.
+
+### `android/app/src/main/res/values-night/styles.xml` (لو موجودة)
+كرّر نفس البلوك مع `windowSplashScreenBackground=@android:color/black` لو الـ dark mode مفعّل.
+
+### تأكيد عدم تثبيت Capacitor SplashScreen plugin
+```bash
+grep splash-screen package.json
+# يجب ألا يُرجع شيئاً
+```
+
+---
+
+## 12. اختبار الإشعارات على الجهاز (4 خطوات)
+
+1. **افتح التطبيق لأول مرة** → يطلب إذن POST_NOTIFICATIONS (Android 13+) → اقبل.
+2. **Menu → Notifications → اضغط "إرسال إشعار اختباري"** → يجب أن يظهر إشعار بعنوان "Tips & Tricks" خلال 5 ثوانٍ مع أيقونة `ic_stat_icon` (ليست مربعاً أبيض).
+3. **اسحب لأسفل من شريط الإشعارات** → انقر الإشعار → التطبيق يفتح بدون كراش.
+4. **محاكاة تذكير التجربة**: في DevTools console:
+   ```js
+   localStorage.setItem('obgyn_trial_started_at', String(Date.now() - 5*86400000));
+   localStorage.removeItem('obgyn_trial_notif_scheduled_for');
+   location.reload();
+   ```
+   إشعار "بقي يوم واحد…" يُجدوَل تلقائياً. عند النقر عليه → يفتح التطبيق على `/?paywall=1` ويظهر Paywall فوراً.
+
+### إذا لم يظهر أي إشعار
+- تأكد أن `ic_stat_icon.png` موجود في كل `drawable-*` (راجع القسم 2).
+- في إعدادات التطبيق → Notifications → تأكد أن قناة "Daily Tips & Reminders" مفعّلة.
+- على Xiaomi/Huawei: أضف التطبيق لقائمة "Autostart" و "Battery optimization → Don't optimize".
