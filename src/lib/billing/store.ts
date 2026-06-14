@@ -87,6 +87,7 @@ async function verifyOnServer(productId: string, purchaseToken: string) {
     body: { productId, purchaseToken, deviceId: getDeviceId() },
   });
   if (error) throw error;
+  if (data?.pending) throw new Error("pending");
   if (!data?.ok) throw new Error("server-verification-failed");
   return data as { ok: true; plan: PlanId; expiresAt: string | null };
 }
