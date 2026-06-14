@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Accessibility,
   Bell,
+  BellRing,
   BookOpen,
   Bug,
   Check,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { fireTestNotification } from "@/hooks/useLocalNotifications";
 import { FaqSection } from "@/components/FaqSection";
 import {
   APP_BUILD_DATE,
