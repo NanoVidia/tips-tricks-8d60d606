@@ -1,110 +1,101 @@
 ## الهدف
-تشغيل اختبار شامل لرحلة الدفع (شراء + استعادة + تجربة ٧ أيام) على جهاز Android حقيقي باستخدام حساب Google Play License Tester، والتأكد من عدم وجود حلقات أو رسائل مضللة قبل إصدار v5.
-
-ينقسم العمل إلى قسمين: **(أ)** إصلاحات برمجية صغيرة لإزالة الفجوات التي قد تظهر أثناء الاختبار، **(ب)** سيناريو الاختبار الفعلي على الجهاز.
-
----
-
-## أ) إصلاحات قبل بناء الـ AAB للاختبار
-
-### 1. Restore — إزالة الرسالة المضللة "لم يتم العثور على اشتراك"
-المشكلة: `handleRestore` ينتظر 5 ثوانٍ ثابتة ثم يعرض "لم يتم العثور على اشتراك" حتى لو كانت عملية التحقق ما زالت جارية على الشبكة البطيئة، مما يصنع انطباعاً خاطئاً بأن المستخدم خسر اشتراكه.
-
-التغيير في `src/components/Paywall.tsx`:
-- عرض toast loading (`جارٍ الاستعادة…`) فور الضغط.
-- الانتظار حتى **8 ثوانٍ** أو حتى `entitlement-changed`.
-- إذا انتهت المهلة، استدعاء `check-access` مرة إضافية مع `purchaseTokens` المُسترجعة قبل عرض رسالة "لم يتم العثور".
-- صياغة جديدة: "لم نعثر على اشتراك نشط مرتبط بحساب Google الحالي. تأكد أنك تستخدم نفس الحساب الذي اشتريت به."
-
-### 2. Paywall — منع حلقة "ابدأ التجربة" بعد انتهاء التجربة
-المشكلة: زر `ابدأ ٧ أيام مجاناً` يظهر حتى لو كانت التجربة منتهية محلياً/خادمياً. المستخدم يضغط ويذهب إلى شاشة `trial-explainer` المضللة.
-
-التغيير: في `Paywall.tsx`، إخفاء خطوة `trial-explainer` والذهاب مباشرة إلى `handlePurchase` إذا كانت `useAccess().status === "expired"` — لأن Google Play هي من تقرر أهلية التجربة (لا نكررها محلياً). نص الزر يصبح: `متابعة عبر Google Play` بدل `ابدأ ٧ أيام مجاناً`.
-
-### 3. verify-purchase — معالجة حالة "تم القبول من Google لكن paymentState=0 (pending)"
-المشكلة الحالية: لو الدفع pending، نُرجع `ok:false` ونغلق التذكرة بـ `p.finish()` → يفقد المستخدم اشتراكه فور تأكيد البنك.
-
-التغيير في `supabase/functions/verify-purchase/index.ts`:
-- التمييز بين "rejected" (purchaseState=1 أو expiry<now) و"pending" (paymentState=0).
-- إرجاع `{ ok: false, pending: true }` للحالة المعلّقة، والعميل لا يستدعي `finish()` (Google ستُعيد المحاولة).
-
-التغيير في `store.ts`: عدم استدعاء `p.finish()` إذا كان الخطأ `pending`.
-
-### 4. AutoPaywall — منع إعادة الفتح بعد رفض المستخدم
-التحقق من أن `AutoPaywall` يحترم إغلاق المستخدم لمدة معقولة (مثلاً 5 دقائق) قبل إعادة محاولة الفتح، لتجنب حلقة "أغلقت → فُتحت فوراً".
+1. **إلغاء سبلاش Android الأصلية** (الشاشة البيضاء التي يعرضها النظام قبل ظهور التطبيق) بحيث ينتقل المستخدم مباشرة إلى الواجهة.
+2. **التحقق من تكامل نظام الإشعارات** للمستخدم وسد الفجوات المتبقية قبل إصدار v5.
 
 ---
 
-## ب) سيناريو الاختبار على الجهاز
+## أ) إلغاء السبلاش الأصلية
 
-### الإعداد (مرة واحدة)
-1. في Play Console → **License Testing** → إضافة بريد حساب الـ tester.
-2. في Play Console → **Internal Testing** → رفع AAB → دعوة الـ tester.
-3. على الجهاز: تسجيل الدخول بحساب الـ tester في Google Play، ثم تثبيت التطبيق من رابط الاختبار الداخلي.
-4. تفعيل `License Testing` في إعدادات Google Play على الجهاز ليجعل التجديد سريعاً (5 دقائق = شهر).
+### الوضع الحالي
+- `@capacitor/splash-screen` **غير مثبّت** في `package.json` ✅
+- `capacitor.config.ts` لا يحوي قسم `SplashScreen` ✅
+- إذاً ما يراه المستخدم حالياً هو **Android 12+ System Splash** (يأتي من `android:windowSplashScreenAnimatedIcon` في `styles.xml` تلقائياً عند `npx cap add android`).
 
-### اختبار 1 — التجربة المجانية المحلية (7 أيام)
-| خطوة | المتوقع |
-|---|---|
-| تثبيت جديد → فتح أول مرة | ظهور الـ banner: "تجربتك تنتهي بعد 7 أيام" |
-| فتح أي أداة مقفلة | تعمل بدون paywall |
-| محاكاة انتهاء التجربة (مسح localStorage `obgyn_trial_started_at` ووضع قيمة قديمة، أو الانتظار) | AutoPaywall يفتح؛ الأدوات مقفلة |
-| إغلاق الـ Paywall | لا يُعاد فتحه قبل 5 دقائق |
+### الحل
+لا يمكن إزالتها 100% (Android يفرض شاشة افتتاح دنيا)، لكن نجعلها **شفافة وفورية**:
+- تعديل `android/app/src/main/res/values/styles.xml` لجعل theme الـ launch:
+  - `windowSplashScreenBackground = #FFFFFF` (نفس خلفية التطبيق → لا وميض)
+  - حذف `windowSplashScreenAnimatedIcon` → لا أيقونة متحركة
+  - `windowSplashScreenAnimationDuration = 0`
+- بما أن `android/` مولّد محلياً، نضع التعديل في **`docs/NATIVE_BUILD.md`** مع snippet جاهز للنسخ.
 
-### اختبار 2 — الشراء (Yearly مع تجربة Google)
-| خطوة | المتوقع |
-|---|---|
-| فتح Paywall → اختيار Yearly → "متابعة" | تظهر شاشة Google Play الرسمية مع "Free for 7 days then $X" |
-| إكمال الشراء | يُغلق الـ Paywall، toast نجاح، الأدوات تفتح فوراً |
-| فحص جدول `subscriptions` | صف جديد بـ `status='active'`, `plan='yearly'`, `purchase_token` موجود |
-| فحص `purchase_events` | حدث `client_verify` بحالة `processed=true` |
-| إعادة فتح التطبيق | لا يظهر Paywall، الوصول مستمر |
-
-### اختبار 3 — Restore بعد إعادة التثبيت
-| خطوة | المتوقع |
-|---|---|
-| إلغاء تثبيت التطبيق ثم إعادة تثبيته | بدء كأنه جهاز جديد |
-| فتح Paywall → الضغط على "استعادة المشتريات" | toast `جارٍ الاستعادة...` ثم toast نجاح خلال ≤ 8 ث |
-| الأدوات تفتح بدون شراء جديد | ✅ |
-| في حالة الإنترنت البطيء | لا تظهر رسالة "لم يتم العثور" قبل التحقق الثاني |
-
-### اختبار 4 — الإلغاء (RTDN)
-| خطوة | المتوقع |
-|---|---|
-| في Google Play → Subscriptions → إلغاء | خلال دقيقة: `play-rtdn-webhook` يُحدّث `status='cancelled'` لكن `current_period_end` يبقى |
-| الوصول يستمر حتى نهاية الفترة | ✅ |
-| بعد انتهاء الفترة (5 دقائق tester) → فتح التطبيق | Paywall يظهر، `useAccess.status='expired'` |
-
-### اختبار 5 — استرداد الأموال (Refund)
-| خطوة | المتوقع |
-|---|---|
-| اعتماد refund من Play Console | RTDN يُحدّث `status='refunded'` → `hasAccess=false` فوراً عند next check-access (focus/5min) |
-
-### اختبار 6 — رسائل بلا حلقات
-أثناء كل ما سبق نتحقق:
-- لا يظهر toast واحد مرتين متتاليتين.
-- لا تُفتح Paywall ثانيةً خلال 5 دقائق من إغلاق المستخدم لها.
-- لا تُعرض رسالة "تعذّر إتمام الشراء" بعد نجاح فعلي.
-- زر "ابدأ ٧ أيام مجاناً" يختفي/يتحول إلى "متابعة" إذا كانت التجربة منتهية.
+### في الكود
+- التأكد أن لا شيء في `src/` يستدعي `SplashScreen.show/hide` (تحقّقت: لا شيء).
+- لا تغييرات في React side.
 
 ---
 
-## التفاصيل التقنية للإصلاحات
+## ب) التحقق من تكامل الإشعارات
 
-**ملفات يتم تعديلها**:
-- `src/components/Paywall.tsx` — تحسين `handleRestore` + إخفاء `trial-explainer` بعد الانتهاء.
-- `src/lib/billing/store.ts` — معالجة `pending` بدلاً من `finish()`.
-- `supabase/functions/verify-purchase/index.ts` — إرجاع `pending: true` عند `paymentState === 0`.
-- `src/components/AutoPaywall.tsx` — تأكيد cooldown 5 دقائق (إن لم يكن موجوداً).
+### ما هو موجود ويعمل ✅
+| المكوّن | الحالة |
+|---|---|
+| `useLocalNotifications` — boot + focus + online + realtime resync | ✅ |
+| طلب POST_NOTIFICATIONS (Android 13+) | ✅ |
+| إنشاء قناة High Importance | ✅ |
+| `fireTestNotification` (زر اختبار في SafeHome) | ✅ |
+| `useTrialExpiryNotification` (تذكير قبل ٤٨ ساعة) | ✅ |
+| إدارة الإشعارات من Admin Panel | ✅ |
 
-**لا تُلمس**: schema، RLS، RTDN webhook، plans، start-trial — كلها سليمة.
+### الفجوات التي سنسدّها
 
-**ما هو خارج النطاق**: بناء AAB، رفعه على Play Console، تكوين RTDN topic — كلها في `docs/NATIVE_BUILD.md` بالفعل.
+#### 1. **مستمع نقر الإشعار (deep-link)**
+حالياً عند نقر الإشعار → التطبيق يفتح فقط. لا يذهب لشاشة محدّدة.
+
+**التغيير**: إضافة `useNotificationTapHandler` يُسجَّل في `App.tsx`:
+```ts
+LocalNotifications.addListener("localNotificationActionPerformed", (event) => {
+  const route = event.notification.extra?.route;
+  if (route) navigate(route);
+});
+```
+وتعديل `useLocalNotifications.ts` و `useTrialExpiryNotification.ts` لتمرير `extra: { route: "..." }`:
+- إشعار التجربة → `/?paywall=1`
+- إشعارات Admin → الـ route الذي حدّده المسؤول (نضيف عمود `extra_route` لاحقاً لو طُلب — حالياً نسمح بحقل اختياري في `scheduled_notifications.body` كـ JSON أو نقتصر على home).
+
+ملاحظة: لا حاجة لـ migration الآن — نمرّر `route` فقط لإشعارات النظام (trial expiry) وندع إشعارات Admin مفتوحة على home.
+
+#### 2. **زر اختبار الإشعارات في مكان واضح للمستخدم**
+حالياً `fireTestNotification` متاح فقط في صفحة `SafeHome`. لا يصل إليه المستخدم في الوضع الطبيعي.
+
+**التغيير**: إضافة قسم "الإشعارات" في صفحة الإعدادات/الملف الشخصي (لو موجودة) أو زر صغير في `GlobalTrialBanner` لاختبار وصول الإشعارات.
+
+أبحث أولاً عن صفحة Settings موجودة، وإلا نُضيف القسم في صفحة `Profile`/`Account` إذا وُجدت. إن لم تكن موجودة، نضع الزر داخل قائمة منسدلة في الـ Header.
+
+#### 3. **تحسين رسائل الـ permission**
+حالياً عند رفض المستخدم لإذن الإشعارات، نطبع `console.info` فقط. **التغيير**: عند الرفض، عرض toast صديق:
+> "لتصلك تذكيرات يومية، فعّل الإشعارات من إعدادات التطبيق."
+مع زر "فتح الإعدادات" (Capacitor App settings intent).
+
+#### 4. **التأكد من المتطلبات النيتيف**
+في `docs/NATIVE_BUILD.md` (موجود بالفعل):
+- ✅ `ic_stat_icon` بكل DPIs
+- ✅ `RECEIVE_BOOT_COMPLETED` في AndroidManifest
+- ✅ `SCHEDULE_EXACT_ALARM` + `USE_EXACT_ALARM`
+
+سنضيف فقرة جديدة "اختبار الإشعارات على الجهاز" بأربع خطوات تحقق سريعة.
+
+---
+
+## الملفات المعدّلة
+
+| ملف | تغيير |
+|---|---|
+| `src/hooks/useNotificationTapHandler.ts` (جديد) | مستمع localNotificationActionPerformed + navigate |
+| `src/App.tsx` | استدعاء `useNotificationTapHandler()` داخل NotificationsBootstrap |
+| `src/hooks/useLocalNotifications.ts` | توست عند رفض الإذن + زر فتح الإعدادات |
+| `src/hooks/useTrialExpiryNotification.ts` | إضافة `extra: { route: "/?paywall=1" }` |
+| `src/components/NotificationsTestButton.tsx` (جديد) | زر صغير قابل لإعادة الاستخدام |
+| إضافة الزر في مكان يصله المستخدم (سأحدد بعد قراءة هيكل الـ Settings/Profile) |
+| `docs/NATIVE_BUILD.md` | snippet styles.xml لإلغاء السبلاش + قسم اختبار الإشعارات |
+
+**لا تغييرات في**: schema، RLS، edge functions، plans، billing.
 
 ---
 
 ## التسليم
-- 4 تعديلات صغيرة في الكود.
-- ملف جديد `docs/TEST_PROTOCOL.md` يحوي السيناريو أعلاه بصيغة checklist قابلة للطباعة لاستخدامه أثناء الاختبار اليدوي.
+- إلغاء عملي للسبلاش (عبر docs لأنها native).
+- 5 ملفات React صغيرة + توثيق.
+- اختبار يدوي بعد بناء AAB التالي.
 
 أوافق على البدء؟
