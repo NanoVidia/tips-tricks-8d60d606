@@ -69,15 +69,6 @@ const config: CapacitorConfig = {
       smallIcon: "ic_stat_icon",
       iconColor: "#0ea5e9",
     },
-    SplashScreen: {
-      launchShowDuration: 0,
-      launchAutoHide: true,
-      autoHide: true,
-      backgroundColor: "#ffffff",
-      showSpinner: false,
-      splashFullScreen: false,
-      splashImmersive: false,
-    },
   },
 };
 
