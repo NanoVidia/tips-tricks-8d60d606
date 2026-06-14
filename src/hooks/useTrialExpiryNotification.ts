@@ -68,14 +68,27 @@ export function useTrialExpiryNotification() {
     }
 
     trySchedule();
-    const onRetry = () => trySchedule();
-    window.addEventListener("notif-permission-granted", onRetry);
-    window.addEventListener("entitlement-changed", onRetry);
+
+    // Retry once — and only once per install — when the user finally grants
+    // notification permission. Prevents duplicate scheduling if the
+    // `notif-permission-granted` event fires multiple times (focus resyncs,
+    // realtime resubscribes, etc.).
+    const onPermissionGranted = () => {
+      if (localStorage.getItem(POST_GRANT_RESCHEDULED_KEY) === "1") return;
+      localStorage.setItem(POST_GRANT_RESCHEDULED_KEY, "1");
+      trySchedule();
+    };
+    // Entitlement changes (purchase / restore / trial reset) should always
+    // re-evaluate — `trySchedule` itself guards against duplicate fire-times.
+    const onEntitlementChanged = () => trySchedule();
+
+    window.addEventListener("notif-permission-granted", onPermissionGranted);
+    window.addEventListener("entitlement-changed", onEntitlementChanged);
 
     return () => {
       cancelled = true;
-      window.removeEventListener("notif-permission-granted", onRetry);
-      window.removeEventListener("entitlement-changed", onRetry);
+      window.removeEventListener("notif-permission-granted", onPermissionGranted);
+      window.removeEventListener("entitlement-changed", onEntitlementChanged);
     };
   }, []);
 }
