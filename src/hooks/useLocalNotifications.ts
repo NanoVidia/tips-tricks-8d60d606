@@ -51,8 +51,20 @@ export function useLocalNotifications() {
           const req = await LocalNotifications.requestPermissions();
           if (req.display !== "granted") {
             console.info("[notifications] permission denied by user");
+            // Show a friendly explanation once per install so the user knows
+            // why no reminders ever arrive — and how to fix it.
+            if (localStorage.getItem(DENIED_TOAST_KEY) !== "1") {
+              localStorage.setItem(DENIED_TOAST_KEY, "1");
+              toast.message("التذكيرات معطّلة", {
+                description: "فعّل الإشعارات من إعدادات النظام لتصلك تذكيرات يومية.",
+                duration: 7000,
+              });
+            }
             return;
           }
+          // User just granted — clear the "denied" flag so future rejections
+          // show the toast again.
+          localStorage.removeItem(DENIED_TOAST_KEY);
         }
 
         // 2. Make sure the high-importance Android channel exists.
