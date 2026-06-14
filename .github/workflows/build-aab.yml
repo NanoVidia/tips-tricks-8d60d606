@@ -131,15 +131,14 @@ jobs:
           fi
           npx cap sync android
 
-      - name: 🎨 Generate Android icons & splash from resources/
+      - name: 🎨 Generate Android icons from resources/
         run: |
           set -euo pipefail
           npx --yes @capacitor/assets generate \
             --android \
+            --assetPath resources \
             --iconBackgroundColor '#ffffff' \
-            --iconBackgroundColorDark '#ffffff' \
-            --splashBackgroundColor '#ffffff' \
-            --splashBackgroundColorDark '#ffffff'
+            --iconBackgroundColorDark '#ffffff'
           npx cap sync android
 
       - name: 🔢 Patch Gradle version
