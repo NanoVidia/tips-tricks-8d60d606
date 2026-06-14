@@ -106,24 +106,42 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
 
   async function handleRestore() {
     setBusy(true);
-    // Listen for entitlement-changed for up to 5s after restore() — the
-    // approved callback fires asynchronously when Google Play replays
-    // owned purchases.
+    const loadingId = toast.loading("جارٍ الاستعادة من Google Play…");
     let gotEntitlement = false;
     const onEntitlement = () => { gotEntitlement = true; };
     window.addEventListener("entitlement-changed", onEntitlement);
     try {
       const { restore } = await import("@/lib/billing/store");
       await restore();
-      // Wait up to 5s for verify-purchase + grantEntitlement to fire.
-      await new Promise((r) => setTimeout(r, 5000));
+      // Wait up to 8s for the approved callback → verify-purchase → grantEntitlement.
+      for (let i = 0; i < 16 && !gotEntitlement; i++) {
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      // Fallback: ask the server directly with any tokens we've remembered.
+      if (!gotEntitlement) {
+        const tokens = getRememberedTokens().map((t) => t.purchaseToken);
+        if (tokens.length > 0) {
+          const { data } = await supabase.functions.invoke<{ hasAccess: boolean; plan: PlanId | null }>(
+            "check-access",
+            { body: { purchaseTokens: tokens } },
+          );
+          if (data?.hasAccess && data.plan) {
+            grantEntitlement(data.plan);
+            gotEntitlement = true;
+          }
+        }
+      }
+      toast.dismiss(loadingId);
       if (gotEntitlement) {
         toast.success("تمت استعادة اشتراكك بنجاح");
         onOpenChange(false);
       } else {
-        toast.info("لم يتم العثور على اشتراك مرتبط بحساب Google Play هذا");
+        toast.info(
+          "لم نعثر على اشتراك نشط مرتبط بحساب Google الحالي. تأكد أنك تستخدم نفس الحساب الذي اشتريت به.",
+        );
       }
     } catch {
+      toast.dismiss(loadingId);
       toast.error("تعذّر الاتصال بـ Google Play. حاول لاحقاً.");
     } finally {
       window.removeEventListener("entitlement-changed", onEntitlement);
