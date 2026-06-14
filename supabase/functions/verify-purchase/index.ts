@@ -187,7 +187,7 @@ Deno.serve(async (req) => {
 
     // Persist subscription keyed on purchase_token (works with or without user).
     // Status must match DB enum: {trial, active, expired, cancelled, on_hold, paused, refunded}
-    const status = valid ? "active" : "expired";
+    const status = valid ? "active" : isPending ? "trial" : "expired";
     const subRow = {
       user_id: userId, // nullable — anonymous device-bound purchases supported
       plan,
@@ -210,13 +210,13 @@ Deno.serve(async (req) => {
       product_id: productId,
       purchase_token: purchaseToken,
       order_id: orderId,
-      raw_payload: { ...(raw as object), deviceId: deviceId ?? null },
+      raw_payload: { ...(raw as object), deviceId: deviceId ?? null, pending: isPending },
       processed: true,
     });
 
     return new Response(
-      JSON.stringify({ ok: valid, plan, expiresAt, autoRenewing, orderId }),
-      { status: valid ? 200 : 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({ ok: valid, pending: isPending && !valid, plan, expiresAt, autoRenewing, orderId }),
+      { status: valid ? 200 : isPending ? 202 : 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
     console.error("verify-purchase error", e);
