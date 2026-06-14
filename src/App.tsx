@@ -67,7 +67,15 @@ const App = () => {
       ((cb: () => void) => setTimeout(cb, 1200));
     idle(() => {
       import("./lib/billing/store").then((m) => {
-        m.initStore().catch((err) => console.warn("[billing] init failed", err));
+        m.initStore()
+          .then(() => {
+            // Silent auto-restore on every cold start — recovers entitlement
+            // on reinstall, cache wipe, or device change with same Play account.
+            if (m.isBillingAvailable()) {
+              m.restore().catch((err) => console.warn("[billing] auto-restore failed", err));
+            }
+          })
+          .catch((err) => console.warn("[billing] init failed", err));
       });
     });
   }, []);
