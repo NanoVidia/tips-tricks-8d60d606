@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { getAccessState } from "@/lib/billing/trial";
 
 const SCHEDULED_KEY = "obgyn_trial_notif_scheduled_for";
+const POST_GRANT_RESCHEDULED_KEY = "obgyn_trial_notif_post_grant_done";
 const NOTIF_ID = 9_999_001; // unique id outside scheduled_notifications range
 
 /**
