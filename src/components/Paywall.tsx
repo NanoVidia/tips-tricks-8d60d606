@@ -59,8 +59,12 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
   const [step, setStep] = useState<Step>("plans");
   const [busy, setBusy] = useState(false);
 
+  const access = useAccess();
   const selectedPlan = PLANS.find((p) => p.id === selected)!;
-  const hasTrial = selected !== "lifetime";
+  // Only show the trial-explainer step when the user is still eligible for
+  // the local 7-day intro. After expiry, Google Play is the sole authority
+  // on trial eligibility — sending them to the explainer would be misleading.
+  const hasTrial = selected !== "lifetime" && access.status !== "expired";
 
   function handleContinue() {
     if (hasTrial) {
