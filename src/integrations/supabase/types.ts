@@ -441,7 +441,7 @@ export type Database = {
           trial_ends_at: string | null
           trial_started_at: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           auto_renewing?: boolean
@@ -458,7 +458,7 @@ export type Database = {
           trial_ends_at?: string | null
           trial_started_at?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           auto_renewing?: boolean
@@ -475,7 +475,7 @@ export type Database = {
           trial_ends_at?: string | null
           trial_started_at?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
