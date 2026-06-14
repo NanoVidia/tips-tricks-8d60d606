@@ -30,12 +30,14 @@ import { AccessGate } from "./components/AccessGate";
 import { GlobalTrialBanner } from "./components/GlobalTrialBanner";
 import { AutoPaywall } from "./components/AutoPaywall";
 import { useTrialExpiryNotification } from "./hooks/useTrialExpiryNotification";
+import { useNativeBootstrap } from "./hooks/useNativeBootstrap";
 import { SAFE_MODE } from "./lib/safeMode";
 const SafeHome = lazy(() => import("./pages/SafeHome.tsx"));
 
 function NotificationsBootstrap() {
   useLocalNotifications();
   useTrialExpiryNotification();
+  useNativeBootstrap();
   return null;
 }
 
