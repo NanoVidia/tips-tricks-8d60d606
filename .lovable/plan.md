@@ -1,101 +1,65 @@
-## الهدف
-1. **إلغاء سبلاش Android الأصلية** (الشاشة البيضاء التي يعرضها النظام قبل ظهور التطبيق) بحيث ينتقل المستخدم مباشرة إلى الواجهة.
-2. **التحقق من تكامل نظام الإشعارات** للمستخدم وسد الفجوات المتبقية قبل إصدار v5.
+# تحسين سلوك الإغلاق بعد انتهاء الـ 7 أيام
 
----
+الهدف: عندما تنتهي التجربة المجانية، تجربة المستخدم تكون "مثالية": لا حلقات، لا التباس، لا نوافذ متكررة، ولا ثغرات تسمح بالوصول للأدوات.
 
-## أ) إلغاء السبلاش الأصلية
+## ما هو موجود وسليم (لن نلمسه)
+- `useAccess` يجمع بين الحالة المحلية (فورية) والـ `check-access` (المصدر الموثوق).
+- `AccessGate` يقفل `/tools` و`/exams` و`/exams/compare` مع شاشة قفل واضحة وزر «عرض الخطط».
+- `AutoPaywall` يفتح الـ Paywall مرة واحدة عند الانتهاء + دعم Deep link `?paywall=1` من الإشعار.
+- `useTrialExpiryNotification` يجدول إشعاراً قبل النهاية بـ 24 ساعة.
+- `syncTrialWithServer` يمنع تمديد التجربة بمسح البيانات.
 
-### الوضع الحالي
-- `@capacitor/splash-screen` **غير مثبّت** في `package.json` ✅
-- `capacitor.config.ts` لا يحوي قسم `SplashScreen` ✅
-- إذاً ما يراه المستخدم حالياً هو **Android 12+ System Splash** (يأتي من `android:windowSplashScreenAnimatedIcon` في `styles.xml` تلقائياً عند `npx cap add android`).
+## الفجوات التي سنعالجها
 
-### الحل
-لا يمكن إزالتها 100% (Android يفرض شاشة افتتاح دنيا)، لكن نجعلها **شفافة وفورية**:
-- تعديل `android/app/src/main/res/values/styles.xml` لجعل theme الـ launch:
-  - `windowSplashScreenBackground = #FFFFFF` (نفس خلفية التطبيق → لا وميض)
-  - حذف `windowSplashScreenAnimatedIcon` → لا أيقونة متحركة
-  - `windowSplashScreenAnimationDuration = 0`
-- بما أن `android/` مولّد محلياً، نضع التعديل في **`docs/NATIVE_BUILD.md`** مع snippet جاهز للنسخ.
+### 1) لا يوجد إشعار دائم على الصفحة الرئيسية بعد الانتهاء
+حالياً `GlobalTrialBanner` يختفي تماماً عند `status === "expired"`، فالمستخدم في `/` (غير المقفلة) قد لا يرى أي شيء بعد إغلاق الـ AutoPaywall.
 
-### في الكود
-- التأكد أن لا شيء في `src/` يستدعي `SplashScreen.show/hide` (تحقّقت: لا شيء).
-- لا تغييرات في React side.
+**الحل:** توسعة `GlobalTrialBanner` لتعرض ثلاث حالات:
+- `trial` والأيام > 3 → مخفي.
+- `trial` والأيام ≤ 3 → الشريط الحالي البرتقالي.
+- `trial` ويوم واحد متبقٍ → نفس الشريط بلون أحمر + نبض بسيط (`animate-pulse`).
+- `expired` → شريط أحمر دائم: «انتهت تجربتك المجانية — اشترك للوصول الكامل» مع زر «اشترك الآن».
+- `paid` → مخفي.
 
----
+### 2) `AutoPaywall` يفتح مرة واحدة فقط في الجلسة
+إذا أغلق المستخدم النافذة ولم يضغط زر مقفل، لن يراها مجدداً. لكن يجب ألا تتحول إلى إزعاج (حلقة).
 
-## ب) التحقق من تكامل الإشعارات
+**الحل:** الإبقاء على القاعدة "مرة واحدة لكل جلسة" + إعادة الفتح تلقائياً مرة واحدة بعد كل **6 ساعات** من نشاط مستمر (تخزين timestamp في `sessionStorage` فقط — لا يتراكم بين الجلسات). هذا يمنع الحلقة ويعالج النسيان.
 
-### ما هو موجود ويعمل ✅
-| المكوّن | الحالة |
-|---|---|
-| `useLocalNotifications` — boot + focus + online + realtime resync | ✅ |
-| طلب POST_NOTIFICATIONS (Android 13+) | ✅ |
-| إنشاء قناة High Importance | ✅ |
-| `fireTestNotification` (زر اختبار في SafeHome) | ✅ |
-| `useTrialExpiryNotification` (تذكير قبل ٤٨ ساعة) | ✅ |
-| إدارة الإشعارات من Admin Panel | ✅ |
+### 3) وميض شاشة القفل أثناء استجابة الخادم (Race)
+في الإقلاع البارد للمشترك المدفوع، قد تظهر شاشة `AccessGate` لجزء من الثانية قبل أن يصل رد `check-access` ويمنح الوصول.
 
-### الفجوات التي سنسدّها
+**الحل:** إضافة حقل `loading` صغير في `useAccess` (true حتى أول جواب من الخادم أو 1500ms أيهما أسبق) وفي `AccessGate`: إذا `loading && !hasAccess` نعرض سبلاش هادئ (سبينر صغير) بدل شاشة "انتهت التجربة".
 
-#### 1. **مستمع نقر الإشعار (deep-link)**
-حالياً عند نقر الإشعار → التطبيق يفتح فقط. لا يذهب لشاشة محدّدة.
+### 4) إشعار يوم النهاية لا يُجدول إذا لم يُمنح الإذن وقت الإقلاع
+إذا قبل المستخدم الإذن لاحقاً، الإشعار لا يُجدول.
 
-**التغيير**: إضافة `useNotificationTapHandler` يُسجَّل في `App.tsx`:
-```ts
-LocalNotifications.addListener("localNotificationActionPerformed", (event) => {
-  const route = event.notification.extra?.route;
-  if (route) navigate(route);
-});
-```
-وتعديل `useLocalNotifications.ts` و `useTrialExpiryNotification.ts` لتمرير `extra: { route: "..." }`:
-- إشعار التجربة → `/?paywall=1`
-- إشعارات Admin → الـ route الذي حدّده المسؤول (نضيف عمود `extra_route` لاحقاً لو طُلب — حالياً نسمح بحقل اختياري في `scheduled_notifications.body` كـ JSON أو نقتصر على home).
+**الحل:** في `useTrialExpiryNotification` نستمع لحدث `notif-permission-granted` (يُرسله `useLocalNotifications` بعد منح الإذن) ونعيد محاولة الجدولة. تغيير صغير.
 
-ملاحظة: لا حاجة لـ migration الآن — نمرّر `route` فقط لإشعارات النظام (trial expiry) وندع إشعارات Admin مفتوحة على home.
+### 5) رسائل مضللة بعد الشراء أو الاستعادة
+بعد نجاح الشراء/الاستعادة، إن بقي `GlobalTrialBanner` أو شاشة `AccessGate` ظاهرين لثوانٍ، يبدو الأمر مكسوراً.
 
-#### 2. **زر اختبار الإشعارات في مكان واضح للمستخدم**
-حالياً `fireTestNotification` متاح فقط في صفحة `SafeHome`. لا يصل إليه المستخدم في الوضع الطبيعي.
+**الحل:** `grantEntitlement` بالفعل يطلق `entitlement-changed` و`useAccess` يستمع له — سنتأكد أن `AccessGate` و`GlobalTrialBanner` يتفاعلان فوراً (موجود عبر `useAccess`)، ونضيف إغلاق فوري لأي `Paywall` مفتوح عند `status === "paid"` (في `AutoPaywall` و`AccessGate` و`GlobalTrialBanner`).
 
-**التغيير**: إضافة قسم "الإشعارات" في صفحة الإعدادات/الملف الشخصي (لو موجودة) أو زر صغير في `GlobalTrialBanner` لاختبار وصول الإشعارات.
+### 6) المسارات الفرعية للأدوات والاختبارات
+المسارات الحالية المسجلة هي فقط `/tools` و`/exams` و`/exams/compare`. أي مسار فرعي (`/tools/xxx`) سيقع على `*` (NotFound). لا يوجد تسريب وصول، لكن نتحقق سريعاً ونوثّق في خطة الاختبار.
 
-أبحث أولاً عن صفحة Settings موجودة، وإلا نُضيف القسم في صفحة `Profile`/`Account` إذا وُجدت. إن لم تكن موجودة، نضع الزر داخل قائمة منسدلة في الـ Header.
+## الملفات المتأثرة (تعديل فقط — لا ملفات جديدة)
+- `src/components/GlobalTrialBanner.tsx` — حالات urgent/expired.
+- `src/components/AutoPaywall.tsx` — إعادة فتح كل 6 ساعات + إغلاق فوري عند paid.
+- `src/components/AccessGate.tsx` — حالة `loading` لتجنب الوميض + إغلاق Paywall عند paid.
+- `src/hooks/useAccess.ts` — إضافة `loading` (true حتى أول استجابة خادم أو timeout 1500ms).
+- `src/hooks/useTrialExpiryNotification.ts` — الاستماع لـ `notif-permission-granted` وإعادة الجدولة.
+- `src/hooks/useLocalNotifications.ts` — إطلاق `window.dispatchEvent(new Event("notif-permission-granted"))` بعد منح الإذن.
 
-#### 3. **تحسين رسائل الـ permission**
-حالياً عند رفض المستخدم لإذن الإشعارات، نطبع `console.info` فقط. **التغيير**: عند الرفض، عرض toast صديق:
-> "لتصلك تذكيرات يومية، فعّل الإشعارات من إعدادات التطبيق."
-مع زر "فتح الإعدادات" (Capacitor App settings intent).
+## لا تغييرات في:
+- المخطط (DB)، الـ RLS، الـ edge functions، خطط الأسعار، أو منطق الشراء.
 
-#### 4. **التأكد من المتطلبات النيتيف**
-في `docs/NATIVE_BUILD.md` (موجود بالفعل):
-- ✅ `ic_stat_icon` بكل DPIs
-- ✅ `RECEIVE_BOOT_COMPLETED` في AndroidManifest
-- ✅ `SCHEDULE_EXACT_ALARM` + `USE_EXACT_ALARM`
-
-سنضيف فقرة جديدة "اختبار الإشعارات على الجهاز" بأربع خطوات تحقق سريعة.
-
----
-
-## الملفات المعدّلة
-
-| ملف | تغيير |
-|---|---|
-| `src/hooks/useNotificationTapHandler.ts` (جديد) | مستمع localNotificationActionPerformed + navigate |
-| `src/App.tsx` | استدعاء `useNotificationTapHandler()` داخل NotificationsBootstrap |
-| `src/hooks/useLocalNotifications.ts` | توست عند رفض الإذن + زر فتح الإعدادات |
-| `src/hooks/useTrialExpiryNotification.ts` | إضافة `extra: { route: "/?paywall=1" }` |
-| `src/components/NotificationsTestButton.tsx` (جديد) | زر صغير قابل لإعادة الاستخدام |
-| إضافة الزر في مكان يصله المستخدم (سأحدد بعد قراءة هيكل الـ Settings/Profile) |
-| `docs/NATIVE_BUILD.md` | snippet styles.xml لإلغاء السبلاش + قسم اختبار الإشعارات |
-
-**لا تغييرات في**: schema، RLS، edge functions، plans، billing.
-
----
-
-## التسليم
-- إلغاء عملي للسبلاش (عبر docs لأنها native).
-- 5 ملفات React صغيرة + توثيق.
-- اختبار يدوي بعد بناء AAB التالي.
-
-أوافق على البدء؟
+## التحقق بعد التنفيذ
+1. ضبط `localStorage.obgyn_trial_started_at` لقيمة قبل 8 أيام → إعادة تحميل → التأكد من:
+   - شريط أحمر دائم على `/`.
+   - فتح Paywall تلقائياً مرة واحدة + إعادة فتح بعد 6h (محاكاة بتعديل الـ timestamp).
+   - `/tools` و`/exams` تعرض شاشة القفل بلا وميض.
+2. ضبط القيمة لقبل 6 أيام و11 ساعة → شريط أحمر "يوم واحد" مع نبض.
+3. محاكاة شراء (`grantEntitlement("monthly")`) → اختفاء فوري للشريط وشاشة القفل وإغلاق Paywall.
+4. على Android حقيقي: رفض إذن الإشعار → منحه لاحقاً من الإعدادات → الإشعار يُجدول.
