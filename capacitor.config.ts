@@ -69,6 +69,13 @@ const config: CapacitorConfig = {
       smallIcon: "ic_stat_icon",
       iconColor: "#0ea5e9",
     },
+    StatusBar: {
+      // Android 15 edge-to-edge: we draw under the status bar and use
+      // viewport-fit=cover + safe-area insets in CSS.
+      overlaysWebView: false,
+      style: "DEFAULT",
+      backgroundColor: "#ffffff",
+    },
   },
 };
 
