@@ -144,6 +144,8 @@ Deno.serve(async (req) => {
     let autoRenewing = false;
     let raw: unknown = null;
 
+    let isPending = false;
+
     if (plan === "lifetime") {
       const resp = await fetchProduct(productId, purchaseToken, accessToken);
       raw = resp.body;
@@ -156,6 +158,7 @@ Deno.serve(async (req) => {
       // purchaseState: 0 = purchased, 1 = canceled, 2 = pending
       const state = (resp.body as any).purchaseState;
       valid = state === 0;
+      isPending = state === 2;
       orderId = (resp.body as any).orderId ?? null;
       if (valid && (resp.body as any).acknowledgementState === 0) {
         await acknowledgeProduct(productId, purchaseToken, accessToken).catch(() => {});
@@ -171,7 +174,8 @@ Deno.serve(async (req) => {
       }
       const b = resp.body as any;
       const expiryMs = b.expiryTimeMillis ? parseInt(b.expiryTimeMillis, 10) : 0;
-      // paymentState: 1 = received, 2 = free trial, 3 = pending deferred upgrade, 0 = pending
+      // paymentState: 0 = pending, 1 = received, 2 = free trial, 3 = pending deferred upgrade
+      isPending = b.paymentState === 0 || b.paymentState === 3;
       valid = expiryMs > Date.now() && (b.paymentState === 1 || b.paymentState === 2);
       expiresAt = expiryMs ? new Date(expiryMs).toISOString() : null;
       orderId = b.orderId ?? null;
