@@ -3,66 +3,74 @@ import { Link } from "react-router-dom";
 export default function Terms() {
   return (
     <main dir="rtl" className="min-h-screen bg-background text-foreground px-5 py-10 max-w-3xl mx-auto leading-relaxed">
-      <Link to="/" className="text-sm text-primary underline">← العودة للرئيسية</Link>
-      <h1 className="text-3xl font-bold mt-4 mb-2">شروط الاستخدام (Terms of Use)</h1>
-      <p className="text-sm text-muted-foreground mb-6">آخر تحديث: مايو 2026</p>
+      <Link to="/" className="text-sm text-primary underline">← Back to home</Link>
+      <h1 className="text-3xl font-bold mt-4 mb-2">Terms of Use</h1>
+      <p className="text-sm text-muted-foreground mb-6">Last updated: May 2026</p>
 
       <section className="space-y-4 text-sm">
-        <h2 className="text-xl font-semibold">1. طبيعة التطبيق</h2>
+        <h2 className="text-xl font-semibold">1. Nature of the Application</h2>
         <p>
-          تطبيق <strong>Tips &amp; Tricks</strong> هو منصة <strong>تعليمية وإرشادية</strong> موجهة للمهتمين بمجال
-          صحة المرأة والحمل والولادة والخصوبة (طلاب طب، ممارسين، مهتمين بالصحة العامة). التطبيق
-          <strong> ليس جهازاً طبياً</strong>، ولا يقدم تشخيصاً أو علاجاً، ولا يحل محل استشارة الطبيب المختص.
+          <strong>Tips &amp; Tricks</strong> is an <strong>educational and informational platform</strong>{" "}
+          for those interested in women's health, pregnancy, obstetrics, and reproductive medicine
+          (medical students, practitioners, and health-conscious individuals). The application is{" "}
+          <strong>not a medical device</strong>, does not provide diagnosis or treatment, and does
+          not replace consultation with a qualified clinician.
         </p>
 
-        <h2 className="text-xl font-semibold">2. قبول الشروط</h2>
+        <h2 className="text-xl font-semibold">2. Acceptance of Terms</h2>
         <p>
-          باستخدامك للتطبيق فإنك توافق على هذه الشروط بالكامل. إذا لم توافق، يرجى عدم استخدام التطبيق.
-          يحق لنا تعديل الشروط في أي وقت، وسيتم إعلامك بالتحديثات داخل التطبيق.
+          By using the application you agree to these terms in full. If you do not agree, please
+          discontinue use. We reserve the right to modify these terms at any time; you will be
+          notified of updates within the application.
         </p>
 
-        <h2 className="text-xl font-semibold">3. الحساب والاشتراك</h2>
+        <h2 className="text-xl font-semibold">3. Account and Subscription</h2>
         <ul className="list-disc pr-6 space-y-1">
-          <li>يجب أن يكون عمرك 18 عاماً أو أكثر لاستخدام التطبيق.</li>
-          <li>أنت مسؤول عن سرية بيانات الدخول الخاصة بك.</li>
-          <li>الاشتراكات المدفوعة تتم عبر Google Play وتخضع لسياساتها (الاسترجاع خلال 48 ساعة).</li>
-          <li>يحق لنا إيقاف أي حساب يخالف الشروط دون إشعار مسبق.</li>
+          <li>You must be at least 18 years of age to use the application.</li>
+          <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+          <li>Paid subscriptions are processed through Google Play and are subject to its policies (refunds within 48 hours).</li>
+          <li>We reserve the right to suspend any account that violates these terms without prior notice.</li>
         </ul>
 
-        <h2 className="text-xl font-semibold">4. الاستخدام المسموح</h2>
+        <h2 className="text-xl font-semibold">4. Permitted Use</h2>
         <ul className="list-disc pr-6 space-y-1">
-          <li>الاستخدام الشخصي التعليمي فقط.</li>
-          <li>يُمنع نسخ المحتوى أو إعادة بيعه أو توزيعه تجارياً.</li>
-          <li>يُمنع استخدام التطبيق لأي غرض غير قانوني أو ضار.</li>
+          <li>Personal educational use only.</li>
+          <li>Copying, reselling, or commercially distributing content is prohibited.</li>
+          <li>Using the application for any unlawful or harmful purpose is prohibited.</li>
         </ul>
 
-        <h2 className="text-xl font-semibold">5. الملكية الفكرية</h2>
+        <h2 className="text-xl font-semibold">5. Intellectual Property</h2>
         <p>
-          جميع المحتويات (نصوص، حاسبات، أسئلة، تصاميم) محمية بحقوق الملكية الفكرية ومملوكة للتطبيق
-          أو مُرخّصة له. لا يجوز إعادة استخدامها دون إذن خطي.
+          All content (texts, calculators, questions, designs) is protected by intellectual property
+          rights and is owned by or licensed to the application. Reuse without written permission
+          is not permitted.
         </p>
 
-        <h2 className="text-xl font-semibold">6. إخلاء المسؤولية</h2>
+        <h2 className="text-xl font-semibold">6. Disclaimer</h2>
         <p>
-          المعلومات المعروضة لأغراض إرشادية وتعليمية عامة فقط. لا نضمن دقتها الكاملة أو ملاءمتها
-          لحالة فردية معينة. القرار الطبي النهائي يجب أن يكون دائماً من طبيب مختص. راجع صفحة{" "}
-          <Link to="/disclaimer" className="text-primary underline">إخلاء المسؤولية</Link>.
+          Information presented is for general guidance and educational purposes only. We do not
+          guarantee its complete accuracy or suitability for any individual case. The final clinical
+          decision must always rest with a qualified clinician. See the{" "}
+          <Link to="/disclaimer" className="text-primary underline">Educational Disclaimer</Link> page.
         </p>
 
-        <h2 className="text-xl font-semibold">7. حدود المسؤولية</h2>
+        <h2 className="text-xl font-semibold">7. Limitation of Liability</h2>
         <p>
-          لا يتحمل التطبيق أو مطوّروه أي مسؤولية عن أي ضرر مباشر أو غير مباشر ناتج عن استخدام
-          المعلومات المقدمة، بما في ذلك أي قرار طبي يُتخذ بناءً عليها.
+          The application and its developers accept no liability for any direct or indirect harm
+          resulting from the use of the information provided, including any clinical decision made
+          on the basis of that information.
         </p>
 
-        <h2 className="text-xl font-semibold">8. القانون الحاكم</h2>
+        <h2 className="text-xl font-semibold">8. Governing Law</h2>
         <p>
-          تخضع هذه الشروط لقوانين سلطنة عُمان. أي نزاع يُحل ودياً، وإلا يُحال للجهات المختصة في عُمان.
+          These terms are governed by the laws of the Sultanate of Oman. Any dispute shall be
+          resolved amicably; failing that, it shall be referred to the competent authorities in Oman.
         </p>
 
-        <h2 className="text-xl font-semibold">9. التواصل</h2>
+        <h2 className="text-xl font-semibold">9. Contact</h2>
         <p>
-          لأي استفسار: <a href="mailto:support@tips-tricks.app" className="text-primary underline">support@tips-tricks.app</a>
+          For enquiries:{" "}
+          <a href="mailto:support@tips-tricks.app" className="text-primary underline">support@tips-tricks.app</a>
         </p>
       </section>
     </main>

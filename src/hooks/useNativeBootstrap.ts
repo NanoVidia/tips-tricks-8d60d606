@@ -37,7 +37,7 @@ export function useNativeBootstrap() {
               lastBackPress.current = now;
               // Tiny toast — uses sonner if available, else native-ish overlay.
               import("sonner")
-                .then(({ toast }) => toast("اضغط مرة أخرى للخروج"))
+                .then(({ toast }) => toast("Press back again to exit"))
                 .catch(() => {});
             }
           });

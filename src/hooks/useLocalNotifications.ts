@@ -55,8 +55,8 @@ export function useLocalNotifications() {
             // why no reminders ever arrive — and how to fix it.
             if (localStorage.getItem(DENIED_TOAST_KEY) !== "1") {
               localStorage.setItem(DENIED_TOAST_KEY, "1");
-              toast.message("التذكيرات معطّلة", {
-                description: "فعّل الإشعارات من إعدادات النظام لتصلك تذكيرات يومية.",
+              toast.message("Reminders Disabled", {
+                description: "Enable notifications in system settings to receive daily reminders.",
                 duration: 7000,
               });
             }

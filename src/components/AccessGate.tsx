@@ -19,7 +19,7 @@ interface AccessGateProps {
  * While the server access check is still pending on cold boot we render a
  * quiet spinner instead of flashing the "expired" screen at paid users.
  */
-export function AccessGate({ children, featureLabel = "هذا القسم" }: AccessGateProps) {
+export function AccessGate({ children, featureLabel = "This section" }: AccessGateProps) {
   const access = useAccess();
   const [paywallOpen, setPaywallOpen] = useState(false);
 
@@ -34,36 +34,36 @@ export function AccessGate({ children, featureLabel = "هذا القسم" }: Acc
   }
 
   // Avoid flashing the lock screen during the brief server reconciliation
-  // window on cold boot — paid users would otherwise see "انتهت التجربة"
+  // window on cold boot — paid users would otherwise see "Trial ended"
   // for a fraction of a second.
   if (access.loading) {
     return (
-      <div className="min-h-[calc(100vh-120px)] flex items-center justify-center" dir="rtl">
+      <div className="min-h-[calc(100vh-120px)] flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-5 py-10" dir="rtl">
+    <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-5 py-10">
       <div className="max-w-md w-full text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg mb-4">
           <Lock className="w-7 h-7 text-white" />
         </div>
-        <h1 className="text-xl font-black tracking-tight mb-2">انتهت الفترة المجانية</h1>
+        <h1 className="text-xl font-black tracking-tight mb-2">Free Trial Ended</h1>
         <p className="text-[13.5px] text-muted-foreground leading-relaxed mb-5">
-          {featureLabel} متاح للمشتركين فقط. اشترك للوصول الكامل إلى بنك الأسئلة،
-          الاختبارات، السيناريوهات، ومكتبة العمليات.
+          {featureLabel} is available to subscribers only. Subscribe for full access to the question
+          bank, exams, clinical scenarios, and surgery library.
         </p>
 
-        <div className="rounded-xl bg-muted/40 border border-border/60 p-3 mb-5 text-[12px] text-right">
+        <div className="rounded-xl bg-muted/40 border border-border/60 p-3 mb-5 text-[12px] text-left">
           <div className="font-bold mb-1.5 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            ما زال متاحاً مجاناً
+            Always free
           </div>
           <ul className="space-y-1 text-muted-foreground">
-            <li>• حالة سؤال اليوم</li>
-            <li>• المساعد الذكي</li>
+            <li>• Daily case question</li>
+            <li>• AI assistant</li>
           </ul>
         </div>
 
@@ -72,13 +72,13 @@ export function AccessGate({ children, featureLabel = "هذا القسم" }: Acc
           className="w-full h-12 text-[15px] font-bold rounded-xl bg-gradient-to-r from-primary to-primary/80 shadow-md"
         >
           <Crown className="w-4 h-4" />
-          عرض خطط الاشتراك
+          View Subscription Plans
         </Button>
 
         <Paywall
           open={paywallOpen}
           onOpenChange={setPaywallOpen}
-          reason="انتهت الفترة المجانية — اختر خطتك للاستمرار"
+          reason="Free trial ended — choose a plan to continue"
         />
       </div>
     </div>

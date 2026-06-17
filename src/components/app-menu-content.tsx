@@ -562,20 +562,20 @@ function NotificationsPanel() {
         const ok = req.display === "granted";
         setGranted(ok);
         if (ok) {
-          toast.success("تم تفعيل الإشعارات");
+          toast.success("Notifications enabled");
         } else {
-          toast.message("التذكيرات معطّلة", {
-            description: "افتح إعدادات النظام → الإشعارات → فعّل التطبيق.",
+          toast.message("Notifications disabled", {
+            description: "Open System Settings → Notifications → enable this app.",
           });
         }
       } else {
         if (typeof Notification === "undefined") {
-          toast.error("غير مدعوم على هذا المتصفح");
+          toast.error("Not supported in this browser");
           return;
         }
         const result = await Notification.requestPermission();
         setGranted(result === "granted");
-        if (result === "granted") toast.success("تم تفعيل الإشعارات");
+        if (result === "granted") toast.success("Notifications enabled");
       }
     } finally {
       setBusy(false);
@@ -587,13 +587,13 @@ function NotificationsPanel() {
     try {
       const result = await fireTestNotification();
       if (result === "ok") {
-        toast.success("سيصلك إشعار اختباري خلال 5 ثوانٍ");
+        toast.success("A test notification will arrive in 5 seconds");
       } else if (result === "denied") {
-        toast.error("الإشعارات مرفوضة — فعّلها من إعدادات النظام");
+        toast.error("Notifications denied — enable them in system settings");
       } else if (result === "web") {
-        toast.info("اختبار الإشعارات يعمل فقط داخل تطبيق الجوال");
+        toast.info("Full notification testing is available only inside the mobile app");
       } else {
-        toast.error("تعذّر إرسال الإشعار الاختباري");
+        toast.error("Failed to send the test notification");
       }
     } finally {
       setTesting(false);
@@ -603,21 +603,21 @@ function NotificationsPanel() {
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        احصل على تذكيرات يومية وإشعارات حالة سؤال اليوم وتحديثات هامة.
+        Get daily reminders, Question of the Day alerts, and important updates.
       </p>
       <Button onClick={request} disabled={granted || busy} className="w-full">
         <Bell className="mr-2 h-4 w-4" />
-        {granted ? "الإشعارات مفعّلة" : busy ? "جارٍ…" : "تفعيل الإشعارات"}
+        {granted ? "Notifications enabled" : busy ? "Working…" : "Enable notifications"}
       </Button>
       {native && (
         <Button onClick={sendTest} disabled={testing} variant="outline" className="w-full">
           <BellRing className="mr-2 h-4 w-4" />
-          {testing ? "جارٍ الإرسال…" : "إرسال إشعار اختباري"}
+          {testing ? "Sending…" : "Send a test notification"}
         </Button>
       )}
       {!native && (
         <p className="text-[11px] text-muted-foreground/80 text-center">
-          الاختبار الكامل للإشعارات متاح داخل تطبيق الجوال فقط.
+          Full notification testing is available only inside the mobile app.
         </p>
       )}
     </div>

@@ -85,15 +85,15 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
         // Developer preview ONLY — never reached in production builds.
         await new Promise((r) => setTimeout(r, 400));
         grantEntitlement(selected);
-        toast.success("تم تفعيل الاشتراك (وضع المعاينة فقط)");
+        toast.success("Subscription activated (preview mode only)");
       } else {
-        toast.error("الشراء متاح فقط داخل تطبيق Google Play.");
+        toast.error("Purchases are only available in the Google Play app.");
         return;
       }
       onOpenChange(false);
       setStep("plans");
     } catch (e) {
-      toast.error("تعذّر إتمام الشراء. حاول مجدداً.");
+      toast.error("Could not complete purchase. Please try again.");
       console.error(e);
     } finally {
       setBusy(false);
@@ -106,7 +106,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
 
   async function handleRestore() {
     setBusy(true);
-    const loadingId = toast.loading("جارٍ الاستعادة من Google Play…");
+    const loadingId = toast.loading("Restoring from Google Play…");
     let gotEntitlement = false;
     const onEntitlement = () => { gotEntitlement = true; };
     window.addEventListener("entitlement-changed", onEntitlement);
@@ -133,16 +133,16 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
       }
       toast.dismiss(loadingId);
       if (gotEntitlement) {
-        toast.success("تمت استعادة اشتراكك بنجاح");
+        toast.success("Subscription restored successfully.");
         onOpenChange(false);
       } else {
         toast.info(
-          "لم نعثر على اشتراك نشط مرتبط بحساب Google الحالي. تأكد أنك تستخدم نفس الحساب الذي اشتريت به.",
+          "No active subscription found for this Google account. Make sure you are using the same account used for purchase.",
         );
       }
     } catch {
       toast.dismiss(loadingId);
-      toast.error("تعذّر الاتصال بـ Google Play. حاول لاحقاً.");
+      toast.error("Could not connect to Google Play. Please try again later.");
     } finally {
       window.removeEventListener("entitlement-changed", onEntitlement);
       setBusy(false);
@@ -161,7 +161,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
         side="bottom"
         className="h-[92vh] rounded-t-3xl p-0 overflow-hidden border-t-2 border-primary/20"
       >
-        <div className="h-full overflow-y-auto px-5 pt-6 pb-8" dir="rtl">
+        <div className="h-full overflow-y-auto px-5 pt-6 pb-8">
           <AnimatePresence mode="wait">
             {step === "plans" ? (
               <motion.div
@@ -180,9 +180,9 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                   >
                     <Crown className="w-7 h-7 text-white" />
                   </motion.div>
-                  <h2 className="text-xl font-black tracking-tight">افتح الوصول الكامل</h2>
+                  <h2 className="text-xl font-black tracking-tight">Unlock Full Access</h2>
                   <p className="text-[13px] text-muted-foreground mt-1">
-                    {reason ?? `جرّب ${TRIAL_DAYS} أيام مجاناً، ثم اختر الخطة الأنسب لك.`}
+                    {reason ?? `Try ${TRIAL_DAYS} days free, then choose the plan that works for you.`}
                   </p>
                 </div>
 
@@ -190,11 +190,11 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                 <div className="rounded-xl bg-muted/40 border border-border/60 p-3 mb-5 text-[12px] leading-relaxed">
                   <div className="font-bold mb-1.5 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-primary" />
-                    يبقى مجانياً دائماً
+                    Always free
                   </div>
                   <ul className="space-y-1 text-muted-foreground">
-                    <li>• حالة سؤال اليوم</li>
-                    <li>• المساعد الذكي</li>
+                    <li>• Daily case question</li>
+                    <li>• AI assistant</li>
                   </ul>
                 </div>
 
@@ -207,7 +207,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                         key={p.id}
                         type="button"
                         onClick={() => setSelected(p.id)}
-                        className={`w-full text-right rounded-2xl border-2 p-4 transition-all ${
+                        className={`w-full text-left rounded-2xl border-2 p-4 transition-all ${
                           isSelected
                             ? "border-primary bg-primary/5 shadow-md"
                             : "border-border bg-card hover:border-primary/40"
@@ -216,7 +216,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                              <span className="font-black text-[15px]">{p.labelAr}</span>
+                              <span className="font-black text-[15px]">{p.labelEn}</span>
                               {p.badge && (
                                 <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                                   {p.badge}
@@ -224,14 +224,14 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                               )}
                               {p.highlight && (
                                 <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                                  الأكثر اختياراً
+                                  Most popular
                                 </span>
                               )}
                             </div>
                             <div className="text-[11px] text-muted-foreground">
                               {p.id === "lifetime"
-                                ? "دفعة واحدة — وصول دائم"
-                                : `${TRIAL_DAYS} أيام مجاناً، ثم تجديد تلقائي`}
+                                ? "One-time payment — lifetime access"
+                                : `${TRIAL_DAYS} days free, then auto-renews`}
                             </div>
                           </div>
                           <div className="text-left shrink-0">
@@ -259,11 +259,11 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                 >
                   {hasTrial ? (
                     <>
-                      ابدأ ٧ أيام مجاناً
+                      Start 7 days free
                       <ArrowLeft className="w-4 h-4 mr-1.5" />
                     </>
                   ) : (
-                    "متابعة عبر Google Play"
+                    "Continue via Google Play"
                   )}
                 </Button>
 
@@ -274,26 +274,26 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                     disabled={busy}
                     className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
                   >
-                    <RefreshCw className="w-3 h-3" /> استعادة المشتريات
+                    <RefreshCw className="w-3 h-3" /> Restore purchases
                   </button>
                   <span className="inline-flex items-center gap-1 text-muted-foreground">
-                    <ShieldCheck className="w-3 h-3" /> دفع آمن عبر Google Play
+                    <ShieldCheck className="w-3 h-3" /> Secure payment via Google Play
                   </span>
                 </div>
 
                 <div className="flex items-center justify-center gap-3 mt-3 text-[11px]">
                   <button type="button" onClick={handleManage} className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline">
-                    إدارة الاشتراك
+                    Manage subscription
                   </button>
                   <span className="text-muted-foreground/40">•</span>
-                  <a href="/terms" className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline">الشروط</a>
+                  <a href="/terms" className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline">Terms</a>
                   <span className="text-muted-foreground/40">•</span>
-                  <a href="/privacy" className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline">الخصوصية</a>
+                  <a href="/privacy" className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline">Privacy</a>
                 </div>
 
                 <p className="text-[10.5px] text-muted-foreground/80 text-center leading-relaxed mt-4">
-                  يتم التجديد تلقائياً ما لم يتم الإلغاء قبل 24 ساعة من نهاية الفترة.
-                  يمكنك الإلغاء في أي وقت من إعدادات Google Play.
+                  Subscription renews automatically unless cancelled at least 24 hours before the end of the current period.
+                  You can cancel at any time from Google Play settings.
                 </p>
               </motion.div>
             ) : (
@@ -314,18 +314,18 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                     <Sparkles className="w-7 h-7 text-white" />
                   </motion.div>
                   <h2 className="text-xl font-black tracking-tight">
-                    ٧ أيام مجاناً — لن يتم خصم أي مبلغ اليوم
+                    7 days free — no charge today
                   </h2>
                   <p className="text-[13px] text-muted-foreground mt-1.5 leading-relaxed">
-                    استمتع بالوصول الكامل لمدة أسبوع. إن لم يعجبك التطبيق، ألغِ في أي وقت قبل اليوم السابع
-                    ولن يتم خصم شيء.
+                    Enjoy full access for one week. If the app is not for you, cancel anytime before day 7
+                    and you will not be charged.
                   </p>
                 </div>
 
                 {/* Timeline */}
                 <div className="relative mb-6 rounded-2xl border-2 border-border bg-card p-5">
                   {/* vertical line */}
-                  <div className="absolute right-[34px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-emerald-400 via-amber-400 to-primary" />
+                  <div className="absolute left-[34px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-emerald-400 via-amber-400 to-primary" />
 
                   {/* Step 1 — today */}
                   <div className="relative flex gap-3 mb-5">
@@ -333,9 +333,9 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                       <Unlock className="w-5 h-5" />
                     </div>
                     <div className="flex-1 pt-0.5">
-                      <div className="font-bold text-[14px]">اليوم — وصول فوري مجاناً</div>
+                      <div className="font-bold text-[14px]">Today — immediate free access</div>
                       <div className="text-[12px] text-muted-foreground mt-0.5">
-                        تبدأ تجربتك المجانية بكامل المزايا. لن يخصم شيء من بطاقتك الآن.
+                        Your free trial begins with full features. Nothing is charged to your card now.
                       </div>
                     </div>
                   </div>
@@ -346,9 +346,9 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                       <Bell className="w-5 h-5" />
                     </div>
                     <div className="flex-1 pt-0.5">
-                      <div className="font-bold text-[14px]">اليوم الخامس — تذكير</div>
+                      <div className="font-bold text-[14px]">Day 5 — reminder</div>
                       <div className="text-[12px] text-muted-foreground mt-0.5">
-                        نُرسل لك إشعاراً قبل ٤٨ ساعة من انتهاء التجربة، حتى تقرر بحرية.
+                        We send a notification 48 hours before the trial ends so you can decide freely.
                       </div>
                     </div>
                   </div>
@@ -360,11 +360,11 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                     </div>
                     <div className="flex-1 pt-0.5">
                       <div className="font-bold text-[14px]">
-                        اليوم السابع — يبدأ الاشتراك بـ {formatPrice(selected, selectedPlan.price)}
+                        Day 7 — subscription starts at {formatPrice(selected, selectedPlan.price)}
                         <span className="text-muted-foreground font-medium"> {selectedPlan.per}</span>
                       </div>
                       <div className="text-[12px] text-muted-foreground mt-0.5">
-                        ما لم تُلغِ قبل ذلك من إعدادات Google Play. الإلغاء في ثانيتين، بدون أسئلة.
+                        Unless cancelled beforehand from Google Play settings. Cancel in seconds, no questions asked.
                       </div>
                     </div>
                   </div>
@@ -375,9 +375,9 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                   <div className="flex items-start gap-2">
                     <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-bold mb-0.5">لا مفاجآت</div>
-                      ستجد تذكيراً واضحاً قبل انتهاء التجربة. وإن نسيت الإلغاء بعد الخصم، تواصل معنا
-                      ويسعدنا مساعدتك.
+                      <div className="font-bold mb-0.5">No surprises</div>
+                      You will receive a clear reminder before the trial ends. If you forget to cancel
+                      after being charged, contact us and we will be happy to help.
                     </div>
                   </div>
                 </div>
@@ -385,12 +385,12 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                 {/* Selected plan summary */}
                 <div className="rounded-xl bg-muted/40 border border-border/60 p-3 mb-5 flex items-center justify-between text-[12px]">
                   <div>
-                    <div className="text-muted-foreground">الخطة المختارة</div>
-                    <div className="font-bold text-[14px]">{selectedPlan.labelAr}</div>
+                    <div className="text-muted-foreground">Selected plan</div>
+                    <div className="font-bold text-[14px]">{selectedPlan.labelEn}</div>
                   </div>
                   <div className="text-left">
                     <div className="font-black text-base">{formatPrice(selected, selectedPlan.price)}</div>
-                    <div className="text-[10px] text-muted-foreground">بعد التجربة • {selectedPlan.per}</div>
+                    <div className="text-[10px] text-muted-foreground">after trial · {selectedPlan.per}</div>
                   </div>
                 </div>
 
@@ -405,7 +405,7 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                   ) : (
                     <>
                       <ShieldCheck className="w-4 h-4 ml-1.5" />
-                      ابدأ التجربة المجانية الآن
+                      Start free trial now
                     </>
                   )}
                 </Button>
@@ -417,12 +417,12 @@ export function Paywall({ open, onOpenChange, reason }: PaywallProps) {
                   className="w-full mt-3 inline-flex items-center justify-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground"
                 >
                   <ArrowRight className="w-3.5 h-3.5" />
-                  العودة لاختيار خطة أخرى
+                  Back to plan selection
                 </button>
 
                 <p className="text-[10.5px] text-muted-foreground/80 text-center leading-relaxed mt-4">
-                  بالضغط على «ابدأ التجربة» فإنك توافق على بدء اشتراك يتجدد تلقائياً بسعر {formatPrice(selected, selectedPlan.price)}{" "}
-                  {selectedPlan.per} بعد انتهاء أيام التجربة الـ{TRIAL_DAYS}، عبر حساب Google Play الخاص بك.
+                  By tapping "Start free trial" you agree to begin a subscription that auto-renews at {formatPrice(selected, selectedPlan.price)}{" "}
+                  {selectedPlan.per} after the {TRIAL_DAYS}-day trial period, via your Google Play account.
                 </p>
               </motion.div>
             )}

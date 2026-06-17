@@ -43,7 +43,7 @@ export function AutoPaywall() {
     <Paywall
       open={open}
       onOpenChange={setOpen}
-      reason="انتهت الفترة المجانية — اختر خطتك للاستمرار"
+      reason="Free trial ended — choose a plan to continue"
     />
   );
 }

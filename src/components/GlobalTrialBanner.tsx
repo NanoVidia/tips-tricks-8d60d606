@@ -11,7 +11,7 @@ import { useAccess } from "@/hooks/useAccess";
  *  - trial, days > 3            → hidden
  *  - trial, 2-3 days left       → amber/orange info banner
  *  - trial, 1 day left          → red urgent banner with pulse
- *  - expired                    → red persistent banner ("انتهت تجربتك")
+ *  - expired                    → red persistent banner ("Trial ended")
  */
 export function GlobalTrialBanner() {
   const access = useAccess();
@@ -33,7 +33,6 @@ export function GlobalTrialBanner() {
               ? "w-full flex items-center justify-between gap-2 px-4 py-2 bg-gradient-to-r from-red-500/15 to-rose-500/15 border-b border-red-500/40 text-[12px] font-medium animate-pulse"
               : "w-full flex items-center justify-between gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-amber-500/30 text-[12px] font-medium"
           }
-          dir="rtl"
         >
           <span
             className={
@@ -44,15 +43,15 @@ export function GlobalTrialBanner() {
           >
             <Crown className="w-3.5 h-3.5" />
             {urgent
-              ? "تنتهي تجربتك خلال يوم واحد"
-              : `تنتهي تجربتك خلال ${access.daysLeft} أيام`}
+              ? "Your trial expires in 1 day"
+              : `Your trial expires in ${access.daysLeft} days`}
           </span>
-          <span className="text-primary font-bold">اشترك الآن ←</span>
+          <span className="text-primary font-bold">Subscribe now →</span>
         </button>
         <Paywall
           open={open}
           onOpenChange={setOpen}
-          reason="تجربتك المجانية على وشك الانتهاء"
+          reason="Your free trial is about to expire"
         />
       </>
     );
@@ -66,18 +65,17 @@ export function GlobalTrialBanner() {
           type="button"
           onClick={() => setOpen(true)}
           className="w-full flex items-center justify-between gap-2 px-4 py-2 bg-gradient-to-r from-red-500/20 to-rose-500/20 border-b border-red-500/50 text-[12px] font-medium"
-          dir="rtl"
         >
           <span className="inline-flex items-center gap-1.5 text-red-700 dark:text-red-300">
             <AlertTriangle className="w-3.5 h-3.5" />
-            انتهت تجربتك المجانية — اشترك للوصول الكامل
+            Your free trial has ended — subscribe for full access
           </span>
-          <span className="text-primary font-bold">اشترك الآن ←</span>
+          <span className="text-primary font-bold">Subscribe now →</span>
         </button>
         <Paywall
           open={open}
           onOpenChange={setOpen}
-          reason="انتهت الفترة المجانية — اختر خطتك للاستمرار"
+          reason="Free trial ended — choose a plan to continue"
         />
       </>
     );

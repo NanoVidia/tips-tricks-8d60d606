@@ -122,7 +122,7 @@ function SubscriptionRow({ sub }: { sub: SubRow }) {
           {shorten(sub.user_id, 18)}
         </span>
         <span className="text-[10.5px] text-muted-foreground shrink-0 hidden md:inline">
-          {sub.current_period_end ? `إلى ${formatDate(sub.current_period_end).split(",")[0]}` : "—"}
+          {sub.current_period_end ? `until ${formatDate(sub.current_period_end).split(",")[0]}` : "—"}
         </span>
         {isExpired && sub.status === "active" && (
           <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
@@ -268,7 +268,7 @@ export default function BillingMonitor() {
             Billing Monitor
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            مراقبة الاشتراكات وأحداث الشراء في الوقت الحقيقي
+            Real-time subscription and purchase event monitoring
           </p>
         </div>
         <Button
@@ -278,16 +278,16 @@ export default function BillingMonitor() {
           disabled={isFetching}
         >
           <RefreshCw className={`h-3.5 w-3.5 ml-1.5 ${isFetching ? "animate-spin" : ""}`} />
-          تحديث
+          Refresh
         </Button>
       </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={Users} label="إجمالي المشتركين" value={stats?.total ?? "…"} />
-        <StatCard icon={CheckCircle2} label="نشطون" value={stats?.active ?? "…"} tone="success" />
-        <StatCard icon={Clock} label="فترة تجريبية" value={stats?.trial ?? "…"} tone="warning" />
-        <StatCard icon={XCircle} label="منتهون / ملغون" value={(stats?.expired ?? 0) + (stats?.canceled ?? 0)} tone="danger" />
+        <StatCard icon={Users} label="Total subscribers" value={stats?.total ?? "…"} />
+        <StatCard icon={CheckCircle2} label="Active" value={stats?.active ?? "…"} tone="success" />
+        <StatCard icon={Clock} label="Trial" value={stats?.trial ?? "…"} tone="warning" />
+        <StatCard icon={XCircle} label="Expired / Cancelled" value={(stats?.expired ?? 0) + (stats?.canceled ?? 0)} tone="danger" />
       </div>
 
       {/* Plan + activity */}
@@ -296,20 +296,20 @@ export default function BillingMonitor() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Crown className="h-4 w-4 text-amber-500" />
-              توزيع الخطط
+              Plan breakdown
             </CardTitle>
           </CardHeader>
           <CardContent className="text-xs space-y-1.5">
             <div className="flex justify-between">
-              <span>شهري</span>
+              <span>Monthly</span>
               <span className="font-mono font-bold">{stats?.byPlan.monthly ?? 0}</span>
             </div>
             <div className="flex justify-between">
-              <span>سنوي</span>
+              <span>Yearly</span>
               <span className="font-mono font-bold">{stats?.byPlan.yearly ?? 0}</span>
             </div>
             <div className="flex justify-between">
-              <span>مدى الحياة</span>
+              <span>Lifetime</span>
               <span className="font-mono font-bold">{stats?.byPlan.lifetime ?? 0}</span>
             </div>
           </CardContent>
@@ -319,20 +319,20 @@ export default function BillingMonitor() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Activity className="h-4 w-4 text-blue-500" />
-              نشاط الأحداث
+              Event activity
             </CardTitle>
           </CardHeader>
           <CardContent className="text-xs space-y-1.5">
             <div className="flex justify-between">
-              <span>آخر 24 ساعة</span>
+              <span>Last 24 hours</span>
               <span className="font-mono font-bold">{data?.events24h ?? 0}</span>
             </div>
             <div className="flex justify-between">
-              <span>آخر 7 أيام</span>
+              <span>Last 7 days</span>
               <span className="font-mono font-bold">{data?.events7d ?? 0}</span>
             </div>
             <div className="flex justify-between text-muted-foreground">
-              <span>المعروضة الآن</span>
+              <span>Currently shown</span>
               <span className="font-mono">{events.length}</span>
             </div>
           </CardContent>
@@ -341,7 +341,7 @@ export default function BillingMonitor() {
 
       {/* Search */}
       <Input
-        placeholder="بحث (user_id, order_id, product_id, JSON…)"
+        placeholder="Search (user_id, order_id, product_id, JSON…)"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="text-xs font-mono"
@@ -351,20 +351,20 @@ export default function BillingMonitor() {
       <Tabs defaultValue="subscriptions">
         <TabsList className="grid grid-cols-2 w-full max-w-md">
           <TabsTrigger value="subscriptions" className="text-xs">
-            الاشتراكات ({subs.length})
+            Subscriptions ({subs.length})
           </TabsTrigger>
           <TabsTrigger value="events" className="text-xs">
-            الأحداث ({events.length})
+            Events ({events.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="subscriptions" className="mt-3">
           <Card className="overflow-hidden">
             {isLoading ? (
-              <div className="p-8 text-center text-sm text-muted-foreground">جاري التحميل…</div>
+              <div className="p-8 text-center text-sm text-muted-foreground">Loading…</div>
             ) : subs.length === 0 ? (
               <div className="p-8 text-center text-sm text-muted-foreground">
-                لا توجد اشتراكات بعد. ستظهر هنا فور أن يبدأ مستخدم تجربة أو شراء حقيقي.
+                No subscriptions yet. They will appear here once a user starts a trial or makes a purchase.
               </div>
             ) : (
               filtered(subs).map((s) => <SubscriptionRow key={(s as SubRow).id} sub={s as SubRow} />)
@@ -375,10 +375,10 @@ export default function BillingMonitor() {
         <TabsContent value="events" className="mt-3">
           <Card className="overflow-hidden">
             {isLoading ? (
-              <div className="p-8 text-center text-sm text-muted-foreground">جاري التحميل…</div>
+              <div className="p-8 text-center text-sm text-muted-foreground">Loading…</div>
             ) : events.length === 0 ? (
               <div className="p-8 text-center text-sm text-muted-foreground">
-                لا توجد أحداث بعد.
+                No events yet.
               </div>
             ) : (
               filtered(events).map((e) => <EventRow key={(e as EventRow).id} ev={e as EventRow} />)
@@ -389,7 +389,7 @@ export default function BillingMonitor() {
             <Card className="mt-3">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">
-                  أنواع الأحداث
+                  Event types
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-xs flex flex-wrap gap-1.5">
