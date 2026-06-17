@@ -47,7 +47,7 @@ export default function MenuPage() {
   const whatsapp = String(get("whatsapp_number") || "").replace(/\D/g, "");
   const supportEmail = typeof settingsMap.support_email === "string"
     ? settingsMap.support_email
-    : "support@tips-tricks.app";
+    : "Dr.sahar.ask@gmail.com";
   const aboutContent = settingsMap.about_content || null;
   const privacyContent = settingsMap.privacy_content || null;
   const termsContent = settingsMap.terms_content || null;
