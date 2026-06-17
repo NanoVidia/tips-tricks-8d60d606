@@ -76,8 +76,8 @@ export default function SafeLegal({
               <p className="font-semibold">How can I suggest a question?</p>
               <p className="text-muted-foreground">
                 Email us at{" "}
-                <a href="mailto:support@tips-tricks.app" className="text-primary underline">
-                  support@tips-tricks.app
+                <a href="mailto:Dr.sahar.ask@gmail.com" className="text-primary underline">
+                  Dr.sahar.ask@gmail.com
                 </a>
                 .
               </p>
@@ -217,8 +217,8 @@ export default function SafeLegal({
           <h2 className="text-xl font-bold">Contact</h2>
           <p className="text-sm">
             Questions or feedback?{" "}
-            <a href="mailto:support@tips-tricks.app" className="text-primary underline">
-              support@tips-tricks.app
+            <a href="mailto:Dr.sahar.ask@gmail.com" className="text-primary underline">
+              Dr.sahar.ask@gmail.com
             </a>
           </p>
         </section>

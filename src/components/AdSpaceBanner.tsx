@@ -126,7 +126,7 @@ export function AdSpaceBanner() {
         </div>
 
         <motion.a
-          href="mailto:ads@example.com"
+          href="mailto:Dr.sahar.ask@gmail.com"
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
           className="inline-flex items-center gap-2 mt-1 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md shadow-primary/20 ring-1 ring-primary/30"

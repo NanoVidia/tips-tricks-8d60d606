@@ -217,7 +217,7 @@ export function MenuPageBody({
             <p className="text-muted-foreground">
               You can clear all local data at any time from <em>Menu → Reset Local Data</em>, or
               uninstall the app to remove everything from your device. For access, correction, or
-              deletion requests, contact us at <a href={`mailto:${"support@example.com"}`} className="text-primary hover:underline">our support email</a>.
+              deletion requests, contact us at <a href={`mailto:${"Dr.sahar.ask@gmail.com"}`} className="text-primary hover:underline">our support email</a>.
             </p>
           </div>
 

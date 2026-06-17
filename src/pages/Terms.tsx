@@ -70,7 +70,7 @@ export default function Terms() {
         <h2 className="text-xl font-semibold">9. Contact</h2>
         <p>
           For enquiries:{" "}
-          <a href="mailto:support@tips-tricks.app" className="text-primary underline">support@tips-tricks.app</a>
+          <a href="mailto:Dr.sahar.ask@gmail.com" className="text-primary underline">Dr.sahar.ask@gmail.com</a>
         </p>
       </section>
     </main>
