@@ -129,35 +129,177 @@ export function MenuPageBody({
   termsContent,
 }: MenuPageBodyProps) {
   if (id === "about") return (
-    <>
+    <div className="space-y-4 text-sm leading-relaxed">
       {aboutContent?.body ? (
         <p className="whitespace-pre-line">{aboutContent.body}</p>
       ) : (
-        <p><strong>{APP_NAME}</strong> is a curated clinical reference for OB/GYN practitioners.</p>
+        <>
+          <p>
+            <strong>{APP_NAME}</strong> is a fast, evidence-anchored chairside reference built for
+            obstetricians, gynecologists, residents, midwives, and senior medical students who need
+            confident answers in seconds — not minutes scrolling through textbooks.
+          </p>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">What you get</p>
+            <ul className="list-disc space-y-1 pr-5 text-muted-foreground">
+              <li>Curated clinical scenarios with stepwise action plans and red flags.</li>
+              <li>Searchable MCQ bank with explanations for board and exam prep.</li>
+              <li>Surgery library, calculators, and an AI assistant for free-text questions.</li>
+              <li>Aligned with ACOG, RCOG, NICE, WHO, FIGO and SMFM where relevant.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">Built for real practice</p>
+            <p className="text-muted-foreground">
+              Every entry is written by clinicians, reviewed against published guidelines, and
+              updated as recommendations evolve. Works offline once loaded, respects your data, and
+              stays out of your way during ward rounds, clinic, and on-call.
+            </p>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            ⚠️ Educational reference only. Not a diagnostic tool. Always follow your local
+            protocols, individual patient assessment, and your clinical judgement.
+          </p>
+          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} — All rights reserved.</p>
+        </>
       )}
-      <p className="text-muted-foreground text-xs">⚠️ For educational purposes only. Always follow local protocols and clinical judgment.</p>
-      <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} — All rights reserved.</p>
-    </>
+    </div>
   );
 
   if (id === "privacy") return (
-    <>
+    <div className="space-y-4 text-sm leading-relaxed">
       {privacyContent?.body ? (
         <p className="whitespace-pre-line">{privacyContent.body}</p>
       ) : (
-        <p>We respect your privacy. Preferences are stored locally on your device.</p>
+        <>
+          <p className="text-muted-foreground">
+            Effective date: {new Date().toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}
+          </p>
+
+          <p>
+            Your privacy is fundamental to how this app is built. We collect the minimum data
+            required to run the service and we never sell, rent, or trade your information.
+          </p>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">What we store</p>
+            <ul className="list-disc space-y-1 pr-5 text-muted-foreground">
+              <li>App preferences (theme, language, accessibility) — stored locally on your device.</li>
+              <li>Saved bookmarks, recent searches, and trial state — stored locally on your device.</li>
+              <li>Anonymous device identifiers used only for license and trial validation.</li>
+              <li>Optional crash reports and basic usage counters to fix bugs and improve quality.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">What we do NOT collect</p>
+            <ul className="list-disc space-y-1 pr-5 text-muted-foreground">
+              <li>Patient names, medical records, or any identifiable clinical data.</li>
+              <li>Your contacts, photos, microphone, location, or background activity.</li>
+              <li>Behavioral tracking or third-party advertising profiles.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">AI assistant</p>
+            <p className="text-muted-foreground">
+              When you use the AI assistant, your question is sent to our AI provider solely to
+              generate the answer. Do not enter identifiable patient information. Conversations are
+              not used to train external models.
+            </p>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">Your rights</p>
+            <p className="text-muted-foreground">
+              You can clear all local data at any time from <em>Menu → Reset Local Data</em>, or
+              uninstall the app to remove everything from your device. For access, correction, or
+              deletion requests, contact us at <a href={`mailto:${"support@example.com"}`} className="text-primary hover:underline">our support email</a>.
+            </p>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            This app is intended for healthcare professionals and is not directed at children under 16.
+          </p>
+        </>
       )}
-    </>
+    </div>
   );
 
   if (id === "terms") return (
-    <>
+    <div className="space-y-4 text-sm leading-relaxed">
       {termsContent?.body ? (
         <p className="whitespace-pre-line">{termsContent.body}</p>
       ) : (
-        <p>Content is educational and not a substitute for professional clinical judgement.</p>
+        <>
+          <p className="text-muted-foreground">
+            Effective date: {new Date().toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}
+          </p>
+
+          <p>
+            By installing or using <strong>{APP_NAME}</strong> you agree to the terms below. If you
+            do not agree, please stop using the app and uninstall it from your device.
+          </p>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">1. Educational use only</p>
+            <p className="text-muted-foreground">
+              All content is provided for professional education and reference. It is <strong>not</strong> a
+              substitute for individualized clinical assessment, diagnosis, or treatment. Final
+              decisions remain the sole responsibility of the treating clinician.
+            </p>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">2. No doctor–patient relationship</p>
+            <p className="text-muted-foreground">
+              Using this app does not create a doctor–patient relationship with the authors, owners,
+              or contributors. The app does not provide emergency services — for medical
+              emergencies, contact your local emergency number immediately.
+            </p>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">3. Accuracy & updates</p>
+            <p className="text-muted-foreground">
+              We work to keep content aligned with current guidelines (ACOG, RCOG, NICE, WHO, FIGO,
+              SMFM), but medicine evolves. Always cross-check with your local protocols and the
+              latest primary sources before acting.
+            </p>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">4. Acceptable use</p>
+            <p className="text-muted-foreground">
+              Do not reverse-engineer, scrape, resell, or redistribute the content. Do not enter
+              personally identifiable patient data into the AI assistant. Do not use the app in any
+              way that violates applicable laws or professional standards.
+            </p>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">5. Limitation of liability</p>
+            <p className="text-muted-foreground">
+              To the maximum extent permitted by law, the authors and publishers are not liable for
+              any direct or indirect damages arising from clinical decisions, omissions, or errors
+              related to the use of this app. The app is provided "as is" without warranties of any
+              kind, express or implied.
+            </p>
+          </div>
+
+          <div>
+            <p className="font-semibold text-foreground mb-1.5">6. Changes</p>
+            <p className="text-muted-foreground">
+              We may update these terms to reflect new features or legal requirements. Continued use
+              after an update constitutes acceptance of the revised terms.
+            </p>
+          </div>
+        </>
       )}
-    </>
+    </div>
   );
 
   if (id === "contact") return (
@@ -176,18 +318,53 @@ export function MenuPageBody({
   if (id === "faq") return <FaqSection />;
 
   if (id === "help") return (
-    <>
-      <p>Need help using the app?</p>
-      <ul className="list-disc space-y-1 pr-5">
-        <li>Tap any scenario card to open detailed action steps.</li>
-        <li>Use the search bar to find topics across all categories.</li>
-        <li>The AI assistant (chat icon) answers free-text clinical questions.</li>
-      </ul>
-      <a href={`mailto:${supportEmail}`} className="inline-flex items-center gap-2 text-primary hover:underline">
-        <Mail className="h-4 w-4" /> Email support
-      </a>
-    </>
+    <div className="space-y-4 text-sm leading-relaxed">
+      <p>
+        Get the most out of <strong>{APP_NAME}</strong> in under a minute. Here are the moves that
+        most clinicians use every shift.
+      </p>
+
+      <div>
+        <p className="font-semibold text-foreground mb-1.5">⚡ Quick start</p>
+        <ul className="list-disc space-y-1 pr-5 text-muted-foreground">
+          <li>Use the search bar — it handles typos and synonyms across 200+ entries (try "PPH", "ectopic", "PCOS").</li>
+          <li>Tap any scenario card for stepwise actions, red flags, and dosing guidance.</li>
+          <li>The AI assistant (chat icon) answers free-text clinical questions in plain English.</li>
+        </ul>
+      </div>
+
+      <div>
+        <p className="font-semibold text-foreground mb-1.5">🎯 Power features</p>
+        <ul className="list-disc space-y-1 pr-5 text-muted-foreground">
+          <li><strong>Bookmarks</strong> — long-press or tap the bookmark icon to save anything for offline review.</li>
+          <li><strong>MCQ bank</strong> — exam-style questions with explanations; tracks your weak topics.</li>
+          <li><strong>Calculators</strong> — BMI, EDD, Bishop score, eGFR, and more, all under <em>Tools</em>.</li>
+          <li><strong>Surgery library</strong> — illustrated step-by-step procedures for residents.</li>
+          <li><strong>Dark mode</strong> — tap the moon/sun in the header; perfect for night shifts.</li>
+        </ul>
+      </div>
+
+      <div>
+        <p className="font-semibold text-foreground mb-1.5">🛠 Troubleshooting</p>
+        <ul className="list-disc space-y-1 pr-5 text-muted-foreground">
+          <li>Content looks stale? Pull down on the home screen to refresh.</li>
+          <li>Something broken? Use <em>Menu → Report a Bug</em> — we read every report.</li>
+          <li>Want to start fresh? <em>Menu → Reset Local Data</em> clears bookmarks and preferences.</li>
+        </ul>
+      </div>
+
+      <div>
+        <p className="font-semibold text-foreground mb-1.5">💬 Still need help?</p>
+        <p className="text-muted-foreground">
+          The team replies to every email — usually within one working day.
+        </p>
+        <a href={`mailto:${supportEmail}`} className="mt-2 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-primary transition-colors hover:bg-muted">
+          <Mail className="h-4 w-4" /> Email support
+        </a>
+      </div>
+    </div>
   );
+
 
   if (id === "feedback") return <FeedbackForm supportEmail={supportEmail} />;
   if (id === "bug") return <BugForm supportEmail={supportEmail} />;
