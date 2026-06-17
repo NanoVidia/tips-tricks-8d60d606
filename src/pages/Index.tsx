@@ -38,6 +38,7 @@ import { DisclaimerBanner } from "@/components/Disclaimer";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Clock, Trash2, ShieldCheck } from "lucide-react";
 import { PhIcon } from "@/components/ui/PhIcon";
+import brandLogo from "@/assets/brand-logo.png.asset.json";
 import { detectUrgency } from "@/lib/clinicalTags";
 import { expandClinicalSearchQueries, rankSearchScenarios } from "@/lib/clinicalSearch";
 import { buildHighlightRegex, highlightText } from "@/lib/highlight";
@@ -501,31 +502,16 @@ export default function Index() {
               scrolled ? "mb-3" : "mb-5 mt-1"
             }`}
           >
-            {/* Logo medallion with halo */}
-            <span
-              className={`relative inline-flex items-center justify-center rounded-[28%] bg-gradient-to-br from-rose-400 via-pink-500 to-rose-600 text-white shrink-0 transition-all duration-300
-                shadow-[0_10px_30px_-8px_rgba(244,63,94,0.55)]
-                ring-[3px] ring-white/70 dark:ring-white/10
-                ${scrolled ? "w-10 h-10" : "w-16 h-16"}`}
-              aria-label="Obstetrics & Gynecology"
-            >
-              {/* Inner glossy highlight */}
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 rounded-[28%] bg-gradient-to-b from-white/30 via-white/0 to-transparent"
-              />
-              <Baby className={scrolled ? "w-5 h-5" : "w-8 h-8"} strokeWidth={2.4} />
-              <span
-                className={`absolute -bottom-1 -end-1 rounded-full bg-card border border-border/70 flex items-center justify-center shadow-md ${
-                  scrolled ? "w-4 h-4" : "w-6 h-6"
-                }`}
-              >
-                <Stethoscope
-                  className={scrolled ? "w-2 h-2 text-rose-500" : "w-3 h-3 text-rose-500"}
-                  strokeWidth={3}
-                />
-              </span>
-            </span>
+            {/* Brand logo (transparent PNG, no background) */}
+            <img
+              src={brandLogo.url}
+              alt="OB/GYN Tips & Tricks logo"
+              className={`shrink-0 object-contain transition-all duration-300 drop-shadow-[0_6px_14px_rgba(79,70,229,0.25)] ${
+                scrolled ? "w-9 h-9" : "w-14 h-14"
+              }`}
+              loading="eager"
+              decoding="async"
+            />
 
             {/* Wordmark */}
             <h1
