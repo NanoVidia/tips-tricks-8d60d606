@@ -302,8 +302,10 @@ export default function Tools() {
 
 
   useEffect(() => {
+    // Don't persist tab state from the /saved page (it would override /tools default)
+    if (isSavedPage) return;
     window.localStorage.setItem(STORAGE_TAB, active);
-  }, [active]);
+  }, [active, isSavedPage]);
 
   useEffect(() => {
     setMcqOrder(mcqs.map((_, i) => i));
