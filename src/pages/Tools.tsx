@@ -217,12 +217,15 @@ function DrugInteractionChecker() {
 const FDA_FILTERS = ["All", "A", "B", "C", "D", "X"] as const;
 
 export default function Tools() {
+  const isSavedPage = typeof window !== "undefined" && window.location.pathname.startsWith("/saved");
   const [active, setActive] = useState<string>(() => {
     if (typeof window === "undefined") return "calc";
-    if (window.location.pathname.startsWith("/saved")) return "favorites";
+    if (isSavedPage) return "favorites";
     const urlTab = new URLSearchParams(window.location.search).get("tab");
     if (urlTab && sections.some((s) => s.id === urlTab)) return urlTab;
     const saved = window.localStorage.getItem(STORAGE_TAB);
+    // On /tools, never restore "favorites" — that tab now has its own /saved page
+    if (saved === "favorites") return "calc";
     return saved && sections.some((s) => s.id === saved) ? saved : "calc";
   });
   const [drugSearch, setDrugSearch] = useState("");
