@@ -142,9 +142,9 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/index" element={<Index />} />
-              <Route path="/tools" element={<AccessGate featureLabel="الأدوات السريرية"><Tools /></AccessGate>} />
-              <Route path="/exams" element={<AccessGate featureLabel="الاختبارات وبنك الأسئلة"><Exams /></AccessGate>} />
-              <Route path="/exams/compare" element={<AccessGate featureLabel="مقارنة الاختبارات"><ExamsCompare /></AccessGate>} />
+              <Route path="/tools" element={<AccessGate featureLabel="Clinical Tools"><Tools /></AccessGate>} />
+              <Route path="/exams" element={<AccessGate featureLabel="Exams &amp; Question Bank"><Exams /></AccessGate>} />
+              <Route path="/exams/compare" element={<AccessGate featureLabel="Exam Comparison"><ExamsCompare /></AccessGate>} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/control/login" element={<ControlLoginPage />} />
               <Route path="/control" element={<Control />} />

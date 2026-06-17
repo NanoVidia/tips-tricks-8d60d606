@@ -23,7 +23,7 @@ export const PLANS: Plan[] = [
     productId: "tt_monthly",
     price: 7.99,
     labelEn: "Monthly",
-    labelAr: "شهري",
+    labelAr: "Monthly",
     per: "/mo",
   },
   {
@@ -31,7 +31,7 @@ export const PLANS: Plan[] = [
     productId: "tt_yearly",
     price: 49.99,
     labelEn: "Yearly",
-    labelAr: "سنوي",
+    labelAr: "Yearly",
     per: "/yr",
     badge: "Save 48%",
     highlight: true,
@@ -41,7 +41,7 @@ export const PLANS: Plan[] = [
     productId: "tt_lifetime",
     price: 119.99,
     labelEn: "Lifetime",
-    labelAr: "مدى الحياة",
+    labelAr: "Lifetime",
     per: "one-time",
   },
 ];

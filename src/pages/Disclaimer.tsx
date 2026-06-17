@@ -3,94 +3,101 @@ import { Link } from "react-router-dom";
 export default function Disclaimer() {
   return (
     <main dir="rtl" className="min-h-screen bg-background text-foreground px-5 py-10 max-w-3xl mx-auto leading-relaxed">
-      <Link to="/" className="text-sm text-primary underline">← العودة للرئيسية</Link>
-      <h1 className="text-3xl font-bold mt-4 mb-2">إخلاء المسؤولية (Disclaimer)</h1>
-      <p className="text-sm text-muted-foreground mb-6">آخر تحديث: مايو 2026</p>
+      <Link to="/" className="text-sm text-primary underline">← Back to home</Link>
+      <h1 className="text-3xl font-bold mt-4 mb-2">Educational Disclaimer</h1>
+      <p className="text-sm text-muted-foreground mb-6">Last updated: May 2026</p>
 
       <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 mb-6 text-sm">
-        ⚠️ <strong>تنبيه مهم:</strong> هذا التطبيق <strong>تعليمي وإرشادي فقط</strong> ولا يقدم
-        تشخيصاً أو علاجاً طبياً. لا تستخدمه بديلاً عن استشارة الطبيب.
+        ⚠️ <strong>Important Notice:</strong> This application is intended for{" "}
+        <strong>educational and informational purposes only</strong>. It does not provide medical
+        diagnosis or treatment. Do not use it as a substitute for professional medical advice.
       </div>
 
       <section className="space-y-4 text-sm">
-        <h2 className="text-xl font-semibold">1. الغرض من التطبيق</h2>
+        <h2 className="text-xl font-semibold">1. Purpose of the Application</h2>
         <p>
-          <strong>Tips &amp; Tricks</strong> أداة تعليمية وإرشادية مصممة لمساعدة المهتمين بمجال
-          صحة المرأة والحمل والولادة والخصوبة على فهم المفاهيم العامة، والمراجعة الذاتية،
-          والتحضير للاختبارات الأكاديمية مثل Prometric وMRCOG.
+          <strong>Tips &amp; Tricks</strong> is an educational and informational tool designed to help
+          those interested in women's health, pregnancy, obstetrics, and reproductive medicine understand
+          general concepts, conduct self-review, and prepare for academic examinations such as Prometric
+          and MRCOG.
         </p>
 
-        <h2 className="text-xl font-semibold">2. ليس استشارة طبية</h2>
+        <h2 className="text-xl font-semibold">2. Not Medical Advice</h2>
         <p>
-          المعلومات والحاسبات والأسئلة المعروضة في التطبيق:
-        </p>
-        <ul className="list-disc pr-6 space-y-1">
-          <li>لا تُعتبر استشارة طبية أو رأياً تشخيصياً.</li>
-          <li>لا تحل محل الفحص السريري أو التحاليل المخبرية.</li>
-          <li>لا يجب الاعتماد عليها لاتخاذ قرارات علاجية.</li>
-          <li>قد تحتوي على أخطاء أو معلومات غير محدّثة.</li>
-        </ul>
-
-        <h2 className="text-xl font-semibold">3. الحاسبات الإرشادية</h2>
-        <p>
-          الحاسبات (مثل تاريخ الولادة المتوقع EDD، عمر الحمل، مؤشر BMI، نافذة الإباضة)
-          تُقدم نتائج <strong>تقريبية</strong> بناءً على معادلات شائعة، وقد تختلف عن النتائج
-          السريرية الفعلية. <strong>دائماً راجع طبيبك</strong> للحصول على تقييم دقيق.
-        </p>
-
-        <h2 className="text-xl font-semibold">4. الأسئلة والسيناريوهات</h2>
-        <p>
-          أسئلة الاختبارات والسيناريوهات السريرية مأخوذة من مصادر تعليمية عامة وأبحاث منشورة،
-          وهي مخصصة <strong>للتدريب الأكاديمي فقط</strong>، وليست بديلاً عن المناهج الرسمية
-          أو الكتب المرجعية المعتمدة.
-        </p>
-
-        <h2 className="text-xl font-semibold">5. مساعد الذكاء الاصطناعي (AI Mentor)</h2>
-        <p>
-          الردود التي يقدمها مساعد الذكاء الاصطناعي تُولَّد آلياً وقد تحتوي على أخطاء أو
-          معلومات غير دقيقة. <strong>لا تستخدمها لاتخاذ قرارات طبية</strong>، واعتمد على
-          المصادر الموثوقة والاستشارة المتخصصة دائماً.
-        </p>
-
-        <h2 className="text-xl font-semibold">6. حالات الطوارئ</h2>
-        <p>
-          إذا كنتِ تعانين من نزيف، ألم شديد، انخفاض حركة الجنين، أو أي عرض طارئ:
-          <strong> توجهي فوراً إلى أقرب مستشفى أو اتصلي بالطوارئ</strong>. لا تستخدمي هذا
-          التطبيق في حالات الطوارئ.
-        </p>
-
-        <h2 className="text-xl font-semibold">7. حدود المسؤولية</h2>
-        <p>
-          المطوّرون وفريق العمل والمساهمون في التطبيق <strong>غير مسؤولين</strong> عن أي ضرر
-          مباشر أو غير مباشر، صحي أو مادي، ينتج عن:
+          The information, calculators, and questions presented in the application:
         </p>
         <ul className="list-disc pr-6 space-y-1">
-          <li>استخدام أو سوء استخدام المعلومات المعروضة.</li>
-          <li>أي قرار طبي أو شخصي يُتخذ بناءً على محتوى التطبيق.</li>
-          <li>أي خطأ أو نقص في المحتوى.</li>
+          <li>Do not constitute medical advice or a diagnostic opinion.</li>
+          <li>Do not replace clinical examination or laboratory investigations.</li>
+          <li>Must not be relied upon for therapeutic decision-making.</li>
+          <li>May contain errors or outdated information.</li>
         </ul>
 
-        <h2 className="text-xl font-semibold">8. الفئة المستهدفة</h2>
+        <h2 className="text-xl font-semibold">3. Informational Calculators</h2>
         <p>
-          التطبيق موجه للبالغين (18+) من المهتمين بالمعرفة الصحية، طلاب وطالبات الكليات الصحية،
-          والممارسين الذين يستخدمونه <strong>كأداة مراجعة شخصية</strong> فقط.
+          Calculators (such as estimated delivery date EDD, gestational age, BMI index, and ovulation
+          window) provide <strong>approximate results</strong> based on widely used formulae and may
+          differ from actual clinical findings. <strong>Always consult a clinician</strong> for an
+          accurate assessment.
         </p>
 
-        <h2 className="text-xl font-semibold">9. اللغة الطبية</h2>
+        <h2 className="text-xl font-semibold">4. Questions and Scenarios</h2>
         <p>
-          قد يحتوي التطبيق على مصطلحات طبية متقدمة. إذا كنت غير متخصص، فالمحتوى قد يكون
-          صعب الفهم وقد يُساء تفسيره. <strong>استشر مختصاً</strong> لتفسير أي معلومة.
+          Examination questions and clinical scenarios are drawn from general educational sources and
+          published research. They are intended <strong>for academic training only</strong> and are not
+          a substitute for official curricula or approved reference textbooks.
         </p>
 
-        <h2 className="text-xl font-semibold">10. الموافقة</h2>
+        <h2 className="text-xl font-semibold">5. AI Assistant (AI Mentor)</h2>
         <p>
-          باستخدامك للتطبيق فإنك تُقر بأنك قرأت وفهمت هذا الإخلاء وتوافق عليه بالكامل.
+          Responses generated by the AI assistant are produced automatically and may contain errors or
+          inaccuracies. <strong>Do not use them to make clinical decisions.</strong> Always rely on
+          authoritative sources and specialist consultation.
+        </p>
+
+        <h2 className="text-xl font-semibold">6. Emergencies</h2>
+        <p>
+          If you are experiencing bleeding, severe pain, reduced fetal movement, or any emergency
+          symptom: <strong>go immediately to the nearest hospital or call emergency services.</strong>{" "}
+          Do not use this application in emergency situations.
+        </p>
+
+        <h2 className="text-xl font-semibold">7. Limitation of Liability</h2>
+        <p>
+          The developers, team members, and contributors of this application are{" "}
+          <strong>not liable</strong> for any direct or indirect harm — physical, financial, or
+          otherwise — arising from:
+        </p>
+        <ul className="list-disc pr-6 space-y-1">
+          <li>The use or misuse of information presented in the application.</li>
+          <li>Any medical or personal decision made based on the application's content.</li>
+          <li>Any error or omission in the content.</li>
+        </ul>
+
+        <h2 className="text-xl font-semibold">8. Target Audience</h2>
+        <p>
+          This application is intended for adults (18+) interested in health knowledge, students in
+          health-related faculties, and practitioners who use it exclusively as a{" "}
+          <strong>personal review tool</strong>.
+        </p>
+
+        <h2 className="text-xl font-semibold">9. Medical Terminology</h2>
+        <p>
+          The application may contain advanced medical terminology. If you are not a specialist, the
+          content may be difficult to understand and could be misinterpreted.{" "}
+          <strong>Consult a specialist</strong> to interpret any information.
+        </p>
+
+        <h2 className="text-xl font-semibold">10. Acceptance</h2>
+        <p>
+          By using the application you acknowledge that you have read and understood this disclaimer
+          and agree to it in full.
         </p>
 
         <p className="text-xs text-muted-foreground mt-6">
-          اطّلع أيضاً على{" "}
-          <Link to="/terms" className="text-primary underline">شروط الاستخدام</Link> و{" "}
-          <Link to="/privacy" className="text-primary underline">سياسة الخصوصية</Link>.
+          See also{" "}
+          <Link to="/terms" className="text-primary underline">Terms of Use</Link> and{" "}
+          <Link to="/privacy" className="text-primary underline">Privacy Policy</Link>.
         </p>
       </section>
     </main>

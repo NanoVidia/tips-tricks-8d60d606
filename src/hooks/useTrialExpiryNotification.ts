@@ -52,8 +52,8 @@ export function useTrialExpiryNotification() {
           notifications: [
             {
               id: NOTIF_ID,
-              title: "بقي يوم واحد على انتهاء تجربتك",
-              body: "اشترك الآن لمواصلة الوصول الكامل للأدوات والاختبارات.",
+              title: "Your trial ends in 24 hours",
+              body: "Subscribe now to keep full access to all tools and exams.",
               schedule: { at: new Date(fireAt), allowWhileIdle: true },
               channelId: "tips_tricks_default",
               smallIcon: "ic_stat_icon",

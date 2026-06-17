@@ -11,13 +11,13 @@ import { Loader2, KeyRound, Rocket, ShieldAlert, ExternalLink, RefreshCw } from 
 import sodium from "libsodium-wrappers";
 
 // ============================================================================
-// صفحة إعداد Keystore بنقرة واحدة
+// One-Click Keystore Setup page
 // ----------------------------------------------------------------------------
-// تتيح لك:
-//   1) لصق GitHub Personal Access Token مرة واحدة (لا يُحفظ على القرص)
-//   2) رفعه كـ GH_REPO_ADMIN_TOKEN داخل أسرار المستودع (مشفّراً عبر libsodium)
-//   3) تشغيل workflow "Build Android AAB" بنقرة واحدة ليولّد keystore عند الحاجة
-//   4) متابعة آخر تشغيل والذهاب إليه مباشرة
+// Allows you to:
+//   1) Paste a GitHub Personal Access Token once (not saved to disk)
+//   2) Upload it as GH_REPO_ADMIN_TOKEN into repository secrets (encrypted via libsodium)
+//   3) Trigger the "Build Android AAB" workflow with one click to generate the keystore when needed
+//   4) Monitor the latest run and navigate to it directly
 // ============================================================================
 
 const DEFAULT_OWNER = "";
@@ -49,7 +49,7 @@ async function uploadSecretToRepo(owner: string, repo: string, token: string, se
   const keyRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/secrets/public-key`, {
     headers: ghHeaders(token),
   });
-  if (!keyRes.ok) throw new Error(`فشل جلب المفتاح العام (${keyRes.status}): ${await keyRes.text()}`);
+  if (!keyRes.ok) throw new Error(`Failed to fetch public key (${keyRes.status}): ${await keyRes.text()}`);
   const { key, key_id } = await keyRes.json();
 
   const binkey = sodium.from_base64(key, sodium.base64_variants.ORIGINAL);
@@ -63,7 +63,7 @@ async function uploadSecretToRepo(owner: string, repo: string, token: string, se
     body: JSON.stringify({ encrypted_value, key_id }),
   });
   if (!putRes.ok && putRes.status !== 201 && putRes.status !== 204) {
-    throw new Error(`فشل رفع السر (${putRes.status}): ${await putRes.text()}`);
+    throw new Error(`Failed to upload secret (${putRes.status}): ${await putRes.text()}`);
   }
 }
 
@@ -77,7 +77,7 @@ async function dispatchWorkflow(owner: string, repo: string, token: string) {
     }
   );
   if (!res.ok && res.status !== 204) {
-    throw new Error(`فشل تشغيل الـ workflow (${res.status}): ${await res.text()}`);
+    throw new Error(`Failed to trigger workflow (${res.status}): ${await res.text()}`);
   }
 }
 
@@ -86,7 +86,7 @@ async function fetchLatestRun(owner: string, repo: string, token: string) {
     `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${WORKFLOW_FILE}/runs?per_page=1`,
     { headers: ghHeaders(token) }
   );
-  if (!res.ok) throw new Error(`فشل جلب آخر تشغيل (${res.status})`);
+  if (!res.ok) throw new Error(`Failed to fetch latest run (${res.status})`);
   const data = await res.json();
   return data.workflow_runs?.[0];
 }
@@ -123,14 +123,14 @@ export default function KeystoreSetup() {
       if (cfg.persistToken) {
         setBusy("save");
         await uploadSecretToRepo(cfg.owner.trim(), cfg.repo.trim(), token.trim(), SECRET_NAME, token.trim());
-        toast.success(`تم رفع ${SECRET_NAME} إلى أسرار المستودع`);
+        toast.success(`${SECRET_NAME} uploaded to repository secrets`);
       }
       setBusy("run");
       await dispatchWorkflow(cfg.owner.trim(), cfg.repo.trim(), token.trim());
-      toast.success("تم تشغيل Build Android AAB — راقب التقدم بالأسفل");
+      toast.success("Build Android AAB triggered — monitor progress below");
       setTimeout(() => handleRefresh(), 3000);
     } catch (e: any) {
-      toast.error(e?.message ?? "فشل غير متوقع");
+      toast.error(e?.message ?? "Unexpected error");
     } finally {
       setBusy(null);
     }
@@ -138,16 +138,16 @@ export default function KeystoreSetup() {
 
   async function handleRefresh() {
     if (!cfg.owner || !cfg.repo || !token) {
-      toast.error("أدخل owner/repo والتوكن أولاً");
+      toast.error("Enter owner, repo, and token first");
       return;
     }
     try {
       setBusy("refresh");
       const run = await fetchLatestRun(cfg.owner.trim(), cfg.repo.trim(), token.trim());
       setLatestRun(run);
-      if (!run) toast.info("لا يوجد تشغيل سابق بعد");
+      if (!run) toast.info("No previous runs found yet");
     } catch (e: any) {
-      toast.error(e?.message ?? "فشل التحديث");
+      toast.error(e?.message ?? "Refresh failed");
     } finally {
       setBusy(null);
     }
@@ -158,26 +158,28 @@ export default function KeystoreSetup() {
       <header className="space-y-2">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <KeyRound className="size-6 text-primary" />
-          إعداد Keystore بنقرة واحدة
+          One-Click Keystore Setup
         </h1>
         <p className="text-sm text-muted-foreground">
-          أدخل GitHub Personal Access Token لمرة واحدة، احفظه كسرّ دائم في المستودع، ثم شغّل بناء AAB بحيث يتم توليد keystore تلقائياً عند الحاجة.
+          Enter your GitHub Personal Access Token once, save it as a permanent repository secret,
+          then trigger an AAB build so the keystore is generated automatically when needed.
         </p>
       </header>
 
       <Alert variant="destructive">
         <ShieldAlert className="size-4" />
-        <AlertTitle>تنبيه أمني مهم</AlertTitle>
+        <AlertTitle>Important Security Notice</AlertTitle>
         <AlertDescription className="text-xs leading-relaxed">
-          التوكن يُستخدم في المتصفح فقط ولا يُحفظ على القرص. أنشئه بصلاحية{" "}
-          <code className="bg-muted px-1 rounded">repo</code> فقط، واحذفه من GitHub بعد انتهاء الإعداد إن أردت.
+          The token is used in the browser only and is not saved to disk. Create it with the{" "}
+          <code className="bg-muted px-1 rounded">repo</code> scope only, and revoke it from
+          GitHub after setup is complete if desired.
         </AlertDescription>
       </Alert>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">١. معلومات المستودع</CardTitle>
-          <CardDescription>تجدها في رابط GitHub الخاص بمستودعك.</CardDescription>
+          <CardTitle className="text-base">1. Repository Details</CardTitle>
+          <CardDescription>Found in your GitHub repository URL.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -207,7 +209,7 @@ export default function KeystoreSetup() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">٢. GitHub Personal Access Token</CardTitle>
+          <CardTitle className="text-base">2. GitHub Personal Access Token</CardTitle>
           <CardDescription>
             <a
               href="https://github.com/settings/tokens/new?scopes=repo&description=lovable-keystore-setup"
@@ -215,7 +217,7 @@ export default function KeystoreSetup() {
               rel="noreferrer"
               className="text-primary underline inline-flex items-center gap-1"
             >
-              أنشئ توكن جديد بصلاحية <code>repo</code>
+              Create a new token with <code>repo</code> scope
               <ExternalLink className="size-3" />
             </a>
           </CardDescription>
@@ -240,8 +242,10 @@ export default function KeystoreSetup() {
               className="mt-0.5"
             />
             <span className="text-muted-foreground leading-relaxed">
-              احفظ التوكن كسرّ دائم باسم <code className="bg-muted px-1 rounded">GH_REPO_ADMIN_TOKEN</code> داخل
-              المستودع (مطلوب مرة واحدة فقط لكي يستطيع workflow إنشاء أسرار التوقيع تلقائياً في GitHub).
+              Save the token as a permanent secret named{" "}
+              <code className="bg-muted px-1 rounded">GH_REPO_ADMIN_TOKEN</code> inside the
+              repository (required once so the workflow can create signing secrets automatically
+              in GitHub).
             </span>
           </label>
         </CardContent>
@@ -252,7 +256,7 @@ export default function KeystoreSetup() {
           {busy === "save" && <Loader2 className="size-4 animate-spin" />}
           {busy === "run" && <Loader2 className="size-4 animate-spin" />}
           {!busy && <Rocket className="size-4" />}
-          {cfg.persistToken ? "احفظ التوكن وشغّل التوليد" : "شغّل التوليد فقط"}
+          {cfg.persistToken ? "Save Token & Run Build" : "Run Build Only"}
         </Button>
       </div>
 
@@ -261,43 +265,43 @@ export default function KeystoreSetup() {
       <Card>
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
-            <CardTitle className="text-base">آخر تشغيل</CardTitle>
-            <CardDescription>اضغط تحديث لجلب الحالة من GitHub.</CardDescription>
+            <CardTitle className="text-base">Latest Run</CardTitle>
+            <CardDescription>Click Refresh to fetch status from GitHub.</CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={handleRefresh} disabled={busy !== null}>
             {busy === "refresh" ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
-            تحديث
+            Refresh
           </Button>
         </CardHeader>
         <CardContent>
           {latestRun ? (
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">الحالة</span>
+                <span className="text-muted-foreground">Status</span>
                 <span className="font-mono">
                   {latestRun.status} · {latestRun.conclusion ?? "—"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">رقم التشغيل</span>
+                <span className="text-muted-foreground">Run Number</span>
                 <span className="font-mono">#{latestRun.run_number}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">التاريخ</span>
+                <span className="text-muted-foreground">Date</span>
                 <span className="font-mono text-xs">
-                  {new Date(latestRun.created_at).toLocaleString("ar-EG")}
+                  {new Date(latestRun.created_at).toLocaleString("en-US")}
                 </span>
               </div>
               <Button asChild variant="link" className="h-auto p-0">
                 <a href={latestRun.html_url} target="_blank" rel="noreferrer">
-                  افتح في GitHub <ExternalLink className="size-3 mr-1" />
+                  Open in GitHub <ExternalLink className="size-3 mr-1" />
                 </a>
               </Button>
             </div>
           ) : (
             <Button asChild variant="link" className="h-auto p-0 text-xs">
               <a href={runUrl} target="_blank" rel="noreferrer">
-                افتح صفحة الـ workflow في GitHub <ExternalLink className="size-3 mr-1" />
+                Open workflow page on GitHub <ExternalLink className="size-3 mr-1" />
               </a>
             </Button>
           )}
@@ -306,10 +310,12 @@ export default function KeystoreSetup() {
 
       <Alert>
         <AlertDescription className="text-xs leading-relaxed">
-          بعد نجاح التشغيل لأول مرة: ستجد artifact باسم{" "}
-          <code className="bg-muted px-1 rounded">keystore-backup-DOWNLOAD-AND-DELETE</code> داخل صفحة الـ run —
-          نزّله واحفظه في خزنة آمنة (1Password / Bitwarden). كل البناءات القادمة من workflow{" "}
-          <code className="bg-muted px-1 rounded">Build Android AAB</code> ستستخدم نفس التوقيع تلقائياً.
+          After the first successful run: you will find an artifact named{" "}
+          <code className="bg-muted px-1 rounded">keystore-backup-DOWNLOAD-AND-DELETE</code> inside
+          the run page — download it and store it in a secure vault (1Password / Bitwarden). All
+          subsequent builds from the{" "}
+          <code className="bg-muted px-1 rounded">Build Android AAB</code> workflow will use the
+          same signing key automatically.
         </AlertDescription>
       </Alert>
     </div>
