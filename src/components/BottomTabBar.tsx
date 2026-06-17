@@ -26,13 +26,10 @@ export function BottomTabBar() {
   const tabs = [
     { to: "/", label: "Home", icon: Home, match: (p: string) => p === "/" || p === "/index" },
     {
-      to: "/tools?tab=favorites",
+      to: "/saved",
       label: "Saved",
       icon: Star,
-      match: (p: string) =>
-        p.startsWith("/tools") &&
-        typeof window !== "undefined" &&
-        window.location.search.includes("tab=favorites"),
+      match: (p: string) => p.startsWith("/saved"),
     },
     { to: "/tools", label: "Tools", icon: Wrench, match: (p: string) => p.startsWith("/tools") },
     {
