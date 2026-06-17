@@ -562,7 +562,6 @@ function NotificationsPanel() {
         const ok = req.display === "granted";
         setGranted(ok);
         if (ok) {
-        if (ok) {
           toast.success("Notifications enabled");
         } else {
           toast.message("Notifications disabled", {
