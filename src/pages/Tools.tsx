@@ -471,7 +471,7 @@ export default function Tools() {
         </nav>
       </header>
 
-      <main className="flex-1 px-4 sm:px-5 pt-5 pb-6">
+      <main className="flex-1 px-4 sm:px-5 pt-5 pb-[calc(env(safe-area-inset-bottom,0px)+120px)]">
         <Tabs value={active} onValueChange={setActive} className="w-full">
           <TabsList className="hidden">
             {sections.map((s) => <TabsTrigger key={s.id} value={s.id}>{s.label}</TabsTrigger>)}
