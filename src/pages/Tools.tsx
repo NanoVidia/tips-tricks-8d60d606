@@ -219,6 +219,7 @@ const FDA_FILTERS = ["All", "A", "B", "C", "D", "X"] as const;
 export default function Tools() {
   const [active, setActive] = useState<string>(() => {
     if (typeof window === "undefined") return "calc";
+    if (window.location.pathname.startsWith("/saved")) return "favorites";
     const urlTab = new URLSearchParams(window.location.search).get("tab");
     if (urlTab && sections.some((s) => s.id === urlTab)) return urlTab;
     const saved = window.localStorage.getItem(STORAGE_TAB);
