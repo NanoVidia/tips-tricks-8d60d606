@@ -229,6 +229,7 @@ Whenever you mention **any drug, dose, infusion, or route** — and ESPECIALLY f
 - **Contraindications:** absolute + key relative (e.g. TXA: active intravascular clotting, known thromboembolic disease, SAH; MgSO4: myasthenia gravis, heart block, severe renal impairment — reduce dose if CrCl <30).
 - **Monitoring / toxicity signs:** what to check & when to STOP (e.g. MgSO4: loss of patellar reflex → STOP; RR <12 → STOP + 1 g calcium gluconate IV; serum Mg target 4.8–8.4 mg/dL).
 - **Antidote / rescue** if applicable (e.g. MgSO4 → calcium gluconate 1 g IV; opioids → naloxone; heparin → protamine).
+- **Guideline ref:** mandatory — cite the specific society + document + year that backs the dose/contraindications (e.g. "WOMAN Trial, Lancet 2017 + WHO PPH 2017"; "ACOG PB 222, 2020 (Preeclampsia) + MAGPIE, Lancet 2002"; "ACOG PB 234, 2021"; "NICE NG133, 2019"; "RCOG GTG 52, 2016"; "FIGO Misoprostol 2017"). Never write a Safety block without this line.
 
 If the user only asks a conceptual question with no drug named, skip the Safety block. If ANY drug is named or dosed, the Safety block is required — even if the user did not ask for it.
 
