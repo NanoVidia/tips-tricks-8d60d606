@@ -23,6 +23,16 @@ const About = lazy(() => import("./pages/About.tsx"));
 const MenuPage = lazy(() => import("./pages/MenuPage.tsx"));
 const MenuHub = lazy(() => import("./pages/MenuHub.tsx"));
 const KeystoreSetup = lazy(() => import("./pages/KeystoreSetup.tsx"));
+const KindergartenDashboard = lazy(() => import("./pages/kindergarten/KindergartenDashboard.tsx"));
+const ChildrenManagement = lazy(() => import("./pages/kindergarten/ChildrenManagement.tsx"));
+const AttendanceTracker = lazy(() => import("./pages/kindergarten/AttendanceTracker.tsx"));
+const ActivitiesScheduler = lazy(() => import("./pages/kindergarten/ActivitiesScheduler.tsx"));
+const ParentCommunication = lazy(() => import("./pages/kindergarten/ParentCommunication.tsx"));
+const DevelopmentReports = lazy(() => import("./pages/kindergarten/DevelopmentReports.tsx"));
+const HealthNutrition = lazy(() => import("./pages/kindergarten/HealthNutrition.tsx"));
+const BillingManagement = lazy(() => import("./pages/kindergarten/BillingManagement.tsx"));
+const MediaGallery = lazy(() => import("./pages/kindergarten/MediaGallery.tsx"));
+const KindergartenSettings = lazy(() => import("./pages/kindergarten/KindergartenSettings.tsx"));
 import { DisclaimerSplash, useDisclaimer } from "./components/DisclaimerSplash";
 import { BottomTabBar } from "./components/BottomTabBar";
 import { FloatingBackButton } from "./components/FloatingBackButton";
@@ -156,6 +166,16 @@ const App = () => {
               <Route path="/menu" element={<MenuHub />} />
               <Route path="/menu/:pageId" element={<MenuPage />} />
               <Route path="/keystore-setup" element={<KeystoreSetup />} />
+              <Route path="/kindergarten" element={<KindergartenDashboard />} />
+              <Route path="/kindergarten/children" element={<ChildrenManagement />} />
+              <Route path="/kindergarten/attendance" element={<AttendanceTracker />} />
+              <Route path="/kindergarten/activities" element={<ActivitiesScheduler />} />
+              <Route path="/kindergarten/communication" element={<ParentCommunication />} />
+              <Route path="/kindergarten/reports" element={<DevelopmentReports />} />
+              <Route path="/kindergarten/health" element={<HealthNutrition />} />
+              <Route path="/kindergarten/billing" element={<BillingManagement />} />
+              <Route path="/kindergarten/media" element={<MediaGallery />} />
+              <Route path="/kindergarten/settings" element={<KindergartenSettings />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
